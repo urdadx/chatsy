@@ -8,6 +8,7 @@ import {
   Magnet,
   PaletteIcon,
   Settings2,
+  Zap,
 } from "lucide-react";
 import type * as React from "react";
 
@@ -25,6 +26,7 @@ import { Outlet } from "@tanstack/react-router";
 import { useLocation } from "@tanstack/react-router";
 import { ChatPreview } from "./chat-preview";
 import { NavMain } from "./nav-main";
+import { Navbar } from "./navbar";
 import { UpgradeBanner } from "./upgrade-banner";
 import { UserDropdown } from "./user-dropdown";
 
@@ -57,7 +59,11 @@ const data = {
       url: "/admin/playground",
       icon: Flame,
     },
-
+    {
+      title: "Actions",
+      url: "/admin/actions",
+      icon: Zap,
+    },
     {
       title: "Branding",
       url: "/admin/branding",
@@ -74,11 +80,7 @@ const data = {
       url: "/admin/leads",
       icon: Magnet,
     },
-    {
-      title: "Integrations",
-      url: "/admin/integrations",
-      icon: Blocks,
-    },
+
     {
       title: "Settings",
       url: "/admin/settings",
@@ -118,6 +120,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
+        <Navbar />
         <div className="flex flex-row h-full">
           <Outlet />
           {(isPlaygroundPage || isBrandingPage) && <ChatPreview />}

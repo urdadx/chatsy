@@ -17,9 +17,9 @@ import { Route as OnboardingIndexImport } from './routes/onboarding/index'
 import { Route as AdminSettingsImport } from './routes/admin/settings'
 import { Route as AdminPlaygroundImport } from './routes/admin/playground'
 import { Route as AdminLeadsImport } from './routes/admin/leads'
-import { Route as AdminIntegrationsImport } from './routes/admin/integrations'
 import { Route as AdminBrandingImport } from './routes/admin/branding'
 import { Route as AdminAnalyticsImport } from './routes/admin/analytics'
+import { Route as AdminActionsImport } from './routes/admin/actions'
 
 // Create/Update Routes
 
@@ -59,12 +59,6 @@ const AdminLeadsRoute = AdminLeadsImport.update({
   getParentRoute: () => AdminRouteRoute,
 } as any)
 
-const AdminIntegrationsRoute = AdminIntegrationsImport.update({
-  id: '/integrations',
-  path: '/integrations',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-
 const AdminBrandingRoute = AdminBrandingImport.update({
   id: '/branding',
   path: '/branding',
@@ -74,6 +68,12 @@ const AdminBrandingRoute = AdminBrandingImport.update({
 const AdminAnalyticsRoute = AdminAnalyticsImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+
+const AdminActionsRoute = AdminActionsImport.update({
+  id: '/actions',
+  path: '/actions',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 
@@ -95,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRoute
     }
+    '/admin/actions': {
+      id: '/admin/actions'
+      path: '/actions'
+      fullPath: '/admin/actions'
+      preLoaderRoute: typeof AdminActionsImport
+      parentRoute: typeof AdminRouteImport
+    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/analytics'
@@ -107,13 +114,6 @@ declare module '@tanstack/react-router' {
       path: '/branding'
       fullPath: '/admin/branding'
       preLoaderRoute: typeof AdminBrandingImport
-      parentRoute: typeof AdminRouteImport
-    }
-    '/admin/integrations': {
-      id: '/admin/integrations'
-      path: '/integrations'
-      fullPath: '/admin/integrations'
-      preLoaderRoute: typeof AdminIntegrationsImport
       parentRoute: typeof AdminRouteImport
     }
     '/admin/leads': {
@@ -150,18 +150,18 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AdminRouteRouteChildren {
+  AdminActionsRoute: typeof AdminActionsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminBrandingRoute: typeof AdminBrandingRoute
-  AdminIntegrationsRoute: typeof AdminIntegrationsRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminPlaygroundRoute: typeof AdminPlaygroundRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminActionsRoute: AdminActionsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminBrandingRoute: AdminBrandingRoute,
-  AdminIntegrationsRoute: AdminIntegrationsRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminPlaygroundRoute: AdminPlaygroundRoute,
   AdminSettingsRoute: AdminSettingsRoute,
@@ -174,9 +174,9 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
-  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -186,9 +186,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
-  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -199,9 +199,9 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
-  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -213,9 +213,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/admin/actions'
     | '/admin/analytics'
     | '/admin/branding'
-    | '/admin/integrations'
     | '/admin/leads'
     | '/admin/playground'
     | '/admin/settings'
@@ -224,9 +224,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/admin/actions'
     | '/admin/analytics'
     | '/admin/branding'
-    | '/admin/integrations'
     | '/admin/leads'
     | '/admin/playground'
     | '/admin/settings'
@@ -235,9 +235,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/admin/actions'
     | '/admin/analytics'
     | '/admin/branding'
-    | '/admin/integrations'
     | '/admin/leads'
     | '/admin/playground'
     | '/admin/settings'
@@ -278,13 +278,17 @@ export const routeTree = rootRoute
     "/admin": {
       "filePath": "admin/route.tsx",
       "children": [
+        "/admin/actions",
         "/admin/analytics",
         "/admin/branding",
-        "/admin/integrations",
         "/admin/leads",
         "/admin/playground",
         "/admin/settings"
       ]
+    },
+    "/admin/actions": {
+      "filePath": "admin/actions.tsx",
+      "parent": "/admin"
     },
     "/admin/analytics": {
       "filePath": "admin/analytics.tsx",
@@ -292,10 +296,6 @@ export const routeTree = rootRoute
     },
     "/admin/branding": {
       "filePath": "admin/branding.tsx",
-      "parent": "/admin"
-    },
-    "/admin/integrations": {
-      "filePath": "admin/integrations.tsx",
       "parent": "/admin"
     },
     "/admin/leads": {

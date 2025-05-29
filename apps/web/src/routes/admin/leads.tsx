@@ -8,7 +8,7 @@ export const Route = createFileRoute("/admin/leads")({
 function RouteComponent() {
   return (
     <div className="max-w-4xl w-full max-h-screen mx-auto py-4">
-      <h1 className="text-lg font-semibold my-2">Leads</h1>
+      {/* <h1 className="text-lg font-semibold my-2">Leads</h1> */}
       <span className="text-sm text-muted-foreground">
         Manage your leads, track their interactions, and convert them into
         customers.

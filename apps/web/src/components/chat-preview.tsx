@@ -37,7 +37,7 @@ export function ChatPreview() {
   const inputLength = input.trim().length;
 
   return (
-    <div className="flex h-full w-[35%] border-l border-dashed items-center justify-center p-3">
+    <div className=" h-full w-[35%] border-l border-dashed items-center justify-center p-3 hidden md:flex">
       <Card className="h-[550px] ">
         <CardHeader className="flex flex-row items-center border-b">
           <div className="flex items-center space-x-2">

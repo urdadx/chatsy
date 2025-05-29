@@ -8,7 +8,7 @@ export const Route = createFileRoute("/admin/branding")({
 function RouteComponent() {
   return (
     <div className="max-w-2xl w-full max-h-screen mx-auto py-4">
-      <h1 className="text-lg font-semibold my-2">Branding</h1>
+      {/* <h1 className="text-lg font-semibold my-2">Branding</h1> */}
       <span className="text-sm text-muted-foreground">
         Customize your bot's appearance, including colors, logo, and more.
       </span>
