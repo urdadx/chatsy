@@ -108,7 +108,7 @@ export const BotQuestions = () => {
           <AddQuestions />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {botQuestions.map((question) => {
             const isActive = questionStates[question.id];
 
@@ -116,7 +116,7 @@ export const BotQuestions = () => {
               <motion.div
                 key={question.id}
                 className={cn(
-                  "group w-full max-w-[320px] h-fit bg-white rounded-2xl border-2 border-purple-100 shadow-xs hover:shadow-sm transition-all duration-200 overflow-hidden relative",
+                  "group h-fit bg-white rounded-2xl border-2 border-purple-100 shadow-xs hover:shadow-sm transition-all duration-200 overflow-hidden relative",
                   !isActive && "opacity-50",
                 )}
               >

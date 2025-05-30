@@ -14,7 +14,7 @@ export const StepThree = () => {
               Common Questions
             </h1>
             <p className="text-start  text-muted-foreground">
-              Add common questions your fans ask
+              What questions do your fans ask most?
             </p>
           </div>
           <div className="grid gap-2">

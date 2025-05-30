@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 
 import { seo } from "@/lib/seo";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
@@ -54,10 +55,12 @@ function RootDocument() {
       </head>
       <body>
         <div className="grid h-svh grid-rows-[auto_1fr]">
-          <Outlet />
+          <TooltipProvider>
+            <Outlet />
+          </TooltipProvider>
         </div>
         <Toaster richColors />
-        <ReactQueryDevtools position="right" initialIsOpen={false} />
+        {/* <ReactQueryDevtools position="right" initialIsOpen={false} /> */}
         <Scripts />
       </body>
     </html>

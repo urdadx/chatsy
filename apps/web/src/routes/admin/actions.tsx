@@ -1,9 +1,7 @@
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { MoreVertical } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/admin/actions")({
@@ -76,7 +74,6 @@ function RouteComponent() {
 
   return (
     <div className="max-w-4xl w-full max-h-screen mx-auto py-4">
-      {/* <h1 className="text-lg font-semibold my-2">Actions</h1> */}
       <span className="text-sm text-muted-foreground">
         Integrate your bot with various services to enhance its capabilities.
       </span>
@@ -88,7 +85,7 @@ function RouteComponent() {
             <motion.div
               key={action.id}
               className={cn(
-                "group w-full max-w-[300px] bg-white rounded-2xl border-2 border-purple-100 shadow-xs hover:shadow-sm transition-all duration-200 overflow-visible relative",
+                "group w-full bg-white rounded-2xl border-2 border-purple-100 shadow-xs hover:shadow-sm transition-all duration-200 overflow-visible relative",
                 !isActive && "opacity-50",
               )}
             >
@@ -105,20 +102,6 @@ function RouteComponent() {
                     <h3 className="font-normal text-sm leading-5 truncate">
                       {action.title}
                     </h3>
-                  </div>
-                  <div className="relative">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="shadow-none transition-opacity flex-shrink-0 h-8 w-8"
-                      aria-label={`Open edit menu for ${action.title}`}
-                    >
-                      <MoreVertical
-                        size={14}
-                        strokeWidth={2}
-                        aria-hidden="true"
-                      />
-                    </Button>
                   </div>
                 </div>
 

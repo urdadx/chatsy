@@ -13,7 +13,7 @@ export const Navbar = () => {
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 border-b">
         <div className="flex items-center gap-2 px-4 capitalize">
-          <p className="text-lg font-semibold capitalize">{headerName}</p>
+          <h2 className="text-md font-semibold capitalize">{headerName}</h2>
         </div>
       </header>
     </>

@@ -1,4 +1,5 @@
-import OnboardFirstPhoto from "@/assets/svgs/thinking-girl.svg";
+import GirlPointing from "@/assets/svgs/girl-pointing";
+import OnboardFirstPhoto from "@/assets/svgs/girl-pointing.svg";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { cn } from "@/lib/utils";
@@ -18,11 +19,11 @@ export function OnboardForm({
             </div>
           </div>
           <div className="relative hidden  md:block">
-            <img
-              src={OnboardFirstPhoto}
-              alt="side"
-              className="absolute inset-0 h-full w-full object-contain "
-            />
+            <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent">
+              <div className="flex items-center justify-center h-full">
+                <GirlPointing className="w-full h-full object-cover" />
+              </div>
+            </div>
           </div>{" "}
         </CardContent>
       </Card>

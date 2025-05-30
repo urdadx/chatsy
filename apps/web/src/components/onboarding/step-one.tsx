@@ -1,4 +1,3 @@
-import { containerVariants } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -6,7 +5,7 @@ import { Textarea } from "../ui/textarea";
 
 export const StepOne = () => {
   return (
-    <motion.div initial="hidden" animate="visible" variants={containerVariants}>
+    <motion.div initial="hidden" animate="visible">
       <form className="pt-6">
         <div className="flex flex-col gap-6">
           <div className="flex flex-col">

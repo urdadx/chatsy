@@ -1,6 +1,5 @@
 import {
   AudioWaveform,
-  Blocks,
   ChartNoAxesColumnIncreasing,
   Command,
   Flame,
@@ -123,7 +122,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <Navbar />
         <div className="flex flex-row h-full">
           <Outlet />
-          {(isPlaygroundPage || isBrandingPage) && <ChatPreview />}
+          <ChatPreview />
+          {/* {(isPlaygroundPage || isBrandingPage) && <ChatPreview />} */}
         </div>
       </SidebarInset>
     </SidebarProvider>

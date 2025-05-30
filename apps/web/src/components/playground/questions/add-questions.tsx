@@ -28,13 +28,13 @@ export const AddQuestions = () => {
         </motion.div>
       </DialogTrigger>
 
-      <DialogContent className="w-full">
+      <DialogContent className="w-full sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add question</DialogTitle>
         </DialogHeader>
         <form className="w-full space-y-4">
           <div className="flex flex-col space-y-2">
-            <label htmlFor="question" className="text-sm  font-medium">
+            <label htmlFor="question" className="text-sm font-medium">
               Question
             </label>
             <Input

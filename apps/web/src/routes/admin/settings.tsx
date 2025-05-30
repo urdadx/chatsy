@@ -8,7 +8,6 @@ export const Route = createFileRoute("/admin/settings")({
 function RouteComponent() {
   return (
     <div className="max-w-4xl w-full max-h-screen mx-auto py-4">
-      {/* <h1 className="text-lg font-semibold my-2">Settings</h1> */}
       <span className="text-sm text-muted-foreground">
         View and manage your workspace settings.
       </span>
