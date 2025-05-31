@@ -5,7 +5,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Link, useLocation } from "@tanstack/react-router";
-import type { LucideIcon } from "lucide-react";
 
 export function NavMain({
   items,
@@ -13,7 +12,7 @@ export function NavMain({
   items: {
     title: string;
     url: string;
-    icon?: LucideIcon;
+    icon?: any;
     items?: {
       title: string;
       url: string;

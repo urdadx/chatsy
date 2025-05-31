@@ -26,9 +26,9 @@ export function AccountSettings() {
 
       <div className="space-y-3">
         <div className="flex flex-col gap-2">
-          <h2 className="text-md font-semibold text-gray-900">
+          {/* <h2 className="text-md font-semibold text-gray-900">
             Deactivate account
-          </h2>
+          </h2> */}
           <p className="text-sm text-gray-600">
             Deactivating your account will remove all your data
           </p>

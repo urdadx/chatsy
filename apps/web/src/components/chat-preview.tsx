@@ -75,8 +75,8 @@ export function ChatPreview() {
             exit={{ opacity: 0, scale: 0.8 }}
             style={{ transformOrigin: "bottom right" }}
           >
-            <Card className="w-[400px] h-[550px] shadow-lg border-1 py-3">
-              <div className="flex flex-row items-center border-b justify-between px-2 pb-2">
+            <Card className="w-[400px] h-[550px] shadow-lg border-1 py-0 ">
+              <div className="bg-primary p-3 text-white flex flex-row items-center border-b justify-between px-2 pb-2 rounded-t-xl">
                 <p className="font-normal px-1 text-sm">Chat Preview</p>
                 <div>
                   <Tooltip>
@@ -90,7 +90,12 @@ export function ChatPreview() {
                         <span className="sr-only">Close chat</span>
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="top">Close</TooltipContent>
+                    <TooltipContent
+                      className="bg-white text-primary"
+                      side="top"
+                    >
+                      Close
+                    </TooltipContent>
                   </Tooltip>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -103,7 +108,12 @@ export function ChatPreview() {
                         <span className="sr-only">Close chat</span>
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="top">Reset chat</TooltipContent>
+                    <TooltipContent
+                      className="bg-white text-primary"
+                      side="top"
+                    >
+                      Reset chat
+                    </TooltipContent>
                   </Tooltip>
                 </div>
               </div>
@@ -179,7 +189,7 @@ export function ChatPreview() {
                     <span className="sr-only">Send</span>
                   </Button>
                 </form>
-                <div className="flex py-1 items-center justify-center text-xs text-muted-foreground">
+                <div className="flex py-2 items-center justify-center text-xs text-muted-foreground">
                   <span>Powered by </span>
                   <a
                     href="https://chatsy.me"

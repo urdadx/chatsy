@@ -51,11 +51,13 @@
         "noBannedTypes": "off"
       },
       "style": {
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "useSelfClosingElements": "off"
       },
       "a11y": {
         "useKeyWithClickEvents": "off",
-        "useKeyWithMouseEvents": "off"
+        "useKeyWithMouseEvents": "off",
+        "noSvgWithoutTitle": "off"
       }
     }
   },

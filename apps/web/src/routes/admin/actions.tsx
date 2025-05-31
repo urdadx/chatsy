@@ -31,7 +31,7 @@ const botActions: BotAction[] = [
   {
     id: "link-socials",
     emoji: "🔗",
-    title: "Link socials",
+    title: "Link my socials",
     defaultActive: true,
   },
   {

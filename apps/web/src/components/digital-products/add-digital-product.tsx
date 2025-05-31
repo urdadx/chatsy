@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { CirclePlus, Upload, X } from "lucide-react";
+import { CirclePlus, ImageIcon, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { Label } from "../ui/label";
 
@@ -58,7 +58,7 @@ export const AddDigitalProduct = () => {
               <Input
                 id="title"
                 type="text"
-                placeholder="Enter product name (e.g: My Digital Course)"
+                placeholder="Enter product name"
                 className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
@@ -81,7 +81,7 @@ export const AddDigitalProduct = () => {
                   onClick={() => fileInputRef.current?.click()}
                   className="flex items-center gap-2"
                 >
-                  <Upload className="h-4 w-4" />
+                  <ImageIcon className="h-4 w-4" />
                   Upload Image
                 </Button>
 
