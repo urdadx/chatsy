@@ -10,8 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, InfoIcon } from "lucide-react";
 import { useState } from "react";
 
 export const AddQuestions = () => {
@@ -30,7 +35,7 @@ export const AddQuestions = () => {
 
       <DialogContent className="w-full sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add question</DialogTitle>
+          <DialogTitle className="text-md">Add question</DialogTitle>
         </DialogHeader>
         <form className="w-full space-y-4">
           <div className="flex flex-col space-y-2">
@@ -57,6 +62,16 @@ export const AddQuestions = () => {
           <div className="flex items-center space-x-2">
             <Switch id="suggestion" checked={true} />
             <Label htmlFor="suggestion">Make this a suggestion</Label>
+            <div className="flex items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Your bot will recommend this message to visitors</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
           <div className="flex w-full">
             <Button className="w-full" type="submit">

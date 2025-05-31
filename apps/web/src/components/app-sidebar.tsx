@@ -22,7 +22,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { Outlet } from "@tanstack/react-router";
-import { useLocation } from "@tanstack/react-router";
 import { ChatPreview } from "./chat-preview";
 import { NavMain } from "./nav-main";
 import { Navbar } from "./navbar";
@@ -89,13 +88,6 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const location = useLocation({
-    select: (location) => location.pathname,
-  });
-
-  const isBrandingPage = location.startsWith("/admin/branding");
-  const isPlaygroundPage = location.startsWith("/admin/playground");
-
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon" {...props}>
@@ -123,7 +115,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <div className="flex flex-row h-full">
           <Outlet />
           <ChatPreview />
-          {/* {(isPlaygroundPage || isBrandingPage) && <ChatPreview />} */}
         </div>
       </SidebarInset>
     </SidebarProvider>

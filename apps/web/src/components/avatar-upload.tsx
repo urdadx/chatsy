@@ -197,7 +197,7 @@ export function AvatarUpload() {
         {/* Drop area - uses finalImageUrl */}
         <button
           type="button"
-          className="border-primary bprd hover:bg-accent/50 data-[dragging=true]:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/50 relative flex size-16 items-center justify-center overflow-hidden rounded-full border border-dashed transition-colors outline-none focus-visible:ring-[3px] has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none"
+          className="border-primary h-14 w-14 bprd hover:bg-accent/50 data-[dragging=true]:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/50 relative flex size-16 items-center justify-center overflow-hidden rounded-full border border-dashed transition-colors outline-none focus-visible:ring-[3px] has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none"
           onClick={openFileDialog}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}

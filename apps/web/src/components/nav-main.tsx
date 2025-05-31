@@ -38,7 +38,7 @@ export function NavMain({
                     tooltip={item.title}
                     className={
                       isMainItemActive
-                        ? "bg-purple-100 dark:bg-purple-900/30"
+                        ? "bg-purple-50 dark:bg-purple-900/30"
                         : ""
                     }
                   >

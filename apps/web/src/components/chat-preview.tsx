@@ -76,33 +76,36 @@ export function ChatPreview() {
             style={{ transformOrigin: "bottom right" }}
           >
             <Card className="w-[400px] h-[550px] shadow-lg border-1 py-3">
-              <div className="flex flex-row items-center border-b justify-end px-2 pb-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <X className="h-4 w-4" />
-                      <span className="sr-only">Close chat</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Close</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <RefreshCcw className="h-4 w-4" />
-                      <span className="sr-only">Close chat</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Reset chat</TooltipContent>
-                </Tooltip>
+              <div className="flex flex-row items-center border-b justify-between px-2 pb-2">
+                <p className="font-normal px-1 text-sm">Chat Preview</p>
+                <div>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <X className="h-4 w-4" />
+                        <span className="sr-only">Close chat</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">Close</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <RefreshCcw className="h-4 w-4" />
+                        <span className="sr-only">Close chat</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">Reset chat</TooltipContent>
+                  </Tooltip>
+                </div>
               </div>
 
               <ScrollArea className="flex-1 h-[320px]">

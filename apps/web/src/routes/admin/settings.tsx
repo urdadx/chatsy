@@ -1,5 +1,9 @@
+import { AccountSettings } from "@/components/settings/account-settings";
+import { Billing } from "@/components/settings/billing-page";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createFileRoute } from "@tanstack/react-router";
+import { Mail } from "lucide-react";
 
 export const Route = createFileRoute("/admin/settings")({
   component: RouteComponent,
@@ -7,9 +11,10 @@ export const Route = createFileRoute("/admin/settings")({
 
 function RouteComponent() {
   return (
-    <div className="max-w-4xl w-full max-h-screen mx-auto py-4">
+    <div className="max-w-3xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
       <span className="text-sm text-muted-foreground">
-        View and manage your workspace settings.
+        Manage your workspace settings, update your profile and billing
+        information.
       </span>
       <Tabs defaultValue="tab-1" className="w-full mt-6">
         <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0 ">
@@ -17,14 +22,9 @@ function RouteComponent() {
             value="tab-1"
             className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
-            General
-          </TabsTrigger>
-          <TabsTrigger
-            value="tab-2"
-            className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-          >
             Account
           </TabsTrigger>
+
           <TabsTrigger
             value="tab-3"
             className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
@@ -39,16 +39,27 @@ function RouteComponent() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="tab-1">
-          <p className="text-muted-foreground p-4 text-xs">Content for Tab 1</p>
+          <AccountSettings />
         </TabsContent>
-        <TabsContent value="tab-2">
-          <p className="text-muted-foreground p-4 text-xs">Content for Tab 2</p>
-        </TabsContent>
+
         <TabsContent value="tab-3">
-          <p className="text-muted-foreground p-4 text-xs">Content for Tab 3</p>
+          <Billing />
         </TabsContent>
         <TabsContent value="tab-4">
-          <p className="text-muted-foreground p-4 text-xs">Content for Tab 4</p>
+          <p className="text-muted-foreground py-4 text-sm">
+            Help us improve <span className="text-primary">Chatsy</span> by
+            sharing your feedback.
+          </p>
+          <a
+            href="https://urdadx.userjot.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button>
+              <Mail className="h-4 w-4" />
+              Submit Feedback
+            </Button>
+          </a>
         </TabsContent>
       </Tabs>
     </div>

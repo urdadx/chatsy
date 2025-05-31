@@ -94,29 +94,6 @@ const multiColumnFilterFn: FilterFn<Item> = (row, filterValue) => {
 
 const columns: ColumnDef<Item>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    size: 28,
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
     header: "Name",
     accessorKey: "name",
     cell: ({ row }) => (
@@ -304,10 +281,13 @@ export function LeadsTable() {
             </AlertDialog>
           )}
           {/* Add leads button */}
-          <Button className="ml-auto">
-            <PlusIcon className="-ms-1" size={16} aria-hidden="true" />
-            Add new lead
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button className="ml-auto">
+              <PlusIcon size={16} aria-hidden="true" />
+              Add Leads
+            </Button>
+            <Button variant="outline">Export CSV</Button>
+          </div>
         </div>
       </div>
 
@@ -541,6 +521,9 @@ function RowActions({ row }: { row: Row<Item> }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <span>View details</span>
+          </DropdownMenuItem>
           <DropdownMenuItem>
             <span>Edit details</span>
           </DropdownMenuItem>

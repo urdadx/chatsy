@@ -23,6 +23,12 @@ const botActions: BotAction[] = [
     defaultActive: true,
   },
   {
+    id: "pitch my product",
+    emoji: "📢",
+    title: "Pitch my products",
+    defaultActive: true,
+  },
+  {
     id: "link-socials",
     emoji: "🔗",
     title: "Link socials",
@@ -73,9 +79,9 @@ function RouteComponent() {
   };
 
   return (
-    <div className="max-w-4xl w-full max-h-screen mx-auto py-4">
+    <div className="max-w-3xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
       <span className="text-sm text-muted-foreground">
-        Integrate your bot with various services to enhance its capabilities.
+        Enhance your bot's capabilities with tools and actions
       </span>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">

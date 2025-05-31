@@ -103,12 +103,12 @@ export const BotQuestions = () => {
   return (
     <>
       <div className="w-full flex flex-col mt-5 gap-5">
-        <div className="flex justify-between items-center w-full gap-3">
+        <div className="flex flex-row justify-between items-center w-full gap-3">
           <SearchQuestions />
           <AddQuestions />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {botQuestions.map((question) => {
             const isActive = questionStates[question.id];
 
@@ -122,7 +122,7 @@ export const BotQuestions = () => {
               >
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <h3 className="font-normal text-sm text-gray-900 leading-5 flex-1 min-w-0">
+                    <h3 className="font-normal text-sm text-gray-900 leading-5 flex-1 min-w-0 line-clamp-2">
                       {question.question}
                     </h3>
                     <QuestionCardOptions
@@ -173,6 +173,7 @@ export const BotQuestions = () => {
             </div>
           </div>
         )}
+        <div className="h-[16px]" />
       </div>
     </>
   );

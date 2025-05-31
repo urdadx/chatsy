@@ -7,9 +7,9 @@ export const Route = createFileRoute("/admin/analytics")({
 
 function RouteComponent() {
   return (
-    <div className="max-w-4xl w-full max-h-screen mx-auto py-4">
+    <div className="max-w-3xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
       <span className="text-sm text-muted-foreground">
-        View detailed of your bot analytics and chat history
+        Track and get insights on your bot's performance
       </span>
       <Tabs defaultValue="tab-1" className="w-full mt-6">
         <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0 ">
@@ -17,13 +17,13 @@ function RouteComponent() {
             value="tab-1"
             className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
-            Chat analytics
+            Analytics
           </TabsTrigger>
           <TabsTrigger
             value="tab-2"
             className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
-            All conversations
+            Chat history
           </TabsTrigger>
         </TabsList>
         <TabsContent value="tab-1">
