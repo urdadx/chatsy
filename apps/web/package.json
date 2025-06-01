@@ -9,6 +9,7 @@
 		"dev": "vinxi dev --port=3001"
 	},
 	"dependencies": {
+		"@number-flow/react": "^0.5.9",
 		"@origin-space/image-cropper": "^0.1.9",
 		"@radix-ui/react-accordion": "^1.2.11",
 		"@radix-ui/react-alert-dialog": "^1.1.14",

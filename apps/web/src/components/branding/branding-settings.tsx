@@ -17,11 +17,21 @@ import {
 import { InfoIcon } from "lucide-react";
 import { useState } from "react";
 import { AvatarUpload } from "../avatar-upload";
+import { ColorPickerDialog } from "../onboarding/pick-color-dialog";
 import { Separator } from "../ui/separator";
 
 export function BrandingSettings() {
+  const colors = [
+    "#8b5cf6",
+    "#6366f1",
+    "#3b82f6",
+    "#10b981",
+    "#f97316",
+    "#ec4899",
+  ];
+
   const [name, setName] = useState("urdadx");
-  const [primaryColor, setPrimaryColor] = useState("red");
+  const [primaryColor, setPrimaryColor] = useState(colors[0]);
   const [theme, setTheme] = useState("Dark");
   const [hidePoweredBy, setHidePoweredBy] = useState(false);
 
@@ -49,33 +59,35 @@ export function BrandingSettings() {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <Label htmlFor="primary-color">Primary Color</Label>
-          <Select value={primaryColor} onValueChange={setPrimaryColor}>
-            <SelectTrigger id="primary-color" className="w-[300px]">
-              <div className="flex items-center gap-2">
-                <SelectValue />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="red">
+          <div className="flex items-center gap-2">
+            <Select value={primaryColor} onValueChange={setPrimaryColor}>
+              <SelectTrigger id="primary-color" className="w-[260px]">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-red-500" />
-                  <span>Red</span>
+                  <SelectValue />
                 </div>
-              </SelectItem>
-              <SelectItem value="blue">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-blue-500" />
-                  <span>Blue</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="green">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-green-500" />
-                  <span>Green</span>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+              </SelectTrigger>
+              <SelectContent>
+                {colors?.map((color: string, index: number) => {
+                  return (
+                    <>
+                      <SelectItem key={index} value={color}>
+                        <div className="flex items-center gap-2">
+                          <div
+                            style={{
+                              backgroundColor: `${color}`,
+                            }}
+                            className="w-4 h-4 rounded-full"
+                          />
+                          <span className="capitalize">Purple</span>
+                        </div>
+                      </SelectItem>
+                    </>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            <ColorPickerDialog />
+          </div>
         </div>
         <Separator className="my-3" />
 

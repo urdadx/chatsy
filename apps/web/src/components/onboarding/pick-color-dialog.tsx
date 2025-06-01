@@ -6,9 +6,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Palette, Plus } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight, Palette, Plus } from "lucide-react";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
+import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 
 export const ColorPickerDialog = () => {
@@ -76,7 +78,7 @@ export const ColorPickerDialog = () => {
               htmlFor="hex-input"
               className="text-sm font-medium text-gray-700"
             >
-              Color code
+              Or paste the color code here👇
             </Label>
             <div className="flex gap-2">
               <Input
@@ -87,7 +89,7 @@ export const ColorPickerDialog = () => {
                 className="font-mono"
               />
               <div
-                className="w-10 h-10 rounded-md border-2 border-gray-200 flex-shrink-0"
+                className="w-10 h-10 rounded-full border-2 border-gray-200 flex-shrink-0"
                 style={{ backgroundColor: color }}
               />
             </div>
@@ -96,6 +98,12 @@ export const ColorPickerDialog = () => {
                 Please enter a valid color color (e.g., #6366f1 or 6366f1)
               </p>
             )}
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button className="w-full">
+                {" "}
+                Continue <ArrowRight className=" h-4 w-4" />
+              </Button>
+            </motion.div>
           </div>
         </div>
       </DialogContent>

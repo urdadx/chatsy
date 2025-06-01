@@ -1,8 +1,6 @@
 import { cn, containerVariants } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { BotLogoUpload } from "../bot-logo-upload";
-import { Label } from "../ui/label";
 import { ColorPickerDialog } from "./pick-color-dialog";
 
 export const StepTwo = () => {
@@ -43,11 +41,6 @@ export const StepTwo = () => {
           ))}
           <ColorPickerDialog />
         </div>
-        {/* <div className="flex flex-col gap-2 pt-6">
-          <Label className="text-md text-muted-foreground">Bot Logo</Label>
-
-          <BotLogoUpload />
-        </div> */}
       </div>
     </motion.div>
   );

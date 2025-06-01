@@ -1,5 +1,4 @@
 import GirlPointing from "@/assets/svgs/girl-pointing";
-import OnboardFirstPhoto from "@/assets/svgs/girl-pointing.svg";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { cn } from "@/lib/utils";

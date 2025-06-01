@@ -60,7 +60,7 @@ function RootDocument() {
           </TooltipProvider>
         </div>
         <Toaster richColors />
-        {/* <ReactQueryDevtools position="right" initialIsOpen={false} /> */}
+        {/* <ReactQueryDevtools position="left" initialIsOpen={false} /> */}
         <Scripts />
       </body>
     </html>

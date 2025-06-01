@@ -73,6 +73,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 type Item = {
   id: string;
@@ -282,10 +283,12 @@ export function LeadsTable() {
           )}
           {/* Add leads button */}
           <div className="flex items-center gap-3">
-            <Button className="ml-auto">
-              <PlusIcon size={16} aria-hidden="true" />
-              Add Leads
-            </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button className="ml-auto">
+                <PlusIcon size={16} aria-hidden="true" />
+                Add Leads
+              </Button>
+            </motion.div>
             <Button variant="outline">Export CSV</Button>
           </div>
         </div>
@@ -379,7 +382,7 @@ export function LeadsTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No data yet.
                 </TableCell>
               </TableRow>
             )}
