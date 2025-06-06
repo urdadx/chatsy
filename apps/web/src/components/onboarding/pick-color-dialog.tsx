@@ -78,7 +78,7 @@ export const ColorPickerDialog = () => {
               htmlFor="hex-input"
               className="text-sm font-medium text-gray-700"
             >
-              Or paste the color code here👇
+              Or type the color code here👇
             </Label>
             <div className="flex gap-2">
               <Input
@@ -101,7 +101,7 @@ export const ColorPickerDialog = () => {
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button className="w-full">
                 {" "}
-                Continue <ArrowRight className=" h-4 w-4" />
+                I like this <ArrowRight className=" h-4 w-4" />
               </Button>
             </motion.div>
           </div>

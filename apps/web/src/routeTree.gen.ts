@@ -20,6 +20,8 @@ import { Route as AdminLeadsImport } from './routes/admin/leads'
 import { Route as AdminBrandingImport } from './routes/admin/branding'
 import { Route as AdminAnalyticsImport } from './routes/admin/analytics'
 import { Route as AdminActionsImport } from './routes/admin/actions'
+import { Route as AdminChatHistoryIndexImport } from './routes/admin/chat-history/index'
+import { Route as AdminChatHistoryHistoryIdImport } from './routes/admin/chat-history/$historyId'
 
 // Create/Update Routes
 
@@ -74,6 +76,18 @@ const AdminAnalyticsRoute = AdminAnalyticsImport.update({
 const AdminActionsRoute = AdminActionsImport.update({
   id: '/actions',
   path: '/actions',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+
+const AdminChatHistoryIndexRoute = AdminChatHistoryIndexImport.update({
+  id: '/chat-history/',
+  path: '/chat-history/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+
+const AdminChatHistoryHistoryIdRoute = AdminChatHistoryHistoryIdImport.update({
+  id: '/chat-history/$historyId',
+  path: '/chat-history/$historyId',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 
@@ -144,6 +158,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingIndexImport
       parentRoute: typeof rootRoute
     }
+    '/admin/chat-history/$historyId': {
+      id: '/admin/chat-history/$historyId'
+      path: '/chat-history/$historyId'
+      fullPath: '/admin/chat-history/$historyId'
+      preLoaderRoute: typeof AdminChatHistoryHistoryIdImport
+      parentRoute: typeof AdminRouteImport
+    }
+    '/admin/chat-history/': {
+      id: '/admin/chat-history/'
+      path: '/chat-history'
+      fullPath: '/admin/chat-history'
+      preLoaderRoute: typeof AdminChatHistoryIndexImport
+      parentRoute: typeof AdminRouteImport
+    }
   }
 }
 
@@ -156,6 +184,8 @@ interface AdminRouteRouteChildren {
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminPlaygroundRoute: typeof AdminPlaygroundRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminChatHistoryHistoryIdRoute: typeof AdminChatHistoryHistoryIdRoute
+  AdminChatHistoryIndexRoute: typeof AdminChatHistoryIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
@@ -165,6 +195,8 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminLeadsRoute: AdminLeadsRoute,
   AdminPlaygroundRoute: AdminPlaygroundRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminChatHistoryHistoryIdRoute: AdminChatHistoryHistoryIdRoute,
+  AdminChatHistoryIndexRoute: AdminChatHistoryIndexRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
@@ -181,6 +213,8 @@ export interface FileRoutesByFullPath {
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/admin/chat-history/$historyId': typeof AdminChatHistoryHistoryIdRoute
+  '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -193,6 +227,8 @@ export interface FileRoutesByTo {
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/admin/chat-history/$historyId': typeof AdminChatHistoryHistoryIdRoute
+  '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
 
 export interface FileRoutesById {
@@ -206,6 +242,8 @@ export interface FileRoutesById {
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/onboarding/': typeof OnboardingIndexRoute
+  '/admin/chat-history/$historyId': typeof AdminChatHistoryHistoryIdRoute
+  '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -220,6 +258,8 @@ export interface FileRouteTypes {
     | '/admin/playground'
     | '/admin/settings'
     | '/onboarding'
+    | '/admin/chat-history/$historyId'
+    | '/admin/chat-history'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -231,6 +271,8 @@ export interface FileRouteTypes {
     | '/admin/playground'
     | '/admin/settings'
     | '/onboarding'
+    | '/admin/chat-history/$historyId'
+    | '/admin/chat-history'
   id:
     | '__root__'
     | '/'
@@ -242,6 +284,8 @@ export interface FileRouteTypes {
     | '/admin/playground'
     | '/admin/settings'
     | '/onboarding/'
+    | '/admin/chat-history/$historyId'
+    | '/admin/chat-history/'
   fileRoutesById: FileRoutesById
 }
 
@@ -283,7 +327,9 @@ export const routeTree = rootRoute
         "/admin/branding",
         "/admin/leads",
         "/admin/playground",
-        "/admin/settings"
+        "/admin/settings",
+        "/admin/chat-history/$historyId",
+        "/admin/chat-history/"
       ]
     },
     "/admin/actions": {
@@ -312,6 +358,14 @@ export const routeTree = rootRoute
     },
     "/onboarding/": {
       "filePath": "onboarding/index.tsx"
+    },
+    "/admin/chat-history/$historyId": {
+      "filePath": "admin/chat-history/$historyId.tsx",
+      "parent": "/admin"
+    },
+    "/admin/chat-history/": {
+      "filePath": "admin/chat-history/index.tsx",
+      "parent": "/admin"
     }
   }
 }

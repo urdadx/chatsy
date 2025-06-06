@@ -28,14 +28,14 @@ export const AddQuestions = () => {
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button>
             <CirclePlus className="text-white mr-1 font-semibold" />
-            Add question
+            Add a question
           </Button>
         </motion.div>
       </DialogTrigger>
 
       <DialogContent className="w-full sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-md">Add question</DialogTitle>
+          <DialogTitle className="text-md">Add a Q&A</DialogTitle>
         </DialogHeader>
         <form className="w-full space-y-4">
           <div className="flex flex-col space-y-2">
@@ -44,6 +44,7 @@ export const AddQuestions = () => {
             </label>
             <Input
               id="question"
+              autoFocus
               name="question"
               placeholder="Eg: When is the new product launching?"
             />
@@ -73,10 +74,12 @@ export const AddQuestions = () => {
               </Tooltip>
             </div>
           </div>
-          <div className="flex w-full">
-            <Button className="w-full" type="submit">
-              Create
-            </Button>
+          <div className="flex justify-end w-full">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button type="submit" className="bg-purple-600 text-white">
+                Create Q&A
+              </Button>
+            </motion.div>
           </div>
         </form>
       </DialogContent>

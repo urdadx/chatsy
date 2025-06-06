@@ -10,7 +10,7 @@ export const Route = createFileRoute("/admin/branding")({
 function RouteComponent() {
   return (
     <div className="max-w-3xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
-      <span className="text-sm text-muted-foreground">
+      <span className="text-md text-muted-foreground">
         Customize your bot's appearance and manage your domains.
       </span>
       <Tabs defaultValue="tab-1" className="w-full mt-6">

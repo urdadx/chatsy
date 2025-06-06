@@ -31,7 +31,7 @@ const botActions: BotAction[] = [
   {
     id: "link-socials",
     emoji: "🔗",
-    title: "Link my socials",
+    title: "Promote my socials",
     defaultActive: true,
   },
   {
@@ -80,7 +80,7 @@ function RouteComponent() {
 
   return (
     <div className="max-w-3xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
-      <span className="text-sm text-muted-foreground">
+      <span className="text-md text-muted-foreground">
         Enhance your bot's capabilities with tools and actions
       </span>
 

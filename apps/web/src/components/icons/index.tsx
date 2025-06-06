@@ -31,34 +31,7 @@ export * from "./twitter";
 export * from "./unsplash";
 export * from "./youtube";
 
-// Card types
-export * from "./card-amex";
-export * from "./card-discover";
-export * from "./card-mastercard";
-export * from "./card-visa";
-
-// SDKs
-export * from "./go";
-export * from "./php";
-export * from "./python";
-export * from "./ruby";
-export * from "./typescript";
-
 // continent icons
 export * from "./continents";
-
-// dub default domains logos
-export * from "./default-domains/amazon";
-export * from "./default-domains/chatgpt";
-export * from "./default-domains/figma";
-export * from "./default-domains/github-enhanced";
-export * from "./default-domains/google-enhanced";
-export * from "./default-domains/spotify";
-
-// payout platforms
-export * from "./payout-platforms";
-
-// Nucleo icons
-export * from "./nucleo";
 
 export type Icon = LucideIcon | ComponentType<SVGProps<SVGSVGElement>>;

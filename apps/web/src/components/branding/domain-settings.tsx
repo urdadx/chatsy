@@ -32,9 +32,7 @@ export function DomainSettings() {
 
         <div className="p-3 bg-green-50 border border-green-200 rounded-md flex items-center gap-2 text-green-700">
           <Globe className="h-5 w-5 text-green-600 flex-shrink-0" />
-          <p className="text-sm">
-            Upgrade your plan to add your custom domain.
-          </p>
+          <p className="text-sm">Upgrade your plan to add a custom domain.</p>
         </div>
 
         <div className="flex items-center gap-2">

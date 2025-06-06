@@ -5,6 +5,7 @@ import {
   Flame,
   GalleryVerticalEnd,
   Magnet,
+  MessageCircle,
   PaletteIcon,
   Settings2,
   Zap,
@@ -74,6 +75,11 @@ const data = {
       icon: ChartNoAxesColumnIncreasing,
     },
     {
+      title: "Chat History",
+      url: "/admin/chat-history",
+      icon: MessageCircle,
+    },
+    {
       title: "Leads",
       url: "/admin/leads",
       icon: Magnet,
@@ -90,13 +96,13 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon" {...props}>
+      <Sidebar collapsible="offcanvas" {...props}>
         <SidebarHeader>
           <div className="flex gap-2 items-center pb-4">
             <img src={LOGO} alt="logo" className="w-[40px] h-[40px]" />{" "}
             <div className="hidden lg:flex">
               <h1 className="text-xl font-bold instrument-serif-regular-italic">
-                Chatsy
+                maikus
               </h1>
             </div>
           </div>
@@ -112,10 +118,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </Sidebar>
       <SidebarInset>
         <Navbar />
-        <div className="flex flex-row h-full">
-          <Outlet />
-          <ChatPreview />
-        </div>
+        <Outlet />
+        <ChatPreview />
       </SidebarInset>
     </SidebarProvider>
   );

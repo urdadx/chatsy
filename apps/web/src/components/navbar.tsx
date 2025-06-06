@@ -7,8 +7,8 @@ export const Navbar = () => {
   });
 
   const headerName = pathname.startsWith("/admin")
-    ? pathname.replace("/admin/", "")
-    : pathname;
+    ? pathname.replace("/admin/", "").split("/")[0].replace(/-/g, " ")
+    : pathname.replace(/-/g, " ");
 
   return (
     <>

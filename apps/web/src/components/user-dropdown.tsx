@@ -4,6 +4,7 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
+  User,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -44,7 +45,9 @@ export function UserDropdown({
             >
               <Avatar className="h-8 w-8 rounded-full border-2 border-primary">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-full">CN</AvatarFallback>
+                <AvatarFallback>
+                  <User className="h-5 w-5 text-gray-600" />
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-normal">{user.name}</span>

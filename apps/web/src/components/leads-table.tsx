@@ -95,7 +95,7 @@ const multiColumnFilterFn: FilterFn<Item> = (row, filterValue) => {
 
 const columns: ColumnDef<Item>[] = [
   {
-    header: "Name",
+    header: "Customer",
     accessorKey: "name",
     cell: ({ row }) => (
       <div className="font-medium">{row.getValue("name")}</div>

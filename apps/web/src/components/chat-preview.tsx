@@ -1,4 +1,4 @@
-import { ArrowUp, MessageCircle, RefreshCcw, X } from "lucide-react";
+import { ArrowUp, MessageCircle, RefreshCcw, Settings, X } from "lucide-react";
 import * as React from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -104,6 +104,24 @@ export function ChatPreview() {
                         variant="ghost"
                         onClick={() => setIsOpen(false)}
                       >
+                        <Settings />
+                        <span className="sr-only">Close chat</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      className="bg-white text-primary"
+                      side="top"
+                    >
+                      Settings
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setIsOpen(false)}
+                      >
                         <RefreshCcw className="h-4 w-4" />
                         <span className="sr-only">Close chat</span>
                       </Button>
@@ -172,7 +190,7 @@ export function ChatPreview() {
                 >
                   <Input
                     id="message"
-                    placeholder="Type your message..."
+                    placeholder="Chat with me..."
                     className="flex-1"
                     autoComplete="off"
                     autoFocus

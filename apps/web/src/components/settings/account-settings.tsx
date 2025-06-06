@@ -6,7 +6,6 @@ import { Separator } from "../ui/separator";
 export function AccountSettings() {
   return (
     <div className="w-full mx-auto pt-1 space-y-6">
-      {/* Current Plan */}
       <div className="flex items-center gap-3 ">
         <Avatar className="h-10 w-10 border-2 border-primary">
           <AvatarImage
@@ -26,14 +25,11 @@ export function AccountSettings() {
 
       <div className="space-y-3">
         <div className="flex flex-col gap-2">
-          {/* <h2 className="text-md font-semibold text-gray-900">
-            Deactivate account
-          </h2> */}
           <p className="text-sm text-gray-600">
             Deactivating your account will remove all your data
           </p>
         </div>
-        <Button className="text-white bg-red-300 hover:bg-red-500 focus:ring-red-500 focus:ring-offset-red-200">
+        <Button className="text-white bg-red-300 hover:bg-red-500">
           <Trash2 className="h-4 w-4 " />
           Deactivate account
         </Button>

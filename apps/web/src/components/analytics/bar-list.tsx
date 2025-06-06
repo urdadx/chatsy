@@ -106,7 +106,7 @@ export default function BarList({
 
   return (
     <>
-      <ScrollArea className="h-[45vh] z-0 md:h-[45vh] pr-4">
+      <ScrollArea className="h-[45vh] z-0 pr-4">
         {bars}
         <div className="h-8" />
       </ScrollArea>

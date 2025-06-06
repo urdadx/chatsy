@@ -11,7 +11,7 @@ export const Route = createFileRoute("/admin/playground")({
 function RouteComponent() {
   return (
     <div className="max-w-3xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
-      <span className="text-sm text-muted-foreground">
+      <span className="text-md text-muted-foreground">
         Train your bot based on your social links, fan questions, and digital
         products
       </span>
