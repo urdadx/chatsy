@@ -59,7 +59,7 @@ function RootDocument() {
             <Outlet />
           </TooltipProvider>
         </div>
-        <Toaster richColors />
+        <Toaster />
         {/* <ReactQueryDevtools position="left" initialIsOpen={false} /> */}
         <Scripts />
       </body>

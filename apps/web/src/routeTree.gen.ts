@@ -20,6 +20,8 @@ import { Route as AdminLeadsImport } from './routes/admin/leads'
 import { Route as AdminBrandingImport } from './routes/admin/branding'
 import { Route as AdminAnalyticsImport } from './routes/admin/analytics'
 import { Route as AdminActionsImport } from './routes/admin/actions'
+import { Route as authRegisterImport } from './routes/(auth)/register'
+import { Route as authLoginImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexImport } from './routes/admin/chat-history/index'
 import { Route as AdminChatHistoryHistoryIdImport } from './routes/admin/chat-history/$historyId'
 
@@ -79,6 +81,18 @@ const AdminActionsRoute = AdminActionsImport.update({
   getParentRoute: () => AdminRouteRoute,
 } as any)
 
+const authRegisterRoute = authRegisterImport.update({
+  id: '/(auth)/register',
+  path: '/register',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const authLoginRoute = authLoginImport.update({
+  id: '/(auth)/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AdminChatHistoryIndexRoute = AdminChatHistoryIndexImport.update({
   id: '/chat-history/',
   path: '/chat-history/',
@@ -107,6 +121,20 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/(auth)/login': {
+      id: '/(auth)/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof authLoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/(auth)/register': {
+      id: '/(auth)/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof authRegisterImport
       parentRoute: typeof rootRoute
     }
     '/admin/actions': {
@@ -206,6 +234,8 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/login': typeof authLoginRoute
+  '/register': typeof authRegisterRoute
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
@@ -220,6 +250,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/login': typeof authLoginRoute
+  '/register': typeof authRegisterRoute
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
@@ -235,6 +267,8 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/(auth)/login': typeof authLoginRoute
+  '/(auth)/register': typeof authRegisterRoute
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
@@ -251,6 +285,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/login'
+    | '/register'
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/branding'
@@ -264,6 +300,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/login'
+    | '/register'
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/branding'
@@ -277,6 +315,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/(auth)/login'
+    | '/(auth)/register'
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/branding'
@@ -292,12 +332,16 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  authLoginRoute: typeof authLoginRoute
+  authRegisterRoute: typeof authRegisterRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  authLoginRoute: authLoginRoute,
+  authRegisterRoute: authRegisterRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
 }
 
@@ -313,6 +357,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/admin",
+        "/(auth)/login",
+        "/(auth)/register",
         "/onboarding/"
       ]
     },
@@ -331,6 +377,12 @@ export const routeTree = rootRoute
         "/admin/chat-history/$historyId",
         "/admin/chat-history/"
       ]
+    },
+    "/(auth)/login": {
+      "filePath": "(auth)/login.tsx"
+    },
+    "/(auth)/register": {
+      "filePath": "(auth)/register.tsx"
     },
     "/admin/actions": {
       "filePath": "admin/actions.tsx",

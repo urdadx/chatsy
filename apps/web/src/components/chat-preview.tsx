@@ -210,12 +210,12 @@ export function ChatPreview() {
                 <div className="flex py-2 items-center justify-center text-xs text-muted-foreground">
                   <span>Powered by </span>
                   <a
-                    href="https://chatsy.me"
+                    href="https://maikus.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="ml-1 hover:underline text-primary"
                   >
-                    Chatsy
+                    Maikus
                   </a>
                 </div>
               </CardFooter>

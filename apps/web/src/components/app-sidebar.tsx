@@ -1,4 +1,14 @@
 import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarInset,
+  SidebarProvider,
+  SidebarRail,
+} from "@/components/ui/sidebar";
+import { Outlet } from "@tanstack/react-router";
+import {
   AudioWaveform,
   ChartNoAxesColumnIncreasing,
   Command,
@@ -11,19 +21,8 @@ import {
   Zap,
 } from "lucide-react";
 import type * as React from "react";
-
-import LOGO from "@/assets/violet-icon.png";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarInset,
-  SidebarProvider,
-  SidebarRail,
-} from "@/components/ui/sidebar";
-import { Outlet } from "@tanstack/react-router";
 import { ChatPreview } from "./chat-preview";
+import { Logo } from "./logo-image";
 import { NavMain } from "./nav-main";
 import { Navbar } from "./navbar";
 import { UpgradeBanner } from "./upgrade-banner";
@@ -99,7 +98,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <Sidebar collapsible="offcanvas" {...props}>
         <SidebarHeader>
           <div className="flex gap-2 items-center pb-4">
-            <img src={LOGO} alt="logo" className="w-[40px] h-[40px]" />{" "}
+            <Logo />
             <div className="hidden lg:flex">
               <h1 className="text-xl font-bold instrument-serif-regular-italic">
                 maikus
