@@ -6,6 +6,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowRight, Palette, Plus } from "lucide-react";
 import { useState } from "react";
@@ -13,9 +14,18 @@ import { HexColorPicker } from "react-colorful";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 
-export const ColorPickerDialog = () => {
+interface ColorPickerDialogProps {
+  onColorSelect: (color: string) => void;
+  isUpdating: boolean;
+}
+
+export const ColorPickerDialog = ({
+  onColorSelect,
+  isUpdating,
+}: ColorPickerDialogProps) => {
   const [color, setColor] = useState("#6366f1");
   const [hexInput, setHexInput] = useState(color);
+  const [isOpen, setIsOpen] = useState(false);
 
   const isValidHex = (hex: string) => {
     return /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(hex);
@@ -24,7 +34,6 @@ export const ColorPickerDialog = () => {
   const normalizeHex = (hex: string) => {
     let normalized = hex.startsWith("#") ? hex : `#${hex}`;
     if (normalized.length === 4) {
-      // Convert 3-digit hex to 6-digit
       normalized = `#${normalized[1]}${normalized[1]}${normalized[2]}${normalized[2]}${normalized[3]}${normalized[3]}`;
     }
     return normalized.toUpperCase();
@@ -43,12 +52,24 @@ export const ColorPickerDialog = () => {
     }
   };
 
+  const handleConfirmColor = async () => {
+    if (isValidHex(hexInput)) {
+      const normalizedColor = normalizeHex(hexInput);
+      await onColorSelect(normalizedColor);
+      setIsOpen(false);
+    }
+  };
+
   return (
-    <Dialog>
-      <DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
         <button
           type="button"
-          className="w-8 h-8 cursor-pointer rounded-full flex items-center border-2 border-dashed border-gray-500 justify-center transition-all duration-200 hover:bg-gray-100 hover:scale-105"
+          className={cn(
+            "w-8 h-8 cursor-pointer rounded-full flex items-center border-2 border-dashed border-gray-500 justify-center transition-all duration-200 hover:bg-gray-100 hover:scale-105",
+            isUpdating && "opacity-50 cursor-not-allowed",
+          )}
+          disabled={isUpdating}
         >
           <Plus className="w-4 h-4 text-gray-500" />
         </button>
@@ -62,7 +83,6 @@ export const ColorPickerDialog = () => {
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Color Picker */}
           <div className="flex justify-center">
             <div className="relative">
               <HexColorPicker
@@ -72,7 +92,6 @@ export const ColorPickerDialog = () => {
               />
             </div>
           </div>
-          {/* Hex Input */}
           <div className="space-y-2">
             <Label
               htmlFor="hex-input"
@@ -95,13 +114,17 @@ export const ColorPickerDialog = () => {
             </div>
             {hexInput && !isValidHex(hexInput) && (
               <p className="text-xs text-red-500">
-                Please enter a valid color color (e.g., #6366f1 or 6366f1)
+                Please enter a valid color code (e.g., #6366f1 or 6366f1)
               </p>
             )}
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button className="w-full">
-                {" "}
-                I like this <ArrowRight className=" h-4 w-4" />
+              <Button
+                className="w-full"
+                onClick={handleConfirmColor}
+                disabled={!isValidHex(hexInput) || isUpdating}
+              >
+                {isUpdating ? "Updating..." : "I like this"}
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </motion.div>
           </div>

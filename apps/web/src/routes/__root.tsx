@@ -1,15 +1,14 @@
 import { Toaster } from "@/components/ui/sonner";
-
 import { seo } from "@/lib/seo";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import type { QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   HeadContent,
   Outlet,
   Scripts,
   createRootRouteWithContext,
 } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import appCss from "../index.css?url";
 
 export type RouterAppContext = {
@@ -59,8 +58,9 @@ function RootDocument() {
             <Outlet />
           </TooltipProvider>
         </div>
-        <Toaster />
-        {/* <ReactQueryDevtools position="left" initialIsOpen={false} /> */}
+        <Toaster richColors theme="light" />
+        <TanStackRouterDevtools position="bottom-left" />
+
         <Scripts />
       </body>
     </html>

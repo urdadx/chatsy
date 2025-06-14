@@ -22,6 +22,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { signOut } from "@/lib/auth-client";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 export function UserDropdown({
   user,
@@ -33,6 +36,21 @@ export function UserDropdown({
   };
 }) {
   const { isMobile } = useSidebar();
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          navigate({
+            to: "/login",
+          });
+        },
+        onError: () => {
+          toast.error("Failed to log out. Please try again.");
+        },
+      },
+    });
+  };
 
   return (
     <SidebarMenu>
@@ -80,7 +98,7 @@ export function UserDropdown({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

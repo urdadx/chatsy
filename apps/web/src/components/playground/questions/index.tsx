@@ -1,3 +1,4 @@
+import { NoDataPlaceholder } from "@/components/no-data-placeholder";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -27,46 +28,7 @@ interface BotQuestion {
   createdAt: string;
 }
 
-const botQuestions: BotQuestion[] = [
-  {
-    id: "1",
-    question: "What's your favorite camera for videos?",
-    tags: [
-      { id: "video", label: "video", color: "purple" },
-      { id: "photography", label: "photography", color: "green" },
-    ],
-    isActive: true,
-    createdAt: "2024-01-15",
-  },
-  {
-    id: "2",
-    question: "How do you edit your content?",
-    tags: [
-      { id: "editing", label: "editing", color: "blue" },
-      { id: "workflow", label: "workflow", color: "orange" },
-    ],
-    isActive: true,
-    createdAt: "2024-01-14",
-  },
-  {
-    id: "3",
-    question: "What's your pricing for brand collaborations?",
-    tags: [
-      { id: "business", label: "business", color: "indigo" },
-      { id: "pricing", label: "pricing", color: "yellow" },
-      { id: "collabs", label: "collabs", color: "pink" },
-    ],
-    isActive: false,
-    createdAt: "2024-01-13",
-  },
-  {
-    id: "4",
-    question: "Can you share your content calendar template?",
-    tags: [{ id: "planning", label: "planning", color: "green" }],
-    isActive: true,
-    createdAt: "2024-01-12",
-  },
-];
+const botQuestions: BotQuestion[] = [];
 
 const getTagColorClasses = (color: QuestionTag["color"]) => {
   const colorMap = {
@@ -121,7 +83,7 @@ export const BotQuestions = () => {
                 )}
               >
                 <div className="p-4">
-                  <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex items-start justify-between gap-3 ">
                     <h3 className="font-normal text-sm text-gray-900 leading-5 flex-1 min-w-0 line-clamp-2">
                       {question.question}
                     </h3>
@@ -148,7 +110,7 @@ export const BotQuestions = () => {
                     </div>
                   )}
 
-                  <div className="mt-3 pt-2  border-gray-100">
+                  <div className=" pt-2 border-gray-100">
                     <span className="text-xs text-gray-400">
                       {new Date(question.createdAt).toLocaleDateString(
                         "en-US",
@@ -166,13 +128,7 @@ export const BotQuestions = () => {
           })}
         </div>
 
-        {botQuestions.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-sm">
-              No questions yet. Add your first question to get started!
-            </div>
-          </div>
-        )}
+        {botQuestions.length === 0 && <NoDataPlaceholder />}
         <div className="h-[16px]" />
       </div>
     </>

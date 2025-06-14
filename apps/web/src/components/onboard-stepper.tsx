@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +14,7 @@ import { StepFour } from "./onboarding/step-four";
 import { StepOne } from "./onboarding/step-one";
 import { StepThree } from "./onboarding/step-three";
 import { StepTwo } from "./onboarding/step-two";
+import { useStepperStore } from "./store/stepper-store";
 
 const steps = [1, 2, 3, 4, 5];
 
@@ -36,12 +36,10 @@ const renderStepComponent = (step: number) => {
 };
 
 export default function OnboardStepper() {
-  const [currentStep, setCurrentStep] = useState(1);
-
-  const navigate = useNavigate();
+  const { currentStep, setCurrentStep } = useStepperStore();
 
   return (
-    <div className=" max-w-2xl space-y-8 text-center">
+    <div className="max-w-2xl space-y-8 text-center">
       <div className="flex items-center gap-2">
         <Stepper
           value={currentStep}
@@ -63,37 +61,7 @@ export default function OnboardStepper() {
         </Stepper>
       </div>
 
-      <div className="min-h-[350px]">{renderStepComponent(currentStep)}</div>
-
-      <div className="flex justify-start space-x-4">
-        <Button
-          variant="outline"
-          onClick={() => setCurrentStep((prev) => prev - 1)}
-          disabled={currentStep === 1}
-        >
-          Previous
-        </Button>
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button
-            onClick={() => {
-              if (currentStep === steps.length) {
-                navigate({ to: "/admin/playground" });
-              } else {
-                setCurrentStep((prev) => prev + 1);
-              }
-            }}
-            disabled={currentStep > steps.length}
-          >
-            {currentStep === steps.length ? (
-              "Finish"
-            ) : (
-              <>
-                Continue <ArrowRight className=" h-4 w-4" />
-              </>
-            )}
-          </Button>
-        </motion.div>
-      </div>
+      <div className="">{renderStepComponent(currentStep)}</div>
     </div>
   );
 }

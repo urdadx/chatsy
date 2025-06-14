@@ -1,3 +1,5 @@
+import { AddQuestions } from "@/components/playground/questions/add-questions";
+import { SearchQuestions } from "@/components/playground/search-questions";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
@@ -83,7 +85,10 @@ function RouteComponent() {
       <span className="text-md text-muted-foreground">
         Enhance your bot's capabilities with tools and actions
       </span>
-
+      <div className="pt-4 flex flex-row justify-between items-center w-full gap-3">
+        <SearchQuestions />
+        <AddQuestions />
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
         {botActions.map((action) => {
           const isActive = actionStates[action.id];

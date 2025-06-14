@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef } from "react";
+import { AISuggestion, AISuggestions } from "./ui/ai-suggestions";
 import { ScrollArea } from "./ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
@@ -63,6 +64,12 @@ export function ChatPreview() {
       ]);
     }, 500);
   };
+
+  const suggestions = [
+    "What are the latest trends in AI?",
+    "How does machine learning work?",
+    "Explain quantum computing",
+  ];
 
   return (
     <div className="fixed bottom-2 right-4 z-50 transition-opacity duration-200">
@@ -182,7 +189,11 @@ export function ChatPreview() {
                   <div ref={messagesEndRef} />
                 </CardContent>
               </ScrollArea>
-
+              <AISuggestions className="px-4">
+                {suggestions.map((suggestion) => (
+                  <AISuggestion key={suggestion} suggestion={suggestion} />
+                ))}
+              </AISuggestions>
               <CardFooter className="flex flex-col space-y-2 ">
                 <form
                   onSubmit={handleSubmit}

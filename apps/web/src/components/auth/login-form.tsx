@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
 import { GoogleSVG } from "./google-svg";
 
 interface LoginFormData {
@@ -57,7 +58,6 @@ export function LoginForm({
       },
       {
         onSuccess: () => {
-          toast.success("Redirected to Google");
           navigate({
             to: "/admin/playground",
           });
@@ -159,8 +159,14 @@ export function LoginForm({
                     className="w-full"
                     disabled={isSubmitting}
                   >
-                    <Mail className="h-4 w-4" />
-                    {isSubmitting ? "Signing in..." : "Continue with email"}
+                    {isSubmitting ? (
+                      <Spinner />
+                    ) : (
+                      <>
+                        <Mail className="h-4 w-4" />
+                        Continue with email
+                      </>
+                    )}
                   </Button>
                 </motion.div>
               </div>

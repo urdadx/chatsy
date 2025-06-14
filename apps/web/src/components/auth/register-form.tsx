@@ -10,6 +10,7 @@ import { Mail } from "lucide-react";
 import { nanoid } from "nanoid";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
 import { GoogleSVG } from "./google-svg";
 
 interface RegisterFormData {
@@ -45,7 +46,9 @@ export function RegisterForm({
           });
         },
         onError: (ctx: any) => {
-          toast.error(ctx.error.message);
+          toast.error(
+            ctx.error.message || "An error occurred. Please try again.",
+          );
         },
       },
     );
@@ -152,10 +155,14 @@ export function RegisterForm({
                     className="w-full"
                     disabled={isSubmitting}
                   >
-                    <Mail className="h-4 w-4" />
-                    {isSubmitting
-                      ? "Creating account..."
-                      : "Continue with email"}
+                    {isSubmitting ? (
+                      <Spinner />
+                    ) : (
+                      <>
+                        <Mail className="h-4 w-4" />
+                        Continue with email
+                      </>
+                    )}
                   </Button>
                 </motion.div>
               </div>

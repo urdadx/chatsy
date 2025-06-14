@@ -101,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <Logo />
             <div className="hidden lg:flex">
               <h1 className="text-xl font-bold instrument-serif-regular-italic">
-                maikus
+                Chatsy
               </h1>
             </div>
           </div>
