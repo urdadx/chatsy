@@ -53,7 +53,7 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Data Sources",
       url: "/admin/playground",
       icon: Flame,
     },

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 
-
 export function LinkedIn({ className }: { className?: string }) {
   return (
     <svg

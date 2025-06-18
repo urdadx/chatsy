@@ -203,7 +203,7 @@ export const addQuestion = createServerFn({ method: "POST" })
           userId: session.user.id,
           question: questionText,
           answer,
-          isSuggested: isSuggested || false,
+          isSuggested: isSuggested,
         });
 
         return {
@@ -287,53 +287,5 @@ export const addSocialLinks = createServerFn({ method: "POST" })
       }
 
       throw new Error("Failed to add social links. Please try again later.");
-    }
-  });
-
-// ADDING JUST ONE SOCIAL LINK
-const AddSingleSocialLinkSchema = z.object({
-  platform: z.string().min(1, "Platform is required"),
-  url: z.string().url("Please enter a valid URL"),
-  isConnected: z.boolean().optional().default(true),
-});
-
-export const addSingleSocialLink = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    try {
-      return AddSingleSocialLinkSchema.parse(data);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        throw new Error(
-          `Validation failed: ${error.errors.map((e) => e.message).join(", ")}`,
-        );
-      }
-      throw new Error("Invalid input data");
-    }
-  })
-  .handler(async ({ data: { platform, url, isConnected } }) => {
-    try {
-      const request = getWebRequest();
-      const session = await auth.api.getSession({
-        headers: request?.headers || new Headers(),
-      });
-
-      if (!session?.user?.id) {
-        throw new Error("Unauthorized: Please log in to add social link");
-      }
-
-      await db.insert(socialLink).values({
-        userId: session.user.id,
-        platform,
-        url,
-        isConnected: isConnected || true,
-      });
-
-      return {
-        success: true,
-        message: "Social link added successfully",
-      };
-    } catch (error) {
-      console.error("Error adding social link:", error);
-      throw new Error("Failed to add social link. Please try again later.");
     }
   });

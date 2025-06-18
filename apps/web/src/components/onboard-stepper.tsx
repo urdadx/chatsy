@@ -1,14 +1,9 @@
-import { motion } from "framer-motion";
-
-import { Button } from "@/components/ui/button";
 import {
   Stepper,
   StepperIndicator,
   StepperItem,
   StepperTrigger,
 } from "@/components/ui/stepper";
-import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
 import { Completed } from "./onboarding/completed";
 import { StepFour } from "./onboarding/step-four";
 import { StepOne } from "./onboarding/step-one";

@@ -212,8 +212,11 @@ export const product = pgTable("product", {
   url: text("url").notNull(),
   image: text("image"),
   price: numeric("price", { precision: 10, scale: 2 }),
-  featured: boolean("featured").notNull().default(false),
+  featured: boolean("featured").notNull().default(true),
   description: text("description"),
-
+  type: varchar("type", {
+    enum: ["course", "merch", "downloadable"],
+  }).notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

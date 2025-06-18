@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 
-
 export function Figma({ className }: { className?: string }) {
   return (
     <svg

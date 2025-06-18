@@ -1,5 +1,4 @@
-import { EllipsisVertical } from "lucide-react";
-import { Button } from "../ui/button";
+import { ProductCardOptions } from "./product-card-options";
 
 export const ProductCard = () => {
   return (
@@ -13,13 +12,7 @@ export const ProductCard = () => {
       </div>
 
       <div className="p-3 relative">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-4 right-4 p-1"
-        >
-          <EllipsisVertical size={20} className="text-gray-600" />
-        </Button>
+        <ProductCardOptions />
 
         <h3 className="text-md font-medium text-black mb-3 pr-8">
           product name

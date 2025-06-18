@@ -1,5 +1,5 @@
 import { OnboardForm } from "@/components/onboarding/onboard-form";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth-utils";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/onboarding/")({

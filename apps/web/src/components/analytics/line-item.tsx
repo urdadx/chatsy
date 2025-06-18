@@ -1,5 +1,4 @@
-import { cn } from "@/lib/utils";
-import { getPrettyUrl } from "@/lib/utils";
+import { cn, getPrettyUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { type ReactNode, useMemo, useState } from "react";
 
@@ -23,7 +22,6 @@ export function LineItem({
   href,
   value,
   maxValue,
-  tab,
   unit,
   barBackground,
   hoverBackground,

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 
-
 export function Twitter({ className }: { className?: string }) {
   return (
     <svg

@@ -10,7 +10,11 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
-  trustedOrigins: ["http://localhost:3000", "http://localhost:3001"],
+  trustedOrigins: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://192.168.181.95:3001/",
+  ],
   appName: "chatsy",
   emailAndPassword: {
     enabled: true,

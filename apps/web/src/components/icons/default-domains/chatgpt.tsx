@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-cn
+cn;
 
 export function ChatGPT({ className }: { className?: string }) {
   return (

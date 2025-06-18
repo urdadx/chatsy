@@ -106,6 +106,7 @@ export function RegisterForm({
                   <Input
                     id="email"
                     type="email"
+                    className="sm:text-xs text-sm"
                     placeholder="jane@example.com"
                     {...register("email", {
                       required: "Email is required",
@@ -127,6 +128,7 @@ export function RegisterForm({
                     id="password"
                     placeholder="Password"
                     type="password"
+                    className="sm:text-xs text-sm"
                     {...register("password", {
                       required: "Password is required",
                       minLength: {

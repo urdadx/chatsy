@@ -4,9 +4,15 @@ import { useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { MerchPreview } from "./merch-preview";
 
 export const MerchForm = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    url: "",
+    title: "",
+    price: "",
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,97 +32,115 @@ export const MerchForm = () => {
       fileInputRef.current.value = "";
     }
   };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   return (
-    <>
-      <form>
-        <div className="space-y-4">
-          <div className="flex flex-col">
-            <Label htmlFor="url" className="text-sm font-medium">
-              Product URL
-            </Label>
-            <Input
-              id="url"
-              type="url"
-              autoFocus
-              placeholder="eg: https://example.com/my-product"
-              className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-          <div className="flex flex-col">
-            <Label htmlFor="title" className="text-sm font-medium">
-              Product name
-            </Label>
-            <Input
-              id="title"
-              type="text"
-              placeholder="Enter product name"
-              className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
+    <div className="flex gap-8">
+      <div className="flex-1">
+        <form>
+          <div className="space-y-4">
+            <div className="flex flex-col">
+              <Label htmlFor="url" className="text-sm font-medium">
+                Product URL
+              </Label>
+              <Input
+                id="url"
+                type="url"
+                autoFocus
+                placeholder="eg: https://example.com/my-product"
+                className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                value={formData.url}
+                onChange={(e) => handleInputChange("url", e.target.value)}
+              />
+            </div>
 
-          <div className="flex flex-col">
-            <Label className="text-sm font-medium mb-2">Product Image</Label>
+            <div className="flex flex-col">
+              <Label htmlFor="title" className="text-sm font-medium">
+                Product name
+              </Label>
+              <Input
+                id="title"
+                type="text"
+                placeholder="Enter product name"
+                className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                value={formData.title}
+                onChange={(e) => handleInputChange("title", e.target.value)}
+              />
+            </div>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageSelect}
-              className="hidden"
-            />
+            <div className="flex flex-col">
+              <Label className="text-sm font-medium mb-2">Product Image</Label>
 
-            <div className="flex items-center gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2"
-              >
-                <ImageIcon className="h-4 w-4" />
-                Upload Image
-              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
 
-              {imagePreview && (
-                <div className="relative">
-                  <img
-                    src={imagePreview}
-                    alt="Product preview"
-                    className="w-16 h-16 object-cover rounded-md border"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={removeImage}
-                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                  >
-                    <X className="h-3 w-3 text-white" />
-                  </Button>
-                </div>
-              )}
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-2"
+                >
+                  <ImageIcon className="h-4 w-4" />
+                  Upload Image
+                </Button>
+
+                {imagePreview && (
+                  <div className="relative">
+                    <img
+                      src={imagePreview}
+                      alt="Product preview"
+                      className="w-16 h-16 object-cover rounded-md border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={removeImage}
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                    >
+                      <X className="h-3 w-3 text-white" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <Label htmlFor="price" className="text-sm font-medium">
+                Price (in USD)
+              </Label>
+              <Input
+                id="price"
+                type="number"
+                placeholder="eg: 100"
+                className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                value={formData.price}
+                onChange={(e) => handleInputChange("price", e.target.value)}
+              />
             </div>
           </div>
 
-          <div className="flex flex-col">
-            <Label htmlFor="url" className="text-sm font-medium">
-              Price (in USD)
-            </Label>
-            <Input
-              id="price"
-              type="number"
-              placeholder="eg: 100"
-              className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+          <div className="mt-6 w-full">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button type="submit" className="w-full bg-purple-600 text-white">
+                Add Product
+              </Button>
+            </motion.div>
           </div>
-        </div>
-        <div className="mt-6 flex justify-end">
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button type="submit" className="bg-purple-600 text-white">
-              Add Product
-            </Button>
-          </motion.div>
-        </div>
-      </form>
-    </>
+        </form>
+      </div>
+    </div>
   );
 };

@@ -7,3 +7,11 @@ export const getSession = createServerFn().handler(async () => {
     headers: getHeaders() as unknown as Headers,
   });
 });
+
+export const getUser = async () => {
+  const session = await getSession();
+  if (!session) {
+    return null;
+  }
+  return session.user;
+};

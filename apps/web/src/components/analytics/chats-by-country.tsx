@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BarList from "./bar-list";
 
-import { getCountryCode, getCountryCodeFromCity } from "@/lib/counties";
+import { getCountryCode, getCountryCodeFromCity } from "@/constants/counties";
 import { Maximize2, MousePointerClick } from "lucide-react";
 import { useState } from "react";
 import { ViewAllStats } from "./view-all-stats";

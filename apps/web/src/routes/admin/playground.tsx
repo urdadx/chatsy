@@ -22,27 +22,28 @@ function RouteComponent() {
             value="tab-1"
             className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
-            Q&A
+            My Links
           </TabsTrigger>
           <TabsTrigger
             value="tab-2"
             className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
-            Social Links
+            Q&A
           </TabsTrigger>
 
           <TabsTrigger
             value="tab-3"
             className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
-            Digital Products
+            My Products
           </TabsTrigger>
         </TabsList>
+
         <TabsContent value="tab-1">
-          <BotQuestions />
+          <SocialLinks />
         </TabsContent>
         <TabsContent value="tab-2">
-          <SocialLinks />
+          <BotQuestions />
         </TabsContent>
         <TabsContent value="tab-3">
           <DigitalProducts />

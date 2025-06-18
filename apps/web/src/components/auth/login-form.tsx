@@ -102,6 +102,7 @@ export function LoginForm({
                   <Input
                     id="email"
                     type="email"
+                    className="sm:text-xs text-sm"
                     placeholder="jane@example.com"
                     {...register("email", {
                       required: "Email is required",
@@ -131,6 +132,7 @@ export function LoginForm({
                     placeholder="Password"
                     id="password"
                     type="password"
+                    className="sm:text-xs text-sm"
                     {...register("password", {
                       required: "Password is required",
                       minLength: {
@@ -145,7 +147,7 @@ export function LoginForm({
                     })}
                   />
                   {errors.password && (
-                    <p className="text-sm text-red-500">
+                    <p className="text-sm  text-red-500">
                       {errors.password.message}
                     </p>
                   )}

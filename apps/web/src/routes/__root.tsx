@@ -8,7 +8,6 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import appCss from "../index.css?url";
 
 export type RouterAppContext = {
@@ -59,7 +58,6 @@ function RootDocument() {
           </TooltipProvider>
         </div>
         <Toaster richColors theme="light" />
-        <TanStackRouterDevtools position="bottom-left" />
 
         <Scripts />
       </body>

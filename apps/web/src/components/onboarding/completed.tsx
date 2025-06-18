@@ -2,14 +2,12 @@ import { containerVariants } from "@/lib/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
-import { useWindowSize } from "react-use";
 import { useStepperStore } from "../store/stepper-store";
 import { Button } from "../ui/button";
 
 export const Completed = () => {
   const { previousStep } = useStepperStore();
   const navigate = useNavigate();
-  const { width, height } = useWindowSize();
 
   return (
     <>
@@ -17,9 +15,9 @@ export const Completed = () => {
         recycle={false}
         initialVelocityY={30}
         gravity={0.6}
-        width={width}
-        height={height}
-        numberOfPieces={400}
+        width={window.innerWidth}
+        height={window.innerHeight}
+        numberOfPieces={500}
       />
       <motion.div
         initial="hidden"

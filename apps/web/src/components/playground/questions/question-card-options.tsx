@@ -5,48 +5,66 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Archive, Edit, MoreVertical, Trash2 } from "lucide-react";
+import { Edit, MoreVertical, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { DeleteQuestion } from "./delete-question";
+import { EditQuestion } from "./edit-questions";
 
-interface QuestionCardOptionsProps {
-  questionId: string;
-  isActive: boolean;
-  onToggle: (id: string) => void;
-}
+export const QuestionCardOptions = ({ question }: { question: any }) => {
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
-export const QuestionCardOptions = ({
-  questionId,
-  isActive,
-  onToggle,
-}: QuestionCardOptionsProps) => {
-  console.log(questionId, isActive, onToggle);
+  const handleEdit = () => {
+    setOpenEdit(true);
+  };
+
+  const handleDelete = () => {
+    setOpenDelete(true);
+  };
+
   return (
-    <div className="flex-shrink-0">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="shadow-none transition-opacity"
-            aria-label="Open edit menu"
-          >
-            <MoreVertical size={14} strokeWidth={2} aria-hidden="true" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>
-            <Edit size={14} className="mr-2" />
-            Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Archive size={14} className="mr-2" />
-            Archive
-          </DropdownMenuItem>
-          <DropdownMenuItem className="text-destructive hover:text-destructive">
-            <Trash2 size={14} className="mr-2 text-destructive" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <>
+      <EditQuestion
+        question={question}
+        open={openEdit}
+        onOpenChange={setOpenEdit}
+      />
+      <DeleteQuestion
+        id={question.id}
+        open={openDelete}
+        onOpenChange={setOpenDelete}
+      />
+      <div className="flex-shrink-0">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              className=""
+              aria-label="Open edit menu"
+            >
+              <MoreVertical size={14} strokeWidth={2} aria-hidden="true" />
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleEdit}>
+              <Edit size={14} className="mr-2" />
+              Edit
+            </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={handleDelete}>
+              <Trash2
+                size={14}
+                className="mr-2 text-destructive hover:text-text-red-400"
+              />
+              <span className="text-destructive hover:text-red-500">
+                Delete
+              </span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </>
   );
 };

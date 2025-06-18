@@ -63,7 +63,7 @@ export const ChatHistory = () => {
   return (
     <div className=" bg-white border rounded-lg my-4 py-2">
       <ChatHeader />
-      <div className="flex flex-row h-[calc(100vh-5rem)]">
+      <div className="flex flex-row h-[calc(100vh-13rem)]">
         <div className="w-96 border-r bg-white ">
           <ScrollArea className="h-full p-1">
             {chatLogs.map((log, index) => (
