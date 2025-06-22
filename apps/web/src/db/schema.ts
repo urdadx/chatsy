@@ -88,6 +88,8 @@ export const chat = pgTable("Chat", {
     .default("private"),
 });
 
+export type Chat = InferSelectModel<typeof chat>;
+
 export const message = pgTable("Message", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   chatId: uuid("chatId")
@@ -95,8 +97,8 @@ export const message = pgTable("Message", {
     .references(() => chat.id),
   role: varchar("role").notNull(),
   parts: json("parts").notNull(),
-  attachments: json("attachments").notNull(),
-  createdAt: timestamp("createdAt").notNull().defaultNow(), // Added defaultNow()
+  content: json("content").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
 });
 
 export type DBMessage = InferSelectModel<typeof message>;
