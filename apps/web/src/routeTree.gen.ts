@@ -17,6 +17,7 @@ import { Route as OnboardingIndexImport } from './routes/onboarding/index'
 import { Route as AdminSettingsImport } from './routes/admin/settings'
 import { Route as AdminPlaygroundImport } from './routes/admin/playground'
 import { Route as AdminLeadsImport } from './routes/admin/leads'
+import { Route as AdminIntegrationsImport } from './routes/admin/integrations'
 import { Route as AdminBrandingImport } from './routes/admin/branding'
 import { Route as AdminAnalyticsImport } from './routes/admin/analytics'
 import { Route as AdminActionsImport } from './routes/admin/actions'
@@ -60,6 +61,12 @@ const AdminPlaygroundRoute = AdminPlaygroundImport.update({
 const AdminLeadsRoute = AdminLeadsImport.update({
   id: '/leads',
   path: '/leads',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+
+const AdminIntegrationsRoute = AdminIntegrationsImport.update({
+  id: '/integrations',
+  path: '/integrations',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 
@@ -158,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBrandingImport
       parentRoute: typeof AdminRouteImport
     }
+    '/admin/integrations': {
+      id: '/admin/integrations'
+      path: '/integrations'
+      fullPath: '/admin/integrations'
+      preLoaderRoute: typeof AdminIntegrationsImport
+      parentRoute: typeof AdminRouteImport
+    }
     '/admin/leads': {
       id: '/admin/leads'
       path: '/leads'
@@ -209,6 +223,7 @@ interface AdminRouteRouteChildren {
   AdminActionsRoute: typeof AdminActionsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminBrandingRoute: typeof AdminBrandingRoute
+  AdminIntegrationsRoute: typeof AdminIntegrationsRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminPlaygroundRoute: typeof AdminPlaygroundRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -220,6 +235,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminActionsRoute: AdminActionsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminBrandingRoute: AdminBrandingRoute,
+  AdminIntegrationsRoute: AdminIntegrationsRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminPlaygroundRoute: AdminPlaygroundRoute,
   AdminSettingsRoute: AdminSettingsRoute,
@@ -239,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -255,6 +272,7 @@ export interface FileRoutesByTo {
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -272,6 +290,7 @@ export interface FileRoutesById {
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -290,6 +309,7 @@ export interface FileRouteTypes {
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/branding'
+    | '/admin/integrations'
     | '/admin/leads'
     | '/admin/playground'
     | '/admin/settings'
@@ -305,6 +325,7 @@ export interface FileRouteTypes {
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/branding'
+    | '/admin/integrations'
     | '/admin/leads'
     | '/admin/playground'
     | '/admin/settings'
@@ -320,6 +341,7 @@ export interface FileRouteTypes {
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/branding'
+    | '/admin/integrations'
     | '/admin/leads'
     | '/admin/playground'
     | '/admin/settings'
@@ -371,6 +393,7 @@ export const routeTree = rootRoute
         "/admin/actions",
         "/admin/analytics",
         "/admin/branding",
+        "/admin/integrations",
         "/admin/leads",
         "/admin/playground",
         "/admin/settings",
@@ -394,6 +417,10 @@ export const routeTree = rootRoute
     },
     "/admin/branding": {
       "filePath": "admin/branding.tsx",
+      "parent": "/admin"
+    },
+    "/admin/integrations": {
+      "filePath": "admin/integrations.tsx",
       "parent": "/admin"
     },
     "/admin/leads": {

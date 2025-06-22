@@ -69,7 +69,7 @@ export const SocialCardOptions = ({
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleArchiveLink}>
             <ArchiveIcon className="mr-2 h-4 w-4" />
-            {!isConnected ? "Unarchive" : "Archive"}
+            {isConnected ? "Unarchive" : "Archive"}
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleDeleteLink}

@@ -1,27 +1,33 @@
 import { ProductCardOptions } from "./product-card-options";
 
-export const ProductCard = () => {
+export const ProductCard = ({ product }: any) => {
+  const { name, price, image, url } = product;
+
   return (
-    <div className="w-full group  bg-white rounded-2xl border-2 border-purple-100 shadow-xs hover:shadow-sm transition-all duration-200 overflow-hidden relative">
-      <div className="w-full h-32 overflow-hidden">
+    <div className="p-2 group flex gap-4 w-full overflow-hidden rounded-xl border border-gray-200">
+      <div className="h-24 w-28 relative overflow-hidden flex-shrink-0">
         <img
-          src="https://m.media-amazon.com/images/I/81bsw6fnUiL._SL1500_.jpg"
+          src={image || "https://via.placeholder.com/150"}
           alt="Product thumbnail"
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover rounded-md"
         />
       </div>
 
-      <div className="p-3 relative">
-        <ProductCardOptions />
+      <div className="flex-1 flex flex-col justify-between">
+        <div className="flex justify-between">
+          <div className="w-full flex justify-between">
+            <div className="flex flex-col gap-3">
+              <p className="text-xs text-muted-foreground truncate">
+                {url ? new URL(url).hostname : "No URL"}
+              </p>
+              <h3 className="text-base leading-snug line-clamp-2">{name}</h3>
 
-        <h3 className="text-md font-medium text-black mb-3 pr-8">
-          product name
-        </h3>
-
-        <div className="flex flex-wrap gap-2">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
-            courses
-          </span>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-purple-600">${price}</span>
+              </div>
+            </div>
+            <ProductCardOptions product={product} />
+          </div>
         </div>
       </div>
     </div>

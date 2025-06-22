@@ -1,6 +1,6 @@
-import { Badge } from "@/components/ui/badge";
 import { GOOGLE_FAVICON_URL } from "@/constants/domains";
-import { getApexDomain } from "@/lib/utils";
+import { getApexDomain, getBaseUrl } from "@/lib/utils";
+import { BarChart } from "lucide-react";
 import { SocialCardOptions } from "./social-card-options";
 
 export const SocialCard = ({
@@ -25,23 +25,15 @@ export const SocialCard = ({
             {platform}
           </div>
           <div className="flex items-center gap-2">
-            {isConnected ? (
-              <Badge variant="outline" className="gap-1.5">
-                <span
-                  className="size-1.5 rounded-full bg-emerald-500"
-                  aria-hidden="true"
-                ></span>
-                Active
-              </Badge>
-            ) : (
-              <Badge variant="outline" className="gap-1.5">
-                <span
-                  className="size-1.5 rounded-full bg-gray-400"
-                  aria-hidden="true"
-                ></span>
-                Inactive
-              </Badge>
-            )}
+            <div className="flex items-center space-x-1 cursor-pointer rounded-sm bg-gray-100 px-2 py-0.5 transition-all duration-75 active:scale-100 border">
+              <BarChart color="grey" size={15} className="w-4 h-4" />
+              <span className="text-xs sm:text-sm text-muted-foreground">
+                2
+              </span>
+              <span className="hidden md:inline-block text-xs sm:text-sm text-muted-foreground">
+                clicks
+              </span>
+            </div>
             <SocialCardOptions
               platform={platform}
               url={url}
@@ -51,7 +43,7 @@ export const SocialCard = ({
           </div>
         </div>
         <span className="text-sm text-muted-foreground hover:text-primary cursor-pointer">
-          {url}
+          {getBaseUrl(url)}
         </span>
       </div>
     </>

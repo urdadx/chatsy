@@ -1,5 +1,7 @@
 import { useLocation } from "@tanstack/react-router";
+import { Settings } from "lucide-react";
 import { ShareBot } from "./share-bot";
+import { Button } from "./ui/button";
 import { SidebarTrigger } from "./ui/sidebar";
 
 export const Navbar = () => {
@@ -20,7 +22,13 @@ export const Navbar = () => {
           </div>
           <h2 className="text-md font-semibold capitalize">{headerName}</h2>
         </div>
-        <ShareBot />
+        <div className="flex items-center gap-2">
+          <Button className="hover:text-primary" variant="outline">
+            <Settings className="w-4 h-4" />
+            Settings
+          </Button>
+          <ShareBot />
+        </div>
       </header>
     </>
   );

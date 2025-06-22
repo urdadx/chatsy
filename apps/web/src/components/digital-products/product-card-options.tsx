@@ -5,30 +5,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  ArchiveIcon,
-  Edit,
-  EllipsisVertical,
-  MoreVertical,
-  Trash,
-} from "lucide-react";
+import { ArchiveIcon, Edit, EllipsisVertical, Trash } from "lucide-react";
 import { useState } from "react";
+import { ArchiveProduct } from "./archive-product";
+import { DeleteProduct } from "./delete-product";
+import { EditProduct } from "./edit-product";
 
-type ProductCardProps = {
-  id: string;
-  featured: boolean;
-  name: string;
-  image: string;
-  url: string;
-};
-
-export const ProductCardOptions = ({
-  id,
-  featured,
-  name,
-  image,
-  url,
-}: ProductCardProps) => {
+export const ProductCardOptions = ({ product }: any) => {
   const [deleteProduct, setDeleteProduct] = useState(false);
   const [archiveProduct, setArchiveProduct] = useState(false);
   const [editProduct, setEditProduct] = useState(false);
@@ -47,13 +30,25 @@ export const ProductCardOptions = ({
 
   return (
     <>
+      <DeleteProduct
+        id={product.id}
+        open={deleteProduct}
+        onOpenChange={setDeleteProduct}
+      />
+      <ArchiveProduct
+        featured={product.featured}
+        id={product.id}
+        open={archiveProduct}
+        onOpenChange={setArchiveProduct}
+      />
+      <EditProduct
+        product={product}
+        open={editProduct}
+        onOpenChange={setEditProduct}
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-4 right-4 p-1"
-          >
+          <Button variant="ghost" size="icon">
             <EllipsisVertical size={20} className="text-gray-600" />
           </Button>
         </DropdownMenuTrigger>
@@ -64,7 +59,7 @@ export const ProductCardOptions = ({
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleArchiveProduct}>
             <ArchiveIcon className="mr-2 h-4 w-4" />
-            {featured ? "Unarchive" : "Archive"}
+            {!product.featured ? "Unarchive" : "Archive"}
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleDeleteProduct}

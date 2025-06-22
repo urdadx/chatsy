@@ -158,6 +158,8 @@ export const socialLink = pgTable("social_link", {
     .references(() => user.id, { onDelete: "cascade" }),
   platform: text("platform").notNull(),
   url: text("url").notNull(),
+  description: text("description"),
+  isSocial: boolean("is_social").notNull().default(false),
   isConnected: boolean("is_connected").notNull().default(false),
   createdAt: timestamp("created_at")
     .notNull()

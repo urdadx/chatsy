@@ -25,6 +25,29 @@ export const getPrettyUrl = (url?: string | null) => {
     .replace(/\/$/, "");
 };
 
+export function getBaseUrl(url: string) {
+  try {
+    // Create a URL object
+    const parsedUrl = new URL(url);
+
+    // Get the pathname and split it
+    const pathSegments = parsedUrl.pathname
+      .split("/")
+      .filter((segment) => segment !== "");
+
+    // If no path segments, return just the origin
+    if (pathSegments.length === 0) {
+      return parsedUrl.origin;
+    }
+
+    // Construct the base URL
+    return `${parsedUrl.origin}`;
+  } catch (error: any) {
+    console.error("Error parsing URL:", error.message);
+    return null;
+  }
+}
+
 import ccTLDs from "@/constants/cctlds";
 import {
   SECOND_LEVEL_DOMAINS,
@@ -66,28 +89,6 @@ export const getApexDomain = (url: string) => {
 export const validDomainRegex = new RegExp(
   /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/,
 );
-
-// Get time link was added
-// export const timeAgo = (timestamp: string) => {
-//   if (!timestamp) return "Just now";
-//   const diff = Date.now() - new Date(timestamp).getTime();
-//   if (diff < 60000) {
-//     // less than 1 second
-//     return "Just now";
-//   }
-//   if (diff > 82800000) {
-//     // more than 23 hours – similar to how Twitter displays timestamps
-//     return new Date(timestamp).toLocaleDateString("en-US", {
-//       month: "short",s
-//       day: "numeric",
-//       year:
-//         new Date(timestamp).getFullYear() !== new Date().getFullYear()
-//           ? "numeric"
-//           : undefined,
-//     });
-//   }
-//   return ms(diff);
-// };
 
 export const isValidUrl = (url: string) => {
   try {

@@ -9,6 +9,7 @@ import { z } from "zod";
 const createLinkSchema = z.object({
   platform: z.string().min(1),
   url: z.string().url(),
+  description: z.string().optional(),
   isConnected: z.boolean().default(true),
 });
 
@@ -55,12 +56,13 @@ export const APIRoute = createAPIFileRoute("/api/my-links")({
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
-    const { platform, url } = parsed.data;
+    const { platform, url, description } = parsed.data;
 
     const result = await db.insert(socialLink).values({
       userId,
       platform,
       url,
+      description,
     });
 
     return json({ message: "Link added", result });

@@ -7,17 +7,16 @@ import {
   SidebarProvider,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useSession } from "@/lib/auth-client";
+import { getUser } from "@/lib/auth-utils";
 import { Outlet } from "@tanstack/react-router";
 import {
-  AudioWaveform,
   ChartNoAxesColumnIncreasing,
-  Command,
   Flame,
-  GalleryVerticalEnd,
-  Magnet,
+  LayoutDashboard,
   MessageCircle,
   PaletteIcon,
-  Settings2,
+  Users,
   Zap,
 } from "lucide-react";
 import type * as React from "react";
@@ -29,31 +28,9 @@ import { UpgradeBanner } from "./upgrade-banner";
 import { UserDropdown } from "./user-dropdown";
 
 const data = {
-  user: {
-    name: "urdadx",
-    email: "urdadx@gmail.com",
-    avatar: "https://avatars.githubusercontent.com/u/70736338?v=4",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
     {
-      title: "Data Sources",
+      title: "Playground",
       url: "/admin/playground",
       icon: Flame,
     },
@@ -81,18 +58,22 @@ const data = {
     {
       title: "Leads",
       url: "/admin/leads",
-      icon: Magnet,
+      icon: Users,
     },
 
     {
-      title: "Settings",
-      url: "/admin/settings",
-      icon: Settings2,
+      title: "Integrations",
+      url: "/admin/integrations",
+      icon: LayoutDashboard,
     },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: session } = useSession();
+
+  const user = session?.user;
+  console.log(user?.name, user?.email, user?.image);
   return (
     <SidebarProvider>
       <Sidebar collapsible="offcanvas" {...props}>
@@ -111,7 +92,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarContent>
         <SidebarFooter>
           <UpgradeBanner />
-          <UserDropdown user={data.user} />
+          <UserDropdown user={user} />
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>

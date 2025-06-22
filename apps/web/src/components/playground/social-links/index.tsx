@@ -30,15 +30,19 @@ export const SocialLinks = () => {
         </div>
         <div className="w-full py-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
           {isError && (
-            <div className="flex justify-center items-center h-24">
+            <div className="flex flex-row justify-center items-center h-24">
               <span className="text-red-500">Failed to load questions</span>
-              <Button onClick={() => refetch()} className="ml-4">
+              <Button
+                variant="outline"
+                onClick={() => refetch()}
+                className="ml-4"
+              >
                 Retry
               </Button>
             </div>
           )}
           {isLoading && (
-            <div className="flex justify-center items-center h-24">
+            <div className="col-span-2 flex justify-center">
               <Spinner className="text-primary" />
             </div>
           )}

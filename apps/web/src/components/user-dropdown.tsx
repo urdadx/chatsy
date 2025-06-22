@@ -26,17 +26,10 @@ import { signOut } from "@/lib/auth-client";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-export function UserDropdown({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+export function UserDropdown({ user }: any) {
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
+
   const handleLogout = async () => {
     await signOut({
       fetchOptions: {
@@ -62,14 +55,14 @@ export function UserDropdown({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-full border-2 border-primary">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src={user?.image} alt={user?.name} />
                 <AvatarFallback>
                   <User className="h-5 w-5 text-gray-600" />
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-normal">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-normal">{user?.name}</span>
+                <span className="truncate text-xs">{user?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>

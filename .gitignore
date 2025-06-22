@@ -1,2 +1,3 @@
 node_modules
 .turbo
+apps/web/chatsy-service-keys.json
