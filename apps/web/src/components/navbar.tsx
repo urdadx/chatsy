@@ -25,7 +25,7 @@ export const Navbar = () => {
         <div className="flex items-center gap-2">
           <Button className="hover:text-primary" variant="outline">
             <Settings className="w-4 h-4" />
-            Settings
+            <span className="hidden sm:inline">Settings</span>
           </Button>
           <ShareBot />
         </div>

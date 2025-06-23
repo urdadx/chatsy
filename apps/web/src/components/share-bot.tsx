@@ -6,7 +6,8 @@ export const ShareBot = () => {
     <>
       <Button variant={"outline"} className="w-fit text-primary">
         <Share className="w-4 h-4" />
-        Publish your page
+        <span className="hidden sm:inline">Publish your bot</span>
+        <span className="inline sm:hidden">Publish</span>
       </Button>
     </>
   );

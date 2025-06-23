@@ -36,6 +36,28 @@ export function getLocalStorage(key: string) {
   return [];
 }
 
+export async function fetchWithErrorHandlers(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+) {
+  try {
+    const response = await fetch(input, init);
+
+    if (!response.ok) {
+      const { code, cause } = await response.json();
+      throw new ChatSDKError(code as ErrorCode, cause);
+    }
+
+    return response;
+  } catch (error: unknown) {
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      throw new ChatSDKError("offline:chat");
+    }
+
+    throw error;
+  }
+}
+
 export function generateUUID(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
@@ -116,6 +138,7 @@ import {
   SECOND_LEVEL_DOMAINS,
   SPECIAL_APEX_DOMAINS,
 } from "@/constants/domains";
+import { ChatSDKError, type ErrorCode } from "./errors";
 
 type SnakeToCamelCase<S extends string> = S extends `${infer T}_${infer U}`
   ? `${T}${Capitalize<SnakeToCamelCase<U>>}`

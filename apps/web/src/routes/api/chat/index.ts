@@ -6,7 +6,6 @@ import type { Message } from "@/lib/ai/save-assistant-message";
 import {
   deleteChatById,
   getChatById,
-  getUserIdFromUsername,
   saveChat,
 } from "@/lib/server-functions/chat-queries";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
@@ -18,19 +17,10 @@ import { auth } from "auth";
 export const ServerRoute = createServerFileRoute("/api/chat/").methods({
   POST: async ({ request }) => {
     try {
-      const { id, messages, handle } = await request.json();
+      const { id, messages } = await request.json();
 
       const chat = await getChatById(id);
-      // const result = await getSession();
 
-      // if (!result.success || !result.userId) {
-      //   return new Response(
-      //     JSON.stringify({ error: "Could not get userId from handle" }),
-      //     {
-      //       status: 400,
-      //     },
-      //   );
-      // }
       const userMessage = messages[messages.length - 1];
       const session = await auth.api.getSession({ headers: request.headers });
       if (!session) {
@@ -41,9 +31,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         const title = await generateTitleFromUserMessage({
           message: userMessage,
         });
-
         await saveChat({
-          id,
           userId: session.user.id,
           title,
           visibility: "private",
@@ -82,7 +70,6 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
               id,
               response.messages as unknown as Message[],
             );
-            console.log(response.messages);
           } catch (err) {
             console.error(
               "Error in onFinish while saving assistant messages:",

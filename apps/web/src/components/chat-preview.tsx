@@ -1,14 +1,14 @@
-import { ArrowUp, MessageCircle, RefreshCcw, Settings, X } from "lucide-react";
-import * as React from "react";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { cn, generateUUID } from "@/lib/utils";
-
 import { Input } from "@/components/ui/input";
+import { ChatSDKError } from "@/lib/errors";
+import { cn, fetchWithErrorHandlers, generateUUID } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUp, MessageCircle, RefreshCcw, Settings, X } from "lucide-react";
+import * as React from "react";
 import { useCallback, useEffect, useRef } from "react";
+import { toast } from "sonner";
 import { PreviewMessage, ThinkingMessage } from "./message";
 import { AISuggestion, AISuggestions } from "./ui/ai-suggestions";
 import { ScrollArea } from "./ui/scroll-area";
@@ -16,7 +16,22 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function ChatPreview() {
   const [isOpen, setIsOpen] = React.useState(false);
-  const id = generateUUID();
+
+  const [chatSessionId, _setChatSessionId] = React.useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const CHAT_SESSION_KEY = "chat-preview-session-id";
+      let sessionId = localStorage.getItem(CHAT_SESSION_KEY);
+
+      if (!sessionId) {
+        sessionId = generateUUID();
+        localStorage.setItem(CHAT_SESSION_KEY, sessionId);
+      }
+
+      return sessionId;
+    }
+    return "";
+  });
+
   const {
     messages,
     setMessages,
@@ -25,9 +40,14 @@ export function ChatPreview() {
     handleSubmit,
     input,
     setInput,
-    append,
   } = useChat({
-    id: id,
+    id: chatSessionId,
+    fetch: fetchWithErrorHandlers,
+    onError: (error) => {
+      if (error instanceof ChatSDKError) {
+        toast.error(error.message);
+      }
+    },
   });
   const inputLength = input.trim().length;
 
@@ -43,8 +63,6 @@ export function ChatPreview() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
-
-  console.log(messages);
 
   const suggestions = [
     "What are the latest trends in AI?",
@@ -190,7 +208,7 @@ export function ChatPreview() {
                     rel="noopener noreferrer"
                     className="ml-1 hover:underline text-primary"
                   >
-                    Maikus
+                    Padyna
                   </a>
                 </div>
               </CardFooter>
