@@ -1,5 +1,5 @@
 import { json } from "@tanstack/react-start";
-import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { createServerFileRoute } from "@tanstack/react-start/server";
 import { JSDOM } from "jsdom";
 
 const getMeta = (doc: Document, selectors: string[]): string | null => {
@@ -12,7 +12,7 @@ const getMeta = (doc: Document, selectors: string[]): string | null => {
   return null;
 };
 
-export const APIRoute = createAPIFileRoute("/api/get-og-info")({
+export const ServerRoute = createServerFileRoute("/api/get-og-info").methods({
   GET: async ({ request }) => {
     const { searchParams } = new URL(request.url);
     const url = searchParams.get("url");

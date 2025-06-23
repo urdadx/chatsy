@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { product } from "@/db/schema";
 import { json } from "@tanstack/react-start";
-import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -31,7 +31,7 @@ const deleteProductSchema = z.object({
   id: z.string().uuid(),
 });
 
-export const APIRoute = createAPIFileRoute("/api/my-products")({
+export const ServerRoute = createServerFileRoute("/api/my-products").methods({
   GET: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
     const userId = session?.user?.id;

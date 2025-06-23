@@ -8,244 +8,145 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { createServerRootRoute } from '@tanstack/react-start/server'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as AdminRouteImport } from './routes/admin/route'
-import { Route as IndexImport } from './routes/index'
-import { Route as OnboardingIndexImport } from './routes/onboarding/index'
-import { Route as AdminSettingsImport } from './routes/admin/settings'
-import { Route as AdminPlaygroundImport } from './routes/admin/playground'
-import { Route as AdminLeadsImport } from './routes/admin/leads'
-import { Route as AdminIntegrationsImport } from './routes/admin/integrations'
-import { Route as AdminBrandingImport } from './routes/admin/branding'
-import { Route as AdminAnalyticsImport } from './routes/admin/analytics'
-import { Route as AdminActionsImport } from './routes/admin/actions'
-import { Route as authRegisterImport } from './routes/(auth)/register'
-import { Route as authLoginImport } from './routes/(auth)/login'
-import { Route as AdminChatHistoryIndexImport } from './routes/admin/chat-history/index'
-import { Route as AdminChatHistoryHistoryIdImport } from './routes/admin/chat-history/$historyId'
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
+import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminPlaygroundRouteImport } from './routes/admin/playground'
+import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
+import { Route as AdminIntegrationsRouteImport } from './routes/admin/integrations'
+import { Route as AdminBrandingRouteImport } from './routes/admin/branding'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
+import { Route as AdminActionsRouteImport } from './routes/admin/actions'
+import { Route as authRegisterRouteImport } from './routes/(auth)/register'
+import { Route as authLoginRouteImport } from './routes/(auth)/login'
+import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
+import { Route as AdminChatHistoryHistoryIdRouteImport } from './routes/admin/chat-history/$historyId'
+import { ServerRoute as ApiUploadServerRouteImport } from './routes/api/upload'
+import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
+import { ServerRoute as ApiMyProductsServerRouteImport } from './routes/api/my-products'
+import { ServerRoute as ApiMyLinksServerRouteImport } from './routes/api/my-links'
+import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
+import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-og-info'
+import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
+import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
-// Create/Update Routes
+const rootServerRouteImport = createServerRootRoute()
 
-const AdminRouteRoute = AdminRouteImport.update({
+const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const OnboardingIndexRoute = OnboardingIndexImport.update({
+const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
   id: '/onboarding/',
   path: '/onboarding/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AdminSettingsRoute = AdminSettingsImport.update({
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminPlaygroundRoute = AdminPlaygroundImport.update({
+const AdminPlaygroundRoute = AdminPlaygroundRouteImport.update({
   id: '/playground',
   path: '/playground',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminLeadsRoute = AdminLeadsImport.update({
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminIntegrationsRoute = AdminIntegrationsImport.update({
+const AdminIntegrationsRoute = AdminIntegrationsRouteImport.update({
   id: '/integrations',
   path: '/integrations',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminBrandingRoute = AdminBrandingImport.update({
+const AdminBrandingRoute = AdminBrandingRouteImport.update({
   id: '/branding',
   path: '/branding',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminAnalyticsRoute = AdminAnalyticsImport.update({
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminActionsRoute = AdminActionsImport.update({
+const AdminActionsRoute = AdminActionsRouteImport.update({
   id: '/actions',
   path: '/actions',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const authRegisterRoute = authRegisterImport.update({
+const authRegisterRoute = authRegisterRouteImport.update({
   id: '/(auth)/register',
   path: '/register',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const authLoginRoute = authLoginImport.update({
+const authLoginRoute = authLoginRouteImport.update({
   id: '/(auth)/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AdminChatHistoryIndexRoute = AdminChatHistoryIndexImport.update({
+const AdminChatHistoryIndexRoute = AdminChatHistoryIndexRouteImport.update({
   id: '/chat-history/',
   path: '/chat-history/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminChatHistoryHistoryIdRoute = AdminChatHistoryHistoryIdImport.update({
-  id: '/chat-history/$historyId',
-  path: '/chat-history/$historyId',
-  getParentRoute: () => AdminRouteRoute,
+const AdminChatHistoryHistoryIdRoute =
+  AdminChatHistoryHistoryIdRouteImport.update({
+    id: '/chat-history/$historyId',
+    path: '/chat-history/$historyId',
+    getParentRoute: () => AdminRouteRoute,
+  } as any)
+const ApiUploadServerRoute = ApiUploadServerRouteImport.update({
+  id: '/api/upload',
+  path: '/api/upload',
+  getParentRoute: () => rootServerRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRoute
-    }
-    '/(auth)/login': {
-      id: '/(auth)/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof authLoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/(auth)/register': {
-      id: '/(auth)/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof authRegisterImport
-      parentRoute: typeof rootRoute
-    }
-    '/admin/actions': {
-      id: '/admin/actions'
-      path: '/actions'
-      fullPath: '/admin/actions'
-      preLoaderRoute: typeof AdminActionsImport
-      parentRoute: typeof AdminRouteImport
-    }
-    '/admin/analytics': {
-      id: '/admin/analytics'
-      path: '/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AdminAnalyticsImport
-      parentRoute: typeof AdminRouteImport
-    }
-    '/admin/branding': {
-      id: '/admin/branding'
-      path: '/branding'
-      fullPath: '/admin/branding'
-      preLoaderRoute: typeof AdminBrandingImport
-      parentRoute: typeof AdminRouteImport
-    }
-    '/admin/integrations': {
-      id: '/admin/integrations'
-      path: '/integrations'
-      fullPath: '/admin/integrations'
-      preLoaderRoute: typeof AdminIntegrationsImport
-      parentRoute: typeof AdminRouteImport
-    }
-    '/admin/leads': {
-      id: '/admin/leads'
-      path: '/leads'
-      fullPath: '/admin/leads'
-      preLoaderRoute: typeof AdminLeadsImport
-      parentRoute: typeof AdminRouteImport
-    }
-    '/admin/playground': {
-      id: '/admin/playground'
-      path: '/playground'
-      fullPath: '/admin/playground'
-      preLoaderRoute: typeof AdminPlaygroundImport
-      parentRoute: typeof AdminRouteImport
-    }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsImport
-      parentRoute: typeof AdminRouteImport
-    }
-    '/onboarding/': {
-      id: '/onboarding/'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/admin/chat-history/$historyId': {
-      id: '/admin/chat-history/$historyId'
-      path: '/chat-history/$historyId'
-      fullPath: '/admin/chat-history/$historyId'
-      preLoaderRoute: typeof AdminChatHistoryHistoryIdImport
-      parentRoute: typeof AdminRouteImport
-    }
-    '/admin/chat-history/': {
-      id: '/admin/chat-history/'
-      path: '/chat-history'
-      fullPath: '/admin/chat-history'
-      preLoaderRoute: typeof AdminChatHistoryIndexImport
-      parentRoute: typeof AdminRouteImport
-    }
-  }
-}
-
-// Create and export the route tree
-
-interface AdminRouteRouteChildren {
-  AdminActionsRoute: typeof AdminActionsRoute
-  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
-  AdminBrandingRoute: typeof AdminBrandingRoute
-  AdminIntegrationsRoute: typeof AdminIntegrationsRoute
-  AdminLeadsRoute: typeof AdminLeadsRoute
-  AdminPlaygroundRoute: typeof AdminPlaygroundRoute
-  AdminSettingsRoute: typeof AdminSettingsRoute
-  AdminChatHistoryHistoryIdRoute: typeof AdminChatHistoryHistoryIdRoute
-  AdminChatHistoryIndexRoute: typeof AdminChatHistoryIndexRoute
-}
-
-const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminActionsRoute: AdminActionsRoute,
-  AdminAnalyticsRoute: AdminAnalyticsRoute,
-  AdminBrandingRoute: AdminBrandingRoute,
-  AdminIntegrationsRoute: AdminIntegrationsRoute,
-  AdminLeadsRoute: AdminLeadsRoute,
-  AdminPlaygroundRoute: AdminPlaygroundRoute,
-  AdminSettingsRoute: AdminSettingsRoute,
-  AdminChatHistoryHistoryIdRoute: AdminChatHistoryHistoryIdRoute,
-  AdminChatHistoryIndexRoute: AdminChatHistoryIndexRoute,
-}
-
-const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
-  AdminRouteRouteChildren,
-)
+const ApiQuestionsServerRoute = ApiQuestionsServerRouteImport.update({
+  id: '/api/questions',
+  path: '/api/questions',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiMyProductsServerRoute = ApiMyProductsServerRouteImport.update({
+  id: '/api/my-products',
+  path: '/api/my-products',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiMyLinksServerRoute = ApiMyLinksServerRouteImport.update({
+  id: '/api/my-links',
+  path: '/api/my-links',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiHelloServerRoute = ApiHelloServerRouteImport.update({
+  id: '/api/hello',
+  path: '/api/hello',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiGetOgInfoServerRoute = ApiGetOgInfoServerRouteImport.update({
+  id: '/api/get-og-info',
+  path: '/api/get-og-info',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiChatIndexServerRoute = ApiChatIndexServerRouteImport.update({
+  id: '/api/chat/',
+  path: '/api/chat/',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -263,7 +164,6 @@ export interface FileRoutesByFullPath {
   '/admin/chat-history/$historyId': typeof AdminChatHistoryHistoryIdRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
@@ -280,9 +180,8 @@ export interface FileRoutesByTo {
   '/admin/chat-history/$historyId': typeof AdminChatHistoryHistoryIdRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
@@ -298,7 +197,6 @@ export interface FileRoutesById {
   '/admin/chat-history/$historyId': typeof AdminChatHistoryHistoryIdRoute
   '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
@@ -350,7 +248,6 @@ export interface FileRouteTypes {
     | '/admin/chat-history/'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
@@ -358,6 +255,271 @@ export interface RootRouteChildren {
   authRegisterRoute: typeof authRegisterRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
+export interface FileServerRoutesByFullPath {
+  '/api/get-og-info': typeof ApiGetOgInfoServerRoute
+  '/api/hello': typeof ApiHelloServerRoute
+  '/api/my-links': typeof ApiMyLinksServerRoute
+  '/api/my-products': typeof ApiMyProductsServerRoute
+  '/api/questions': typeof ApiQuestionsServerRoute
+  '/api/upload': typeof ApiUploadServerRoute
+  '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat': typeof ApiChatIndexServerRoute
+}
+export interface FileServerRoutesByTo {
+  '/api/get-og-info': typeof ApiGetOgInfoServerRoute
+  '/api/hello': typeof ApiHelloServerRoute
+  '/api/my-links': typeof ApiMyLinksServerRoute
+  '/api/my-products': typeof ApiMyProductsServerRoute
+  '/api/questions': typeof ApiQuestionsServerRoute
+  '/api/upload': typeof ApiUploadServerRoute
+  '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat': typeof ApiChatIndexServerRoute
+}
+export interface FileServerRoutesById {
+  __root__: typeof rootServerRouteImport
+  '/api/get-og-info': typeof ApiGetOgInfoServerRoute
+  '/api/hello': typeof ApiHelloServerRoute
+  '/api/my-links': typeof ApiMyLinksServerRoute
+  '/api/my-products': typeof ApiMyProductsServerRoute
+  '/api/questions': typeof ApiQuestionsServerRoute
+  '/api/upload': typeof ApiUploadServerRoute
+  '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat/': typeof ApiChatIndexServerRoute
+}
+export interface FileServerRouteTypes {
+  fileServerRoutesByFullPath: FileServerRoutesByFullPath
+  fullPaths:
+    | '/api/get-og-info'
+    | '/api/hello'
+    | '/api/my-links'
+    | '/api/my-products'
+    | '/api/questions'
+    | '/api/upload'
+    | '/api/auth/$'
+    | '/api/chat'
+  fileServerRoutesByTo: FileServerRoutesByTo
+  to:
+    | '/api/get-og-info'
+    | '/api/hello'
+    | '/api/my-links'
+    | '/api/my-products'
+    | '/api/questions'
+    | '/api/upload'
+    | '/api/auth/$'
+    | '/api/chat'
+  id:
+    | '__root__'
+    | '/api/get-og-info'
+    | '/api/hello'
+    | '/api/my-links'
+    | '/api/my-products'
+    | '/api/questions'
+    | '/api/upload'
+    | '/api/auth/$'
+    | '/api/chat/'
+  fileServerRoutesById: FileServerRoutesById
+}
+export interface RootServerRouteChildren {
+  ApiGetOgInfoServerRoute: typeof ApiGetOgInfoServerRoute
+  ApiHelloServerRoute: typeof ApiHelloServerRoute
+  ApiMyLinksServerRoute: typeof ApiMyLinksServerRoute
+  ApiMyProductsServerRoute: typeof ApiMyProductsServerRoute
+  ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
+  ApiUploadServerRoute: typeof ApiUploadServerRoute
+  ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
+  ApiChatIndexServerRoute: typeof ApiChatIndexServerRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/': {
+      id: '/onboarding/'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/playground': {
+      id: '/admin/playground'
+      path: '/playground'
+      fullPath: '/admin/playground'
+      preLoaderRoute: typeof AdminPlaygroundRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/leads': {
+      id: '/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminLeadsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/integrations': {
+      id: '/admin/integrations'
+      path: '/integrations'
+      fullPath: '/admin/integrations'
+      preLoaderRoute: typeof AdminIntegrationsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/branding': {
+      id: '/admin/branding'
+      path: '/branding'
+      fullPath: '/admin/branding'
+      preLoaderRoute: typeof AdminBrandingRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/actions': {
+      id: '/admin/actions'
+      path: '/actions'
+      fullPath: '/admin/actions'
+      preLoaderRoute: typeof AdminActionsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/(auth)/register': {
+      id: '/(auth)/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof authRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/login': {
+      id: '/(auth)/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof authLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/chat-history/': {
+      id: '/admin/chat-history/'
+      path: '/chat-history'
+      fullPath: '/admin/chat-history'
+      preLoaderRoute: typeof AdminChatHistoryIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/chat-history/$historyId': {
+      id: '/admin/chat-history/$historyId'
+      path: '/chat-history/$historyId'
+      fullPath: '/admin/chat-history/$historyId'
+      preLoaderRoute: typeof AdminChatHistoryHistoryIdRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+  }
+}
+declare module '@tanstack/react-start/server' {
+  interface ServerFileRoutesByPath {
+    '/api/upload': {
+      id: '/api/upload'
+      path: '/api/upload'
+      fullPath: '/api/upload'
+      preLoaderRoute: typeof ApiUploadServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/questions': {
+      id: '/api/questions'
+      path: '/api/questions'
+      fullPath: '/api/questions'
+      preLoaderRoute: typeof ApiQuestionsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/my-products': {
+      id: '/api/my-products'
+      path: '/api/my-products'
+      fullPath: '/api/my-products'
+      preLoaderRoute: typeof ApiMyProductsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/my-links': {
+      id: '/api/my-links'
+      path: '/api/my-links'
+      fullPath: '/api/my-links'
+      preLoaderRoute: typeof ApiMyLinksServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/hello': {
+      id: '/api/hello'
+      path: '/api/hello'
+      fullPath: '/api/hello'
+      preLoaderRoute: typeof ApiHelloServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/get-og-info': {
+      id: '/api/get-og-info'
+      path: '/api/get-og-info'
+      fullPath: '/api/get-og-info'
+      preLoaderRoute: typeof ApiGetOgInfoServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/chat/': {
+      id: '/api/chat/'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatIndexServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+  }
+}
+
+interface AdminRouteRouteChildren {
+  AdminActionsRoute: typeof AdminActionsRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminBrandingRoute: typeof AdminBrandingRoute
+  AdminIntegrationsRoute: typeof AdminIntegrationsRoute
+  AdminLeadsRoute: typeof AdminLeadsRoute
+  AdminPlaygroundRoute: typeof AdminPlaygroundRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminChatHistoryHistoryIdRoute: typeof AdminChatHistoryHistoryIdRoute
+  AdminChatHistoryIndexRoute: typeof AdminChatHistoryIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminActionsRoute: AdminActionsRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminBrandingRoute: AdminBrandingRoute,
+  AdminIntegrationsRoute: AdminIntegrationsRoute,
+  AdminLeadsRoute: AdminLeadsRoute,
+  AdminPlaygroundRoute: AdminPlaygroundRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminChatHistoryHistoryIdRoute: AdminChatHistoryHistoryIdRoute,
+  AdminChatHistoryIndexRoute: AdminChatHistoryIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -366,86 +528,19 @@ const rootRouteChildren: RootRouteChildren = {
   authRegisterRoute: authRegisterRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/admin",
-        "/(auth)/login",
-        "/(auth)/register",
-        "/onboarding/"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/admin": {
-      "filePath": "admin/route.tsx",
-      "children": [
-        "/admin/actions",
-        "/admin/analytics",
-        "/admin/branding",
-        "/admin/integrations",
-        "/admin/leads",
-        "/admin/playground",
-        "/admin/settings",
-        "/admin/chat-history/$historyId",
-        "/admin/chat-history/"
-      ]
-    },
-    "/(auth)/login": {
-      "filePath": "(auth)/login.tsx"
-    },
-    "/(auth)/register": {
-      "filePath": "(auth)/register.tsx"
-    },
-    "/admin/actions": {
-      "filePath": "admin/actions.tsx",
-      "parent": "/admin"
-    },
-    "/admin/analytics": {
-      "filePath": "admin/analytics.tsx",
-      "parent": "/admin"
-    },
-    "/admin/branding": {
-      "filePath": "admin/branding.tsx",
-      "parent": "/admin"
-    },
-    "/admin/integrations": {
-      "filePath": "admin/integrations.tsx",
-      "parent": "/admin"
-    },
-    "/admin/leads": {
-      "filePath": "admin/leads.tsx",
-      "parent": "/admin"
-    },
-    "/admin/playground": {
-      "filePath": "admin/playground.tsx",
-      "parent": "/admin"
-    },
-    "/admin/settings": {
-      "filePath": "admin/settings.tsx",
-      "parent": "/admin"
-    },
-    "/onboarding/": {
-      "filePath": "onboarding/index.tsx"
-    },
-    "/admin/chat-history/$historyId": {
-      "filePath": "admin/chat-history/$historyId.tsx",
-      "parent": "/admin"
-    },
-    "/admin/chat-history/": {
-      "filePath": "admin/chat-history/index.tsx",
-      "parent": "/admin"
-    }
-  }
+const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiGetOgInfoServerRoute: ApiGetOgInfoServerRoute,
+  ApiHelloServerRoute: ApiHelloServerRoute,
+  ApiMyLinksServerRoute: ApiMyLinksServerRoute,
+  ApiMyProductsServerRoute: ApiMyProductsServerRoute,
+  ApiQuestionsServerRoute: ApiQuestionsServerRoute,
+  ApiUploadServerRoute: ApiUploadServerRoute,
+  ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiChatIndexServerRoute: ApiChatIndexServerRoute,
 }
-ROUTE_MANIFEST_END */
+export const serverRouteTree = rootServerRouteImport
+  ._addFileChildren(rootServerRouteChildren)
+  ._addFileTypes<FileServerRouteTypes>()

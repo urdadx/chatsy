@@ -1,7 +1,7 @@
 // routes/api/hello.ts
-import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { createServerFileRoute } from "@tanstack/react-start/server";
 
-export const APIRoute = createAPIFileRoute("/api/hello")({
+export const ServerRoute = createServerFileRoute("/api/hello").methods({
   GET: async ({ request }) => {
     return new Response(`Hello, World! from ${request.url}`);
   },

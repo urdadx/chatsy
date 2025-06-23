@@ -25,13 +25,13 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Chatsy",
+        title: "Padyna",
       },
       ...seo({
-        title: "Chatsy - An AI agent for content creators",
+        title: "Padyna - An AI agent for content creators",
         description: "Create a custom AI agent for your link in bio",
-        keywords: "AI, bot, link in bio, custom bot, chatsy",
-        image: "https://chatsy.app/og-image.png",
+        keywords: "AI, bot, link in bio, custom bot, padyna",
+        image: "https://padyna.app/og-image.png",
       }),
     ],
     links: [

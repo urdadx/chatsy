@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { socialLink } from "@/db/schema";
 import { json } from "@tanstack/react-start";
-import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -24,7 +24,7 @@ const deleteLinkSchema = z.object({
   id: z.string().uuid(),
 });
 
-export const APIRoute = createAPIFileRoute("/api/my-links")({
+export const ServerRoute = createServerFileRoute("/api/my-links").methods({
   GET: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
     const userId = session?.user?.id;

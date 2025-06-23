@@ -1,6 +1,6 @@
 import { uploadImageToStorage } from "@/lib/upload-to-storage";
 import { json } from "@tanstack/react-start";
-import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { createServerFileRoute } from "@tanstack/react-start/server";
 
 async function parseFormData(request: Request) {
   const formData = await request.formData();
@@ -26,7 +26,7 @@ async function fileToBuffer(file: File): Promise<Buffer> {
   }
 }
 
-export const APIRoute = createAPIFileRoute("/api/upload")({
+export const ServerRoute = createServerFileRoute("/api/upload").methods({
   POST: async ({ request }) => {
     try {
       const file = await parseFormData(request);

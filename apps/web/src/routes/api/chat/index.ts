@@ -11,11 +11,11 @@ import {
 } from "@/lib/server-functions/chat-queries";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { json } from "@tanstack/react-start";
-import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { createServerFileRoute } from "@tanstack/react-start/server";
 import { streamText } from "ai";
 import { auth } from "auth";
 
-export const APIRoute = createAPIFileRoute("/api/chat")({
+export const ServerRoute = createServerFileRoute("/api/chat/").methods({
   POST: async ({ request }) => {
     try {
       const { id, messages, handle } = await request.json();
