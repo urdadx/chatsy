@@ -38,17 +38,19 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
 
       if (userMessage && userMessage?.role === "user") {
         try {
-          await db.insert(message).values({
-            chatId: id,
-            role: "user",
-            content: userMessage.content,
-            parts: userMessage.parts,
-          });
+          await db
+            .insert(message)
+            .values({
+              chatId: id,
+              role: "user",
+              content: userMessage.content,
+              parts: userMessage.parts,
+            })
+            .onConflictDoNothing();
         } catch (error) {
           console.error("Error saving user message:", error);
         }
       }
-
       const google = createGoogleGenerativeAI({
         apiKey: process.env.GEMINI_API_KEY!,
       });

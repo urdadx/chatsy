@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useChatWithReset } from "@/hooks/use-chat-reset";
 import { ChatSDKError } from "@/lib/errors";
-import { cn, fetchWithErrorHandlers, generateUUID } from "@/lib/utils";
+import { cn, fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp, MessageCircle, RefreshCcw, Settings, X } from "lucide-react";
@@ -16,10 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function ChatPreview() {
   const [isOpen, setIsOpen] = React.useState(false);
-  const id = localStorage.getItem("chatId") || generateUUID();
-  if (!localStorage.getItem("chatId")) {
-    localStorage.setItem("chatId", id);
-  }
+  const { chatId, resetChat } = useChatWithReset();
 
   const {
     messages,
@@ -30,7 +28,7 @@ export function ChatPreview() {
     input,
     setInput,
   } = useChat({
-    id,
+    id: chatId,
     fetch: fetchWithErrorHandlers,
     onError: (error) => {
       if (error instanceof ChatSDKError) {
@@ -38,8 +36,8 @@ export function ChatPreview() {
       }
     },
   });
-  const inputLength = input.trim().length;
 
+  const inputLength = input.trim().length;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -52,6 +50,13 @@ export function ChatPreview() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  const handleResetChat = useCallback(() => {
+    resetChat();
+    setMessages([]);
+    setInput("");
+    toast.success("Chat reset successfully");
+  }, [resetChat, setMessages, setInput]);
 
   const suggestions = [
     "What are the latest trends in AI?",
@@ -100,7 +105,7 @@ export function ChatPreview() {
                         onClick={() => setIsOpen(false)}
                       >
                         <Settings />
-                        <span className="sr-only">Close chat</span>
+                        <span className="sr-only">Settings</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent
@@ -115,10 +120,10 @@ export function ChatPreview() {
                       <Button
                         size="icon"
                         variant="ghost"
-                        onClick={() => setIsOpen(false)}
+                        onClick={handleResetChat}
                       >
                         <RefreshCcw className="h-4 w-4" />
-                        <span className="sr-only">Close chat</span>
+                        <span className="sr-only">Reset chat</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent
@@ -140,7 +145,7 @@ export function ChatPreview() {
                         key={message.id}
                       >
                         <PreviewMessage
-                          chatId={message.id}
+                          chatId={chatId}
                           message={message}
                           isLoading={
                             status === "streaming" &&
