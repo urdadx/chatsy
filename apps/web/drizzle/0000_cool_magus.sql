@@ -48,8 +48,6 @@ CREATE TABLE "Message" (
 	"chatId" uuid NOT NULL,
 	"role" varchar NOT NULL,
 	"parts" json NOT NULL,
-	"toolInvocations" json NOT NULL,
-	"attachments" json NOT NULL,
 	"content" json NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL
 );

@@ -16,21 +16,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function ChatPreview() {
   const [isOpen, setIsOpen] = React.useState(false);
-
-  const [chatSessionId, _setChatSessionId] = React.useState<string>(() => {
-    if (typeof window !== "undefined") {
-      const CHAT_SESSION_KEY = "chat-preview-session-id";
-      let sessionId = localStorage.getItem(CHAT_SESSION_KEY);
-
-      if (!sessionId) {
-        sessionId = generateUUID();
-        localStorage.setItem(CHAT_SESSION_KEY, sessionId);
-      }
-
-      return sessionId;
-    }
-    return "";
-  });
+  const id = localStorage.getItem("chatId") || generateUUID();
+  if (!localStorage.getItem("chatId")) {
+    localStorage.setItem("chatId", id);
+  }
 
   const {
     messages,
@@ -41,7 +30,7 @@ export function ChatPreview() {
     input,
     setInput,
   } = useChat({
-    id: chatSessionId,
+    id,
     fetch: fetchWithErrorHandlers,
     onError: (error) => {
       if (error instanceof ChatSDKError) {
@@ -171,12 +160,13 @@ export function ChatPreview() {
                   <div ref={messagesEndRef} />
                 </CardContent>
               </ScrollArea>
-              <AISuggestions className="px-4">
-                {suggestions.map((suggestion) => (
-                  <AISuggestion key={suggestion} suggestion={suggestion} />
-                ))}
-              </AISuggestions>
+
               <CardFooter className="flex flex-col space-y-2 ">
+                <AISuggestions className="">
+                  {suggestions.map((suggestion) => (
+                    <AISuggestion key={suggestion} suggestion={suggestion} />
+                  ))}
+                </AISuggestions>
                 <form
                   onSubmit={handleSubmit}
                   className="flex w-full items-center space-x-2"
@@ -184,7 +174,7 @@ export function ChatPreview() {
                   <Input
                     id="message"
                     placeholder="Chat with me..."
-                    className="flex-1"
+                    className="flex-1 text-sm sm:text-base"
                     autoComplete="off"
                     autoFocus
                     value={input}

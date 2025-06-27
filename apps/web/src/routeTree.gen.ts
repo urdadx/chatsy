@@ -20,7 +20,7 @@ import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
 import { Route as AdminIntegrationsRouteImport } from './routes/admin/integrations'
 import { Route as AdminBrandingRouteImport } from './routes/admin/branding'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
-import { Route as AdminActionsRouteImport } from './routes/admin/actions'
+import { Route as AdminAgentsRouteImport } from './routes/admin/agents'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
@@ -81,9 +81,9 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminActionsRoute = AdminActionsRouteImport.update({
-  id: '/actions',
-  path: '/actions',
+const AdminAgentsRoute = AdminAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const authRegisterRoute = authRegisterRouteImport.update({
@@ -153,7 +153,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/admin/actions': typeof AdminActionsRoute
+  '/admin/agents': typeof AdminAgentsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
@@ -169,7 +169,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/admin/actions': typeof AdminActionsRoute
+  '/admin/agents': typeof AdminAgentsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
@@ -186,7 +186,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
-  '/admin/actions': typeof AdminActionsRoute
+  '/admin/agents': typeof AdminAgentsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/branding': typeof AdminBrandingRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
@@ -204,7 +204,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/register'
-    | '/admin/actions'
+    | '/admin/agents'
     | '/admin/analytics'
     | '/admin/branding'
     | '/admin/integrations'
@@ -220,7 +220,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/register'
-    | '/admin/actions'
+    | '/admin/agents'
     | '/admin/analytics'
     | '/admin/branding'
     | '/admin/integrations'
@@ -236,7 +236,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/(auth)/login'
     | '/(auth)/register'
-    | '/admin/actions'
+    | '/admin/agents'
     | '/admin/analytics'
     | '/admin/branding'
     | '/admin/integrations'
@@ -395,11 +395,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/actions': {
-      id: '/admin/actions'
-      path: '/actions'
-      fullPath: '/admin/actions'
-      preLoaderRoute: typeof AdminActionsRouteImport
+    '/admin/agents': {
+      id: '/admin/agents'
+      path: '/agents'
+      fullPath: '/admin/agents'
+      preLoaderRoute: typeof AdminAgentsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/(auth)/register': {
@@ -494,7 +494,7 @@ declare module '@tanstack/react-start/server' {
 }
 
 interface AdminRouteRouteChildren {
-  AdminActionsRoute: typeof AdminActionsRoute
+  AdminAgentsRoute: typeof AdminAgentsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminBrandingRoute: typeof AdminBrandingRoute
   AdminIntegrationsRoute: typeof AdminIntegrationsRoute
@@ -506,7 +506,7 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminActionsRoute: AdminActionsRoute,
+  AdminAgentsRoute: AdminAgentsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminBrandingRoute: AdminBrandingRoute,
   AdminIntegrationsRoute: AdminIntegrationsRoute,

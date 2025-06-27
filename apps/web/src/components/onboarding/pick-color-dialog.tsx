@@ -8,7 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { ArrowRight, Palette, Plus } from "lucide-react";
+import { ArrowRight, PaintbrushIcon, Palette, Plus } from "lucide-react";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { Button } from "../ui/button";
@@ -63,16 +63,9 @@ export const ColorPickerDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button
-          type="button"
-          className={cn(
-            "w-8 h-8 cursor-pointer rounded-full flex items-center border-2 border-dashed border-gray-500 justify-center transition-all duration-200 hover:bg-gray-100 hover:scale-105",
-            isUpdating && "opacity-50 cursor-not-allowed",
-          )}
-          disabled={isUpdating}
-        >
-          <Plus className="w-4 h-4 text-gray-500" />
-        </button>
+        <Button variant="outline" className="w-fit text-purple-600">
+          <PaintbrushIcon />
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

@@ -1,6 +1,6 @@
 {
-  "id": "d79c7f2f-53fc-4abd-955d-9b690897a904",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "d3c955d5-2f2e-4e74-b4a4-da322c2f83ca",
+  "prevId": "d79c7f2f-53fc-4abd-955d-9b690897a904",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -343,14 +343,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "parts": {
-          "name": "parts",
-          "type": "json",
+        "content": {
+          "name": "content",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "content": {
-          "name": "content",
+        "parts": {
+          "name": "parts",
           "type": "json",
           "primaryKey": false,
           "notNull": true
@@ -359,8 +359,7 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},

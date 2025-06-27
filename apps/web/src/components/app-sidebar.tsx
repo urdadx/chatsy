@@ -8,7 +8,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useSession } from "@/lib/auth-client";
-import { getUser } from "@/lib/auth-utils";
+import { getChatById } from "@/lib/server-functions/chat-queries";
+import { generateUUID } from "@/lib/utils";
 import { Outlet } from "@tanstack/react-router";
 import {
   ChartNoAxesColumnIncreasing,
@@ -35,8 +36,8 @@ const data = {
       icon: Flame,
     },
     {
-      title: "Actions",
-      url: "/admin/actions",
+      title: "Agents",
+      url: "/admin/agents",
       icon: Zap,
     },
     {
@@ -73,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
 
   const user = session?.user;
-  console.log(user?.name, user?.email, user?.image);
+
   return (
     <SidebarProvider>
       <Sidebar collapsible="offcanvas" {...props}>
@@ -82,7 +83,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <Logo />
             <div className="hidden lg:flex">
               <h1 className="text-xl font-bold instrument-serif-regular-italic">
-                Chatsy
+                Padyna
               </h1>
             </div>
           </div>

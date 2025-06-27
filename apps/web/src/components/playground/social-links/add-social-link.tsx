@@ -230,10 +230,10 @@ export const AddSocialLink = () => {
               >
                 <Button
                   type="submit"
-                  className="bg-purple-600 text-white px-4 sm:px-6 py-2 w-full sm:w-auto text-sm sm:text-base"
+                  className="bg-purple-600 text-white px-4 sm:px-6 py-2 w-full sm:w-auto text-sm "
                   disabled={submitLink.isPending}
                 >
-                  <CirclePlus className="mr-2 h-4 w-4" />
+                  <CirclePlus className="mr-1 h-4 w-4" />
                   {submitLink.isPending ? (
                     <>
                       <span className="hidden sm:inline">Adding link...</span>

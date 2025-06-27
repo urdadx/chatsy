@@ -6,7 +6,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
-export const Route = createFileRoute("/admin/actions")({
+export const Route = createFileRoute("/admin/agents")({
   component: RouteComponent,
 });
 
@@ -83,7 +83,7 @@ function RouteComponent() {
   return (
     <div className="max-w-3xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
       <span className="text-md text-muted-foreground">
-        Enhance your bot's capabilities with tools and actions
+        Enhance your bot's capabilities with powerful agents
       </span>
       <div className="pt-4 flex flex-row justify-between items-center w-full gap-3">
         <SearchQuestions />

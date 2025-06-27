@@ -1,13 +1,9 @@
 import { db } from "@/db";
 import { message } from "@/db/schema";
+import { deleteChatById, getChatById, saveChat } from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import { saveFinalAssistantMessage } from "@/lib/ai/save-assistant-message";
 import type { Message } from "@/lib/ai/save-assistant-message";
-import {
-  deleteChatById,
-  getChatById,
-  saveChat,
-} from "@/lib/server-functions/chat-queries";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -18,6 +14,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
   POST: async ({ request }) => {
     try {
       const { id, messages } = await request.json();
+      console.log("Received chat ID:", id);
 
       const chat = await getChatById(id);
 
@@ -32,6 +29,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
           message: userMessage,
         });
         await saveChat({
+          id,
           userId: session.user.id,
           title,
           visibility: "private",
