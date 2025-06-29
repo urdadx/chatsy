@@ -2,7 +2,6 @@ import { db } from "@/db";
 import { chat, message } from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import { asc, eq } from "drizzle-orm";
-import { z } from "zod";
 
 export const getChatById = createServerFn({ method: "GET" })
   .validator((data: string) => data)
@@ -37,10 +36,13 @@ export const getMessagesByChatId = createServerFn({ method: "GET" })
       return results.map((result) => ({
         ...result,
         parts: result.parts as {},
-        content: result.content as {},
+        content: result.content as string,
+        role: result.role as "user" | "assistant",
+        createdAt: result.createdAt,
       }));
     } catch (error) {
       console.error("Error retrieving messages:", error);
+      console.log("Chat ID used:", ctx.data);
       throw new Error("Failed to get messages by chat ID");
     }
   });

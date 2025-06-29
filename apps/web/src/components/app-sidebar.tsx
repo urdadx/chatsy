@@ -8,8 +8,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useSession } from "@/lib/auth-client";
-import { getChatById } from "@/lib/server-functions/chat-queries";
-import { generateUUID } from "@/lib/utils";
 import { Outlet } from "@tanstack/react-router";
 import {
   ChartNoAxesColumnIncreasing,

@@ -1,0 +1,1 @@
+ALTER TABLE "branding" DROP COLUMN "name";

@@ -6,9 +6,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { ArrowRight, PaintbrushIcon, Palette, Plus } from "lucide-react";
+import { ArrowRight, Palette } from "lucide-react";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { Button } from "../ui/button";
@@ -63,9 +62,12 @@ export const ColorPickerDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-fit text-purple-600">
-          <PaintbrushIcon />
-        </Button>
+        <div
+          style={{
+            backgroundColor: color,
+          }}
+          className="w-8 h-8 rounded-full"
+        />
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

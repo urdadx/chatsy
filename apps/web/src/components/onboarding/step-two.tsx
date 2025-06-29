@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useStepperStore } from "../store/stepper-store";
 import { Button } from "../ui/button";
-import { ColorPickerDialog } from "./pick-color-dialog";
+import { ColorPickerDialog } from "./pick-color-onboard";
 
 export const StepTwo = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>("#8b5cf6");

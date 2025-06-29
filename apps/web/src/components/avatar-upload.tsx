@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
+import { useBranding, useUpdateBranding } from "@/hooks/use-bot-branding";
 import { useFileUpload } from "@/hooks/use-file-upload";
 
 // Define type for pixel crop area
@@ -34,14 +35,14 @@ const createImage = (url: string): Promise<HTMLImageElement> =>
     const image = new Image();
     image.addEventListener("load", () => resolve(image));
     image.addEventListener("error", (error) => reject(error));
-    image.setAttribute("crossOrigin", "anonymous"); // Needed for canvas Tainted check
+    image.setAttribute("crossOrigin", "anonymous");
     image.src = url;
   });
 
 async function getCroppedImg(
   imageSrc: string,
   pixelCrop: Area,
-  outputWidth: number = pixelCrop.width, // Optional: specify output size
+  outputWidth: number = pixelCrop.width,
   outputHeight: number = pixelCrop.height,
 ): Promise<Blob | null> {
   try {
@@ -53,11 +54,9 @@ async function getCroppedImg(
       return null;
     }
 
-    // Set canvas size to desired output size
     canvas.width = outputWidth;
     canvas.height = outputHeight;
 
-    // Draw the cropped image onto the canvas
     ctx.drawImage(
       image,
       pixelCrop.x,
@@ -66,15 +65,14 @@ async function getCroppedImg(
       pixelCrop.height,
       0,
       0,
-      outputWidth, // Draw onto the output size
+      outputWidth,
       outputHeight,
     );
 
-    // Convert canvas to blob
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
         resolve(blob);
-      }, "image/jpeg"); // Specify format and quality if needed
+      }, "image/jpeg");
     });
   } catch (error) {
     console.error("Error in getCroppedImg:", error);
@@ -83,6 +81,10 @@ async function getCroppedImg(
 }
 
 export function AvatarUpload() {
+  // Branding hooks
+  const { data: branding, isLoading: isBrandingLoading } = useBranding();
+  const updateBrandingMutation = useUpdateBranding();
+
   const [
     { files, isDragging },
     {
@@ -103,30 +105,31 @@ export function AvatarUpload() {
 
   const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-  // Ref to track the previous file ID to detect new uploads
   const previousFileIdRef = useRef<string | undefined | null>(null);
-
-  // State to store the desired crop area in pixels
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-
-  // State for zoom level
   const [zoom, setZoom] = useState(1);
 
-  // Callback for Cropper to provide crop data - Wrap with useCallback
+  // Set initial image from branding data
+  useEffect(() => {
+    if (branding?.image && !finalImageUrl) {
+      setFinalImageUrl(branding.image);
+    }
+  }, [branding?.image, finalImageUrl]);
+
   const handleCropChange = useCallback((pixels: Area | null) => {
     setCroppedAreaPixels(pixels);
   }, []);
 
   const handleApply = async () => {
-    // Check if we have the necessary data
-    if (!previewUrl || !fileId || !croppedAreaPixels) {
+    if (!previewUrl || !fileId || !croppedAreaPixels || !branding) {
       console.error("Missing data for apply:", {
         previewUrl,
         fileId,
         croppedAreaPixels,
+        branding,
       });
-      // Remove file if apply is clicked without crop data?
       if (fileId) {
         removeFile(fileId);
         setCroppedAreaPixels(null);
@@ -135,43 +138,82 @@ export function AvatarUpload() {
     }
 
     try {
-      // 1. Get the cropped image blob using the helper
+      setIsUploading(true);
+
+      // 1. Get the cropped image blob
       const croppedBlob = await getCroppedImg(previewUrl, croppedAreaPixels);
 
       if (!croppedBlob) {
         throw new Error("Failed to generate cropped image blob.");
       }
 
-      // 2. Create a NEW object URL from the cropped blob
-      const newFinalUrl = URL.createObjectURL(croppedBlob);
+      // 2. Create FormData for upload
+      const formData = new FormData();
+      formData.append("file", croppedBlob, "avatar.jpg");
 
-      // 3. Revoke the OLD finalImageUrl if it exists
-      if (finalImageUrl) {
-        URL.revokeObjectURL(finalImageUrl);
+      // 3. Upload via API endpoint
+      const uploadResponse = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Upload failed");
       }
 
-      // 4. Set the final avatar state to the NEW URL
-      setFinalImageUrl(newFinalUrl);
+      const { url: uploadedImageUrl } = await uploadResponse.json();
 
-      // 5. Close the dialog (don't remove the file yet)
+      // 4. Update branding with new image URL
+      const updatedBranding = {
+        ...branding,
+        image: uploadedImageUrl,
+      };
+
+      await updateBrandingMutation.mutateAsync(updatedBranding);
+
+      // 6. Update local state
+      if (finalImageUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(finalImageUrl);
+      }
+      setFinalImageUrl(uploadedImageUrl as string);
+
+      // 7. Clean up
+      removeFile(fileId);
       setIsDialogOpen(false);
+      setCroppedAreaPixels(null);
     } catch (error) {
       console.error("Error during apply:", error);
-      // Close the dialog even if cropping fails
-      setIsDialogOpen(false);
+      // You might want to show a toast notification here
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  const handleRemoveFinalImage = () => {
-    if (finalImageUrl) {
-      URL.revokeObjectURL(finalImageUrl);
+  const handleRemoveFinalImage = async () => {
+    if (!branding) return;
+
+    try {
+      // Update branding to remove image
+      const updatedBranding = {
+        ...branding,
+        image: null,
+      };
+
+      await updateBrandingMutation.mutateAsync(updatedBranding);
+
+      // Clean up local state
+      if (finalImageUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(finalImageUrl);
+      }
+      setFinalImageUrl(null);
+    } catch (error) {
+      console.error("Error removing image:", error);
+      // You might want to show a toast notification here
     }
-    setFinalImageUrl(null);
   };
 
   useEffect(() => {
     const currentFinalUrl = finalImageUrl;
-    // Cleanup function
     return () => {
       if (currentFinalUrl?.startsWith("blob:")) {
         URL.revokeObjectURL(currentFinalUrl);
@@ -179,22 +221,29 @@ export function AvatarUpload() {
     };
   }, [finalImageUrl]);
 
-  // Effect to open dialog when a *new* file is ready
   useEffect(() => {
-    // Check if fileId exists and is different from the previous one
     if (fileId && fileId !== previousFileIdRef.current) {
-      setIsDialogOpen(true); // Open dialog for the new file
-      setCroppedAreaPixels(null); // Reset crop area for the new file
-      setZoom(1); // Reset zoom for the new file
+      setIsDialogOpen(true);
+      setCroppedAreaPixels(null);
+      setZoom(1);
     }
-    // Update the ref to the current fileId for the next render
     previousFileIdRef.current = fileId;
-  }, [fileId]); // Depend only on fileId
+  }, [fileId]);
+
+  // Show loading state while branding is loading
+  if (isBrandingLoading) {
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="relative inline-flex">
+          <div className="h-14 w-14 animate-pulse rounded-full bg-muted" />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col  gap-2">
+    <div className="flex flex-col gap-2">
       <div className="relative inline-flex">
-        {/* Drop area - uses finalImageUrl */}
         <button
           type="button"
           className="border-primary h-14 w-14 bprd hover:bg-accent/50 data-[dragging=true]:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/50 relative flex size-16 items-center justify-center overflow-hidden rounded-full border border-dashed transition-colors outline-none focus-visible:ring-[3px] has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none"
@@ -205,12 +254,13 @@ export function AvatarUpload() {
           onDrop={handleDrop}
           data-dragging={isDragging || undefined}
           aria-label={finalImageUrl ? "Change image" : "Upload image"}
+          disabled={isUploading || updateBrandingMutation.isPending}
         >
           {finalImageUrl ? (
             <img
               className="size-full object-cover"
               src={finalImageUrl}
-              alt="User avatar"
+              alt="Branding"
               width={64}
               height={64}
               style={{ objectFit: "cover" }}
@@ -220,9 +270,14 @@ export function AvatarUpload() {
               <CircleUserRoundIcon className="size-4 opacity-60" />
             </div>
           )}
+          {(isUploading || updateBrandingMutation.isPending) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
+              <div className="size-4 animate-spin rounded-full border-2 border-primary border-r-transparent" />
+            </div>
+          )}
         </button>
-        {/* Remove button - depends on finalImageUrl */}
-        {finalImageUrl && (
+
+        {finalImageUrl && !isUploading && !updateBrandingMutation.isPending && (
           <Button
             onClick={handleRemoveFinalImage}
             size="icon"
@@ -240,7 +295,6 @@ export function AvatarUpload() {
         />
       </div>
 
-      {/* Cropper Dialog - Use isDialogOpen for open prop */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="gap-0 p-0 sm:max-w-140 *:[button]:hidden">
           <DialogDescription className="sr-only">
@@ -256,6 +310,7 @@ export function AvatarUpload() {
                   className="-my-1 opacity-60"
                   onClick={() => setIsDialogOpen(false)}
                   aria-label="Cancel"
+                  disabled={isUploading}
                 >
                   <ArrowLeftIcon aria-hidden="true" />
                 </Button>
@@ -264,10 +319,10 @@ export function AvatarUpload() {
               <Button
                 className="-my-1"
                 onClick={handleApply}
-                disabled={!previewUrl}
+                disabled={!previewUrl || isUploading || !branding}
                 autoFocus
               >
-                Apply
+                {isUploading ? "Uploading..." : "Apply"}
               </Button>
             </DialogTitle>
           </DialogHeader>
@@ -299,6 +354,7 @@ export function AvatarUpload() {
                 step={0.1}
                 onValueChange={(value) => setZoom(value[0])}
                 aria-label="Zoom slider"
+                disabled={isUploading}
               />
               <ZoomInIcon
                 className="shrink-0 opacity-60"

@@ -271,7 +271,7 @@ export const addSocialLinks = createServerFn({ method: "POST" })
 
       return {
         success: true,
-        message: " Social links added successfully",
+        message: "Social links added successfully",
         socialLinks: insertedLinks,
       };
     } catch (error) {

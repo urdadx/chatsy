@@ -29,6 +29,7 @@ import { ServerRoute as ApiUploadServerRouteImport } from './routes/api/upload'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
 import { ServerRoute as ApiMyProductsServerRouteImport } from './routes/api/my-products'
 import { ServerRoute as ApiMyLinksServerRouteImport } from './routes/api/my-links'
+import { ServerRoute as ApiMyBrandingServerRouteImport } from './routes/api/my-branding'
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
 import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-og-info'
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
@@ -125,6 +126,11 @@ const ApiMyProductsServerRoute = ApiMyProductsServerRouteImport.update({
 const ApiMyLinksServerRoute = ApiMyLinksServerRouteImport.update({
   id: '/api/my-links',
   path: '/api/my-links',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiMyBrandingServerRoute = ApiMyBrandingServerRouteImport.update({
+  id: '/api/my-branding',
+  path: '/api/my-branding',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiHelloServerRoute = ApiHelloServerRouteImport.update({
@@ -258,6 +264,7 @@ export interface RootRouteChildren {
 export interface FileServerRoutesByFullPath {
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
+  '/api/my-branding': typeof ApiMyBrandingServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/my-products': typeof ApiMyProductsServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -268,6 +275,7 @@ export interface FileServerRoutesByFullPath {
 export interface FileServerRoutesByTo {
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
+  '/api/my-branding': typeof ApiMyBrandingServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/my-products': typeof ApiMyProductsServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -279,6 +287,7 @@ export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
+  '/api/my-branding': typeof ApiMyBrandingServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/my-products': typeof ApiMyProductsServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -291,6 +300,7 @@ export interface FileServerRouteTypes {
   fullPaths:
     | '/api/get-og-info'
     | '/api/hello'
+    | '/api/my-branding'
     | '/api/my-links'
     | '/api/my-products'
     | '/api/questions'
@@ -301,6 +311,7 @@ export interface FileServerRouteTypes {
   to:
     | '/api/get-og-info'
     | '/api/hello'
+    | '/api/my-branding'
     | '/api/my-links'
     | '/api/my-products'
     | '/api/questions'
@@ -311,6 +322,7 @@ export interface FileServerRouteTypes {
     | '__root__'
     | '/api/get-og-info'
     | '/api/hello'
+    | '/api/my-branding'
     | '/api/my-links'
     | '/api/my-products'
     | '/api/questions'
@@ -322,6 +334,7 @@ export interface FileServerRouteTypes {
 export interface RootServerRouteChildren {
   ApiGetOgInfoServerRoute: typeof ApiGetOgInfoServerRoute
   ApiHelloServerRoute: typeof ApiHelloServerRoute
+  ApiMyBrandingServerRoute: typeof ApiMyBrandingServerRoute
   ApiMyLinksServerRoute: typeof ApiMyLinksServerRoute
   ApiMyProductsServerRoute: typeof ApiMyProductsServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
@@ -462,6 +475,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiMyLinksServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/my-branding': {
+      id: '/api/my-branding'
+      path: '/api/my-branding'
+      fullPath: '/api/my-branding'
+      preLoaderRoute: typeof ApiMyBrandingServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/hello': {
       id: '/api/hello'
       path: '/api/hello'
@@ -534,6 +554,7 @@ export const routeTree = rootRouteImport
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiGetOgInfoServerRoute: ApiGetOgInfoServerRoute,
   ApiHelloServerRoute: ApiHelloServerRoute,
+  ApiMyBrandingServerRoute: ApiMyBrandingServerRoute,
   ApiMyLinksServerRoute: ApiMyLinksServerRoute,
   ApiMyProductsServerRoute: ApiMyProductsServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,

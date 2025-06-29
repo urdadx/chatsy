@@ -15,6 +15,13 @@
       "when": 1750976952740,
       "tag": "0001_wealthy_colossus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751197290049,
+      "tag": "0002_smart_mauler",
+      "breakpoints": true
     }
   ]
 }

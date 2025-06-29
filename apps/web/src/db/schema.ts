@@ -181,7 +181,6 @@ export const branding = pgTable("branding", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 
-  name: text("name").notNull(),
   image: text("image"),
   primaryColor: text("primary_color").notNull().default("#9333ea"),
   theme: text("theme").notNull().default("light"),
@@ -195,8 +194,10 @@ export const branding = pgTable("branding", {
     .$defaultFn(() => new Date()),
 });
 
-export type Branding = InferSelectModel<typeof branding>;
-
+// In your schema file or types file
+export type Branding = InferSelectModel<typeof branding> & {
+  name: string;
+};
 export const lead = pgTable("lead", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   userId: uuid("user_id")
