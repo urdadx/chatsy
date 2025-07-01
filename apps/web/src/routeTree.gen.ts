@@ -24,7 +24,6 @@ import { Route as AdminAgentsRouteImport } from './routes/admin/agents'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
-import { Route as AdminChatHistoryHistoryIdRouteImport } from './routes/admin/chat-history/$historyId'
 import { ServerRoute as ApiUploadServerRouteImport } from './routes/api/upload'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
 import { ServerRoute as ApiMyProductsServerRouteImport } from './routes/api/my-products'
@@ -33,6 +32,7 @@ import { ServerRoute as ApiMyBrandingServerRouteImport } from './routes/api/my-b
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
 import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-og-info'
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
+import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -102,12 +102,6 @@ const AdminChatHistoryIndexRoute = AdminChatHistoryIndexRouteImport.update({
   path: '/chat-history/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminChatHistoryHistoryIdRoute =
-  AdminChatHistoryHistoryIdRouteImport.update({
-    id: '/chat-history/$historyId',
-    path: '/chat-history/$historyId',
-    getParentRoute: () => AdminRouteRoute,
-  } as any)
 const ApiUploadServerRoute = ApiUploadServerRouteImport.update({
   id: '/api/upload',
   path: '/api/upload',
@@ -148,6 +142,11 @@ const ApiChatIndexServerRoute = ApiChatIndexServerRouteImport.update({
   path: '/api/chat/',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiChatHistoryServerRoute = ApiChatHistoryServerRouteImport.update({
+  id: '/api/chat/history',
+  path: '/api/chat/history',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -167,7 +166,6 @@ export interface FileRoutesByFullPath {
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/onboarding': typeof OnboardingIndexRoute
-  '/admin/chat-history/$historyId': typeof AdminChatHistoryHistoryIdRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
 export interface FileRoutesByTo {
@@ -183,7 +181,6 @@ export interface FileRoutesByTo {
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/onboarding': typeof OnboardingIndexRoute
-  '/admin/chat-history/$historyId': typeof AdminChatHistoryHistoryIdRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
 export interface FileRoutesById {
@@ -200,7 +197,6 @@ export interface FileRoutesById {
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/onboarding/': typeof OnboardingIndexRoute
-  '/admin/chat-history/$historyId': typeof AdminChatHistoryHistoryIdRoute
   '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
 }
 export interface FileRouteTypes {
@@ -218,7 +214,6 @@ export interface FileRouteTypes {
     | '/admin/playground'
     | '/admin/settings'
     | '/onboarding'
-    | '/admin/chat-history/$historyId'
     | '/admin/chat-history'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -234,7 +229,6 @@ export interface FileRouteTypes {
     | '/admin/playground'
     | '/admin/settings'
     | '/onboarding'
-    | '/admin/chat-history/$historyId'
     | '/admin/chat-history'
   id:
     | '__root__'
@@ -250,7 +244,6 @@ export interface FileRouteTypes {
     | '/admin/playground'
     | '/admin/settings'
     | '/onboarding/'
-    | '/admin/chat-history/$historyId'
     | '/admin/chat-history/'
   fileRoutesById: FileRoutesById
 }
@@ -270,6 +263,7 @@ export interface FileServerRoutesByFullPath {
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/upload': typeof ApiUploadServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
 }
 export interface FileServerRoutesByTo {
@@ -281,6 +275,7 @@ export interface FileServerRoutesByTo {
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/upload': typeof ApiUploadServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
 }
 export interface FileServerRoutesById {
@@ -293,6 +288,7 @@ export interface FileServerRoutesById {
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/upload': typeof ApiUploadServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/chat/': typeof ApiChatIndexServerRoute
 }
 export interface FileServerRouteTypes {
@@ -306,6 +302,7 @@ export interface FileServerRouteTypes {
     | '/api/questions'
     | '/api/upload'
     | '/api/auth/$'
+    | '/api/chat/history'
     | '/api/chat'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
@@ -317,6 +314,7 @@ export interface FileServerRouteTypes {
     | '/api/questions'
     | '/api/upload'
     | '/api/auth/$'
+    | '/api/chat/history'
     | '/api/chat'
   id:
     | '__root__'
@@ -328,6 +326,7 @@ export interface FileServerRouteTypes {
     | '/api/questions'
     | '/api/upload'
     | '/api/auth/$'
+    | '/api/chat/history'
     | '/api/chat/'
   fileServerRoutesById: FileServerRoutesById
 }
@@ -340,6 +339,7 @@ export interface RootServerRouteChildren {
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
   ApiUploadServerRoute: typeof ApiUploadServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
+  ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
   ApiChatIndexServerRoute: typeof ApiChatIndexServerRoute
 }
 
@@ -436,13 +436,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminChatHistoryIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/chat-history/$historyId': {
-      id: '/admin/chat-history/$historyId'
-      path: '/chat-history/$historyId'
-      fullPath: '/admin/chat-history/$historyId'
-      preLoaderRoute: typeof AdminChatHistoryHistoryIdRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -503,6 +496,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiChatIndexServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/chat/history': {
+      id: '/api/chat/history'
+      path: '/api/chat/history'
+      fullPath: '/api/chat/history'
+      preLoaderRoute: typeof ApiChatHistoryServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -521,7 +521,6 @@ interface AdminRouteRouteChildren {
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminPlaygroundRoute: typeof AdminPlaygroundRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
-  AdminChatHistoryHistoryIdRoute: typeof AdminChatHistoryHistoryIdRoute
   AdminChatHistoryIndexRoute: typeof AdminChatHistoryIndexRoute
 }
 
@@ -533,7 +532,6 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminLeadsRoute: AdminLeadsRoute,
   AdminPlaygroundRoute: AdminPlaygroundRoute,
   AdminSettingsRoute: AdminSettingsRoute,
-  AdminChatHistoryHistoryIdRoute: AdminChatHistoryHistoryIdRoute,
   AdminChatHistoryIndexRoute: AdminChatHistoryIndexRoute,
 }
 
@@ -560,6 +558,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,
   ApiUploadServerRoute: ApiUploadServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
   ApiChatIndexServerRoute: ApiChatIndexServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport

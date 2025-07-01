@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { seo } from "@/lib/seo";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import type { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   HeadContent,
   Outlet,
@@ -60,6 +61,11 @@ function RootDocument() {
         <Toaster richColors theme="light" />
 
         <Scripts />
+        <ReactQueryDevtools
+          buttonPosition="bottom-left"
+          position="left"
+          initialIsOpen={false}
+        />
       </body>
     </html>
   );

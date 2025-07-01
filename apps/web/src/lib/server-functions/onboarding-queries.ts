@@ -131,7 +131,6 @@ export const updatePrimaryColor = createServerFn({ method: "POST" })
       if (existingBranding.length === 0) {
         result = await db.insert(branding).values({
           userId: session.user.id,
-          name: session.user.name,
           primaryColor,
         });
       } else {

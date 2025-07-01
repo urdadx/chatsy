@@ -19,7 +19,7 @@ const PurePreviewMessage = ({
 }: {
   chatId: string;
   message: UIMessage;
-  isLoading: boolean;
+  isLoading?: boolean;
   setMessages: UseChatHelpers["setMessages"];
   reload: UseChatHelpers["reload"];
 }) => {

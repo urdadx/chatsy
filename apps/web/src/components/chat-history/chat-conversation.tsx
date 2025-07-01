@@ -1,49 +1,54 @@
-import { ShoppingBag } from "lucide-react";
+import { useMessages } from "@/hooks/use-db-messages";
+import { useSearch } from "@tanstack/react-router";
+import { convertToUIMessages } from "../chat-preview";
+import { PreviewMessage } from "../message";
 import { Button } from "../ui/button";
+import { ScrollArea } from "../ui/scroll-area";
+import { Spinner } from "../ui/spinner";
 
 export const ChatConversation = () => {
+  const { chatId } = useSearch({ from: "/admin/chat-history/" });
+  const {
+    data: messagesFromDb,
+    isLoading,
+    error,
+    refetch,
+  } = useMessages(chatId || "");
+
+  const messages = messagesFromDb ? convertToUIMessages(messagesFromDb) : [];
+
   return (
-    <div className=" p-4 ">
-      <div className="max-w-2xl mx-auto space-y-4">
-        <div className="flex justify-end">
-          <div className="bg-gray-50 text-black px-4 py-2 rounded-lg max-w-xs">
-            <p className="text-sm">
-              Hey, I would like to check if my payment went through for my order
-            </p>
-          </div>
-        </div>
-
-        <div className="flex justify-start">
-          <div className="bg-purple-600 text-white px-4 py-2 rounded-lg max-w-xs">
-            <p className="text-sm">Ok, what's your order number?</p>
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <div className="bg-gray-50 text-black px-4 py-2 rounded-lg max-w-xs">
-            <p className="text-sm">Its #313A-DAD placed on 12th Nov.</p>
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <Button
-            variant="outline"
-            className="text-sm text-green-600 border-green-200 hover:bg-green-50 hover:text-green-800"
-          >
-            Get product info
-            <ShoppingBag className="h-4 w-4 " />
-          </Button>
-        </div>
-
-        <div className="flex justify-end">
-          <div className="bg-purple-600 text-white border px-4 py-2 rounded-lg max-w-md">
-            <p className="text-sm  mb-3">
-              We can see that your payment went through, you should receive an
-              email confirmation for the same shortly.
-            </p>
-          </div>
+    <ScrollArea className="flex-1 h-[320px]">
+      <div className=" p-4 ">
+        <div className="max-w-3xl mx-auto space-y-4">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <Spinner className="text-primary" />
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center h-full text-red-500">
+              <div className="text-center space-y-2">
+                <div>Error loading messages</div>
+                <Button onClick={() => refetch()} variant="outline">
+                  Retry
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {messages?.map((message) => (
+                <div key={message.id} className="w-full overflow-hidden p-1">
+                  <PreviewMessage
+                    chatId={chatId || ""}
+                    message={message}
+                    setMessages={messages}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 };

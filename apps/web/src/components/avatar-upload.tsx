@@ -1,5 +1,4 @@
 import {
-  ArrowLeftIcon,
   CircleUserRoundIcon,
   XIcon,
   ZoomInIcon,
@@ -305,17 +304,15 @@ export function AvatarUpload() {
               <div className="flex items-center gap-2">
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="-my-1 opacity-60"
+                  variant="outline"
                   onClick={() => setIsDialogOpen(false)}
                   aria-label="Cancel"
                   disabled={isUploading}
                 >
-                  <ArrowLeftIcon aria-hidden="true" />
+                  Cancel
                 </Button>
-                <span>Crop image</span>
               </div>
+              <p className="text-center">Crop image</p>
               <Button
                 className="-my-1"
                 onClick={handleApply}

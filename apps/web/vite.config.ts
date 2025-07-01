@@ -8,6 +8,7 @@ export default defineConfig({
     tsconfigPaths({
       projects: ["./tsconfig.json"],
     }),
+
     tailwindcss(),
     tanstackStart(),
   ],

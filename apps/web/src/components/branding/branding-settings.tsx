@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useBranding, useUpdateBranding } from "@/hooks/use-bot-branding";
 import { InfoIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { AvatarUpload } from "../avatar-upload";
 import { PickColor } from "../onboarding/pick-color";
@@ -49,15 +49,10 @@ export function BrandingSettings() {
     }
   };
 
-  useEffect(() => {
+  const handleNameBlur = () => {
     if (!branding || name === branding.name) return;
-
-    const timeoutId = setTimeout(() => {
-      updateBranding({ name });
-    }, 800);
-
-    return () => clearTimeout(timeoutId);
-  }, [name, branding]);
+    updateBranding({ name });
+  };
 
   const handleThemeChange = (newTheme: "light" | "dark") => {
     setSystemTheme(newTheme);
@@ -101,6 +96,7 @@ export function BrandingSettings() {
               className="w-[300px]"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onBlur={handleNameBlur}
               disabled={updateBrandingMutation.isPending}
             />
             {updateBrandingMutation.isPending && name !== branding?.name && (

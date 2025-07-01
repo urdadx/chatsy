@@ -7,6 +7,7 @@ import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
 import { cn, fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
+import { useQueryClient } from "@tanstack/react-query";
 import type { UIMessage } from "ai";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp, MessageCircle, RefreshCcw, Settings, X } from "lucide-react";
@@ -18,7 +19,9 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Spinner } from "./ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-function convertToUIMessages(messages: Array<DBMessage>): Array<UIMessage> {
+export function convertToUIMessages(
+  messages: Array<DBMessage>,
+): Array<UIMessage> {
   return messages.map((message) => ({
     id: message.id,
     parts: message.parts as UIMessage["parts"],
@@ -43,6 +46,8 @@ export function ChatPreview() {
     ? convertToUIMessages(messagesFromDb)
     : [];
 
+  const queryClient = useQueryClient();
+
   const {
     messages,
     setMessages,
@@ -60,6 +65,9 @@ export function ChatPreview() {
         toast.error(error.message);
       }
     },
+    onFinish: () => {
+      queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+    },
   });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -75,6 +83,8 @@ export function ChatPreview() {
     setMessages([]);
     setInput("");
     toast.success("Chat reset successfully");
+    queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+    queryClient.invalidateQueries({ queryKey: ["messages"] });
   }, [resetChat, setMessages, setInput]);
 
   const handleToggleOpen = useCallback(() => {
@@ -170,7 +180,6 @@ export function ChatPreview() {
                 </div>
               </div>
 
-              {/* Messages Area */}
               <ScrollArea className="flex-1 h-[320px]">
                 <CardContent className="p-4">
                   {isLoading ? (
