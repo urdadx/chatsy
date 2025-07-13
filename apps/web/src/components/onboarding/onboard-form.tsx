@@ -23,7 +23,7 @@ export function OnboardForm({
                 <GirlPointing className="w-full h-full object-cover" />
               </div>
             </div>
-          </div>{" "}
+          </div>
         </CardContent>
       </Card>
     </div>

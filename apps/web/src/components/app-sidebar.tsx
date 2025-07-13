@@ -7,41 +7,44 @@ import {
   SidebarProvider,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { useSession } from "@/lib/auth-client";
 import { Outlet } from "@tanstack/react-router";
 import {
+  BrainCog,
   ChartNoAxesColumnIncreasing,
   Flame,
-  LayoutDashboard,
+  Hammer,
   MessageCircle,
-  PaletteIcon,
-  Users,
+  Settings,
   Zap,
 } from "lucide-react";
 import type * as React from "react";
-import { ChatPreview } from "./chat-preview";
 import { Logo } from "./logo-image";
 import { NavMain } from "./nav-main";
 import { Navbar } from "./navbar";
 import { UpgradeBanner } from "./upgrade-banner";
-import { UserDropdown } from "./user-dropdown";
+import { WorkspaceSwitcher } from "./workspace-switcher";
 
 const data = {
   navMain: [
     {
-      title: "Playground",
-      url: "/admin/playground",
+      title: "Overview",
+      url: "/admin/overview",
       icon: Flame,
     },
     {
-      title: "Agents",
-      url: "/admin/agents",
-      icon: Zap,
+      title: "Knowlege Base",
+      url: "/admin/knowledge-base",
+      icon: BrainCog,
     },
     {
-      title: "Branding",
-      url: "/admin/branding",
-      icon: PaletteIcon,
+      title: "Playground",
+      url: "/admin/playground",
+      icon: Hammer,
+    },
+    {
+      title: "Actions",
+      url: "/admin/actions",
+      icon: Zap,
     },
 
     {
@@ -55,29 +58,19 @@ const data = {
       icon: MessageCircle,
     },
     {
-      title: "Leads",
-      url: "/admin/leads",
-      icon: Users,
-    },
-
-    {
-      title: "Integrations",
-      url: "/admin/integrations",
-      icon: LayoutDashboard,
+      title: "Settings",
+      url: "/admin/settings",
+      icon: Settings,
     },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session } = useSession();
-
-  const user = session?.user;
-
   return (
     <SidebarProvider>
       <Sidebar collapsible="offcanvas" {...props}>
-        <SidebarHeader>
-          <div className="flex gap-2 items-center pb-4">
+        <SidebarHeader className="pb-2">
+          <div className="flex gap-2 items-center pb-2">
             <Logo />
             <div className="hidden lg:flex">
               <h1 className="text-xl font-bold instrument-serif-regular-italic">
@@ -85,20 +78,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </h1>
             </div>
           </div>
+          <WorkspaceSwitcher />
         </SidebarHeader>
         <SidebarContent>
           <NavMain items={data.navMain} />
         </SidebarContent>
         <SidebarFooter>
           <UpgradeBanner />
-          <UserDropdown user={user} />
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
         <Navbar />
         <Outlet />
-        <ChatPreview />
       </SidebarInset>
     </SidebarProvider>
   );

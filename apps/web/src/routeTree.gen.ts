@@ -8,6 +8,7 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
@@ -16,11 +17,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminPlaygroundRouteImport } from './routes/admin/playground'
+import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
 import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
-import { Route as AdminIntegrationsRouteImport } from './routes/admin/integrations'
-import { Route as AdminBrandingRouteImport } from './routes/admin/branding'
+import { Route as AdminKnowledgeBaseRouteImport } from './routes/admin/knowledge-base'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
-import { Route as AdminAgentsRouteImport } from './routes/admin/agents'
+import { Route as AdminActionsRouteImport } from './routes/admin/actions'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
@@ -35,6 +36,7 @@ import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
+const AdminTestLazyRouteImport = createFileRoute('/admin/test')()
 const rootServerRouteImport = createServerRootRoute()
 
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -52,6 +54,11 @@ const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
   path: '/onboarding/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTestLazyRoute = AdminTestLazyRouteImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => AdminRouteRoute,
+} as any).lazy(() => import('./routes/admin/test.lazy').then((d) => d.Route))
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -62,19 +69,19 @@ const AdminPlaygroundRoute = AdminPlaygroundRouteImport.update({
   path: '/playground',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminOverviewRoute = AdminOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminLeadsRoute = AdminLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminIntegrationsRoute = AdminIntegrationsRouteImport.update({
-  id: '/integrations',
-  path: '/integrations',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminBrandingRoute = AdminBrandingRouteImport.update({
-  id: '/branding',
-  path: '/branding',
+const AdminKnowledgeBaseRoute = AdminKnowledgeBaseRouteImport.update({
+  id: '/knowledge-base',
+  path: '/knowledge-base',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
@@ -82,9 +89,9 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminAgentsRoute = AdminAgentsRouteImport.update({
-  id: '/agents',
-  path: '/agents',
+const AdminActionsRoute = AdminActionsRouteImport.update({
+  id: '/actions',
+  path: '/actions',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const authRegisterRoute = authRegisterRouteImport.update({
@@ -158,13 +165,14 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/admin/agents': typeof AdminAgentsRoute
+  '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/branding': typeof AdminBrandingRoute
-  '/admin/integrations': typeof AdminIntegrationsRoute
+  '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
   '/admin/leads': typeof AdminLeadsRoute
+  '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
@@ -173,13 +181,14 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/admin/agents': typeof AdminAgentsRoute
+  '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/branding': typeof AdminBrandingRoute
-  '/admin/integrations': typeof AdminIntegrationsRoute
+  '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
   '/admin/leads': typeof AdminLeadsRoute
+  '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
@@ -189,13 +198,14 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
-  '/admin/agents': typeof AdminAgentsRoute
+  '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/branding': typeof AdminBrandingRoute
-  '/admin/integrations': typeof AdminIntegrationsRoute
+  '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
   '/admin/leads': typeof AdminLeadsRoute
+  '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/test': typeof AdminTestLazyRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
 }
@@ -206,13 +216,14 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/register'
-    | '/admin/agents'
+    | '/admin/actions'
     | '/admin/analytics'
-    | '/admin/branding'
-    | '/admin/integrations'
+    | '/admin/knowledge-base'
     | '/admin/leads'
+    | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
+    | '/admin/test'
     | '/onboarding'
     | '/admin/chat-history'
   fileRoutesByTo: FileRoutesByTo
@@ -221,13 +232,14 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/register'
-    | '/admin/agents'
+    | '/admin/actions'
     | '/admin/analytics'
-    | '/admin/branding'
-    | '/admin/integrations'
+    | '/admin/knowledge-base'
     | '/admin/leads'
+    | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
+    | '/admin/test'
     | '/onboarding'
     | '/admin/chat-history'
   id:
@@ -236,13 +248,14 @@ export interface FileRouteTypes {
     | '/admin'
     | '/(auth)/login'
     | '/(auth)/register'
-    | '/admin/agents'
+    | '/admin/actions'
     | '/admin/analytics'
-    | '/admin/branding'
-    | '/admin/integrations'
+    | '/admin/knowledge-base'
     | '/admin/leads'
+    | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
+    | '/admin/test'
     | '/onboarding/'
     | '/admin/chat-history/'
   fileRoutesById: FileRoutesById
@@ -366,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/test': {
+      id: '/admin/test'
+      path: '/test'
+      fullPath: '/admin/test'
+      preLoaderRoute: typeof AdminTestLazyRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -380,6 +400,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPlaygroundRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/overview': {
+      id: '/admin/overview'
+      path: '/overview'
+      fullPath: '/admin/overview'
+      preLoaderRoute: typeof AdminOverviewRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/leads': {
       id: '/admin/leads'
       path: '/leads'
@@ -387,18 +414,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/integrations': {
-      id: '/admin/integrations'
-      path: '/integrations'
-      fullPath: '/admin/integrations'
-      preLoaderRoute: typeof AdminIntegrationsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/branding': {
-      id: '/admin/branding'
-      path: '/branding'
-      fullPath: '/admin/branding'
-      preLoaderRoute: typeof AdminBrandingRouteImport
+    '/admin/knowledge-base': {
+      id: '/admin/knowledge-base'
+      path: '/knowledge-base'
+      fullPath: '/admin/knowledge-base'
+      preLoaderRoute: typeof AdminKnowledgeBaseRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/analytics': {
@@ -408,11 +428,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/agents': {
-      id: '/admin/agents'
-      path: '/agents'
-      fullPath: '/admin/agents'
-      preLoaderRoute: typeof AdminAgentsRouteImport
+    '/admin/actions': {
+      id: '/admin/actions'
+      path: '/actions'
+      fullPath: '/admin/actions'
+      preLoaderRoute: typeof AdminActionsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/(auth)/register': {
@@ -514,24 +534,26 @@ declare module '@tanstack/react-start/server' {
 }
 
 interface AdminRouteRouteChildren {
-  AdminAgentsRoute: typeof AdminAgentsRoute
+  AdminActionsRoute: typeof AdminActionsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
-  AdminBrandingRoute: typeof AdminBrandingRoute
-  AdminIntegrationsRoute: typeof AdminIntegrationsRoute
+  AdminKnowledgeBaseRoute: typeof AdminKnowledgeBaseRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
+  AdminOverviewRoute: typeof AdminOverviewRoute
   AdminPlaygroundRoute: typeof AdminPlaygroundRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTestLazyRoute: typeof AdminTestLazyRoute
   AdminChatHistoryIndexRoute: typeof AdminChatHistoryIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminAgentsRoute: AdminAgentsRoute,
+  AdminActionsRoute: AdminActionsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
-  AdminBrandingRoute: AdminBrandingRoute,
-  AdminIntegrationsRoute: AdminIntegrationsRoute,
+  AdminKnowledgeBaseRoute: AdminKnowledgeBaseRoute,
   AdminLeadsRoute: AdminLeadsRoute,
+  AdminOverviewRoute: AdminOverviewRoute,
   AdminPlaygroundRoute: AdminPlaygroundRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminTestLazyRoute: AdminTestLazyRoute,
   AdminChatHistoryIndexRoute: AdminChatHistoryIndexRoute,
 }
 

@@ -1,5 +1,6 @@
 import { Markdown } from "@/components/markdown";
 import type { Vote } from "@/db/schema";
+import { useBranding } from "@/hooks/use-bot-branding";
 
 import { cn, sanitizeText } from "@/lib/utils";
 import type { UseChatHelpers } from "@ai-sdk/react";
@@ -24,6 +25,7 @@ const PurePreviewMessage = ({
   reload: UseChatHelpers["reload"];
 }) => {
   const [mode, setMode] = useState<"view" | "edit">("view");
+  const { data: branding } = useBranding();
 
   return (
     <AnimatePresence>
@@ -45,7 +47,15 @@ const PurePreviewMessage = ({
         >
           {message.role === "assistant" && (
             <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
-              <SparklesIcon size={14} />
+              {branding?.image ? (
+                <img
+                  src={branding.image}
+                  alt="Assistant"
+                  className="rounded-full"
+                />
+              ) : (
+                <SparklesIcon size={14} />
+              )}
             </div>
           )}
 
@@ -58,9 +68,15 @@ const PurePreviewMessage = ({
                 return (
                   <div key={key} className="flex flex-row gap-2 items-start">
                     <div
+                      style={{
+                        backgroundColor:
+                          message.role === "user"
+                            ? branding?.primaryColor
+                            : undefined,
+                      }}
                       data-testid="message-content"
                       className={cn("flex flex-col gap-4", {
-                        "bg-primary text-primary-foreground px-3 py-2 rounded-md":
+                        " text-primary-foreground px-3 py-2 rounded-md":
                           message.role === "user",
                       })}
                     >

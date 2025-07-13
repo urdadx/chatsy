@@ -1,9 +1,8 @@
 import { AccountSettings } from "@/components/settings/account-settings";
 import { Billing } from "@/components/settings/billing-page";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MembersTable } from "@/components/workspace/members-table";
 import { createFileRoute } from "@tanstack/react-router";
-import { Mail } from "lucide-react";
 
 export const Route = createFileRoute("/admin/settings")({
   component: RouteComponent,
@@ -24,42 +23,28 @@ function RouteComponent() {
           >
             Account
           </TabsTrigger>
-
           <TabsTrigger
             value="tab-3"
             className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
-            Billing
+            Invited members
           </TabsTrigger>
           <TabsTrigger
-            value="tab-4"
+            value="tab-2"
             className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
-            Feedback
+            Billing
           </TabsTrigger>
         </TabsList>
         <TabsContent value="tab-1">
           <AccountSettings />
         </TabsContent>
 
-        <TabsContent value="tab-3">
+        <TabsContent value="tab-2">
           <Billing />
         </TabsContent>
-        <TabsContent value="tab-4">
-          <p className="text-muted-foreground py-4 text-sm">
-            Help us improve <span className="text-primary">Chatsy</span> by
-            sharing your feedback.
-          </p>
-          <a
-            href="https://urdadx.userjot.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button>
-              <Mail className="h-4 w-4" />
-              Submit Feedback
-            </Button>
-          </a>
+        <TabsContent value="tab-3">
+          <MembersTable />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,73 +1,36 @@
-import { DigitalProducts } from "@/components/digital-products";
-import { BotQuestions } from "@/components/playground/questions";
-import { SocialLinks } from "@/components/playground/social-links";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  createFileRoute,
-  useNavigate,
-  useSearch,
-} from "@tanstack/react-router";
+import { BrandingSettings } from "@/components/branding/branding-settings";
+import { ChatPreview } from "@/components/chat-preview";
+import { createFileRoute } from "@tanstack/react-router";
+
 import { z } from "zod";
 
-const playgroundSearchSchema = z.object({
-  tab: z.enum(["socials", "qa", "products"]).optional().default("socials"),
+const brandingSearchSchema = z.object({
+  tab: z
+    .enum(["chat-settings", "appearance"])
+    .optional()
+    .default("chat-settings"),
 });
 
 export const Route = createFileRoute("/admin/playground")({
   component: RouteComponent,
-  validateSearch: playgroundSearchSchema,
+  validateSearch: brandingSearchSchema,
 });
 
 function RouteComponent() {
-  const navigate = useNavigate({ from: "/admin/playground" });
-  const { tab } = useSearch({ from: "/admin/playground" });
-
-  const handleTabChange = (value: string) => {
-    navigate({
-      search: { tab: value as "socials" | "qa" | "products" },
-    });
-  };
-
   return (
-    <div className="max-w-3xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
-      <span className="text-md text-muted-foreground">
-        Train your bot based on your social links, fan questions, and your
-        products
-      </span>
+    <div className="flex flex-1 min-h-0">
+      <div className="mb-12 w-full sm:basis-3/5">
+        <div className="max-w-xl mx-auto w-full p-4">
+          <span className="text-md text-muted-foreground">
+            Test your bot's responses and customize its appearance
+          </span>
 
-      <Tabs value={tab} onValueChange={handleTabChange} className="mt-6">
-        <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0 ">
-          <TabsTrigger
-            value="socials"
-            className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-          >
-            My Links
-          </TabsTrigger>
-          <TabsTrigger
-            value="qa"
-            className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-          >
-            Q&A
-          </TabsTrigger>
-
-          <TabsTrigger
-            value="products"
-            className="hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-          >
-            My Products
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="socials">
-          <SocialLinks />
-        </TabsContent>
-        <TabsContent value="qa">
-          <BotQuestions />
-        </TabsContent>
-        <TabsContent value="products">
-          <DigitalProducts />
-        </TabsContent>
-      </Tabs>
+          <BrandingSettings />
+        </div>
+      </div>
+      <div className="hidden lg:flex lg:basis-2/5 border-l bg-background fixed right-0 top-0 h-full p-6">
+        <ChatPreview />
+      </div>
     </div>
   );
 }

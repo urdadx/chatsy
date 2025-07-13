@@ -1,14 +1,10 @@
 import type { Branding } from "@/db/schema";
 import { api } from "@/lib/api";
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export function useBranding() {
-  return useSuspenseQuery<Branding>({
+  return useQuery<Branding>({
     queryKey: ["branding"],
     queryFn: async () => {
       const response = await api.get("/my-branding");

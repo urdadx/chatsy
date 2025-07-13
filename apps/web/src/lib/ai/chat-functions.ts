@@ -45,11 +45,13 @@ export async function saveChat({
   userId,
   title,
   visibility,
+  organizationId,
 }: {
   id?: string;
   userId: string;
   title: string;
   visibility: VisibilityType;
+  organizationId: string;
 }) {
   try {
     return await db
@@ -60,6 +62,7 @@ export async function saveChat({
         userId,
         title,
         visibility,
+        organizationId,
       })
       .onConflictDoNothing();
   } catch (error) {

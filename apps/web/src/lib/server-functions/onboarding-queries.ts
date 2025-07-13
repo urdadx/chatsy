@@ -1,9 +1,9 @@
 import { db } from "@/db";
-import { branding, question, socialLink, user } from "@/db/schema";
+import { branding, member, question, socialLink, user } from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 const User = z.object({
@@ -118,19 +118,44 @@ export const updatePrimaryColor = createServerFn({ method: "POST" })
         );
       }
 
-      console.log("Updating primary color for user:", session.user.id);
+      const organizationId = session?.session?.activeOrganizationId;
+      if (!organizationId) {
+        throw new Error("No active organization");
+      }
+
+      // Verify user is a member of the organization
+      const [membership] = await db
+        .select()
+        .from(member)
+        .where(
+          and(
+            eq(member.userId, session.user.id),
+            eq(member.organizationId, organizationId),
+          ),
+        );
+
+      if (!membership) {
+        throw new Error("Forbidden: You are not a member of this organization");
+      }
+
+      // Optional: Check if user has permission to update branding
+      // if (!['admin', 'owner'].includes(membership.role)) {
+      //   throw new Error("Insufficient permissions: Only admins and owners can update branding");
+      // }
+
+      console.log("Updating primary color for organization:", organizationId);
 
       const existingBranding = await db
         .select({ id: branding.id })
         .from(branding)
-        .where(eq(branding.userId, session.user.id))
+        .where(eq(branding.organizationId, organizationId))
         .limit(1);
 
       let result: any;
 
       if (existingBranding.length === 0) {
         result = await db.insert(branding).values({
-          userId: session.user.id,
+          organizationId,
           primaryColor,
         });
       } else {
@@ -138,8 +163,9 @@ export const updatePrimaryColor = createServerFn({ method: "POST" })
           .update(branding)
           .set({
             primaryColor,
+            updatedAt: new Date(),
           })
-          .where(eq(branding.userId, session.user.id));
+          .where(eq(branding.organizationId, organizationId));
       }
 
       return {
@@ -154,7 +180,10 @@ export const updatePrimaryColor = createServerFn({ method: "POST" })
         if (
           error.message.startsWith("Unauthorized") ||
           error.message.startsWith("Validation failed") ||
-          error.message.startsWith("Branding not found")
+          error.message.startsWith("Branding not found") ||
+          error.message.startsWith("Forbidden") ||
+          error.message.startsWith("No active organization") ||
+          error.message.startsWith("Insufficient permissions")
         ) {
           throw error;
         }
@@ -198,8 +227,36 @@ export const addQuestion = createServerFn({ method: "POST" })
           throw new Error("Unauthorized: Please log in to add a question");
         }
 
+        const organizationId = session?.session?.activeOrganizationId;
+        if (!organizationId) {
+          throw new Error("No active organization");
+        }
+
+        // Verify user is a member of the organization
+        const [membership] = await db
+          .select()
+          .from(member)
+          .where(
+            and(
+              eq(member.userId, session.user.id),
+              eq(member.organizationId, organizationId),
+            ),
+          );
+
+        if (!membership) {
+          throw new Error(
+            "Forbidden: You are not a member of this organization",
+          );
+        }
+
+        // Optional: Check if user has permission to add questions
+        // if (!['admin', 'owner', 'member'].includes(membership.role)) {
+        //   throw new Error("Insufficient permissions to add questions");
+        // }
+
         await db.insert(question).values({
           userId: session.user.id,
+          organizationId,
           question: questionText,
           answer,
           isSuggested: isSuggested,
@@ -215,7 +272,10 @@ export const addQuestion = createServerFn({ method: "POST" })
         if (error instanceof Error) {
           if (
             error.message.startsWith("Unauthorized") ||
-            error.message.startsWith("Validation failed")
+            error.message.startsWith("Validation failed") ||
+            error.message.startsWith("Forbidden") ||
+            error.message.startsWith("No active organization") ||
+            error.message.startsWith("Insufficient permissions")
           ) {
             throw error;
           }

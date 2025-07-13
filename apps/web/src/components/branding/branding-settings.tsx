@@ -1,13 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
@@ -15,8 +9,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useBranding, useUpdateBranding } from "@/hooks/use-bot-branding";
-import { InfoIcon } from "lucide-react";
-import { useState } from "react";
+import { InfoIcon, Plus, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AvatarUpload } from "../avatar-upload";
 import { PickColor } from "../onboarding/pick-color";
@@ -28,11 +22,20 @@ export function BrandingSettings() {
   const { data: branding, error, refetch } = useBranding();
   const updateBrandingMutation = useUpdateBranding();
 
-  const [name, setName] = useState(branding?.name || "");
-  const [systemTheme, setSystemTheme] = useState(branding?.theme || "light");
+  const [name, setName] = useState("");
   const [hidePoweredBy, setHidePoweredBy] = useState(
     branding?.hidePoweredBy || false,
   );
+  const [initialMessage, setInitialMessage] = useState("");
+  const [suggestedMessages, setSuggestedMessages] = useState<string[]>([]);
+  const [showSuggestedInput, setShowSuggestedInput] = useState(false);
+
+  useEffect(() => {
+    setName(branding?.name || "");
+    setHidePoweredBy(branding?.hidePoweredBy || false);
+    setInitialMessage(branding?.initialMessage || "");
+    setSuggestedMessages(branding?.suggestedMessages || []);
+  }, [branding]);
 
   const updateBranding = async (updates: Partial<typeof branding>) => {
     if (!branding) return;
@@ -54,23 +57,61 @@ export function BrandingSettings() {
     updateBranding({ name });
   };
 
-  const handleThemeChange = (newTheme: "light" | "dark") => {
-    setSystemTheme(newTheme);
-    updateBranding({ theme: newTheme });
-  };
-
   const handleHidePoweredByChange = (checked: boolean) => {
     setHidePoweredBy(checked);
     updateBranding({ hidePoweredBy: checked });
   };
 
+  const handleInitialMessageBlur = () => {
+    if (!branding || initialMessage === branding.initialMessage) return;
+    updateBranding({ initialMessage });
+  };
+
+  const handleSuggestedMessageChange = (index: number, value: string) => {
+    const newMessages = [...suggestedMessages];
+    newMessages[index] = value;
+    setSuggestedMessages(newMessages);
+  };
+
+  const handleSuggestedMessageBlur = () => {
+    const filteredMessages = suggestedMessages.filter(
+      (msg) => msg.trim() !== "",
+    );
+    updateBranding({ suggestedMessages: filteredMessages });
+  };
+
+  const addSuggestedMessage = () => {
+    if (suggestedMessages.length < 3) {
+      setSuggestedMessages([...suggestedMessages, ""]);
+      setShowSuggestedInput(true);
+    }
+  };
+
+  const removeSuggestedMessage = (index: number) => {
+    const newMessages = suggestedMessages.filter((_, i) => i !== index);
+    setSuggestedMessages(newMessages);
+    updateBranding({
+      suggestedMessages: newMessages.filter((msg) => msg.trim() !== ""),
+    });
+    if (newMessages.length === 0) {
+      setShowSuggestedInput(false);
+    }
+  };
+
   if (error) {
     return (
       <div className="w-full mx-auto px-2 sm:px-0">
-        <div className="text-center py-8">
-          <p className="text-red-500">Error loading branding settings</p>
-          <Button variant="outline" onClick={() => refetch()}>
-            Refresh
+        <div className="flex flex-col items-center justify-center py-16 space-y-4">
+          <div className="rounded-full bg-red-50 p-3">
+            <X className="h-6 w-6 text-red-500" />
+          </div>
+          <div className="text-center space-y-2">
+            <h3 className="text-lg font-semibold text-gray-700">
+              Unable to load branding settings
+            </h3>
+          </div>
+          <Button variant="outline" onClick={() => refetch()} className="mt-4">
+            Try again
           </Button>
         </div>
       </div>
@@ -118,37 +159,84 @@ export function BrandingSettings() {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <div className="flex items-center gap-2">
-            <Label htmlFor="systemTheme">Theme</Label>
+            <Label>Initial Bot Message</Label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <InfoIcon className="h-4 w-4 text-muted-foreground" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Choose the theme for your bot</p>
+                  <p>Message that appears when the chat starts</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
-          <Select
-            value={systemTheme}
-            onValueChange={handleThemeChange}
-            disabled={updateBrandingMutation.isPending}
-          >
-            <SelectTrigger id="systemTheme" className="w-[300px]">
-              <SelectValue />
-              {updateBrandingMutation.isPending &&
-                systemTheme !== branding?.theme && (
-                  <div className="ml-2">
-                    <Spinner className="text-primary" />
-                  </div>
-                )}
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="relative">
+            <Textarea
+              className="w-[300px] min-h-[80px]"
+              value={initialMessage}
+              onChange={(e) => setInitialMessage(e.target.value)}
+              onBlur={handleInitialMessageBlur}
+              placeholder="Add initial message"
+              disabled={updateBrandingMutation.isPending}
+            />
+            {updateBrandingMutation.isPending &&
+              initialMessage !== branding?.initialMessage && (
+                <div className="absolute right-2 top-2">
+                  <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-r-transparent" />
+                </div>
+              )}
+          </div>
+        </div>
+        <Separator className="my-3" />
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-between">
+          <div className="flex items-center gap-2">
+            <Label>Suggested Messages</Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Quick reply suggestions for users</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <div className="space-y-2">
+            {(showSuggestedInput || suggestedMessages.length > 0) &&
+              suggestedMessages.map((message, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Input
+                    className=""
+                    value={message}
+                    onChange={(e) =>
+                      handleSuggestedMessageChange(index, e.target.value)
+                    }
+                    onBlur={handleSuggestedMessageBlur}
+                    placeholder={`Suggested message ${index + 1}`}
+                    disabled={updateBrandingMutation.isPending}
+                  />
+                  <Button
+                    variant="ghost"
+                    onClick={() => removeSuggestedMessage(index)}
+                  >
+                    <X className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+              ))}
+            {suggestedMessages.length < 3 && (
+              <Button
+                variant="outline"
+                onClick={addSuggestedMessage}
+                className="w-fit"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add suggested message
+              </Button>
+            )}
+          </div>
         </div>
         <Separator className="my-3" />
 

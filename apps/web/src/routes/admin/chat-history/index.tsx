@@ -6,7 +6,7 @@ import {
   useNavigate,
   useSearch,
 } from "@tanstack/react-router";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Search } from "lucide-react";
 
 import { ChatConversation } from "@/components/chat-history/chat-conversation";
 import { ChatLogItem } from "@/components/chat-history/chat-log-item";
@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { RiSearch2Line } from "@remixicon/react";
 import { z } from "zod";
 
 export const chatHistorySearchSchema = z.object({
@@ -63,11 +64,8 @@ function RouteComponent() {
 
   if (!isLoading && !isError && chats.length === 0) {
     return (
-      <div className="max-w-5xl border rounded-lg my-4 w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
-        <span className="text-md text-muted-foreground mb-4 block">
-          View and manage your bot's chat history
-        </span>
-        <div className="bg-white border rounded-lg py-2">
+      <div className="max-w-5xl my-4 w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
+        <div className="bg-white border rounded-lg my-4 py-2">
           <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white">
             <h1 className="text-md font-semibold">Chat Logs</h1>
             <div className="flex items-center space-x-3">
@@ -94,9 +92,12 @@ function RouteComponent() {
             </div>
           </div>
           <div className="flex justify-center items-center h-[calc(100vh-13rem)]">
-            <p className="text-center text-lg text-gray-500">
-              No chat logs found for the selected time period
-            </p>
+            <div className="flex flex-col items-center space-y-2">
+              <RiSearch2Line className="h-14 w-14 text-primary" />
+              <p className="text-center text-lg text-gray-500">
+                No chat logs found
+              </p>
+            </div>
           </div>
         </div>
       </div>

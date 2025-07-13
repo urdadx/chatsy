@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { message } from "@/db/schema";
+import { member, message } from "@/db/schema";
 import { deleteChatById, getChatById, saveChat } from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import { saveFinalAssistantMessage } from "@/lib/ai/save-assistant-message";
@@ -9,6 +9,7 @@ import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { streamText } from "ai";
 import { auth } from "auth";
+import { and, eq } from "drizzle-orm";
 
 export const ServerRoute = createServerFileRoute("/api/chat/").methods({
   POST: async ({ request }) => {
@@ -16,13 +17,33 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
       const { id, messages } = await request.json();
       console.log("Received chat ID:", id);
 
-      const chat = await getChatById(id);
-
-      const userMessage = messages[messages.length - 1];
       const session = await auth.api.getSession({ headers: request.headers });
       if (!session) {
         return new Response("Unauthorized", { status: 401 });
       }
+
+      const organizationId = session?.session?.activeOrganizationId;
+      if (!organizationId) {
+        return new Response("No active organization", { status: 400 });
+      }
+
+      // Verify user is a member of the organization
+      const [membership] = await db
+        .select()
+        .from(member)
+        .where(
+          and(
+            eq(member.userId, session.user.id),
+            eq(member.organizationId, organizationId),
+          ),
+        );
+
+      if (!membership) {
+        return new Response("Forbidden", { status: 403 });
+      }
+
+      const chat = await getChatById(id);
+      const userMessage = messages[messages.length - 1];
 
       if (!chat) {
         const title = await generateTitleFromUserMessage({
@@ -31,9 +52,15 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         await saveChat({
           id,
           userId: session.user.id,
+          organizationId,
           title,
           visibility: "private",
         });
+      } else {
+        // Verify the chat belongs to the user's organization
+        if (chat.organizationId !== organizationId) {
+          return new Response("Forbidden", { status: 403 });
+        }
       }
 
       if (userMessage && userMessage?.role === "user") {
@@ -51,6 +78,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
           console.error("Error saving user message:", error);
         }
       }
+
       const google = createGoogleGenerativeAI({
         apiKey: process.env.GEMINI_API_KEY!,
       });
@@ -106,11 +134,38 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session) return new Response("Unauthorized", { status: 401 });
 
+    const organizationId = session?.session?.activeOrganizationId;
+    if (!organizationId) {
+      return new Response("No active organization", { status: 400 });
+    }
+
+    // Verify user is a member of the organization
+    const [membership] = await db
+      .select()
+      .from(member)
+      .where(
+        and(
+          eq(member.userId, session.user.id),
+          eq(member.organizationId, organizationId),
+        ),
+      );
+
+    if (!membership) {
+      return new Response("Forbidden", { status: 403 });
+    }
+
     try {
       const chat = await getChatById({ id });
-      if (chat?.userId !== session.user.id) {
+
+      // Check if chat exists and belongs to the user AND the organization
+      if (
+        !chat ||
+        chat.userId !== session.user.id ||
+        chat.organizationId !== organizationId
+      ) {
         return new Response("Forbidden", { status: 403 });
       }
+
       const deletedChat = await deleteChatById({ id });
       return json(deletedChat, { status: 200 });
     } catch (error) {

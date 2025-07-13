@@ -1,8 +1,9 @@
 import { NoDataPlaceholder } from "@/components/no-data-placeholder";
+import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { api } from "@/lib/api";
+import { useSession } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "react-day-picker";
 import { SearchQuestions } from "../search-questions";
 import { AddQuestions } from "./add-questions";
 import { QuestionCard } from "./question-card";
@@ -29,6 +30,9 @@ export const BotQuestions = () => {
       return res.data;
     },
   });
+
+  const { data: session } = useSession();
+  console.log("Session Data:", session);
 
   return (
     <div className="w-full flex flex-col mt-5 gap-5">

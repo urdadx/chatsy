@@ -1,7 +1,9 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
+import { branding } from "@/db/schema";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { organization } from "better-auth/plugins";
 import { reactStartCookies } from "better-auth/react-start";
 import { v4 as uuidv4 } from "uuid";
 
@@ -10,6 +12,7 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
+
   trustedOrigins: [
     "http://localhost:3000",
     "http://localhost:3001",
@@ -30,5 +33,36 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
-  plugins: [reactStartCookies()],
+  plugins: [
+    reactStartCookies(),
+    organization({
+      organizationCreation: {
+        disabled: false,
+        beforeCreate: async ({ organization }) => {
+          return {
+            data: {
+              ...organization,
+            },
+          };
+        },
+        afterCreate: async ({ organization }) => {
+          try {
+            await db.insert(branding).values({
+              organizationId: organization.id,
+              name: organization.name,
+            });
+
+            console.log(
+              `Created default branding for organization: ${organization.id}`,
+            );
+          } catch (error) {
+            console.error(
+              `Failed to create default branding for organization ${organization.id}:`,
+              error,
+            );
+          }
+        },
+      },
+    }),
+  ],
 });

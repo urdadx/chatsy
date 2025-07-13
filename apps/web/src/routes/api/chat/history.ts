@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chat } from "@/db/schema";
+import { chat, member } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -18,6 +18,26 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session?.user?.id) {
       return new Response("Unauthorized", { status: 401 });
+    }
+
+    const organizationId = session?.session?.activeOrganizationId;
+    if (!organizationId) {
+      return new Response("No active organization", { status: 400 });
+    }
+
+    // Verify user is a member of the organization
+    const [membership] = await db
+      .select()
+      .from(member)
+      .where(
+        and(
+          eq(member.userId, session.user.id),
+          eq(member.organizationId, organizationId),
+        ),
+      );
+
+    if (!membership) {
+      return new Response("Forbidden", { status: 403 });
     }
 
     const url = new URL(request.url);
@@ -42,15 +62,27 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
       };
       timeFilter = gt(chat.createdAt, timeMap[filter]);
     }
+
     try {
-      const whereConditions = [eq(chat.userId, userId)];
+      // Modified where conditions to include organization scoping
+      const whereConditions = [
+        eq(chat.userId, userId),
+        eq(chat.organizationId, organizationId),
+      ];
+
       if (timeFilter) whereConditions.push(timeFilter);
 
       if (cursor) {
         const [refChat] = await db
           .select()
           .from(chat)
-          .where(eq(chat.id, cursor))
+          .where(
+            and(
+              eq(chat.id, cursor),
+              eq(chat.organizationId, organizationId),
+              eq(chat.userId, userId),
+            ),
+          )
           .limit(1);
 
         if (!refChat) {

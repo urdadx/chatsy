@@ -63,7 +63,7 @@ export const ChatLogItem = ({
             <Tooltip>
               <TooltipTrigger>
                 <Badge className="capitalize" variant="secondary">
-                  {type}
+                  Test
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>This is a chat you created</TooltipContent>

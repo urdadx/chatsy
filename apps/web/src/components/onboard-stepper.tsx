@@ -5,25 +5,22 @@ import {
   StepperTrigger,
 } from "@/components/ui/stepper";
 import { Completed } from "./onboarding/completed";
+import { CreateWorkspaceOnboard } from "./onboarding/create-workspace-onboard";
 import { StepFour } from "./onboarding/step-four";
 import { StepOne } from "./onboarding/step-one";
 import { StepThree } from "./onboarding/step-three";
 import { StepTwo } from "./onboarding/step-two";
 import { useStepperStore } from "./store/stepper-store";
 
-const steps = [1, 2, 3, 4, 5];
+const steps = [1, 2, 3];
 
 const renderStepComponent = (step: number) => {
   switch (step) {
     case 1:
-      return <StepOne />;
+      return <CreateWorkspaceOnboard />;
     case 2:
       return <StepTwo />;
     case 3:
-      return <StepThree />;
-    case 4:
-      return <StepFour />;
-    case 5:
       return <Completed />;
     default:
       return null;

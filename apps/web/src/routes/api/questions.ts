@@ -48,6 +48,11 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       headers: request.headers || new Headers(),
     });
 
+    const organizationId = session?.session?.activeOrganizationId;
+    if (!organizationId) {
+      return json({ error: "No active organization" }, { status: 400 });
+    }
+
     const userId = session?.user?.id;
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
@@ -65,6 +70,7 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       ...parsed.data,
       createdAt: new Date(),
       updatedAt: new Date(),
+      organizationId,
     });
 
     return json({ message: "Question created", result });

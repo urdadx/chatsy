@@ -61,10 +61,7 @@ export const AddQuestions = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button>
-            <CirclePlus className="text-white mr-1 font-semibold" />
-            Add a question
-          </Button>
+          <Button>Add a question</Button>
         </motion.div>
       </DialogTrigger>
 

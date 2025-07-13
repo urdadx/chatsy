@@ -41,6 +41,7 @@ export const session = pgTable("session", {
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  activeOrganizationId: text("active_organization_id"),
 });
 
 export const account = pgTable("account", {
@@ -74,7 +75,46 @@ export const verification = pgTable("verification", {
   ),
 });
 
-export type User = InferSelectModel<typeof user>;
+export const organization = pgTable("organization", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").unique(),
+  logo: text("logo"),
+  createdAt: timestamp("created_at").notNull(),
+  metadata: text("metadata"),
+});
+
+export type Organization = InferSelectModel<typeof organization>;
+
+export const member = pgTable("member", {
+  id: text("id").primaryKey(),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  role: text("role").default("member").notNull(),
+  createdAt: timestamp("created_at").notNull(),
+});
+
+export type Member = InferSelectModel<typeof member>;
+
+export const invitation = pgTable("invitation", {
+  id: text("id").primaryKey(),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  email: text("email").notNull(),
+  role: text("role"),
+  status: text("status").default("pending").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  inviterId: uuid("inviter_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
+export type Invitation = InferSelectModel<typeof invitation>;
 
 export const chat = pgTable("Chat", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -83,12 +123,15 @@ export const chat = pgTable("Chat", {
   userId: uuid("userId")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
   visibility: varchar("visibility", { enum: ["public", "private"] })
     .notNull()
     .default("private"),
 });
 
-export type Chat = InferSelectModel<typeof chat>;
+export type User = InferSelectModel<typeof user>;
 
 export const message = pgTable("Message", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -103,7 +146,7 @@ export const message = pgTable("Message", {
     .$defaultFn(() => new Date()),
 });
 
-export type DBMessage = InferSelectModel<typeof message>;
+export type Chat = InferSelectModel<typeof chat>;
 
 export const vote = pgTable(
   "vote",
@@ -118,8 +161,7 @@ export const vote = pgTable(
   },
   (table) => [primaryKey({ columns: [table.chatId, table.messageId] })],
 );
-
-export type Vote = InferSelectModel<typeof vote>;
+export type DBMessage = InferSelectModel<typeof message>;
 
 export const stream = pgTable(
   "Stream",
@@ -136,14 +178,16 @@ export const stream = pgTable(
     }),
   ],
 );
-
-export type Stream = InferSelectModel<typeof stream>;
+export type Vote = InferSelectModel<typeof vote>;
 
 export const question = pgTable("question", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   userId: uuid("userId")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   isSuggested: boolean("isSuggested").notNull().default(false),
@@ -154,6 +198,8 @@ export const question = pgTable("question", {
     .notNull()
     .$defaultFn(() => new Date()),
 });
+
+export type Stream = InferSelectModel<typeof stream>;
 
 export const socialLink = pgTable("social_link", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -177,15 +223,19 @@ export type SocialLink = InferSelectModel<typeof socialLink>;
 
 export const branding = pgTable("branding", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
-  userId: uuid("user_id")
+  organizationId: text("organization_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => organization.id, { onDelete: "cascade" }),
 
   image: text("image"),
+  name: text("name"),
   primaryColor: text("primary_color").notNull().default("#9333ea"),
   theme: text("theme").notNull().default("light"),
   hidePoweredBy: boolean("hide_powered_by").notNull().default(false),
-
+  initialMessage: text("initial_message")
+    .notNull()
+    .default("Hello there👋, how can i help you today?"),
+  suggestedMessages: text("suggested_messages").array(),
   createdAt: timestamp("created_at")
     .notNull()
     .$defaultFn(() => new Date()),
@@ -198,11 +248,15 @@ export const branding = pgTable("branding", {
 export type Branding = InferSelectModel<typeof branding> & {
   name: string;
 };
+
 export const lead = pgTable("lead", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   email: text("email").notNull(),
   location: text("location"),
@@ -211,10 +265,12 @@ export const lead = pgTable("lead", {
 
 export const product = pgTable("product", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
-
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   url: text("url").notNull(),
   image: text("image"),

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useBranding, useUpdateBranding } from "@/hooks/use-bot-branding";
 import { motion } from "framer-motion";
 import { ArrowRight, Palette } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
@@ -21,6 +21,13 @@ export const PickColor = () => {
   const [selectedColor, setSelectedColor] = useState(
     branding?.primaryColor || "#9333ea",
   );
+
+  useEffect(() => {
+    if (branding?.primaryColor) {
+      setSelectedColor(branding.primaryColor);
+    }
+  }, [branding]);
+
   const [tempColor, setTempColor] = useState(selectedColor);
   const [hexInput, setHexInput] = useState(selectedColor);
   const [isOpen, setIsOpen] = useState(false);
@@ -56,7 +63,6 @@ export const PickColor = () => {
     try {
       const normalizedColor = normalizeHex(hexInput);
 
-      // Update branding in the database
       const updatedBranding = {
         ...branding,
         primaryColor: normalizedColor,
@@ -64,19 +70,16 @@ export const PickColor = () => {
 
       await updateBrandingMutation.mutateAsync(updatedBranding);
 
-      // Update local state
       setSelectedColor(normalizedColor);
       setIsOpen(false);
     } catch (error) {
       console.error("Error updating color:", error);
-      // You might want to show a toast notification here
     }
   };
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (open) {
-      // Reset temp values to current selected color when opening
       setTempColor(selectedColor);
       setHexInput(selectedColor);
     }

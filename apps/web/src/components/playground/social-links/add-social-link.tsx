@@ -160,7 +160,6 @@ export const AddSocialLink = () => {
       <DialogTrigger asChild>
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button className="w-full sm:w-auto">
-            <CirclePlus className="text-white mr-1 font-semibold" />
             <span className="">Add new link</span>
           </Button>
         </motion.div>
