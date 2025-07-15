@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { branding } from "@/db/schema";
+import { sendOrganizationInvitation } from "@/lib/emails/email";
 import { getActiveOrganization } from "@/lib/hooks/get-active-organization";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -41,7 +42,6 @@ export const auth = betterAuth({
           try {
             const organization = await getActiveOrganization(session.userId);
 
-            // Only set activeOrganizationId if organization exists
             if (organization?.id) {
               return {
                 data: {
@@ -51,14 +51,11 @@ export const auth = betterAuth({
               };
             }
           } catch (error) {
-            // Log error but don't block session creation
             console.log(
               "No active organization found for user:",
               session.userId,
             );
           }
-
-          // Return session without activeOrganizationId if no organization found
           return {
             data: {
               ...session,
@@ -99,6 +96,16 @@ export const auth = betterAuth({
             );
           }
         },
+      },
+      async sendInvitationEmail(data) {
+        const inviteLink = `https://example.com/accept-invitation/${data.id}`;
+        sendOrganizationInvitation({
+          email: data.email,
+          invitedByUsername: data.inviter.user.name,
+          invitedByEmail: data.inviter.user.email,
+          teamName: data.organization.name,
+          inviteLink,
+        });
       },
     }),
   ],
