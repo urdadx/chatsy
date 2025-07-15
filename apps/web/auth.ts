@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { branding } from "@/db/schema";
+import { getActiveOrganization } from "@/lib/hooks/get-active-organization";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { organization } from "better-auth/plugins";
@@ -33,6 +34,42 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session) => {
+          try {
+            const organization = await getActiveOrganization(session.userId);
+
+            // Only set activeOrganizationId if organization exists
+            if (organization?.id) {
+              return {
+                data: {
+                  ...session,
+                  activeOrganizationId: organization.id,
+                },
+              };
+            }
+          } catch (error) {
+            // Log error but don't block session creation
+            console.log(
+              "No active organization found for user:",
+              session.userId,
+            );
+          }
+
+          // Return session without activeOrganizationId if no organization found
+          return {
+            data: {
+              ...session,
+              activeOrganizationId: null,
+            },
+          };
+        },
+      },
+    },
+  },
+
   plugins: [
     reactStartCookies(),
     organization({

@@ -159,14 +159,14 @@ export function BrandingSettings() {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <div className="flex items-center gap-2">
-            <Label>Initial Bot Message</Label>
+            <Label>Welcome Message</Label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <InfoIcon className="h-4 w-4 text-muted-foreground" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p>Message that appears when the chat starts</p>
+                <TooltipContent className="bg-white shadow-sm">
+                  <p className="text-black">First message the user sees</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -198,8 +198,10 @@ export function BrandingSettings() {
                 <TooltipTrigger asChild>
                   <InfoIcon className="h-4 w-4 text-muted-foreground" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p>Quick reply suggestions for users</p>
+                <TooltipContent className="bg-white shadow-sm">
+                  <p className="text-black">
+                    Quick reply suggestions for users
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -248,8 +250,10 @@ export function BrandingSettings() {
                 <TooltipTrigger asChild>
                   <InfoIcon className="h-4 w-4 text-muted-foreground" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p>Remove the "Powered by" text from your site</p>
+                <TooltipContent className="bg-white shadow-sm">
+                  <p className="text-black">
+                    Remove the "Powered by" text from your site
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

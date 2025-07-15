@@ -1,9 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { DialogContent } from "@radix-ui/react-dialog";
-
 interface IntegrationCardProps {
   icon: React.ReactNode;
   name: string;
@@ -17,9 +11,8 @@ export const ActionCard = ({
   description,
   badgeText,
 }: IntegrationCardProps) => {
-  const isMobile = useIsMobile();
   return (
-    <div className="bg-white rounded-md p-3 sm:p-4 border border-gray-200 shadow-sm w-full max-w-xs mx-auto h-full">
+    <div className="bg-white rounded-md p-3 sm:p-4 border border-gray-200 shadow-xs w-full max-w-xs mx-auto h-full">
       <div className="flex flex-col gap-3 sm:gap-4 h-full">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -35,32 +28,6 @@ export const ActionCard = ({
         <p className="text-gray-600 text-xs sm:text-sm flex-grow">
           {description}
         </p>
-        {!isMobile ? (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                className="mt-1 sm:mt-2 w-full rounded-lg transition-colors text-sm"
-              >
-                See details
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="w-full sm:max-w-md">
-              yooo my guy
-            </DialogContent>
-          </Dialog>
-        ) : (
-          <Drawer>
-            <DrawerTrigger asChild>
-              <Button className="mt-1 sm:mt-2 w-full rounded-lg transition-colors text-sm">
-                See details
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent className="w-full sm:max-w-md">
-              yooo my guy
-            </DrawerContent>
-          </Drawer>
-        )}
       </div>
     </div>
   );

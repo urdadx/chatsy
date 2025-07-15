@@ -22,7 +22,7 @@ export const Actions = () => {
                 <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
               </ActionIcon>
             }
-            name="Feedback Form"
+            name="Feedback form"
             description="Collects feedback from users using a form"
           />
 

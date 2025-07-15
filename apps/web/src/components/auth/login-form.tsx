@@ -39,7 +39,7 @@ export function LoginForm({
         onSuccess: () => {
           toast.success("Signed in successfully");
           navigate({
-            to: "/admin/playground",
+            to: "/admin/overview",
           });
         },
         onError: (ctx: any) => {
@@ -54,12 +54,12 @@ export function LoginForm({
     await signIn.social(
       {
         provider: "google",
-        callbackURL: "/admin/playground",
+        callbackURL: "/admin/overview",
       },
       {
         onSuccess: () => {
           navigate({
-            to: "/admin/playground",
+            to: "/admin/overview",
           });
         },
         onError: (ctx: any) => {

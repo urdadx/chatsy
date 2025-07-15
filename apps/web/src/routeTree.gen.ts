@@ -32,6 +32,7 @@ import { ServerRoute as ApiMyLinksServerRouteImport } from './routes/api/my-link
 import { ServerRoute as ApiMyBrandingServerRouteImport } from './routes/api/my-branding'
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
 import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-og-info'
+import { ServerRoute as ApiEmailIndexServerRouteImport } from './routes/api/email/index'
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
@@ -142,6 +143,11 @@ const ApiHelloServerRoute = ApiHelloServerRouteImport.update({
 const ApiGetOgInfoServerRoute = ApiGetOgInfoServerRouteImport.update({
   id: '/api/get-og-info',
   path: '/api/get-og-info',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiEmailIndexServerRoute = ApiEmailIndexServerRouteImport.update({
+  id: '/api/email/',
+  path: '/api/email/',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiChatIndexServerRoute = ApiChatIndexServerRouteImport.update({
@@ -278,6 +284,7 @@ export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
+  '/api/email': typeof ApiEmailIndexServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
@@ -290,6 +297,7 @@ export interface FileServerRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
+  '/api/email': typeof ApiEmailIndexServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
@@ -303,6 +311,7 @@ export interface FileServerRoutesById {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/chat/': typeof ApiChatIndexServerRoute
+  '/api/email/': typeof ApiEmailIndexServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
@@ -317,6 +326,7 @@ export interface FileServerRouteTypes {
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/chat'
+    | '/api/email'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/get-og-info'
@@ -329,6 +339,7 @@ export interface FileServerRouteTypes {
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/chat'
+    | '/api/email'
   id:
     | '__root__'
     | '/api/get-og-info'
@@ -341,6 +352,7 @@ export interface FileServerRouteTypes {
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/chat/'
+    | '/api/email/'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
@@ -354,6 +366,7 @@ export interface RootServerRouteChildren {
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
   ApiChatIndexServerRoute: typeof ApiChatIndexServerRoute
+  ApiEmailIndexServerRoute: typeof ApiEmailIndexServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -509,6 +522,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiGetOgInfoServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/email/': {
+      id: '/api/email/'
+      path: '/api/email'
+      fullPath: '/api/email'
+      preLoaderRoute: typeof ApiEmailIndexServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/chat/': {
       id: '/api/chat/'
       path: '/api/chat'
@@ -582,6 +602,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
   ApiChatIndexServerRoute: ApiChatIndexServerRoute,
+  ApiEmailIndexServerRoute: ApiEmailIndexServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

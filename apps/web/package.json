@@ -62,6 +62,7 @@
     "node-postgres": "^0.6.2",
     "pg": "^8.16.0",
     "postgres": "^3.4.7",
+    "radix-ui": "^1.4.2",
     "react": "^19.0.0",
     "react-colorful": "^5.6.1",
     "react-confetti": "^6.4.0",

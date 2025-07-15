@@ -21,9 +21,12 @@ function RouteComponent() {
     <div className="flex flex-1 min-h-0">
       <div className="mb-12 w-full sm:basis-3/5">
         <div className="max-w-xl mx-auto w-full p-4">
-          <span className="text-md text-muted-foreground">
-            Test your bot's responses and customize its appearance
-          </span>
+          <div className="mb-6">
+            <h1 className="text-xl font-semibold mb-2">Playground</h1>
+            <p className="text-muted-foreground">
+              Preview and configure your chatbot's behavior and styling
+            </p>
+          </div>
 
           <BrandingSettings />
         </div>
