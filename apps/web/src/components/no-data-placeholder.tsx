@@ -1,15 +1,25 @@
-import EmptySpace from "@/assets/svgs/empty-state-light.svg";
+import type { LucideIcon } from "lucide-react";
 
-export const NoDataPlaceholder = () => {
+interface NoDataPlaceholderProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+}
+
+export function NoDataPlaceholder({
+  icon: Icon,
+  title,
+  description,
+}: NoDataPlaceholderProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 text-center">
-      <img alt="Empty Thread" width="150" height="150" src={EmptySpace}></img>
-      <div className="mt-5">
-        <p className="text-lg">It's empty here</p>
-        <p className="text-md text-muted-foreground dark:text-white/50">
-          Click on the button above to add a new Q&A
-        </p>
+    <div className="w-full ">
+      <div className="flex flex-col items-center justify-center gap-4 py-16">
+        <Icon className="h-14 w-14 text-primary/50" />
+        <div className="text-center">
+          <h3 className="text-lg font-semibold">{title}</h3>
+          <p className="text-muted-foreground">{description}</p>
+        </div>
       </div>
     </div>
   );
-};
+}

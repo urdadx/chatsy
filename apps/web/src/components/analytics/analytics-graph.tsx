@@ -10,8 +10,6 @@ import {
 import {
   type ChartConfig,
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -71,6 +69,8 @@ export function ChatAnalytics() {
   return (
     <div className="mt-4 flex flex-col space-y-4 w-full">
       <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold mb-2">Analytics</h1>
+
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger
             className="hidden w-[250px] rounded-lg sm:ml-auto sm:flex"
@@ -126,7 +126,6 @@ export function ChatAnalytics() {
                 <div className="inset-0 size-2 items-center justify-center rounded-full group-hover:animate-none bg-orange-500" />
                 <span>Avg. session time </span>
               </div>
-              <Checkbox checked={true} />
             </CardTitle>
             <CardDescription className="text-xl md:text-2xl font-semibold text-black">
               1m 6s
@@ -138,7 +137,6 @@ export function ChatAnalytics() {
                 <div className="inset-0 size-2 items-center justify-center rounded-full group-hover:animate-none bg-blue-500" />
                 <span>Visitors now </span>
               </div>
-              <Checkbox checked={true} />
             </CardTitle>
             <CardDescription className="text-xl md:text-2xl font-semibold text-black">
               <NumberFlow value={4} />

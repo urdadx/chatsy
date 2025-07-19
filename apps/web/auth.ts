@@ -99,7 +99,7 @@ export const auth = betterAuth({
       },
       async sendInvitationEmail(data) {
         const inviteLink = `https://example.com/accept-invitation/${data.id}`;
-        sendOrganizationInvitation({
+        await sendOrganizationInvitation({
           email: data.email,
           invitedByUsername: data.inviter.user.name,
           invitedByEmail: data.inviter.user.email,

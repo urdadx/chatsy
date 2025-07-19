@@ -9,10 +9,6 @@ export const Route = createFileRoute("/admin/analytics")({
 function RouteComponent() {
   return (
     <div className="max-w-5xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
-      <span className="text-md text-muted-foreground">
-        Track and get insights on your bot's performance
-      </span>
-
       <>
         <ChatAnalytics />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 py-6">

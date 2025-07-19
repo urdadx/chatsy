@@ -2,7 +2,6 @@ import { useSession } from "@/lib/auth-client";
 import { User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ProfileDelete } from "./profile-delete";
-import { WorkspaceDelete } from "./workspace-delete";
 
 export function AccountSettings() {
   const { data: session } = useSession();
@@ -23,8 +22,6 @@ export function AccountSettings() {
           <span className="text-primary ">{user?.email}</span>
         </span>
       </div>
-
-      <WorkspaceDelete />
       <ProfileDelete />
     </div>
   );

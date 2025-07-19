@@ -33,41 +33,39 @@ function RouteComponent() {
 
   return (
     <div className="max-w-4xl w-full max-h-screen mx-auto px-2 sm:px-0 py-2">
-      {/* <span className="text-md text-muted-foreground">
-        Train your bot based on your own custom data
-      </span> */}
+      <h1 className="text-xl font-semibold my-4">Knowledge Base</h1>
 
-      <Tabs value={tab} onValueChange={handleTabChange} className="mt-6">
+      <Tabs value={tab} onValueChange={handleTabChange} className="">
         <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0 ">
           <TabsTrigger
             value="files"
-            className="hover:bg-accent text-base hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
             Files
           </TabsTrigger>
           <TabsTrigger
             value="qa"
-            className="hover:bg-accent text-base hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
             Q&A
           </TabsTrigger>
           <TabsTrigger
             value="website"
-            className="hover:bg-accent text-base hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
             Website
           </TabsTrigger>
 
           <TabsTrigger
             value="text"
-            className="hover:bg-accent text-base hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
             Text
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="files">
-          <div className="mt-10 rounded-md p-6 border ">
+          <div className="mt-6 rounded-md p-6 border ">
             <DocumentSource />
           </div>
         </TabsContent>

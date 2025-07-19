@@ -29,21 +29,25 @@ function RouteComponent() {
 
   return (
     <div className="max-w-4xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
-      <span className="text-md text-muted-foreground">
-        Enhance your bot's capabilities with powerful AI actions and
-        integrations
-      </span>
-      <Tabs value={tab} onValueChange={handleTabChange} className="w-full mt-6">
+      <div className="">
+        <h1 className="text-xl font-semibold mb-2">Agent Actions</h1>
+        <span className="text-md text-muted-foreground">
+          Enhance your bot's capabilities with powerful AI actions and
+          integrations
+        </span>
+      </div>
+
+      <Tabs value={tab} onValueChange={handleTabChange} className="w-full mt-3">
         <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0 ">
           <TabsTrigger
             value="general"
-            className="hover:bg-accent text-base hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
             Actions
           </TabsTrigger>
           <TabsTrigger
             value="integrations"
-            className="hover:bg-accent text-base hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
           >
             Integrations
           </TabsTrigger>

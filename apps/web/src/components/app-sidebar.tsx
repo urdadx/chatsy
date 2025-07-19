@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Outlet } from "@tanstack/react-router";
 import {
-  BrainCog,
+  Book,
   ChartNoAxesColumnIncreasing,
   Flame,
   Hammer,
@@ -18,7 +18,6 @@ import {
   Zap,
 } from "lucide-react";
 import type * as React from "react";
-import { Logo } from "./logo-image";
 import { NavMain } from "./nav-main";
 import { Navbar } from "./navbar";
 import { UpgradeBanner } from "./upgrade-banner";
@@ -34,7 +33,7 @@ const data = {
     {
       title: "Knowlege Base",
       url: "/admin/knowledge-base",
-      icon: BrainCog,
+      icon: Book,
     },
     {
       title: "Playground",

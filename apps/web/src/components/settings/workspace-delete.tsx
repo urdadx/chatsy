@@ -1,76 +1,64 @@
+"use client";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { CircleAlert } from "lucide-react";
+import { authClient, useSession } from "@/lib/auth-client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CircleAlert, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export const WorkspaceDelete = () => {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
 
-  const ConfirmationContent = () => (
-    <>
-      <div className="space-y-2 sm:space-y-3 mt-4">
-        <div className="text-base sm:text-lg flex items-center gap-1 sm:gap-2">
-          <div
-            className="flex size-6 sm:size-8 shrink-0 items-center justify-center rounded-full border border-border"
-            aria-hidden="true"
-          >
-            <CircleAlert className="opacity-80" size={14} strokeWidth={2} />
-          </div>
-          Delete workspace
-        </div>
-        <div className="text-md md:text-md text-start px-4 sm:px-6 text-muted-foreground">
-          Are you sure you want to delete this workspace? This action cannot be
-          undone.
-        </div>
-      </div>
-      <div className="mt-4 sm:mt-6 flex flex-row justify-end gap-2 sm:gap-3">
-        {!isMobile ? (
-          <DialogClose asChild>
-            <Button
-              variant="outline"
-              className="text-xs sm:text-sm py-1.5 sm:py-2"
-            >
-              Cancel
-            </Button>
-          </DialogClose>
-        ) : (
-          <DrawerClose asChild>
-            <Button
-              variant="outline"
-              className="text-xs sm:text-sm py-1.5 sm:py-2"
-            >
-              Cancel
-            </Button>
-          </DrawerClose>
-        )}
-        <Button
-          variant="destructive"
-          className="transition-all text-xs sm:text-sm py-1.5 sm:py-2"
-        >
-          Yes, delete
-        </Button>
-      </div>
-    </>
-  );
+  const { data: session } = useSession();
+  const organizationId = session?.session?.activeOrganizationId ?? "";
+  const { data: activeOrganization } = authClient.useActiveOrganization();
+  const queryClient = useQueryClient();
+
+  const deleteWorkspace = useMutation({
+    mutationFn: async () => {
+      if (!organizationId) {
+        throw new Error("No workspace selected");
+      }
+      await authClient.organization.delete({
+        organizationId: organizationId,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["organizations"] });
+      queryClient.invalidateQueries({ queryKey: ["activeOrganization"] });
+      toast.success("Workspace deleted successfully");
+      setOpen(false);
+      window.location.reload();
+    },
+    onError: (error) => {
+      console.error("Failed to delete workspace:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete workspace. Please try again.",
+      );
+    },
+  });
+
+  const handleDelete = () => {
+    deleteWorkspace.mutate();
+  };
+
+  const workspaceName = activeOrganization?.name || "workspace";
 
   return (
     <div className="mx-auto">
@@ -78,71 +66,61 @@ export const WorkspaceDelete = () => {
         <div className="p-6">
           <h2 className="text-base font-semibold mb-2">Delete workspace</h2>
           <p className="text-gray-600 text-sm">
-            Permanently remove your account and all of its contents. This action
-            is not reversible, so please continue with caution.
+            Permanently remove your workspace "{workspaceName}" and all of its
+            contents. This action is not reversible, so please continue with
+            caution.
           </p>
         </div>
         <div className="bg-red-50 px-6 py-4 flex justify-end border-t border-red-300">
-          {!isMobile ? (
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-red-500 hover:bg-red-600 text-white">
-                  Delete workspace
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="w-[95%] max-w-[450px] px-4 py-4 sm:px-6 sm:py-6">
-                <DialogHeader>
-                  <DialogTitle className="text-lg flex items-center gap-2">
-                    <div
-                      className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border"
-                      aria-hidden="true"
-                    >
-                      <CircleAlert
-                        className="opacity-80"
-                        size={16}
-                        strokeWidth={2}
-                      />
+          <AlertDialog open={open} onOpenChange={setOpen}>
+            <AlertDialogTrigger asChild>
+              <Button
+                className="bg-red-500 hover:bg-red-600 text-white"
+                disabled={!organizationId}
+              >
+                Delete workspace
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">
+                <div
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full border"
+                  aria-hidden="true"
+                >
+                  <CircleAlert className="opacity-80" size={16} />
+                </div>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-md">
+                    This will permanently delete the "{workspaceName}"
+                    workspace.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel
+                  onClick={() => setOpen(false)}
+                  disabled={deleteWorkspace.isPending}
+                >
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-red-500 hover:bg-red-400"
+                  onClick={handleDelete}
+                  disabled={deleteWorkspace.isPending}
+                >
+                  {deleteWorkspace.isPending ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Deleting...
                     </div>
-                    Are you sure?
-                  </DialogTitle>
-                  <DialogDescription className="text-md text-start px-6">
-                    Deleting your account is irreversible and will delete all
-                    your data.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter className="flex flex-row items-center justify-end gap-2 ">
-                  <DialogClose asChild>
-                    <Button
-                      variant="outline"
-                      className="text-xs sm:text-sm py-1.5 sm:py-2"
-                    >
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button
-                    variant="destructive"
-                    className="transition-all text-xs sm:text-sm py-1.5 sm:py-2"
-                  >
-                    Yes, delete
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          ) : (
-            <Drawer open={open} onOpenChange={setOpen}>
-              <DrawerTrigger asChild>
-                <Button className="bg-red-500 hover:bg-red-600 text-white">
-                  Delete workspace
-                </Button>
-              </DrawerTrigger>
-              <DrawerContent className="px-4 py-4">
-                <DrawerHeader className="text-left p-0">
-                  <DrawerTitle className="sr-only">Confirm Delete</DrawerTitle>
-                </DrawerHeader>
-                <ConfirmationContent />
-              </DrawerContent>
-            </Drawer>
-          )}
+                  ) : (
+                    "Yes, delete"
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>

@@ -79,7 +79,7 @@ async function getCroppedImg(
   }
 }
 
-export function AvatarUpload() {
+export function AvatarUpload({ onUploadComplete }: { onUploadComplete: (url: string) => void }) {
   // Branding hooks
   const { data: branding, isLoading: isBrandingLoading } = useBranding();
   const updateBrandingMutation = useUpdateBranding();
@@ -163,12 +163,7 @@ export function AvatarUpload() {
       const { url: uploadedImageUrl } = await uploadResponse.json();
 
       // 4. Update branding with new image URL
-      const updatedBranding = {
-        ...branding,
-        image: uploadedImageUrl,
-      };
-
-      await updateBrandingMutation.mutateAsync(updatedBranding);
+      onUploadComplete(uploadedImageUrl);
 
       // 6. Update local state
       if (finalImageUrl?.startsWith("blob:")) {
