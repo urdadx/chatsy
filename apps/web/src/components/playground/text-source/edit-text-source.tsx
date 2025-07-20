@@ -14,45 +14,45 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 
-interface Question {
+interface TextSource {
   id: string;
-  question: string;
-  answer: string;
+  title: string;
+  content: string;
   userId: string;
   organizationId: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export const EditQuestion = ({
-  question,
+export const EditTextSource = ({
+  textSource,
   open,
   onOpenChange,
 }: {
-  question: Question;
+  textSource: TextSource;
   open: boolean;
   onOpenChange: (value: boolean) => void;
 }) => {
-  const [questionText, setQuestionText] = useState(question.question || "");
-  const [answerText, setAnswerText] = useState(question.answer || "");
+  const [title, setTitle] = useState(textSource.title || "");
+  const [content, setContent] = useState(textSource.content || "");
 
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async () => {
-      return api.patch("/questions", {
-        id: question.id,
-        question: questionText,
-        answer: answerText,
+      return api.patch("/text-sources", {
+        id: textSource.id,
+        title,
+        content,
       });
     },
     onSuccess: () => {
-      toast.success("Question updated!");
-      queryClient.invalidateQueries({ queryKey: ["questions"] });
+      toast.success("Text source updated!");
+      queryClient.invalidateQueries({ queryKey: ["text-sources"] });
       onOpenChange(false);
     },
     onError: () => {
-      toast.error("Failed to update question.");
+      toast.error("Failed to update text source.");
     },
   });
 
@@ -65,33 +65,33 @@ export const EditQuestion = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-full sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-md">Edit Q&A</DialogTitle>
+          <DialogTitle className="text-md">Edit Text Source</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="w-full space-y-4">
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="question" className="text-sm font-medium">
-              Question
+            <Label htmlFor="title" className="text-sm font-medium">
+              Title
             </Label>
             <Input
-              id="question"
+              id="title"
               autoFocus
-              name="question"
-              placeholder="Eg: When is the new product launching?"
-              value={questionText}
-              onChange={(e) => setQuestionText(e.target.value)}
+              name="title"
+              placeholder="Eg: Company History"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="answer" className="text-sm font-medium">
-              Answer
+            <Label htmlFor="content" className="text-sm font-medium">
+              Content
             </Label>
             <Textarea
-              id="answer"
-              name="answer"
-              placeholder="Enter the answer"
+              id="content"
+              name="content"
+              placeholder="Enter the content"
               className="w-full min-h-32"
-              value={answerText}
-              onChange={(e) => setAnswerText(e.target.value)}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
             />
           </div>
           <div className="flex justify-end w-full">

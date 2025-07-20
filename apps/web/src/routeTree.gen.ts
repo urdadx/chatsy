@@ -12,6 +12,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WebsiteSourcesRouteImport } from './routes/website-sources'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
@@ -25,13 +26,17 @@ import { Route as AdminActionsRouteImport } from './routes/admin/actions'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
-import { ServerRoute as ApiUploadServerRouteImport } from './routes/api/upload'
+import { ServerRoute as ApiUploadImagesServerRouteImport } from './routes/api/upload-images'
+import { ServerRoute as ApiUploadDocumentsServerRouteImport } from './routes/api/upload-documents'
+import { ServerRoute as ApiTextSourcesServerRouteImport } from './routes/api/text-sources'
+import { ServerRoute as ApiScrapeServerRouteImport } from './routes/api/scrape'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
-import { ServerRoute as ApiMyProductsServerRouteImport } from './routes/api/my-products'
 import { ServerRoute as ApiMyLinksServerRouteImport } from './routes/api/my-links'
 import { ServerRoute as ApiMyBrandingServerRouteImport } from './routes/api/my-branding'
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
 import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-og-info'
+import { ServerRoute as ApiDocumentSourceServerRouteImport } from './routes/api/document-source'
+import { ServerRoute as ApiCrawlServerRouteImport } from './routes/api/crawl'
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
@@ -39,6 +44,11 @@ import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/
 const AdminTestLazyRouteImport = createFileRoute('/admin/test')()
 const rootServerRouteImport = createServerRootRoute()
 
+const WebsiteSourcesRoute = WebsiteSourcesRouteImport.update({
+  id: '/website-sources',
+  path: '/website-sources',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -109,19 +119,30 @@ const AdminChatHistoryIndexRoute = AdminChatHistoryIndexRouteImport.update({
   path: '/chat-history/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const ApiUploadServerRoute = ApiUploadServerRouteImport.update({
-  id: '/api/upload',
-  path: '/api/upload',
+const ApiUploadImagesServerRoute = ApiUploadImagesServerRouteImport.update({
+  id: '/api/upload-images',
+  path: '/api/upload-images',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiUploadDocumentsServerRoute =
+  ApiUploadDocumentsServerRouteImport.update({
+    id: '/api/upload-documents',
+    path: '/api/upload-documents',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiTextSourcesServerRoute = ApiTextSourcesServerRouteImport.update({
+  id: '/api/text-sources',
+  path: '/api/text-sources',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiScrapeServerRoute = ApiScrapeServerRouteImport.update({
+  id: '/api/scrape',
+  path: '/api/scrape',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiQuestionsServerRoute = ApiQuestionsServerRouteImport.update({
   id: '/api/questions',
   path: '/api/questions',
-  getParentRoute: () => rootServerRouteImport,
-} as any)
-const ApiMyProductsServerRoute = ApiMyProductsServerRouteImport.update({
-  id: '/api/my-products',
-  path: '/api/my-products',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiMyLinksServerRoute = ApiMyLinksServerRouteImport.update({
@@ -144,6 +165,16 @@ const ApiGetOgInfoServerRoute = ApiGetOgInfoServerRouteImport.update({
   path: '/api/get-og-info',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiDocumentSourceServerRoute = ApiDocumentSourceServerRouteImport.update({
+  id: '/api/document-source',
+  path: '/api/document-source',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiCrawlServerRoute = ApiCrawlServerRouteImport.update({
+  id: '/api/crawl',
+  path: '/api/crawl',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiChatIndexServerRoute = ApiChatIndexServerRouteImport.update({
   id: '/api/chat/',
   path: '/api/chat/',
@@ -163,6 +194,7 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/website-sources': typeof WebsiteSourcesRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/admin/actions': typeof AdminActionsRoute
@@ -179,6 +211,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/website-sources': typeof WebsiteSourcesRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/admin/actions': typeof AdminActionsRoute
@@ -196,6 +229,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/website-sources': typeof WebsiteSourcesRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/admin/actions': typeof AdminActionsRoute
@@ -214,6 +248,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/website-sources'
     | '/login'
     | '/register'
     | '/admin/actions'
@@ -230,6 +265,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/website-sources'
     | '/login'
     | '/register'
     | '/admin/actions'
@@ -246,6 +282,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/website-sources'
     | '/(auth)/login'
     | '/(auth)/register'
     | '/admin/actions'
@@ -263,43 +300,56 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  WebsiteSourcesRoute: typeof WebsiteSourcesRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
 export interface FileServerRoutesByFullPath {
+  '/api/crawl': typeof ApiCrawlServerRoute
+  '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
   '/api/my-branding': typeof ApiMyBrandingServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
-  '/api/my-products': typeof ApiMyProductsServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
-  '/api/upload': typeof ApiUploadServerRoute
+  '/api/scrape': typeof ApiScrapeServerRoute
+  '/api/text-sources': typeof ApiTextSourcesServerRoute
+  '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
+  '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
 }
 export interface FileServerRoutesByTo {
+  '/api/crawl': typeof ApiCrawlServerRoute
+  '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
   '/api/my-branding': typeof ApiMyBrandingServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
-  '/api/my-products': typeof ApiMyProductsServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
-  '/api/upload': typeof ApiUploadServerRoute
+  '/api/scrape': typeof ApiScrapeServerRoute
+  '/api/text-sources': typeof ApiTextSourcesServerRoute
+  '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
+  '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
+  '/api/crawl': typeof ApiCrawlServerRoute
+  '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
   '/api/my-branding': typeof ApiMyBrandingServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
-  '/api/my-products': typeof ApiMyProductsServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
-  '/api/upload': typeof ApiUploadServerRoute
+  '/api/scrape': typeof ApiScrapeServerRoute
+  '/api/text-sources': typeof ApiTextSourcesServerRoute
+  '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
+  '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/chat/': typeof ApiChatIndexServerRoute
@@ -307,50 +357,66 @@ export interface FileServerRoutesById {
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
   fullPaths:
+    | '/api/crawl'
+    | '/api/document-source'
     | '/api/get-og-info'
     | '/api/hello'
     | '/api/my-branding'
     | '/api/my-links'
-    | '/api/my-products'
     | '/api/questions'
-    | '/api/upload'
+    | '/api/scrape'
+    | '/api/text-sources'
+    | '/api/upload-documents'
+    | '/api/upload-images'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/chat'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
+    | '/api/crawl'
+    | '/api/document-source'
     | '/api/get-og-info'
     | '/api/hello'
     | '/api/my-branding'
     | '/api/my-links'
-    | '/api/my-products'
     | '/api/questions'
-    | '/api/upload'
+    | '/api/scrape'
+    | '/api/text-sources'
+    | '/api/upload-documents'
+    | '/api/upload-images'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/chat'
   id:
     | '__root__'
+    | '/api/crawl'
+    | '/api/document-source'
     | '/api/get-og-info'
     | '/api/hello'
     | '/api/my-branding'
     | '/api/my-links'
-    | '/api/my-products'
     | '/api/questions'
-    | '/api/upload'
+    | '/api/scrape'
+    | '/api/text-sources'
+    | '/api/upload-documents'
+    | '/api/upload-images'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/chat/'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
+  ApiCrawlServerRoute: typeof ApiCrawlServerRoute
+  ApiDocumentSourceServerRoute: typeof ApiDocumentSourceServerRoute
   ApiGetOgInfoServerRoute: typeof ApiGetOgInfoServerRoute
   ApiHelloServerRoute: typeof ApiHelloServerRoute
   ApiMyBrandingServerRoute: typeof ApiMyBrandingServerRoute
   ApiMyLinksServerRoute: typeof ApiMyLinksServerRoute
-  ApiMyProductsServerRoute: typeof ApiMyProductsServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
-  ApiUploadServerRoute: typeof ApiUploadServerRoute
+  ApiScrapeServerRoute: typeof ApiScrapeServerRoute
+  ApiTextSourcesServerRoute: typeof ApiTextSourcesServerRoute
+  ApiUploadDocumentsServerRoute: typeof ApiUploadDocumentsServerRoute
+  ApiUploadImagesServerRoute: typeof ApiUploadImagesServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
   ApiChatIndexServerRoute: typeof ApiChatIndexServerRoute
@@ -358,6 +424,13 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/website-sources': {
+      id: '/website-sources'
+      path: '/website-sources'
+      fullPath: '/website-sources'
+      preLoaderRoute: typeof WebsiteSourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -460,11 +533,32 @@ declare module '@tanstack/react-router' {
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
-    '/api/upload': {
-      id: '/api/upload'
-      path: '/api/upload'
-      fullPath: '/api/upload'
-      preLoaderRoute: typeof ApiUploadServerRouteImport
+    '/api/upload-images': {
+      id: '/api/upload-images'
+      path: '/api/upload-images'
+      fullPath: '/api/upload-images'
+      preLoaderRoute: typeof ApiUploadImagesServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/upload-documents': {
+      id: '/api/upload-documents'
+      path: '/api/upload-documents'
+      fullPath: '/api/upload-documents'
+      preLoaderRoute: typeof ApiUploadDocumentsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/text-sources': {
+      id: '/api/text-sources'
+      path: '/api/text-sources'
+      fullPath: '/api/text-sources'
+      preLoaderRoute: typeof ApiTextSourcesServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/scrape': {
+      id: '/api/scrape'
+      path: '/api/scrape'
+      fullPath: '/api/scrape'
+      preLoaderRoute: typeof ApiScrapeServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/questions': {
@@ -472,13 +566,6 @@ declare module '@tanstack/react-start/server' {
       path: '/api/questions'
       fullPath: '/api/questions'
       preLoaderRoute: typeof ApiQuestionsServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/api/my-products': {
-      id: '/api/my-products'
-      path: '/api/my-products'
-      fullPath: '/api/my-products'
-      preLoaderRoute: typeof ApiMyProductsServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/my-links': {
@@ -507,6 +594,20 @@ declare module '@tanstack/react-start/server' {
       path: '/api/get-og-info'
       fullPath: '/api/get-og-info'
       preLoaderRoute: typeof ApiGetOgInfoServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/document-source': {
+      id: '/api/document-source'
+      path: '/api/document-source'
+      fullPath: '/api/document-source'
+      preLoaderRoute: typeof ApiDocumentSourceServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/crawl': {
+      id: '/api/crawl'
+      path: '/api/crawl'
+      fullPath: '/api/crawl'
+      preLoaderRoute: typeof ApiCrawlServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/chat/': {
@@ -564,6 +665,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  WebsiteSourcesRoute: WebsiteSourcesRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
@@ -572,13 +674,17 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiCrawlServerRoute: ApiCrawlServerRoute,
+  ApiDocumentSourceServerRoute: ApiDocumentSourceServerRoute,
   ApiGetOgInfoServerRoute: ApiGetOgInfoServerRoute,
   ApiHelloServerRoute: ApiHelloServerRoute,
   ApiMyBrandingServerRoute: ApiMyBrandingServerRoute,
   ApiMyLinksServerRoute: ApiMyLinksServerRoute,
-  ApiMyProductsServerRoute: ApiMyProductsServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,
-  ApiUploadServerRoute: ApiUploadServerRoute,
+  ApiScrapeServerRoute: ApiScrapeServerRoute,
+  ApiTextSourcesServerRoute: ApiTextSourcesServerRoute,
+  ApiUploadDocumentsServerRoute: ApiUploadDocumentsServerRoute,
+  ApiUploadImagesServerRoute: ApiUploadImagesServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
   ApiChatIndexServerRoute: ApiChatIndexServerRoute,

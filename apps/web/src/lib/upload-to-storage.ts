@@ -12,11 +12,11 @@ const storage = new Storage({
 
 const bucket = storage.bucket("nomad-23595.appspot.com");
 
-export const uploadImageToStorage = async (
+export const uploadFileToStorage = async (
   file: { originalname: string; mimetype: any; buffer: any },
   folderPath = "",
 ) => {
-  if (!file) throw new Error("No image file provided");
+  if (!file) throw new Error("No file provided");
 
   const timestamp = Date.now();
   const safeFilename = file.originalname

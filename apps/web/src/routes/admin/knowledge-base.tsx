@@ -65,26 +65,30 @@ function RouteComponent() {
         </TabsList>
 
         <TabsContent value="files">
-          <div className="mt-6 rounded-md p-6 border ">
+          <div className="mt-6  ">
             <DocumentSource />
           </div>
+          <div className="h-10" />
         </TabsContent>
 
         <TabsContent value="qa">
-          <div className="mt-10 rounded-md p-8 border ">
+          <div className="mt-6  ">
             <QuestionSource />
           </div>
+          <div className="h-10" />
         </TabsContent>
 
         <TabsContent value="website">
-          <div className="mt-10 rounded-md p-8 border ">
+          <div className="mt-6 ">
             <WebsiteSource />
           </div>
+          <div className="h-10" />
         </TabsContent>
         <TabsContent value="text">
-          <div className="mt-10 rounded-md p-8 border ">
+          <div className="mt-6 ">
             <TextSource />
           </div>
+          <div className="h-10" />
         </TabsContent>
       </Tabs>
     </div>

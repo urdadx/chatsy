@@ -20,7 +20,7 @@ import {
 import type * as React from "react";
 import { NavMain } from "./nav-main";
 import { Navbar } from "./navbar";
-import { UpgradeBanner } from "./upgrade-banner";
+import { UsageBanner } from "./usage-banner";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 
 const data = {
@@ -39,6 +39,11 @@ const data = {
       title: "Playground",
       url: "/admin/playground",
       icon: Hammer,
+    },
+    {
+      title: "Website Sources",
+      url: "/website-sources",
+      icon: Book,
     },
     {
       title: "Actions",
@@ -83,7 +88,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain items={data.navMain} />
         </SidebarContent>
         <SidebarFooter>
-          <UpgradeBanner />
+          <UsageBanner />
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>

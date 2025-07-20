@@ -1,1 +1,0 @@
-import{j as n,L as e,B as t}from"./main-DGzO-aDm.js";const i=function(){return n.jsx("div",{className:"flex items-center justify-center min-h-screen",children:n.jsx("div",{className:"container mx-auto max-w-3xl px-4 py-2 text-center",children:n.jsx(e,{to:"/login",children:n.jsx(t,{children:"Go to login"})})})})};export{i as component};

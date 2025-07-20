@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useFileUpload } from "@/hooks/use-file-upload";
+import { api } from "@/lib/api";
 import { authClient, useSession } from "@/lib/auth-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { User } from "lucide-react";
@@ -42,17 +43,9 @@ export const WorkspaceLogoSettings = () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      const uploadResponse = await api.post("/upload-images", formData);
 
-      const uploadResponse = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error("Upload failed");
-      }
-
-      const { url: uploadedImageUrl } = await uploadResponse.json();
+      const { url: uploadedImageUrl } = uploadResponse.data;
 
       const resolvedOrganization = await organization;
       if (resolvedOrganization) {

@@ -1,27 +1,28 @@
+
 import { db } from "@/db";
-import { question } from "@/db/schema";
+import { textSource } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
-const createQuestionSchema = z.object({
-  question: z.string().min(1),
-  answer: z.string().min(1),
+const createTextSourceSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
 });
 
-const updateQuestionSchema = z.object({
+const updateTextSourceSchema = z.object({
   id: z.string().uuid(),
-  question: z.string().optional(),
-  answer: z.string().optional(),
+  title: z.string().optional(),
+  content: z.string().optional(),
 });
 
-const deleteQuestionSchema = z.object({
+const deleteTextSourceSchema = z.object({
   id: z.string().uuid(),
 });
 
-export const ServerRoute = createServerFileRoute("/api/questions").methods({
+export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
   GET: async ({ request }) => {
     const session = await auth.api.getSession({
       headers: request.headers || new Headers(),
@@ -35,8 +36,8 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
 
     const results = await db
       .select()
-      .from(question)
-      .where(eq(question.userId, userId));
+      .from(textSource)
+      .where(eq(textSource.userId, userId));
 
     return json(results);
   },
@@ -57,13 +58,13 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
     }
 
     const body = await request.json();
-    const parsed = createQuestionSchema.safeParse(body);
+    const parsed = createTextSourceSchema.safeParse(body);
 
     if (!parsed.success) {
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
-    const result = await db.insert(question).values({
+    const result = await db.insert(textSource).values({
       userId,
       ...parsed.data,
       createdAt: new Date(),
@@ -71,7 +72,7 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       organizationId,
     });
 
-    return json({ message: "Question created", result });
+    return json({ message: "Text source created", result });
   },
 
   PATCH: async ({ request }) => {
@@ -85,7 +86,7 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
     }
 
     const body = await request.json();
-    const parsed = updateQuestionSchema.safeParse(body);
+    const parsed = updateTextSourceSchema.safeParse(body);
 
     if (!parsed.success) {
       return json({ error: parsed.error.format() }, { status: 400 });
@@ -94,19 +95,19 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
     const { id, ...updates } = parsed.data;
 
     const updated = await db
-      .update(question)
+      .update(textSource)
       .set({ ...updates, updatedAt: new Date() })
-      .where(and(eq(question.id, id), eq(question.userId, userId)))
+      .where(and(eq(textSource.id, id), eq(textSource.userId, userId)))
       .returning();
 
     if (!updated.length) {
       return json(
-        { error: "Question not found or unauthorized" },
+        { error: "Text source not found or unauthorized" },
         { status: 404 },
       );
     }
 
-    return json({ message: "Question updated", updated });
+    return json({ message: "Text source updated", updated });
   },
 
   DELETE: async ({ request }) => {
@@ -120,24 +121,24 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
     }
 
     const body = await request.json();
-    const parsed = deleteQuestionSchema.safeParse(body);
+    const parsed = deleteTextSourceSchema.safeParse(body);
 
     if (!parsed.success) {
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
     const deleted = await db
-      .delete(question)
-      .where(and(eq(question.id, parsed.data.id), eq(question.userId, userId)))
+      .delete(textSource)
+      .where(and(eq(textSource.id, parsed.data.id), eq(textSource.userId, userId)))
       .returning();
 
     if (!deleted.length) {
       return json(
-        { error: "Question not found or unauthorized" },
+        { error: "Text source not found or unauthorized" },
         { status: 404 },
       );
     }
 
-    return json({ message: "Question deleted", deleted });
+    return json({ message: "Text source deleted", deleted });
   },
 });

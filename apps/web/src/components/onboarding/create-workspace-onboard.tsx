@@ -20,11 +20,7 @@ export const CreateWorkspaceOnboard = () => {
 
   // Helper function to generate slug from name
   const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-") // Replace spaces with hyphens
-      .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
+    return name.toLowerCase().trim().replace(/\s+/g, "-").replace(/^-|-$/g, "");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,7 +132,7 @@ export const CreateWorkspaceOnboard = () => {
               <Label>Slug</Label>
               <div className="flex rounded-md shadow-xs">
                 <span className="border-input bg-gray-50 text-gray-500 inline-flex items-center rounded-s-md border px-3 text-sm">
-                  padyna.com/
+                  app.padyna.com/
                 </span>
                 <Input
                   className="-ms-px rounded-s-none shadow-none"

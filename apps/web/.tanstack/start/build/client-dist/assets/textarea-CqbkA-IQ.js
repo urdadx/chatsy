@@ -1,1 +1,0 @@
-import{j as a,a as o}from"./main-DGzO-aDm.js";function s({className:t,...e}){return a.jsx("textarea",{"data-slot":"textarea",className:o("flex min-h-[112px] rounded-lg border bg-background px-4 py-2 text-sm leading-6 shadow-xs transition-colors duration-100 placeholder:text-surface-500","outline-primary focus:outline-2  focus:-outline-offset-1",t),...e})}export{s as T};

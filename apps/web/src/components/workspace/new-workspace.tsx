@@ -144,7 +144,7 @@ export const CreateWorkspace = ({ open, setOpen }: any) => {
                   <Label>Workspace slug</Label>
                   <div className="flex rounded-md shadow-xs">
                     <span className="border-input bg-gray-50 text-gray-500 inline-flex items-center rounded-s-md border px-3 text-sm">
-                      padyna.com/
+                      app.padyna.com/
                     </span>
                     <Input
                       className="-ms-px rounded-s-none shadow-none"

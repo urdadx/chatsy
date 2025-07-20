@@ -18,7 +18,7 @@ import { authClient } from "@/lib/auth-client";
 import { RiCheckboxCircleFill } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";
 import Avatar from "boring-avatars";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { InviteMembers } from "./workspace/invite-members";
 import { CreateWorkspace } from "./workspace/new-workspace";
@@ -34,6 +34,10 @@ export function WorkspaceSwitcher() {
   });
 
   const { data: organizations } = authClient.useListOrganizations();
+  const currentLogo = useMemo(
+    () => activeOrganization?.logo,
+    [activeOrganization?.logo],
+  );
 
   const handleSwitchOrganization = async (organizationId: string) => {
     try {
@@ -61,7 +65,7 @@ export function WorkspaceSwitcher() {
 
   if (isLoading) {
     return (
-      <SidebarMenu>
+      <SidebarMenu className="">
         <SidebarMenuItem className="bg-sidebar rounded-lg p-1">
           <SidebarMenuButton size="lg" disabled>
             <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse" />
@@ -85,19 +89,26 @@ export function WorkspaceSwitcher() {
       />
       <InviteMembers open={inviteMembersOpen} setOpen={setInviteMembersOpen} />
       <SidebarMenu>
-        <SidebarMenuItem className="bg-sidebar rounded-lg p-1">
+        <SidebarMenuItem className="bg-transparent border-2 rounded-lg p-1">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
-                size="lg"
+                size="default"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <Avatar name={activeOrganization?.name} size={80} />
+                {currentLogo ? (
+                  <div className=" rounded-full w-8 h-8">
+                    <img
+                      src={currentLogo}
+                      alt={activeOrganization?.name}
+                      className="h-full w-full rounded-full object-cover "
+                    />
+                  </div>
+                ) : (
+                  <Avatar name={activeOrganization?.name} size={200} />
+                )}
 
                 <div className="grid flex-1 text-left leading-tight">
-                  <span className="text-muted-foreground text-xs font-normal">
-                    WORKSPACE
-                  </span>
                   <span className="truncate font-normal">
                     {activeOrganization?.name || "No workspace selected"}
                   </span>
