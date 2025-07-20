@@ -40,11 +40,7 @@ const data = {
       url: "/admin/playground",
       icon: Hammer,
     },
-    {
-      title: "Website Sources",
-      url: "/website-sources",
-      icon: Book,
-    },
+
     {
       title: "Actions",
       url: "/admin/actions",
