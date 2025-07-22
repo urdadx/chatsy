@@ -4,6 +4,7 @@ import { deleteChatById, getChatById, saveChat } from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import { saveFinalAssistantMessage } from "@/lib/ai/save-assistant-message";
 import type { Message } from "@/lib/ai/save-assistant-message";
+import { questionAndAnswer } from "@/lib/ai/tools/question-and-answer";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -22,7 +23,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         return new Response("Unauthorized", { status: 401 });
       }
 
-      const organizationId = session?.session?.activeOrganizationId;
+      const organizationId = session?.session?.activeOrganizationId as string;
       if (!organizationId) {
         return new Response("No active organization", { status: 400 });
       }
@@ -88,7 +89,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         system: "Hi, you are a helpful assistant.",
         messages,
         maxSteps: 5,
-        tools: {},
+        tools: questionAndAnswer(organizationId),
         onError: (err) => {
           console.error("🛑 streamText error:", err);
         },

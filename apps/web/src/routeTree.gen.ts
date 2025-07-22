@@ -28,7 +28,9 @@ import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
 import { ServerRoute as ApiUploadImagesServerRouteImport } from './routes/api/upload-images'
 import { ServerRoute as ApiUploadDocumentsServerRouteImport } from './routes/api/upload-documents'
+import { ServerRoute as ApiTrainServerRouteImport } from './routes/api/train'
 import { ServerRoute as ApiTextSourcesServerRouteImport } from './routes/api/text-sources'
+import { ServerRoute as ApiSimilaritySearchServerRouteImport } from './routes/api/similarity-search'
 import { ServerRoute as ApiScrapeServerRouteImport } from './routes/api/scrape'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
 import { ServerRoute as ApiMyLinksServerRouteImport } from './routes/api/my-links'
@@ -36,6 +38,7 @@ import { ServerRoute as ApiMyBrandingServerRouteImport } from './routes/api/my-b
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
 import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-og-info'
 import { ServerRoute as ApiDocumentSourceServerRouteImport } from './routes/api/document-source'
+import { ServerRoute as ApiDocumentProcessingServerRouteImport } from './routes/api/document-processing'
 import { ServerRoute as ApiCrawlServerRouteImport } from './routes/api/crawl'
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
@@ -130,11 +133,22 @@ const ApiUploadDocumentsServerRoute =
     path: '/api/upload-documents',
     getParentRoute: () => rootServerRouteImport,
   } as any)
+const ApiTrainServerRoute = ApiTrainServerRouteImport.update({
+  id: '/api/train',
+  path: '/api/train',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiTextSourcesServerRoute = ApiTextSourcesServerRouteImport.update({
   id: '/api/text-sources',
   path: '/api/text-sources',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiSimilaritySearchServerRoute =
+  ApiSimilaritySearchServerRouteImport.update({
+    id: '/api/similarity-search',
+    path: '/api/similarity-search',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiScrapeServerRoute = ApiScrapeServerRouteImport.update({
   id: '/api/scrape',
   path: '/api/scrape',
@@ -170,6 +184,12 @@ const ApiDocumentSourceServerRoute = ApiDocumentSourceServerRouteImport.update({
   path: '/api/document-source',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiDocumentProcessingServerRoute =
+  ApiDocumentProcessingServerRouteImport.update({
+    id: '/api/document-processing',
+    path: '/api/document-processing',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiCrawlServerRoute = ApiCrawlServerRouteImport.update({
   id: '/api/crawl',
   path: '/api/crawl',
@@ -307,6 +327,7 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   '/api/crawl': typeof ApiCrawlServerRoute
+  '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
@@ -314,7 +335,9 @@ export interface FileServerRoutesByFullPath {
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
+  '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
   '/api/text-sources': typeof ApiTextSourcesServerRoute
+  '/api/train': typeof ApiTrainServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -323,6 +346,7 @@ export interface FileServerRoutesByFullPath {
 }
 export interface FileServerRoutesByTo {
   '/api/crawl': typeof ApiCrawlServerRoute
+  '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
@@ -330,7 +354,9 @@ export interface FileServerRoutesByTo {
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
+  '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
   '/api/text-sources': typeof ApiTextSourcesServerRoute
+  '/api/train': typeof ApiTrainServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -340,6 +366,7 @@ export interface FileServerRoutesByTo {
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/crawl': typeof ApiCrawlServerRoute
+  '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
@@ -347,7 +374,9 @@ export interface FileServerRoutesById {
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
+  '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
   '/api/text-sources': typeof ApiTextSourcesServerRoute
+  '/api/train': typeof ApiTrainServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -358,6 +387,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
   fullPaths:
     | '/api/crawl'
+    | '/api/document-processing'
     | '/api/document-source'
     | '/api/get-og-info'
     | '/api/hello'
@@ -365,7 +395,9 @@ export interface FileServerRouteTypes {
     | '/api/my-links'
     | '/api/questions'
     | '/api/scrape'
+    | '/api/similarity-search'
     | '/api/text-sources'
+    | '/api/train'
     | '/api/upload-documents'
     | '/api/upload-images'
     | '/api/auth/$'
@@ -374,6 +406,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/crawl'
+    | '/api/document-processing'
     | '/api/document-source'
     | '/api/get-og-info'
     | '/api/hello'
@@ -381,7 +414,9 @@ export interface FileServerRouteTypes {
     | '/api/my-links'
     | '/api/questions'
     | '/api/scrape'
+    | '/api/similarity-search'
     | '/api/text-sources'
+    | '/api/train'
     | '/api/upload-documents'
     | '/api/upload-images'
     | '/api/auth/$'
@@ -390,6 +425,7 @@ export interface FileServerRouteTypes {
   id:
     | '__root__'
     | '/api/crawl'
+    | '/api/document-processing'
     | '/api/document-source'
     | '/api/get-og-info'
     | '/api/hello'
@@ -397,7 +433,9 @@ export interface FileServerRouteTypes {
     | '/api/my-links'
     | '/api/questions'
     | '/api/scrape'
+    | '/api/similarity-search'
     | '/api/text-sources'
+    | '/api/train'
     | '/api/upload-documents'
     | '/api/upload-images'
     | '/api/auth/$'
@@ -407,6 +445,7 @@ export interface FileServerRouteTypes {
 }
 export interface RootServerRouteChildren {
   ApiCrawlServerRoute: typeof ApiCrawlServerRoute
+  ApiDocumentProcessingServerRoute: typeof ApiDocumentProcessingServerRoute
   ApiDocumentSourceServerRoute: typeof ApiDocumentSourceServerRoute
   ApiGetOgInfoServerRoute: typeof ApiGetOgInfoServerRoute
   ApiHelloServerRoute: typeof ApiHelloServerRoute
@@ -414,7 +453,9 @@ export interface RootServerRouteChildren {
   ApiMyLinksServerRoute: typeof ApiMyLinksServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
   ApiScrapeServerRoute: typeof ApiScrapeServerRoute
+  ApiSimilaritySearchServerRoute: typeof ApiSimilaritySearchServerRoute
   ApiTextSourcesServerRoute: typeof ApiTextSourcesServerRoute
+  ApiTrainServerRoute: typeof ApiTrainServerRoute
   ApiUploadDocumentsServerRoute: typeof ApiUploadDocumentsServerRoute
   ApiUploadImagesServerRoute: typeof ApiUploadImagesServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
@@ -547,11 +588,25 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiUploadDocumentsServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/train': {
+      id: '/api/train'
+      path: '/api/train'
+      fullPath: '/api/train'
+      preLoaderRoute: typeof ApiTrainServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/text-sources': {
       id: '/api/text-sources'
       path: '/api/text-sources'
       fullPath: '/api/text-sources'
       preLoaderRoute: typeof ApiTextSourcesServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/similarity-search': {
+      id: '/api/similarity-search'
+      path: '/api/similarity-search'
+      fullPath: '/api/similarity-search'
+      preLoaderRoute: typeof ApiSimilaritySearchServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/scrape': {
@@ -601,6 +656,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/document-source'
       fullPath: '/api/document-source'
       preLoaderRoute: typeof ApiDocumentSourceServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/document-processing': {
+      id: '/api/document-processing'
+      path: '/api/document-processing'
+      fullPath: '/api/document-processing'
+      preLoaderRoute: typeof ApiDocumentProcessingServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/crawl': {
@@ -675,6 +737,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiCrawlServerRoute: ApiCrawlServerRoute,
+  ApiDocumentProcessingServerRoute: ApiDocumentProcessingServerRoute,
   ApiDocumentSourceServerRoute: ApiDocumentSourceServerRoute,
   ApiGetOgInfoServerRoute: ApiGetOgInfoServerRoute,
   ApiHelloServerRoute: ApiHelloServerRoute,
@@ -682,7 +745,9 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiMyLinksServerRoute: ApiMyLinksServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,
   ApiScrapeServerRoute: ApiScrapeServerRoute,
+  ApiSimilaritySearchServerRoute: ApiSimilaritySearchServerRoute,
   ApiTextSourcesServerRoute: ApiTextSourcesServerRoute,
+  ApiTrainServerRoute: ApiTrainServerRoute,
   ApiUploadDocumentsServerRoute: ApiUploadDocumentsServerRoute,
   ApiUploadImagesServerRoute: ApiUploadImagesServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,

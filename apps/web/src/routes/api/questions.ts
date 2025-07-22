@@ -1,5 +1,9 @@
 import { db } from "@/db";
 import { question } from "@/db/schema";
+import {
+  generateAnswerEmbedding,
+  generateQuestionEmbedding,
+} from "@/lib/embeddings";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -63,12 +67,20 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
+    // Generate embeddings
+    const [questionEmbedding, answerEmbedding] = await Promise.all([
+      generateQuestionEmbedding(parsed.data.question),
+      generateAnswerEmbedding(parsed.data.answer),
+    ]);
+
     const result = await db.insert(question).values({
       userId,
+      organizationId,
       ...parsed.data,
+      questionEmbedding,
+      answerEmbedding,
       createdAt: new Date(),
       updatedAt: new Date(),
-      organizationId,
     });
 
     return json({ message: "Question created", result });
@@ -93,9 +105,28 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
 
     const { id, ...updates } = parsed.data;
 
+    const embeddingUpdates: any = {};
+
+    if (updates.question) {
+      embeddingUpdates.questionEmbedding = await generateQuestionEmbedding(
+        updates.question,
+      );
+    }
+
+    if (updates.answer) {
+      embeddingUpdates.answerEmbedding = await generateAnswerEmbedding(
+        updates.answer,
+      );
+    }
+
     const updated = await db
       .update(question)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({
+        ...updates,
+        ...embeddingUpdates,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
       .where(and(eq(question.id, id), eq(question.userId, userId)))
       .returning();
 

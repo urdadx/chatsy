@@ -131,7 +131,7 @@ export function WorkspaceSwitcher() {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
 
-              {organizations && organizations.length > 1 && (
+              {organizations && organizations.length > 0 && (
                 <>
                   <DropdownMenuLabel className="text-xs">
                     Workspaces

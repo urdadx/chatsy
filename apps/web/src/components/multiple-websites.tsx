@@ -35,7 +35,6 @@ export const MultipleWebsites = () => {
     }
   };
 
-  // Cleaner data extraction
   const crawlData = mutation.data?.data;
   const crawledPages = crawlData?.data || [];
   const isSuccessful =

@@ -22,7 +22,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
-import { useBranding, useUpdateBranding } from "@/hooks/use-bot-branding";
 import { useFileUpload } from "@/hooks/use-file-upload";
 
 // Define type for pixel crop area
@@ -79,11 +78,15 @@ async function getCroppedImg(
   }
 }
 
-export function AvatarUpload() {
-  // Branding hooks
-  const { data: branding, isLoading: isBrandingLoading } = useBranding();
-  const updateBrandingMutation = useUpdateBranding();
-
+export function WorkspaceLogoUpload({
+  onUploadComplete,
+  initialImage,
+  onRemove,
+}: {
+  onUploadComplete: (url: string) => void;
+  initialImage: string | null | undefined;
+  onRemove: () => void;
+}) {
   const [
     { files, isDragging },
     {
@@ -110,24 +113,23 @@ export function AvatarUpload() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [zoom, setZoom] = useState(1);
 
-  // Set initial image from branding data
+  // Set initial image from prop
   useEffect(() => {
-    if (branding?.image && !finalImageUrl) {
-      setFinalImageUrl(branding.image);
+    if (initialImage && !finalImageUrl) {
+      setFinalImageUrl(initialImage);
     }
-  }, [branding?.image, finalImageUrl]);
+  }, [initialImage, finalImageUrl]);
 
   const handleCropChange = useCallback((pixels: Area | null) => {
     setCroppedAreaPixels(pixels);
   }, []);
 
   const handleApply = async () => {
-    if (!previewUrl || !fileId || !croppedAreaPixels || !branding) {
+    if (!previewUrl || !fileId || !croppedAreaPixels) {
       console.error("Missing data for apply:", {
         previewUrl,
         fileId,
         croppedAreaPixels,
-        branding,
       });
       if (fileId) {
         removeFile(fileId);
@@ -148,7 +150,7 @@ export function AvatarUpload() {
 
       // 2. Create FormData for upload
       const formData = new FormData();
-      formData.append("file", croppedBlob, "avatar.jpg");
+      formData.append("file", croppedBlob, "logo.jpg");
 
       // 3. Upload via API endpoint
       const uploadResponse = await fetch("/api/upload-images", {
@@ -162,21 +164,16 @@ export function AvatarUpload() {
 
       const { url: uploadedImageUrl } = await uploadResponse.json();
 
-      // 4. Update branding with new image URL
-      const updatedBranding = {
-        ...branding,
-        image: uploadedImageUrl,
-      };
+      // 4. Update parent component with new image URL
+      onUploadComplete(uploadedImageUrl);
 
-      await updateBrandingMutation.mutateAsync(updatedBranding);
-
-      // 6. Update local state
+      // 5. Update local state
       if (finalImageUrl?.startsWith("blob:")) {
         URL.revokeObjectURL(finalImageUrl);
       }
       setFinalImageUrl(uploadedImageUrl as string);
 
-      // 7. Clean up
+      // 6. Clean up
       removeFile(fileId);
       setIsDialogOpen(false);
       setCroppedAreaPixels(null);
@@ -189,26 +186,11 @@ export function AvatarUpload() {
   };
 
   const handleRemoveFinalImage = async () => {
-    if (!branding) return;
-
-    try {
-      // Update branding to remove image
-      const updatedBranding = {
-        ...branding,
-        image: null,
-      };
-
-      await updateBrandingMutation.mutateAsync(updatedBranding);
-
-      // Clean up local state
-      if (finalImageUrl?.startsWith("blob:")) {
-        URL.revokeObjectURL(finalImageUrl);
-      }
-      setFinalImageUrl(null);
-    } catch (error) {
-      console.error("Error removing image:", error);
-      // You might want to show a toast notification here
+    onRemove();
+    if (finalImageUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(finalImageUrl);
     }
+    setFinalImageUrl(null);
   };
 
   useEffect(() => {
@@ -229,17 +211,6 @@ export function AvatarUpload() {
     previousFileIdRef.current = fileId;
   }, [fileId]);
 
-  // Show loading state while branding is loading
-  if (isBrandingLoading) {
-    return (
-      <div className="flex flex-col gap-2">
-        <div className="relative inline-flex">
-          <div className="h-14 w-14 animate-pulse rounded-full bg-muted" />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-2">
       <div className="relative inline-flex">
@@ -253,13 +224,13 @@ export function AvatarUpload() {
           onDrop={handleDrop}
           data-dragging={isDragging || undefined}
           aria-label={finalImageUrl ? "Change image" : "Upload image"}
-          disabled={isUploading || updateBrandingMutation.isPending}
+          disabled={isUploading}
         >
           {finalImageUrl ? (
             <img
               className="size-full object-cover"
               src={finalImageUrl}
-              alt="Branding"
+              alt="Workspace Logo"
               width={64}
               height={64}
               style={{ objectFit: "cover" }}
@@ -269,14 +240,14 @@ export function AvatarUpload() {
               <CircleUserRoundIcon className="size-4 opacity-60" />
             </div>
           )}
-          {(isUploading || updateBrandingMutation.isPending) && (
+          {isUploading && (
             <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
               <div className="size-4 animate-spin rounded-full border-2 border-primary border-r-transparent" />
             </div>
           )}
         </button>
 
-        {finalImageUrl && !isUploading && !updateBrandingMutation.isPending && (
+        {finalImageUrl && !isUploading && (
           <Button
             onClick={handleRemoveFinalImage}
             size="icon"
@@ -316,7 +287,7 @@ export function AvatarUpload() {
               <Button
                 className="-my-1"
                 onClick={handleApply}
-                disabled={!previewUrl || isUploading || !branding}
+                disabled={!previewUrl || isUploading}
                 autoFocus
               >
                 {isUploading ? "Uploading..." : "Apply"}

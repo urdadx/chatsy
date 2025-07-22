@@ -1,6 +1,7 @@
 import { api } from "@/lib/api";
+import { timeAgo } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { MoreHorizontal } from "lucide-react";
+import { Edit, FileText, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { DeleteTextSource } from "./playground/text-source/delete-text-source";
 import { EditTextSource } from "./playground/text-source/edit-text-source";
@@ -91,11 +92,16 @@ export const TextSourceList = () => {
                 key={ts.id}
                 className="border p-4 rounded-md flex justify-between items-start"
               >
-                <div>
-                  <p className="font-medium">{ts.title}</p>
-                  <p className="text-muted-foreground truncate max-w-2xl">
-                    {ts.content}
-                  </p>
+                <div className="flex flex-row gap-3 items-center">
+                  <div className="bg-gray-100 rounded-full p-2">
+                    <FileText className="h-5 w-5 text-primary/70" />
+                  </div>{" "}
+                  <div>
+                    <p className="text-sm">{ts.title}</p>
+                    <p className="text-muted-foreground text-xs">
+                      Last updated {timeAgo(ts.updatedAt)}
+                    </p>
+                  </div>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -106,12 +112,15 @@ export const TextSourceList = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => handleEdit(ts)}>
+                      <Edit className="h-4 w-4 mr-2" />
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onSelect={(e) => e.preventDefault()}
                       onClick={() => handleDeleteClick(ts.id)}
+                      className="text-red-500 hover:text-red-600 focus:text-red-600"
                     >
+                      <Trash2 className="h-4 w-4 mr-2 text-red-500" />
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>

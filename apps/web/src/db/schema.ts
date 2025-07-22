@@ -4,6 +4,7 @@ import {
   foreignKey,
   integer,
   json,
+  jsonb,
   numeric,
   pgTable,
   primaryKey,
@@ -11,6 +12,7 @@ import {
   timestamp,
   uuid,
   varchar,
+  vector,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -191,7 +193,8 @@ export const question = pgTable("question", {
     .references(() => organization.id, { onDelete: "cascade" }),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
-  isSuggested: boolean("isSuggested").notNull().default(false),
+  questionEmbedding: vector("question_embedding", { dimensions: 768 }),
+  answerEmbedding: vector("answer_embedding", { dimensions: 768 }),
   createdAt: timestamp("createdAt")
     .notNull()
     .$defaultFn(() => new Date()),
@@ -318,6 +321,26 @@ export const documentSource = pgTable("document_source", {
 
 export type DocumentSource = InferSelectModel<typeof documentSource>;
 
+export const documentChunk = pgTable("document_chunk", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  documentSourceId: uuid("document_source_id")
+    .notNull()
+    .references(() => documentSource.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  embedding: vector("embedding", { dimensions: 768 }),
+  chunkIndex: integer("chunk_index").notNull(),
+  metadata: jsonb("metadata").$type<{
+    page?: number;
+    section?: string;
+    startChar?: number;
+    endChar?: number;
+  }>(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const websiteSource = pgTable("website_source", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   userId: uuid("user_id")
@@ -335,4 +358,3 @@ export const websiteSource = pgTable("website_source", {
 });
 
 export type WebsiteSource = InferSelectModel<typeof websiteSource>;
-

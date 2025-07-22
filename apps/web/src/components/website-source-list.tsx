@@ -1,7 +1,8 @@
 import type { WebsiteSource } from "@/db/schema";
 import { api } from "@/lib/api";
+import { timeAgo } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { MoreHorizontal } from "lucide-react";
+import { Globe, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { DeleteWebsiteSource } from "./delete-website-source";
 import { Button } from "./ui/button";
@@ -65,13 +66,18 @@ export const WebsiteSourceList = () => {
           {filteredSources.map((source) => (
             <div
               key={source.id}
-              className="border p-4 rounded-md flex justify-between items-start"
+              className="border p-3 rounded-md flex justify-between items-start"
             >
-              <div>
-                <p className="font-medium">{source.url}</p>
-                <p className="text-muted-foreground text-sm">
-                  Last crawled {new Date(source.createdAt).toLocaleDateString()}
-                </p>
+              <div className="flex flex-row gap-3 items-center">
+                <div className="bg-gray-100 rounded-full p-2">
+                  <Globe className="h-5 w-5 text-primary/70" />
+                </div>
+                <div>
+                  <p className="text-sm">{source.url}</p>
+                  <p className="text-muted-foreground text-xs">
+                    Last crawled {timeAgo(source.updatedAt)}
+                  </p>
+                </div>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -84,7 +90,9 @@ export const WebsiteSourceList = () => {
                   <DropdownMenuItem
                     onSelect={(e) => e.preventDefault()}
                     onClick={() => handleDeleteClick(source.id)}
+                    className="text-red-500 hover:text-red-600 focus:text-red-600"
                   >
+                    <Trash2 className="h-4 w-4 mr-2 text-red-500" />
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>

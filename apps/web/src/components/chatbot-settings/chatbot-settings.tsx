@@ -18,7 +18,7 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 
-export function BrandingSettings() {
+export function ChatbotSettings() {
   const { data: branding, error, refetch } = useBranding();
   const updateBrandingMutation = useUpdateBranding();
 

@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import ms from "ms";
 import { twMerge } from "tailwind-merge";
 
 import type { CoreAssistantMessage, CoreToolMessage, UIMessage } from "ai";
@@ -140,10 +141,6 @@ import {
 } from "@/constants/domains";
 import { ChatSDKError, type ErrorCode } from "./errors";
 
-type SnakeToCamelCase<S extends string> = S extends `${infer T}_${infer U}`
-  ? `${T}${Capitalize<SnakeToCamelCase<U>>}`
-  : S;
-
 export const getApexDomain = (url: string) => {
   let domain: any;
   try {
@@ -191,6 +188,30 @@ export const signalIframe = () => {
   if (iframe) {
     iframe.contentWindow?.postMessage("", "*");
   }
+};
+
+export const timeAgo = (timestamp: any) => {
+  if (!timestamp) return "Just now";
+  const diff = Date.now() - new Date(timestamp).getTime();
+
+  if (diff < 60000) {
+    // less than 1 minute
+    return "Just now";
+  }
+
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (days > 0) {
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  }
+
+  if (hours > 0) {
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  }
+
+  return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
 };
 
 export const removeHashFromHexColor = (hexColor: string) => {

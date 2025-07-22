@@ -12,11 +12,11 @@ const getFileIcon = (file: { type: string; name: string }) => {
   const { type, name } = file;
 
   if (type.includes("pdf") || name.endsWith(".pdf")) {
-    return <img src={PDFIcon} alt="PDF Icon" className="size-12 " />;
+    return <img src={PDFIcon} alt="PDF Icon" className="size-10 " />;
   }
 
   if (name.endsWith(".txt") || type.includes("text")) {
-    return <img src={TXTIcon} alt="PDF Icon" className="size-12 " />;
+    return <img src={TXTIcon} alt="PDF Icon" className="size-10 " />;
   }
 
   if (
@@ -24,10 +24,10 @@ const getFileIcon = (file: { type: string; name: string }) => {
     name.endsWith(".doc") ||
     name.endsWith(".docx")
   ) {
-    return <img src={DocxIcon} alt="PDF Icon" className="size-12 " />;
+    return <img src={DocxIcon} alt="PDF Icon" className="size-10 " />;
   }
 
-  return <img src={PDFIcon} alt="PDF Icon" className="size-12 " />;
+  return <img src={PDFIcon} alt="PDF Icon" className="size-10 " />;
 };
 
 export function DocumentList() {
@@ -67,8 +67,8 @@ export function DocumentList() {
 
   return (
     <div className="flex flex-col gap-2 mt-4">
-      <p className="font-semibold text-lg py-2">
-        {documents.length === 0 ? "" : `File sources (${documents.length})`}
+      <p className="font-semibold text-lg">
+        {documents.length === 0 ? "" : "File sources"}
       </p>
       {documents.length > 0 && (
         <div className="space-y-4">

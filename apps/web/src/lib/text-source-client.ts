@@ -11,7 +11,7 @@ export type TextSource = {
 
 export const useTextSources = () => {
   return useQuery<TextSource[]>({
-    queryKey: ["textSources"],
+    queryKey: ["text-sources"],
     queryFn: async () => {
       const { data } = await api.get("/text-sources");
       return data;
@@ -27,7 +27,7 @@ export const useCreateTextSource = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["textSources"] });
+      queryClient.invalidateQueries({ queryKey: ["text-sources"] });
     },
   });
 };
@@ -40,7 +40,7 @@ export const useUpdateTextSource = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["textSources"] });
+      queryClient.invalidateQueries({ queryKey: ["text-sources"] });
     },
   });
 };
@@ -53,7 +53,7 @@ export const useDeleteTextSource = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["textSources"] });
+      queryClient.invalidateQueries({ queryKey: ["text-sources"] });
     },
   });
 };

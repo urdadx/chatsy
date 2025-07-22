@@ -89,7 +89,7 @@ export function DocumentSource() {
             onDragOver={handleDragOver}
             onDrop={handleDrop}
             data-dragging={isDragging || undefined}
-            className="border-input border-2 bg-accent/50 data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 flex min-h-64 flex-col items-center justify-center rounded-xl  border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px]"
+            className="border-input border-2 bg-accent/50 data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 flex min-h-52 flex-col items-center justify-center rounded-xl  border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px] hover:border-primary"
           >
             <input
               {...getInputProps()}

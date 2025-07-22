@@ -1,6 +1,8 @@
 import { api } from "@/lib/api";
+import { timeAgo } from "@/lib/utils";
+import { RiQuestionFill } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";
-import { MoreHorizontal } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { DeleteQuestion } from "./playground/questions/delete-question";
 import { EditQuestion } from "./playground/questions/edit-questions";
@@ -88,9 +90,16 @@ export const QuestionList = () => {
               key={q.id}
               className="border p-4 rounded-md flex justify-between items-start"
             >
-              <div>
-                <p className="font-medium">Q: {q.question}</p>
-                <p className="text-muted-foreground">A: {q.answer}</p>
+              <div className="flex flex-row gap-3 items-center">
+                <div className="bg-gray-100 rounded-full p-2">
+                  <RiQuestionFill className="h-7 w-7 text-primary/60" />
+                </div>
+                <div>
+                  <p className=" text-sm">{q.question}</p>
+                  <p className="text-muted-foreground text-xs">
+                    Last updated {timeAgo(q.updatedAt)}
+                  </p>
+                </div>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -101,12 +110,15 @@ export const QuestionList = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => handleEdit(q)}>
+                    <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={(e) => e.preventDefault()}
                     onClick={() => handleDeleteClick(q.id)}
+                    className="text-red-500 hover:text-red-600 focus:text-red-600"
                   >
+                    <Trash2 className="h-4 w-4 mr-2 text-red-500" />
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>

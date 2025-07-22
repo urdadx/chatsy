@@ -1,5 +1,5 @@
-import { BrandingSettings } from "@/components/branding/branding-settings";
 import { ChatPreview } from "@/components/chat-preview";
+import { ChatbotSettings } from "@/components/chatbot-settings/chatbot-settings";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { z } from "zod";
@@ -28,7 +28,7 @@ function RouteComponent() {
             </p>
           </div>
 
-          <BrandingSettings />
+          <ChatbotSettings />
         </div>
       </div>
       <div className="hidden lg:flex lg:basis-2/5 border-l bg-background fixed right-0 top-0 h-full p-6">
