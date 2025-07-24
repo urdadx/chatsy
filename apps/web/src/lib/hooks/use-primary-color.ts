@@ -10,7 +10,7 @@ export const useUpdatePrimaryColor = () => {
       return await updatePrimaryColor({ data: { primaryColor } });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["branding"] });
+      queryClient.invalidateQueries({ queryKey: ["chatbot"] });
     },
     onError: () => {
       toast.error("An error occured. Please try again.");

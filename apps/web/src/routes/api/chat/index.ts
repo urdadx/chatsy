@@ -1,10 +1,14 @@
 import { db } from "@/db";
-import { member, message } from "@/db/schema";
+import { chatbot, member, message } from "@/db/schema";
 import { deleteChatById, getChatById, saveChat } from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
-import { saveFinalAssistantMessage } from "@/lib/ai/save-assistant-message";
-import type { Message } from "@/lib/ai/save-assistant-message";
-import { questionAndAnswer } from "@/lib/ai/tools/question-and-answer";
+import {
+  type Message,
+  saveFinalAssistantMessage,
+} from "@/lib/ai/save-assistant-message";
+import { systemPrompt } from "@/lib/ai/system-prompt";
+import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
+import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -79,6 +83,13 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
           console.error("Error saving user message:", error);
         }
       }
+      // get the chatbot name for the organization
+      const [chatbotName] = await db
+        .select({
+          name: chatbot.name,
+        })
+        .from(chatbot)
+        .where(eq(chatbot.organizationId, organizationId));
 
       const google = createGoogleGenerativeAI({
         apiKey: process.env.GEMINI_API_KEY!,
@@ -86,10 +97,13 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
 
       const resultStream = streamText({
         model: google("gemini-2.5-flash"),
-        system: "Hi, you are a helpful assistant.",
+        system: systemPrompt(chatbotName.name ?? "Assistant"),
         messages,
         maxSteps: 5,
-        tools: questionAndAnswer(organizationId),
+        tools: {
+          knowledge_base: knowledgeSearchTool(organizationId),
+          collect_feedback: collectFeedbackTool,
+        },
         onError: (err) => {
           console.error("🛑 streamText error:", err);
         },

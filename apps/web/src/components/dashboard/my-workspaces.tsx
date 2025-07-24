@@ -1,10 +1,12 @@
-import { Settings2 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import Avatar from "boring-avatars";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { CreateWorkspace } from "../workspace/new-workspace";
 
 export const MyWorkspaces = () => {
   const [openWorkspace, setOpenWorkspace] = useState(false);
+  const { data: organizations } = authClient.useListOrganizations();
 
   const handleCreateWorkspace = () => {
     setOpenWorkspace(true);
@@ -20,24 +22,29 @@ export const MyWorkspaces = () => {
           <Button onClick={handleCreateWorkspace}>Create new workspace</Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-lg p-4 space-y-3 border">
-            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="flex items-center space-x-2">
-                <img
-                  src="https://avatars.githubusercontent.com/u/70736338?v=4"
-                  alt="RedPear Bot"
-                  className="w-10 h-10 rounded-full object-cover border-2"
-                />
-                <h3 className="text-md font-medium">RedPear Bot</h3>
+          {organizations?.map((workspace) => (
+            <div
+              key={workspace.id}
+              className="bg-white rounded-lg p-4 space-y-3 border"
+            >
+              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="flex items-center space-x-2">
+                  {workspace?.logo ? (
+                    <div className=" rounded-full w-8 h-8">
+                      <img
+                        src={workspace.logo}
+                        alt={workspace.name}
+                        className="h-full w-full rounded-full object-cover "
+                      />
+                    </div>
+                  ) : (
+                    <Avatar name={workspace?.name} size={35} />
+                  )}
+                  <h3 className="text-md font-medium">{workspace.name}</h3>
+                </div>
               </div>
             </div>
-            <div className="flex w-full items-center justify-between ">
-              <Button className="w-full" variant="outline">
-                <Settings2 />
-                Customize
-              </Button>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </>

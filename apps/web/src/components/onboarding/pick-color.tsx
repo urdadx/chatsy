@@ -6,7 +6,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useBranding, useUpdateBranding } from "@/hooks/use-bot-branding";
+import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
 import { motion } from "framer-motion";
 import { ArrowRight, Palette } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -15,18 +15,18 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 
 export const PickColor = () => {
-  const { data: branding, isLoading: isBrandingLoading } = useBranding();
-  const updateBrandingMutation = useUpdateBranding();
+  const { data: chatbot, isLoading: isChatbotLoading } = useChatbot();
+  const updateChatbotMutation = useUpdateChatbot();
 
   const [selectedColor, setSelectedColor] = useState(
-    branding?.primaryColor || "#9333ea",
+    chatbot?.primaryColor || "#9333ea",
   );
 
   useEffect(() => {
-    if (branding?.primaryColor) {
-      setSelectedColor(branding.primaryColor);
+    if (chatbot?.primaryColor) {
+      setSelectedColor(chatbot.primaryColor);
     }
-  }, [branding]);
+  }, [chatbot]);
 
   const [tempColor, setTempColor] = useState(selectedColor);
   const [hexInput, setHexInput] = useState(selectedColor);
@@ -58,17 +58,17 @@ export const PickColor = () => {
   };
 
   const handleConfirmColor = async () => {
-    if (!isValidHex(hexInput) || !branding) return;
+    if (!isValidHex(hexInput) || !chatbot) return;
 
     try {
       const normalizedColor = normalizeHex(hexInput);
 
-      const updatedBranding = {
-        ...branding,
+      const updatedChatbot = {
+        ...chatbot,
         primaryColor: normalizedColor,
       };
 
-      await updateBrandingMutation.mutateAsync(updatedBranding);
+      await updateChatbotMutation.mutateAsync(updatedChatbot);
 
       setSelectedColor(normalizedColor);
       setIsOpen(false);
@@ -85,8 +85,8 @@ export const PickColor = () => {
     }
   };
 
-  // Show loading state while branding is loading
-  if (isBrandingLoading) {
+  // Show loading state while chatbot is loading
+  if (isChatbotLoading) {
     return (
       <div className="flex items-center gap-2">
         <div className="w-16 h-4 bg-muted animate-pulse rounded" />
@@ -142,7 +142,7 @@ export const PickColor = () => {
                 onChange={(e) => handleHexInputChange(e.target.value)}
                 placeholder="#6366f1"
                 className="font-mono"
-                disabled={updateBrandingMutation.isPending}
+                disabled={updateChatbotMutation.isPending}
               />
               <div
                 className="w-10 h-10 rounded-full border-2 border-gray-200 flex-shrink-0"
@@ -160,11 +160,11 @@ export const PickColor = () => {
                 onClick={handleConfirmColor}
                 disabled={
                   !isValidHex(hexInput) ||
-                  updateBrandingMutation.isPending ||
-                  !branding
+                  updateChatbotMutation.isPending ||
+                  !chatbot
                 }
               >
-                {updateBrandingMutation.isPending ? (
+                {updateChatbotMutation.isPending ? (
                   <>
                     <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-r-transparent" />
                     Updating...

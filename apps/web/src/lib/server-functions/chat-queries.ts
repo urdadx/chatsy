@@ -2,7 +2,6 @@ import { db } from "@/db";
 import { chat, message } from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import { asc, eq } from "drizzle-orm";
-
 export const getChatById = createServerFn({ method: "GET" })
   .validator((data: string) => data)
   .handler(async (ctx) => {
@@ -11,18 +10,15 @@ export const getChatById = createServerFn({ method: "GET" })
         .select()
         .from(chat)
         .where(eq(chat.id, ctx.data));
-
       if (!selectedChat) {
         throw new Error(`Chat with id "${ctx.data}" not found`);
       }
-
       return selectedChat;
     } catch (error) {
       console.error("Error getting chat by ID:", error);
       throw new Error("Failed to get chat by ID");
     }
   });
-
 export const getMessagesByChatId = createServerFn({ method: "GET" })
   .validator((data: string) => data)
   .handler(async (ctx) => {
@@ -32,7 +28,6 @@ export const getMessagesByChatId = createServerFn({ method: "GET" })
         .from(message)
         .where(eq(message.chatId, ctx.data))
         .orderBy(asc(message.createdAt));
-
       return results.map((result) => ({
         ...result,
         parts: result.parts as {},

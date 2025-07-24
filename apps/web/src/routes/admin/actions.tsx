@@ -6,7 +6,7 @@ import {
   useNavigate,
   useSearch,
 } from "@tanstack/react-router";
-import { z } from "zod";
+import z from "zod";
 
 const agentSearchSchema = z.object({
   tab: z.enum(["general", "integrations"]).optional().default("general"),

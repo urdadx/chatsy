@@ -1,9 +1,9 @@
 import { db } from "@/db";
-import { documentSource } from "@/db/schema";
+import { documentSource, organization } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const createDocumentSourceSchema = z.object({
@@ -70,13 +70,25 @@ export const ServerRoute = createServerFileRoute(
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
-    const result = await db.insert(documentSource).values({
-      userId,
-      organizationId,
-      ...parsed.data,
-    });
+    const [newDocumentSource] = await db
+      .insert(documentSource)
+      .values({
+        userId,
+        organizationId,
+        ...parsed.data,
+      })
+      .returning();
 
-    return json({ message: "Document source created", result });
+    if (newDocumentSource) {
+      await db
+        .update(organization)
+        .set({
+          sourcesCount: sql`${organization.sourcesCount} + 1`,
+        })
+        .where(eq(organization.id, organizationId));
+    }
+
+    return json(newDocumentSource);
   },
 
   DELETE: async ({ request }) => {
@@ -100,7 +112,7 @@ export const ServerRoute = createServerFileRoute(
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
-    const deleted = await db
+    const [deleted] = await db
       .delete(documentSource)
       .where(
         and(
@@ -111,11 +123,20 @@ export const ServerRoute = createServerFileRoute(
       )
       .returning();
 
-    if (!deleted.length) {
+    if (!deleted) {
       return json(
         { error: "Document source not found or unauthorized" },
         { status: 404 },
       );
+    }
+
+    if (deleted) {
+      await db
+        .update(organization)
+        .set({
+          sourcesCount: sql`greatest(0, ${organization.sourcesCount} - 1)`,
+        })
+        .where(eq(organization.id, organizationId));
     }
 
     return json({ message: "Document source deleted", deleted });

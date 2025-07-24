@@ -1,6 +1,5 @@
+import { Button } from "@/components/ui/button";
 import { RiCheckboxCircleFill } from "@remixicon/react";
-import { Hammer } from "lucide-react";
-import { Button } from "../../ui/button";
 
 export const InProgressStatus = () => {
   return (
@@ -17,6 +16,14 @@ export const InProgressStatus = () => {
             process may take some time depending on the amount of data and the
             complexity of the training.
           </p>
+          <Button
+            className="ml-7 text-yellow-600 mt-2 border border-yellow-400"
+            variant="outline"
+          >
+            <span className="text-yellow-600 hover:text-yellow-500">
+              See progress
+            </span>
+          </Button>
         </div>
       </div>
     </>

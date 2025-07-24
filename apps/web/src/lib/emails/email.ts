@@ -11,11 +11,11 @@ interface OrganizationInvitationData {
   inviteLink: string;
 }
 
-export async function sendOrganizationInvitation(
-  data: OrganizationInvitationData,
+export async function sendOrganizationInvitations(
+  invitations: OrganizationInvitationData[],
 ) {
   try {
-    const { data: result, error } = await resend.emails.send({
+    const emailBatch = invitations.map((data) => ({
       from: "Acme <onboarding@resend.dev>",
       to: [data.email],
       subject: `You've been invited to join ${data.teamName}`,
@@ -25,17 +25,25 @@ export async function sendOrganizationInvitation(
         teamName: data.teamName,
         inviteLink: data.inviteLink,
       }),
-    });
+    }));
+
+    const { data: result, error } = await resend.batch.send(emailBatch);
 
     if (error) {
-      console.error("Error sending organization invitation:", error);
-      throw new Error("Failed to send invitation email");
+      console.error("Error sending organization invitations:", error);
+      throw new Error("Failed to send invitation emails");
     }
 
-    console.log("Organization invitation sent successfully:", result);
+    console.log("Organization invitations sent successfully:", result);
     return result;
   } catch (error) {
-    console.error("Error sending organization invitation:", error);
+    console.error("Error sending organization invitations:", error);
     throw error;
   }
+}
+
+export async function sendOrganizationInvitation(
+  data: OrganizationInvitationData,
+) {
+  return sendOrganizationInvitations([data]);
 }

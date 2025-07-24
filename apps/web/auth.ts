@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { branding } from "@/db/schema";
+import { chatbot } from "@/db/schema";
 import { sendOrganizationInvitation } from "@/lib/emails/email";
 import { getActiveOrganization } from "@/lib/hooks/get-active-organization";
 import { betterAuth } from "better-auth";
@@ -81,7 +81,7 @@ export const auth = betterAuth({
         },
         afterCreate: async ({ organization }) => {
           try {
-            await db.insert(branding).values({
+            await db.insert(chatbot).values({
               organizationId: organization.id,
               name: organization.name,
             });

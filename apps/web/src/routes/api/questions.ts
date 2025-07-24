@@ -1,13 +1,9 @@
 import { db } from "@/db";
-import { question } from "@/db/schema";
-import {
-  generateAnswerEmbedding,
-  generateQuestionEmbedding,
-} from "@/lib/embeddings";
+import { organization, question } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const createQuestionSchema = z.object({
@@ -15,14 +11,8 @@ const createQuestionSchema = z.object({
   answer: z.string().min(1),
 });
 
-const updateQuestionSchema = z.object({
-  id: z.string().uuid(),
-  question: z.string().optional(),
-  answer: z.string().optional(),
-});
-
 const deleteQuestionSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
 });
 
 export const ServerRoute = createServerFileRoute("/api/questions").methods({
@@ -31,8 +21,12 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       headers: request.headers || new Headers(),
     });
 
-    const userId = session?.user?.id;
+    const organizationId = session?.session?.activeOrganizationId;
+    if (!organizationId) {
+      return json({ error: "No active organization" }, { status: 400 });
+    }
 
+    const userId = session?.user?.id;
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
@@ -40,7 +34,12 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
     const results = await db
       .select()
       .from(question)
-      .where(eq(question.userId, userId));
+      .where(
+        and(
+          eq(question.userId, userId),
+          eq(question.organizationId, organizationId),
+        ),
+      );
 
     return json(results);
   },
@@ -67,83 +66,36 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
-    // Generate embeddings
-    const [questionEmbedding, answerEmbedding] = await Promise.all([
-      generateQuestionEmbedding(parsed.data.question),
-      generateAnswerEmbedding(parsed.data.answer),
-    ]);
-
-    const result = await db.insert(question).values({
-      userId,
-      organizationId,
-      ...parsed.data,
-      questionEmbedding,
-      answerEmbedding,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    return json({ message: "Question created", result });
-  },
-
-  PATCH: async ({ request }) => {
-    const session = await auth.api.getSession({
-      headers: request.headers || new Headers(),
-    });
-
-    const userId = session?.user?.id;
-    if (!userId) {
-      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
-    }
-
-    const body = await request.json();
-    const parsed = updateQuestionSchema.safeParse(body);
-
-    if (!parsed.success) {
-      return json({ error: parsed.error.format() }, { status: 400 });
-    }
-
-    const { id, ...updates } = parsed.data;
-
-    const embeddingUpdates: any = {};
-
-    if (updates.question) {
-      embeddingUpdates.questionEmbedding = await generateQuestionEmbedding(
-        updates.question,
-      );
-    }
-
-    if (updates.answer) {
-      embeddingUpdates.answerEmbedding = await generateAnswerEmbedding(
-        updates.answer,
-      );
-    }
-
-    const updated = await db
-      .update(question)
-      .set({
-        ...updates,
-        ...embeddingUpdates,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+    const [newQuestion] = await db
+      .insert(question)
+      .values({
+        userId,
+        organizationId,
+        ...parsed.data,
       })
-      .where(and(eq(question.id, id), eq(question.userId, userId)))
       .returning();
 
-    if (!updated.length) {
-      return json(
-        { error: "Question not found or unauthorized" },
-        { status: 404 },
-      );
+    if (newQuestion) {
+      await db
+        .update(organization)
+        .set({
+          sourcesCount: sql`${organization.sourcesCount} + 1`,
+        })
+        .where(eq(organization.id, organizationId));
     }
 
-    return json({ message: "Question updated", updated });
+    return json(newQuestion);
   },
 
   DELETE: async ({ request }) => {
     const session = await auth.api.getSession({
       headers: request.headers || new Headers(),
     });
+
+    const organizationId = session?.session?.activeOrganizationId;
+    if (!organizationId) {
+      return json({ error: "No active organization" }, { status: 400 });
+    }
 
     const userId = session?.user?.id;
     if (!userId) {
@@ -157,18 +109,32 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
-    const deleted = await db
+    const { id } = parsed.data;
+
+    const [deletedQuestion] = await db
       .delete(question)
-      .where(and(eq(question.id, parsed.data.id), eq(question.userId, userId)))
+      .where(
+        and(
+          eq(question.id, id),
+          eq(question.userId, userId),
+          eq(question.organizationId, organizationId),
+        ),
+      )
       .returning();
 
-    if (!deleted.length) {
-      return json(
-        { error: "Question not found or unauthorized" },
-        { status: 404 },
-      );
+    if (!deletedQuestion) {
+      return json({ error: "Question not found" }, { status: 404 });
     }
 
-    return json({ message: "Question deleted", deleted });
+    if (deletedQuestion) {
+      await db
+        .update(organization)
+        .set({
+          sourcesCount: sql`greatest(0, ${organization.sourcesCount} - 1)`,
+        })
+        .where(eq(organization.id, organizationId));
+    }
+
+    return json(deletedQuestion);
   },
 });

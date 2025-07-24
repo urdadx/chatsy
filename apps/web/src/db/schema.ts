@@ -84,7 +84,9 @@ export const organization = pgTable("organization", {
   slug: text("slug").unique(),
   logo: text("logo"),
   createdAt: timestamp("created_at").notNull(),
+  trainingStatus: text("training_status").default("idle"),
   metadata: text("metadata"),
+  sourcesCount: integer("sources_count").default(0).notNull(),
 });
 
 export type Organization = InferSelectModel<typeof organization>;
@@ -193,8 +195,6 @@ export const question = pgTable("question", {
     .references(() => organization.id, { onDelete: "cascade" }),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
-  questionEmbedding: vector("question_embedding", { dimensions: 768 }),
-  answerEmbedding: vector("answer_embedding", { dimensions: 768 }),
   createdAt: timestamp("createdAt")
     .notNull()
     .$defaultFn(() => new Date()),
@@ -205,27 +205,7 @@ export const question = pgTable("question", {
 
 export type Stream = InferSelectModel<typeof stream>;
 
-export const socialLink = pgTable("social_link", {
-  id: uuid("id").primaryKey().notNull().defaultRandom(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  platform: text("platform").notNull(),
-  url: text("url").notNull(),
-  description: text("description"),
-  isSocial: boolean("is_social").notNull().default(false),
-  isConnected: boolean("is_connected").notNull().default(false),
-  createdAt: timestamp("created_at")
-    .notNull()
-    .$defaultFn(() => new Date()),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$defaultFn(() => new Date()),
-});
-
-export type SocialLink = InferSelectModel<typeof socialLink>;
-
-export const branding = pgTable("branding", {
+export const chatbot = pgTable("chatbot", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   organizationId: text("organization_id")
     .notNull()
@@ -248,8 +228,7 @@ export const branding = pgTable("branding", {
     .$defaultFn(() => new Date()),
 });
 
-// In your schema file or types file
-export type Branding = InferSelectModel<typeof branding> & {
+export type Chatbot = InferSelectModel<typeof chatbot> & {
   name: string;
 };
 
@@ -321,26 +300,6 @@ export const documentSource = pgTable("document_source", {
 
 export type DocumentSource = InferSelectModel<typeof documentSource>;
 
-export const documentChunk = pgTable("document_chunk", {
-  id: uuid("id").primaryKey().notNull().defaultRandom(),
-  documentSourceId: uuid("document_source_id")
-    .notNull()
-    .references(() => documentSource.id, { onDelete: "cascade" }),
-  organizationId: text("organization_id")
-    .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
-  content: text("content").notNull(),
-  embedding: vector("embedding", { dimensions: 768 }),
-  chunkIndex: integer("chunk_index").notNull(),
-  metadata: jsonb("metadata").$type<{
-    page?: number;
-    section?: string;
-    startChar?: number;
-    endChar?: number;
-  }>(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
 export const websiteSource = pgTable("website_source", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   userId: uuid("user_id")
@@ -358,3 +317,35 @@ export const websiteSource = pgTable("website_source", {
 });
 
 export type WebsiteSource = InferSelectModel<typeof websiteSource>;
+
+export const knowledge = pgTable("knowledge", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  source: varchar("source", {
+    enum: ["website", "text", "document", "qna"],
+  }).notNull(),
+  sourceId: uuid("source_id").notNull(),
+  content: text("content").notNull(),
+  embedding: vector("embedding", { dimensions: 768 }).notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type Knowledge = InferSelectModel<typeof knowledge>;
+
+export const feedback = pgTable("feedback", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  email: text("email").notNull(),
+  subject: text("subject"),
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type Feedback = InferSelectModel<typeof feedback>;

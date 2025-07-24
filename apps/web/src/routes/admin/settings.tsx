@@ -13,7 +13,7 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { useState } from "react";
-import { z } from "zod";
+import z from "zod";
 
 const settingsSchema = z.object({
   tab: z

@@ -5,22 +5,21 @@ import {
   StepperTrigger,
 } from "@/components/ui/stepper";
 import { Completed } from "./onboarding/completed";
-import { CreateWorkspaceOnboard } from "./onboarding/create-workspace-onboard";
-import { StepFour } from "./onboarding/step-four";
-import { StepOne } from "./onboarding/step-one";
-import { StepThree } from "./onboarding/step-three";
-import { StepTwo } from "./onboarding/step-two";
+import { CreateWorkspaceOnboarding } from "./onboarding/create-workspace-onboard";
+import { InviteTeamOnboarding } from "./onboarding/invite-team-onboarding";
+import { PickColorOnboarding } from "./onboarding/pick-color-onboarding";
 import { useStepperStore } from "./store/stepper-store";
-
-const steps = [1, 2, 3];
+const steps = [1, 2, 3, 4];
 
 const renderStepComponent = (step: number) => {
   switch (step) {
     case 1:
-      return <CreateWorkspaceOnboard />;
+      return <CreateWorkspaceOnboarding />;
     case 2:
-      return <StepTwo />;
+      return <PickColorOnboarding />;
     case 3:
+      return <InviteTeamOnboarding />;
+    case 4:
       return <Completed />;
     default:
       return null;
@@ -31,7 +30,7 @@ export default function OnboardStepper() {
   const { currentStep, setCurrentStep } = useStepperStore();
 
   return (
-    <div className="max-w-2xl space-y-8 text-center">
+    <div className="w-full max-w-2xl mx-auto space-y-8 text-center">
       <div className="flex items-center gap-2">
         <Stepper
           value={currentStep}

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { branding, member, question, socialLink, user } from "@/db/schema";
+import { chatbot, member, question, socialLink, user } from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -114,7 +114,7 @@ export const updatePrimaryColor = createServerFn({ method: "POST" })
 
       if (!session?.user?.id) {
         throw new Error(
-          "Unauthorized: Please log in to update your bot branding",
+          "Unauthorized: Please log in to update your bot chatbot",
         );
       }
 
@@ -138,40 +138,40 @@ export const updatePrimaryColor = createServerFn({ method: "POST" })
         throw new Error("Forbidden: You are not a member of this organization");
       }
 
-      // Optional: Check if user has permission to update branding
+      // Optional: Check if user has permission to update chatbot
       // if (!['admin', 'owner'].includes(membership.role)) {
-      //   throw new Error("Insufficient permissions: Only admins and owners can update branding");
+      //   throw new Error("Insufficient permissions: Only admins and owners can update chatbot");
       // }
 
       console.log("Updating primary color for organization:", organizationId);
 
-      const existingBranding = await db
-        .select({ id: branding.id })
-        .from(branding)
-        .where(eq(branding.organizationId, organizationId))
+      const existingChatbot = await db
+        .select({ id: chatbot.id })
+        .from(chatbot)
+        .where(eq(chatbot.organizationId, organizationId))
         .limit(1);
 
       let result: any;
 
-      if (existingBranding.length === 0) {
-        result = await db.insert(branding).values({
+      if (existingChatbot.length === 0) {
+        result = await db.insert(chatbot).values({
           organizationId,
           primaryColor,
         });
       } else {
         result = await db
-          .update(branding)
+          .update(chatbot)
           .set({
             primaryColor,
             updatedAt: new Date(),
           })
-          .where(eq(branding.organizationId, organizationId));
+          .where(eq(chatbot.organizationId, organizationId));
       }
 
       return {
         success: true,
         message: "Primary color updated successfully",
-        branding: result[0],
+        chatbot: result[0],
       };
     } catch (error) {
       console.error("Error updating primary color:", error);
@@ -180,7 +180,7 @@ export const updatePrimaryColor = createServerFn({ method: "POST" })
         if (
           error.message.startsWith("Unauthorized") ||
           error.message.startsWith("Validation failed") ||
-          error.message.startsWith("Branding not found") ||
+          error.message.startsWith("Chatbot not found") ||
           error.message.startsWith("Forbidden") ||
           error.message.startsWith("No active organization") ||
           error.message.startsWith("Insufficient permissions")

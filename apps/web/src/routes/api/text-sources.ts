@@ -1,10 +1,10 @@
 
 import { db } from "@/db";
-import { textSource } from "@/db/schema";
+import { organization, textSource } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const createTextSourceSchema = z.object({
@@ -34,10 +34,18 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
+    const organizationId = session?.session?.activeOrganizationId;
+
+    if (!organizationId) {
+      return json({ error: "No active organization" }, { status: 400 });
+    }
+
     const results = await db
       .select()
       .from(textSource)
-      .where(eq(textSource.userId, userId));
+      .where(
+        and(eq(textSource.userId, userId), eq(textSource.organizationId, organizationId)),
+      );
 
     return json(results);
   },
@@ -64,13 +72,25 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
-    const result = await db.insert(textSource).values({
-      userId,
-      ...parsed.data,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      organizationId,
-    });
+    const [result] = await db
+      .insert(textSource)
+      .values({
+        userId,
+        ...parsed.data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        organizationId,
+      })
+      .returning();
+
+    if (result) {
+      await db
+        .update(organization)
+        .set({
+          sourcesCount: sql`${organization.sourcesCount} + 1`,
+        })
+        .where(eq(organization.id, organizationId));
+    }
 
     return json({ message: "Text source created", result });
   },
@@ -115,6 +135,11 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       headers: request.headers || new Headers(),
     });
 
+    const organizationId = session?.session?.activeOrganizationId;
+    if (!organizationId) {
+      return json({ error: "No active organization" }, { status: 400 });
+    }
+
     const userId = session?.user?.id;
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
@@ -129,7 +154,9 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
 
     const deleted = await db
       .delete(textSource)
-      .where(and(eq(textSource.id, parsed.data.id), eq(textSource.userId, userId)))
+      .where(
+        and(eq(textSource.id, parsed.data.id), eq(textSource.userId, userId)),
+      )
       .returning();
 
     if (!deleted.length) {
@@ -137,6 +164,15 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
         { error: "Text source not found or unauthorized" },
         { status: 404 },
       );
+    }
+
+    if (deleted) {
+      await db
+        .update(organization)
+        .set({
+          sourcesCount: sql`greatest(0, ${organization.sourcesCount} - 1)`,
+        })
+        .where(eq(organization.id, organizationId));
     }
 
     return json({ message: "Text source deleted", deleted });

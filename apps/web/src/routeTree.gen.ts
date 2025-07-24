@@ -26,21 +26,26 @@ import { Route as AdminActionsRouteImport } from './routes/admin/actions'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
+import { ServerRoute as ApiVotesCountServerRouteImport } from './routes/api/votesCount'
+import { ServerRoute as ApiVoteServerRouteImport } from './routes/api/vote'
 import { ServerRoute as ApiUploadImagesServerRouteImport } from './routes/api/upload-images'
 import { ServerRoute as ApiUploadDocumentsServerRouteImport } from './routes/api/upload-documents'
-import { ServerRoute as ApiTrainServerRouteImport } from './routes/api/train'
+import { ServerRoute as ApiTrainingStatusServerRouteImport } from './routes/api/training-status'
+import { ServerRoute as ApiTrainAgentServerRouteImport } from './routes/api/train-agent'
 import { ServerRoute as ApiTextSourcesServerRouteImport } from './routes/api/text-sources'
 import { ServerRoute as ApiSimilaritySearchServerRouteImport } from './routes/api/similarity-search'
 import { ServerRoute as ApiScrapeServerRouteImport } from './routes/api/scrape'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
 import { ServerRoute as ApiMyLinksServerRouteImport } from './routes/api/my-links'
-import { ServerRoute as ApiMyBrandingServerRouteImport } from './routes/api/my-branding'
+import { ServerRoute as ApiMyChatbotServerRouteImport } from './routes/api/my-chatbot'
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
 import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-og-info'
+import { ServerRoute as ApiFeedbackServerRouteImport } from './routes/api/feedback'
 import { ServerRoute as ApiDocumentSourceServerRouteImport } from './routes/api/document-source'
 import { ServerRoute as ApiDocumentProcessingServerRouteImport } from './routes/api/document-processing'
 import { ServerRoute as ApiCrawlServerRouteImport } from './routes/api/crawl'
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
+import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/sources/count'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
@@ -122,6 +127,16 @@ const AdminChatHistoryIndexRoute = AdminChatHistoryIndexRouteImport.update({
   path: '/chat-history/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const ApiVotesCountServerRoute = ApiVotesCountServerRouteImport.update({
+  id: '/api/votesCount',
+  path: '/api/votesCount',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiVoteServerRoute = ApiVoteServerRouteImport.update({
+  id: '/api/vote',
+  path: '/api/vote',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiUploadImagesServerRoute = ApiUploadImagesServerRouteImport.update({
   id: '/api/upload-images',
   path: '/api/upload-images',
@@ -133,9 +148,14 @@ const ApiUploadDocumentsServerRoute =
     path: '/api/upload-documents',
     getParentRoute: () => rootServerRouteImport,
   } as any)
-const ApiTrainServerRoute = ApiTrainServerRouteImport.update({
-  id: '/api/train',
-  path: '/api/train',
+const ApiTrainingStatusServerRoute = ApiTrainingStatusServerRouteImport.update({
+  id: '/api/training-status',
+  path: '/api/training-status',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiTrainAgentServerRoute = ApiTrainAgentServerRouteImport.update({
+  id: '/api/train-agent',
+  path: '/api/train-agent',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiTextSourcesServerRoute = ApiTextSourcesServerRouteImport.update({
@@ -164,9 +184,9 @@ const ApiMyLinksServerRoute = ApiMyLinksServerRouteImport.update({
   path: '/api/my-links',
   getParentRoute: () => rootServerRouteImport,
 } as any)
-const ApiMyBrandingServerRoute = ApiMyBrandingServerRouteImport.update({
-  id: '/api/my-branding',
-  path: '/api/my-branding',
+const ApiMyChatbotServerRoute = ApiMyChatbotServerRouteImport.update({
+  id: '/api/my-chatbot',
+  path: '/api/my-chatbot',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiHelloServerRoute = ApiHelloServerRouteImport.update({
@@ -177,6 +197,11 @@ const ApiHelloServerRoute = ApiHelloServerRouteImport.update({
 const ApiGetOgInfoServerRoute = ApiGetOgInfoServerRouteImport.update({
   id: '/api/get-og-info',
   path: '/api/get-og-info',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiFeedbackServerRoute = ApiFeedbackServerRouteImport.update({
+  id: '/api/feedback',
+  path: '/api/feedback',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiDocumentSourceServerRoute = ApiDocumentSourceServerRouteImport.update({
@@ -198,6 +223,11 @@ const ApiCrawlServerRoute = ApiCrawlServerRouteImport.update({
 const ApiChatIndexServerRoute = ApiChatIndexServerRouteImport.update({
   id: '/api/chat/',
   path: '/api/chat/',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiSourcesCountServerRoute = ApiSourcesCountServerRouteImport.update({
+  id: '/api/sources/count',
+  path: '/api/sources/count',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiChatHistoryServerRoute = ApiChatHistoryServerRouteImport.update({
@@ -329,38 +359,48 @@ export interface FileServerRoutesByFullPath {
   '/api/crawl': typeof ApiCrawlServerRoute
   '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
+  '/api/feedback': typeof ApiFeedbackServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
-  '/api/my-branding': typeof ApiMyBrandingServerRoute
+  '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
   '/api/text-sources': typeof ApiTextSourcesServerRoute
-  '/api/train': typeof ApiTrainServerRoute
+  '/api/train-agent': typeof ApiTrainAgentServerRoute
+  '/api/training-status': typeof ApiTrainingStatusServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
+  '/api/vote': typeof ApiVoteServerRoute
+  '/api/votesCount': typeof ApiVotesCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
+  '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/crawl': typeof ApiCrawlServerRoute
   '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
+  '/api/feedback': typeof ApiFeedbackServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
-  '/api/my-branding': typeof ApiMyBrandingServerRoute
+  '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
   '/api/text-sources': typeof ApiTextSourcesServerRoute
-  '/api/train': typeof ApiTrainServerRoute
+  '/api/train-agent': typeof ApiTrainAgentServerRoute
+  '/api/training-status': typeof ApiTrainingStatusServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
+  '/api/vote': typeof ApiVoteServerRoute
+  '/api/votesCount': typeof ApiVotesCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
+  '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
 }
 export interface FileServerRoutesById {
@@ -368,19 +408,24 @@ export interface FileServerRoutesById {
   '/api/crawl': typeof ApiCrawlServerRoute
   '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
+  '/api/feedback': typeof ApiFeedbackServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
-  '/api/my-branding': typeof ApiMyBrandingServerRoute
+  '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
   '/api/text-sources': typeof ApiTextSourcesServerRoute
-  '/api/train': typeof ApiTrainServerRoute
+  '/api/train-agent': typeof ApiTrainAgentServerRoute
+  '/api/training-status': typeof ApiTrainingStatusServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
+  '/api/vote': typeof ApiVoteServerRoute
+  '/api/votesCount': typeof ApiVotesCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
+  '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/chat/': typeof ApiChatIndexServerRoute
 }
 export interface FileServerRouteTypes {
@@ -389,57 +434,72 @@ export interface FileServerRouteTypes {
     | '/api/crawl'
     | '/api/document-processing'
     | '/api/document-source'
+    | '/api/feedback'
     | '/api/get-og-info'
     | '/api/hello'
-    | '/api/my-branding'
+    | '/api/my-chatbot'
     | '/api/my-links'
     | '/api/questions'
     | '/api/scrape'
     | '/api/similarity-search'
     | '/api/text-sources'
-    | '/api/train'
+    | '/api/train-agent'
+    | '/api/training-status'
     | '/api/upload-documents'
     | '/api/upload-images'
+    | '/api/vote'
+    | '/api/votesCount'
     | '/api/auth/$'
     | '/api/chat/history'
+    | '/api/sources/count'
     | '/api/chat'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/crawl'
     | '/api/document-processing'
     | '/api/document-source'
+    | '/api/feedback'
     | '/api/get-og-info'
     | '/api/hello'
-    | '/api/my-branding'
+    | '/api/my-chatbot'
     | '/api/my-links'
     | '/api/questions'
     | '/api/scrape'
     | '/api/similarity-search'
     | '/api/text-sources'
-    | '/api/train'
+    | '/api/train-agent'
+    | '/api/training-status'
     | '/api/upload-documents'
     | '/api/upload-images'
+    | '/api/vote'
+    | '/api/votesCount'
     | '/api/auth/$'
     | '/api/chat/history'
+    | '/api/sources/count'
     | '/api/chat'
   id:
     | '__root__'
     | '/api/crawl'
     | '/api/document-processing'
     | '/api/document-source'
+    | '/api/feedback'
     | '/api/get-og-info'
     | '/api/hello'
-    | '/api/my-branding'
+    | '/api/my-chatbot'
     | '/api/my-links'
     | '/api/questions'
     | '/api/scrape'
     | '/api/similarity-search'
     | '/api/text-sources'
-    | '/api/train'
+    | '/api/train-agent'
+    | '/api/training-status'
     | '/api/upload-documents'
     | '/api/upload-images'
+    | '/api/vote'
+    | '/api/votesCount'
     | '/api/auth/$'
     | '/api/chat/history'
+    | '/api/sources/count'
     | '/api/chat/'
   fileServerRoutesById: FileServerRoutesById
 }
@@ -447,19 +507,24 @@ export interface RootServerRouteChildren {
   ApiCrawlServerRoute: typeof ApiCrawlServerRoute
   ApiDocumentProcessingServerRoute: typeof ApiDocumentProcessingServerRoute
   ApiDocumentSourceServerRoute: typeof ApiDocumentSourceServerRoute
+  ApiFeedbackServerRoute: typeof ApiFeedbackServerRoute
   ApiGetOgInfoServerRoute: typeof ApiGetOgInfoServerRoute
   ApiHelloServerRoute: typeof ApiHelloServerRoute
-  ApiMyBrandingServerRoute: typeof ApiMyBrandingServerRoute
+  ApiMyChatbotServerRoute: typeof ApiMyChatbotServerRoute
   ApiMyLinksServerRoute: typeof ApiMyLinksServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
   ApiScrapeServerRoute: typeof ApiScrapeServerRoute
   ApiSimilaritySearchServerRoute: typeof ApiSimilaritySearchServerRoute
   ApiTextSourcesServerRoute: typeof ApiTextSourcesServerRoute
-  ApiTrainServerRoute: typeof ApiTrainServerRoute
+  ApiTrainAgentServerRoute: typeof ApiTrainAgentServerRoute
+  ApiTrainingStatusServerRoute: typeof ApiTrainingStatusServerRoute
   ApiUploadDocumentsServerRoute: typeof ApiUploadDocumentsServerRoute
   ApiUploadImagesServerRoute: typeof ApiUploadImagesServerRoute
+  ApiVoteServerRoute: typeof ApiVoteServerRoute
+  ApiVotesCountServerRoute: typeof ApiVotesCountServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
+  ApiSourcesCountServerRoute: typeof ApiSourcesCountServerRoute
   ApiChatIndexServerRoute: typeof ApiChatIndexServerRoute
 }
 
@@ -574,6 +639,20 @@ declare module '@tanstack/react-router' {
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
+    '/api/votesCount': {
+      id: '/api/votesCount'
+      path: '/api/votesCount'
+      fullPath: '/api/votesCount'
+      preLoaderRoute: typeof ApiVotesCountServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/vote': {
+      id: '/api/vote'
+      path: '/api/vote'
+      fullPath: '/api/vote'
+      preLoaderRoute: typeof ApiVoteServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/upload-images': {
       id: '/api/upload-images'
       path: '/api/upload-images'
@@ -588,11 +667,18 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiUploadDocumentsServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/api/train': {
-      id: '/api/train'
-      path: '/api/train'
-      fullPath: '/api/train'
-      preLoaderRoute: typeof ApiTrainServerRouteImport
+    '/api/training-status': {
+      id: '/api/training-status'
+      path: '/api/training-status'
+      fullPath: '/api/training-status'
+      preLoaderRoute: typeof ApiTrainingStatusServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/train-agent': {
+      id: '/api/train-agent'
+      path: '/api/train-agent'
+      fullPath: '/api/train-agent'
+      preLoaderRoute: typeof ApiTrainAgentServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/text-sources': {
@@ -630,11 +716,11 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiMyLinksServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/api/my-branding': {
-      id: '/api/my-branding'
-      path: '/api/my-branding'
-      fullPath: '/api/my-branding'
-      preLoaderRoute: typeof ApiMyBrandingServerRouteImport
+    '/api/my-chatbot': {
+      id: '/api/my-chatbot'
+      path: '/api/my-chatbot'
+      fullPath: '/api/my-chatbot'
+      preLoaderRoute: typeof ApiMyChatbotServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/hello': {
@@ -649,6 +735,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/get-og-info'
       fullPath: '/api/get-og-info'
       preLoaderRoute: typeof ApiGetOgInfoServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/feedback': {
+      id: '/api/feedback'
+      path: '/api/feedback'
+      fullPath: '/api/feedback'
+      preLoaderRoute: typeof ApiFeedbackServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/document-source': {
@@ -677,6 +770,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/chat'
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatIndexServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/sources/count': {
+      id: '/api/sources/count'
+      path: '/api/sources/count'
+      fullPath: '/api/sources/count'
+      preLoaderRoute: typeof ApiSourcesCountServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/chat/history': {
@@ -739,19 +839,24 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiCrawlServerRoute: ApiCrawlServerRoute,
   ApiDocumentProcessingServerRoute: ApiDocumentProcessingServerRoute,
   ApiDocumentSourceServerRoute: ApiDocumentSourceServerRoute,
+  ApiFeedbackServerRoute: ApiFeedbackServerRoute,
   ApiGetOgInfoServerRoute: ApiGetOgInfoServerRoute,
   ApiHelloServerRoute: ApiHelloServerRoute,
-  ApiMyBrandingServerRoute: ApiMyBrandingServerRoute,
+  ApiMyChatbotServerRoute: ApiMyChatbotServerRoute,
   ApiMyLinksServerRoute: ApiMyLinksServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,
   ApiScrapeServerRoute: ApiScrapeServerRoute,
   ApiSimilaritySearchServerRoute: ApiSimilaritySearchServerRoute,
   ApiTextSourcesServerRoute: ApiTextSourcesServerRoute,
-  ApiTrainServerRoute: ApiTrainServerRoute,
+  ApiTrainAgentServerRoute: ApiTrainAgentServerRoute,
+  ApiTrainingStatusServerRoute: ApiTrainingStatusServerRoute,
   ApiUploadDocumentsServerRoute: ApiUploadDocumentsServerRoute,
   ApiUploadImagesServerRoute: ApiUploadImagesServerRoute,
+  ApiVoteServerRoute: ApiVoteServerRoute,
+  ApiVotesCountServerRoute: ApiVotesCountServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
+  ApiSourcesCountServerRoute: ApiSourcesCountServerRoute,
   ApiChatIndexServerRoute: ApiChatIndexServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport

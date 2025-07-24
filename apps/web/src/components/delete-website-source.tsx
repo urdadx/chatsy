@@ -31,7 +31,7 @@ export const DeleteWebsiteSource = ({
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["websiteSources"] });
+      queryClient.invalidateQueries({ queryKey: ["website-sources"] });
       toast.success("Website source deleted successfully");
       onOpenChange(false);
     },

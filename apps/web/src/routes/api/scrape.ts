@@ -1,10 +1,10 @@
 import { db } from "@/db";
-import { websiteSource } from "@/db/schema";
+import { organization, websiteSource } from "@/db/schema";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const scrapeRequestSchema = z.object({
@@ -101,6 +101,15 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
           })
           .returning();
 
+        if (inserted) {
+          await db
+            .update(organization)
+            .set({
+              sourcesCount: sql`${organization.sourcesCount} + 1`,
+            })
+            .where(eq(organization.id, organizationId));
+        }
+
         return json({ success: true, data: inserted });
       }
 
@@ -151,13 +160,30 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
       const [source] = await db
         .select()
         .from(websiteSource)
-        .where(and(eq(websiteSource.id, id), eq(websiteSource.organizationId, organizationId)));
+        .where(
+          and(
+            eq(websiteSource.id, id),
+            eq(websiteSource.organizationId, organizationId),
+          ),
+        );
 
       if (!source) {
-        return json({ error: "Source not found or you don't have permission to delete it." }, { status: 404 });
+        return json(
+          {
+            error: "Source not found or you don't have permission to delete it.",
+          },
+          { status: 404 },
+        );
       }
 
       await db.delete(websiteSource).where(eq(websiteSource.id, id));
+
+      await db
+        .update(organization)
+        .set({
+          sourcesCount: sql`greatest(0, ${organization.sourcesCount} - 1)`,
+        })
+        .where(eq(organization.id, organizationId));
 
       return json({ success: true });
     } catch (error) {
@@ -173,5 +199,5 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
         { status: 500 },
       );
     }
-  }
+  },
 });

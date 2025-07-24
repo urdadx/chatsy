@@ -1,3 +1,4 @@
+import { useSession } from "@/lib/auth-client";
 import { api } from "@/lib/api";
 import { timeAgo } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -31,13 +32,19 @@ export const TextSourceList = () => {
     null,
   );
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { data: session } = useSession();
+  const organizationId = session?.session?.activeOrganizationId;
 
   const { data: textSources, isLoading } = useQuery<TextSource[]>({
-    queryKey: ["text-sources"],
+    queryKey: ["text-sources", organizationId],
     queryFn: async () => {
-      const response = await api.get("/text-sources");
+      if (!organizationId) return [];
+      const response = await api.get(
+        `/text-sources?organizationId=${organizationId}`,
+      );
       return response.data;
     },
+    enabled: !!organizationId,
   });
 
   const [deletingTextSourceId, setDeletingTextSourceId] = useState<

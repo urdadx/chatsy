@@ -1,52 +1,33 @@
 import { db } from "@/db";
-import { question } from "@/db/schema";
-import { documentChunk } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { knowledge } from "@/db/schema";
+import { sql } from "drizzle-orm";
 import { generateQuestionEmbedding } from "./embeddings";
 
-export async function searchSimilarQuestions(
+export async function searchKnowledge(
   query: string,
   organizationId: string,
-  limit = 5,
-) {
-  const queryEmbedding = await generateQuestionEmbedding(query);
-
-  // Format embedding as PostgreSQL vector string
-  const embeddingString = `[${queryEmbedding.join(",")}]`;
-
-  const results = await db
-    .select({
-      id: question.id,
-      question: question.question,
-      answer: question.answer,
-      similarity: sql<number>`1 - (${question.questionEmbedding} <=> ${embeddingString}::vector)`,
-    })
-    .from(question)
-    .where(eq(question.organizationId, organizationId))
-    .orderBy(sql`${question.questionEmbedding} <=> ${embeddingString}::vector`)
-    .limit(limit);
-
-  return results;
-}
-
-export async function searchDocumentChunks(
-  query: string,
-  organizationId: string,
-  limit = 5,
+  limit = 10,
+  threshold = 0.5,
 ) {
   const queryEmbedding = await generateQuestionEmbedding(query);
   const embeddingString = `[${queryEmbedding.join(",")}]`;
 
+  const similarity = sql<number>`1 - (${knowledge.embedding} <=> ${embeddingString}::vector)`;
+
   const results = await db
     .select({
-      id: documentChunk.id,
-      content: documentChunk.content,
-      documentSourceId: documentChunk.documentSourceId,
-      similarity: sql<number>`1 - (${documentChunk.embedding} <=> ${embeddingString}::vector)`,
+      id: knowledge.id,
+      content: knowledge.content,
+      source: knowledge.source,
+      sourceId: knowledge.sourceId,
+      metadata: knowledge.metadata,
+      similarity: similarity,
     })
-    .from(documentChunk)
-    .where(eq(documentChunk.organizationId, organizationId))
-    .orderBy(sql`${documentChunk.embedding} <=> ${embeddingString}::vector`)
+    .from(knowledge)
+    .where(
+      sql`${knowledge.organizationId} = ${organizationId} AND ${similarity} > ${threshold}`,
+    )
+    .orderBy(sql`${knowledge.embedding} <=> ${embeddingString}::vector`)
     .limit(limit);
 
   return results;

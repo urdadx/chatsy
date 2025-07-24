@@ -25,7 +25,17 @@ export function DocumentSource() {
         const { name, type, size } = file.file;
         const { url } = uploadResponse.data;
 
-        await api.post("/document-source", { name, type, size, url });
+        const documentSourceResponse = await api.post("/document-source", {
+          name,
+          type,
+          size,
+          url,
+        });
+
+        const { id: documentSourceId } = documentSourceResponse.data;
+
+        // Trigger document processing
+        await api.post("/document-processing", { documentSourceId });
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["document-sources"] });
@@ -58,7 +68,7 @@ export function DocumentSource() {
           loading: "Uploading document...",
           success: () => {
             removeFile(lastFile.id);
-            return "Document uploaded successfully!";
+            return "Document uploaded and is now processing!";
           },
           error: "Failed to upload document.",
         });
@@ -69,8 +79,8 @@ export function DocumentSource() {
   return (
     <>
       <div className="flex flex-col gap-2 rounded-md p-6 border">
-        <div className="flex justify-between items-center mb-3">
-          <div className="flex flex-col gap-2 mb-3">
+        <div className="flex justify-between items-center mb-2">
+          <div className="flex flex-col gap-2">
             <h2 className="font-semibold text-lg">Files</h2>
             <p className=" text-semibold text-base text-muted-foreground">
               Upload and manage various documents to train your AI agent

@@ -230,6 +230,7 @@ export async function voteMessage({
       isUpvoted: type === "up",
     });
   } catch (error) {
+    console.log("Error voting message:", error);
     throw new ChatSDKError("bad_request:database", "Failed to vote message");
   }
 }
@@ -242,6 +243,22 @@ export async function getVotesByChatId({ id }: { id: string }) {
       "bad_request:database",
       "Failed to get votes by chat id",
     );
+  }
+}
+
+export async function getTotalVotes() {
+  try {
+    const upvotes = await db
+      .select({ count: count(vote.messageId) })
+      .from(vote)
+      .where(eq(vote.isUpvoted, true));
+    const downvotes = await db
+      .select({ count: count(vote.messageId) })
+      .from(vote)
+      .where(eq(vote.isUpvoted, false));
+    return { upvotes: upvotes[0].count, downvotes: downvotes[0].count };
+  } catch (error) {
+    throw new ChatSDKError("bad_request:database", "Failed to get total votes");
   }
 }
 

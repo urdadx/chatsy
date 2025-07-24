@@ -1,3 +1,6 @@
+import { useChatHistory } from "@/hooks/use-chat-history";
+import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 import {
   BrainCog,
   MagnetIcon,
@@ -8,6 +11,28 @@ import {
 } from "lucide-react";
 
 export function DashboardMetrics() {
+  const { data: sourcesCount } = useQuery({
+    queryKey: ["sources-count"],
+    queryFn: async () => {
+      const response = await api.get("/sources/count");
+      return response.data.count;
+    },
+  });
+
+  const { data: chatHistoryData } = useChatHistory("all");
+  const conversationsCount = chatHistoryData?.pages.reduce(
+    (acc, page) => acc + page.chats.length,
+    0,
+  );
+
+  const { data: voteCounts } = useQuery({
+    queryKey: ["vote-counts"],
+    queryFn: async () => {
+      const response = await api.get("/votesCount");
+      return response.data;
+    },
+  });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* Total Links Card */}
@@ -23,7 +48,9 @@ export function DashboardMetrics() {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-3xl font-bold text-gray-700 px-10">4</div>
+          <div className="text-3xl font-bold text-gray-700 px-10">
+            {sourcesCount ?? 0}
+          </div>
         </div>
       </div>
       {/* Total conversations */}
@@ -40,7 +67,9 @@ export function DashboardMetrics() {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-3xl font-bold text-gray-700 px-10">123</div>
+          <div className="text-3xl font-bold text-gray-700 px-10">
+            {conversationsCount ?? 0}
+          </div>
         </div>
       </div>
       <div className="bg-white rounded-lg p-4 border">
@@ -86,7 +115,9 @@ export function DashboardMetrics() {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-3xl font-bold text-gray-700 px-10">12</div>
+          <div className="text-3xl font-bold text-gray-700 px-10">
+            {voteCounts?.upvotes ?? 0}
+          </div>
         </div>
       </div>
       {/* Negative sentiments */}
@@ -102,7 +133,9 @@ export function DashboardMetrics() {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-3xl font-bold text-gray-700 px-10">12</div>
+          <div className="text-3xl font-bold text-gray-700 px-10">
+            {voteCounts?.downvotes ?? 0}
+          </div>
         </div>
       </div>
     </div>

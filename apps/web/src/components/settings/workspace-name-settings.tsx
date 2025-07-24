@@ -37,9 +37,7 @@ export const WorkspaceNameSettings = () => {
       <div className="bg-white rounded-xl shadow-xs border overflow-hidden">
         <div className="p-6 pb-0">
           <h2 className="text-base font-semibold mb-2">Workspace Name</h2>
-          <p className="text-gray-600 text-sm">
-            Update your organization's name.
-          </p>
+          <p className="text-gray-600 text-sm">Update your workspace's name.</p>
         </div>
         <div className="p-6 pt-3">
           <div className="flex flex-col gap-4">

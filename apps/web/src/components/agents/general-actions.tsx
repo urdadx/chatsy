@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, Headset, MessageSquare, Users } from "lucide-react";
-import { SearchActions } from "./search-actions";
+import { Calendar, Headset, MessageCircle, Users } from "lucide-react";
+import { useState } from "react";
 import { Button } from "../ui/button";
 import { ActionIcon } from "./action-icon";
 import { ActionCard } from "./actions-card";
+import { SearchActions } from "./search-actions";
 
 export const Actions = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +13,7 @@ export const Actions = () => {
     {
       icon: (
         <ActionIcon>
-          <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
+          <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
         </ActionIcon>
       ),
       name: "Feedback form",
@@ -51,7 +51,7 @@ export const Actions = () => {
   const filteredActions = actionsData.filter(
     (action) =>
       action.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      action.description.toLowerCase().includes(searchTerm.toLowerCase())
+      action.description.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (

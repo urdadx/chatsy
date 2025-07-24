@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import type { DBMessage } from "@/db/schema";
-import { useBranding } from "@/hooks/use-bot-branding";
+import type { DBMessage, Vote } from "@/db/schema";
 import { useChatWithReset } from "@/hooks/use-chat-reset";
+import { useChatbot } from "@/hooks/use-chatbot";
 import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UIMessage } from "ai";
 import { ArrowUp, RefreshCcw } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
@@ -89,20 +89,28 @@ export function ChatPreview() {
     messages.length > 0 && messages[messages.length - 1].role === "user";
   const isStreamingLastMessage = status === "streaming" && messages.length > 0;
 
-  // get bot's branding data
-  const { data: branding } = useBranding();
-  console.log("Branding data:", branding);
+  const { data: chatbot } = useChatbot();
 
-  const SUGGESTIONS = branding?.suggestedMessages || [];
+  const SUGGESTIONS = chatbot?.suggestedMessages || [];
 
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
   };
 
-  const showPoweredBy = !branding?.hidePoweredBy;
+  const showPoweredBy = !chatbot?.hidePoweredBy;
 
-  const greetingMessage =
-    branding?.initialMessage || "Hello! How can I assist you today?";
+  const greetingMessage = chatbot?.initialMessage || "";
+
+  const { data: votes }: { data: Array<Vote> | undefined } = useQuery({
+    queryKey: ["votes", chatId],
+    queryFn: () =>
+      fetchWithErrorHandlers(`/api/vote?chatId=${chatId}`).then((res) =>
+        res.json(),
+      ),
+    enabled: messages.length >= 2,
+  });
+
+  console.log("votes ", votes);
 
   return (
     <div className="flex-1 flex items-center justify-center">
@@ -110,10 +118,10 @@ export function ChatPreview() {
         {/* Header */}
         <div
           className="p-3 text-white flex items-center justify-between border-b rounded-t-xl bg-primary"
-          style={{ backgroundColor: branding?.primaryColor }}
+          style={{ backgroundColor: chatbot?.primaryColor }}
         >
           <p className="font-normal text-base">
-            {branding?.name || "Chat Preview"}
+            {chatbot?.name || "Chat Preview"}
           </p>
           <div className="flex">
             <Tooltip>
@@ -156,6 +164,11 @@ export function ChatPreview() {
                       isLoading={
                         isStreamingLastMessage && messages.length - 1 === index
                       }
+                      vote={
+                        votes
+                          ? votes.find((vote) => vote.messageId === message.id)
+                          : undefined
+                      }
                       setMessages={setMessages}
                       reload={reload}
                     />
@@ -195,7 +208,7 @@ export function ChatPreview() {
               className="flex-1 text-sm sm:text-base"
               style={
                 {
-                  "--tw-ring-color": branding?.primaryColor,
+                  "--tw-ring-color": chatbot?.primaryColor,
                 } as React.CSSProperties
               }
               autoComplete="off"
@@ -205,7 +218,7 @@ export function ChatPreview() {
             />
             <Button
               className="rounded-full"
-              style={{ backgroundColor: branding?.primaryColor }}
+              style={{ backgroundColor: chatbot?.primaryColor }}
               type="submit"
               size="icon"
               disabled={inputLength === 0}
@@ -222,7 +235,7 @@ export function ChatPreview() {
                 href="https://padyna.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: branding?.primaryColor }}
+                style={{ color: chatbot?.primaryColor }}
                 className="ml-1 hover:underline font-semibold"
               >
                 Padyna

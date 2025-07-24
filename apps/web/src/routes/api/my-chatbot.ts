@@ -1,11 +1,11 @@
 import { db } from "@/db";
-import { branding, member } from "@/db/schema";
+import { chatbot, member } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { and, eq } from "drizzle-orm";
 
-export const ServerRoute = createServerFileRoute("/api/my-branding").methods({
+export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
   GET: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session?.user?.id) {
@@ -33,28 +33,28 @@ export const ServerRoute = createServerFileRoute("/api/my-branding").methods({
       return new Response("Forbidden", { status: 403 });
     }
 
-    const [userBranding] = await db
+    const [userChatbot] = await db
       .select({
-        id: branding.id,
-        organizationId: branding.organizationId,
-        name: branding.name,
-        image: branding.image,
-        primaryColor: branding.primaryColor,
-        theme: branding.theme,
-        hidePoweredBy: branding.hidePoweredBy,
-        initialMessage: branding.initialMessage,
-        suggestedMessages: branding.suggestedMessages,
-        createdAt: branding.createdAt,
-        updatedAt: branding.updatedAt,
+        id: chatbot.id,
+        organizationId: chatbot.organizationId,
+        name: chatbot.name,
+        image: chatbot.image,
+        primaryColor: chatbot.primaryColor,
+        theme: chatbot.theme,
+        hidePoweredBy: chatbot.hidePoweredBy,
+        initialMessage: chatbot.initialMessage,
+        suggestedMessages: chatbot.suggestedMessages,
+        createdAt: chatbot.createdAt,
+        updatedAt: chatbot.updatedAt,
       })
-      .from(branding)
-      .where(eq(branding.organizationId, organizationId));
+      .from(chatbot)
+      .where(eq(chatbot.organizationId, organizationId));
 
-    if (!userBranding) {
+    if (!userChatbot) {
       return new Response("Not found", { status: 404 });
     }
 
-    return json(userBranding);
+    return json(userChatbot);
   },
   PATCH: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
@@ -92,7 +92,7 @@ export const ServerRoute = createServerFileRoute("/api/my-branding").methods({
     const body = await request.json();
 
     try {
-      const brandingUpdates = {
+      const chatbotUpdates = {
         ...(body.name && { name: body.name }),
         ...(body.image && { image: body.image }),
         ...(body.primaryColor && { primaryColor: body.primaryColor }),
@@ -109,41 +109,41 @@ export const ServerRoute = createServerFileRoute("/api/my-branding").methods({
         updatedAt: new Date(),
       };
 
-      const hasUpdates = Object.keys(brandingUpdates).length > 1;
+      const hasUpdates = Object.keys(chatbotUpdates).length > 1;
       if (hasUpdates) {
         const [updated] = await db
-          .update(branding)
-          .set(brandingUpdates)
-          .where(eq(branding.organizationId, organizationId))
+          .update(chatbot)
+          .set(chatbotUpdates)
+          .where(eq(chatbot.organizationId, organizationId))
           .returning();
 
         if (!updated) {
-          return new Response("Branding not found", { status: 404 });
+          return new Response("Chatbot not found", { status: 404 });
         }
       }
 
-      const [brandingData] = await db
+      const [chatbotData] = await db
         .select({
-          id: branding.id,
-          organizationId: branding.organizationId,
-          name: branding.name,
-          image: branding.image,
-          primaryColor: branding.primaryColor,
-          theme: branding.theme,
-          hidePoweredBy: branding.hidePoweredBy,
-          initialMessage: branding.initialMessage,
-          suggestedMessages: branding.suggestedMessages,
-          createdAt: branding.createdAt,
-          updatedAt: branding.updatedAt,
+          id: chatbot.id,
+          organizationId: chatbot.organizationId,
+          name: chatbot.name,
+          image: chatbot.image,
+          primaryColor: chatbot.primaryColor,
+          theme: chatbot.theme,
+          hidePoweredBy: chatbot.hidePoweredBy,
+          initialMessage: chatbot.initialMessage,
+          suggestedMessages: chatbot.suggestedMessages,
+          createdAt: chatbot.createdAt,
+          updatedAt: chatbot.updatedAt,
         })
-        .from(branding)
-        .where(eq(branding.organizationId, organizationId));
+        .from(chatbot)
+        .where(eq(chatbot.organizationId, organizationId));
 
-      if (!brandingData) {
-        return new Response("Branding not found", { status: 404 });
+      if (!chatbotData) {
+        return new Response("Chatbot not found", { status: 404 });
       }
 
-      return json(brandingData);
+      return json(chatbotData);
     } catch (err) {
       console.error("PATCH /api/my-branding error:", err);
       return new Response("Failed to update branding", { status: 500 });

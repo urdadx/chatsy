@@ -13,7 +13,7 @@ export const CompletedStatus = () => {
             <RiCheckboxCircleFill className="h-5 w-5 text-green-600 flex-shrink-0" />
             <p className="text-md">Your chatbot is ready!</p>
           </div>
-          <p className="text-sm text-green-600 max-w-2xl line-clamp-2 leading-relaxed mt-2 ml-7">
+          <p className="text-sm text-green-600 max-w-3xl leading-relaxed mt-2 ml-7">
             All the data provided have been processed and your chatbot is ready
             to answer questions. You can add more data for training or test the
             bot in playground

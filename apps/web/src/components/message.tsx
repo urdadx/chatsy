@@ -1,7 +1,7 @@
 import { Markdown } from "@/components/markdown";
 import type { Vote } from "@/db/schema";
-import { useBranding } from "@/hooks/use-bot-branding";
-
+import { useChatbot } from "@/hooks/use-chatbot";
+import { CollectFeedbackForm } from "@/lib/ai/tools-ui/collect-feedback-form";
 import { cn, sanitizeText } from "@/lib/utils";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
@@ -9,23 +9,24 @@ import cx from "classnames";
 import equal from "fast-deep-equal";
 import { AnimatePresence, motion } from "framer-motion";
 import { SparklesIcon } from "lucide-react";
-import { memo, useState } from "react";
+import { memo } from "react";
+import { MessageActions } from "./message-actions";
 
 const PurePreviewMessage = ({
   chatId,
   message,
   isLoading,
-  setMessages,
   reload,
+  vote,
 }: {
   chatId: string;
   message: UIMessage;
-  isLoading?: boolean;
+  vote: Vote | undefined;
+  isLoading: boolean;
   setMessages: UseChatHelpers["setMessages"];
   reload: UseChatHelpers["reload"];
 }) => {
-  const [mode, setMode] = useState<"view" | "edit">("view");
-  const { data: branding } = useBranding();
+  const { data: chatbot } = useChatbot();
 
   return (
     <AnimatePresence>
@@ -38,18 +39,14 @@ const PurePreviewMessage = ({
       >
         <div
           className={cn(
-            "flex items-center gap-3 w-full  group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl",
-            {
-              "w-full": mode === "edit",
-              "group-data-[role=user]/message:w-fit": mode !== "edit",
-            },
+            "flex items-center gap-3 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:w-fit",
           )}
         >
           {message.role === "assistant" && (
             <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
-              {branding?.image ? (
+              {chatbot?.image ? (
                 <img
-                  src={branding.image}
+                  src={chatbot.image}
                   alt="Assistant"
                   className="rounded-full"
                 />
@@ -71,7 +68,7 @@ const PurePreviewMessage = ({
                       style={{
                         backgroundColor:
                           message.role === "user"
-                            ? branding?.primaryColor
+                            ? chatbot?.primaryColor
                             : undefined,
                       }}
                       data-testid="message-content"
@@ -91,34 +88,29 @@ const PurePreviewMessage = ({
                 const { toolName, toolCallId, state } = toolInvocation;
 
                 if (state === "call") {
-                  const { args } = toolInvocation;
-
-                  return (
-                    <div
-                      key={toolCallId}
-                      className={cx({
-                        skeleton: ["getWeather"].includes(toolName),
-                      })}
-                    >
-                      tools here
-                    </div>
-                  );
+                  if (toolName === "collect_feedback") {
+                    return (
+                      <div key={toolCallId}>
+                        <CollectFeedbackForm />
+                      </div>
+                    );
+                  }
                 }
 
                 if (state === "result") {
-                  const { result } = toolInvocation;
-
-                  return (
-                    <div
-                      className="flex flex-row gap-2 items-start"
-                      key={toolCallId}
-                    >
-                      tools here
-                    </div>
-                  );
+                  if (toolName === "knowledge_base") {
+                    return null;
+                  }
                 }
               }
             })}
+            <MessageActions
+              key={`action-${message.id}`}
+              chatId={chatId}
+              message={message}
+              vote={vote}
+              isLoading={isLoading}
+            />
           </div>
         </div>
       </motion.div>

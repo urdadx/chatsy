@@ -70,9 +70,6 @@ export function WorkspaceSwitcher() {
           <SidebarMenuButton size="lg" disabled>
             <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse" />
             <div className="grid flex-1 text-left leading-tight">
-              <span className="text-muted-foreground text-xs font-normal">
-                WORKSPACE
-              </span>
               <div className="h-4 bg-gray-200 rounded animate-pulse" />
             </div>
           </SidebarMenuButton>

@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RiSearch2Line } from "@remixicon/react";
-import { z } from "zod";
+import z from "zod";
 
 export const chatHistorySearchSchema = z.object({
   chatId: z.string().optional(),

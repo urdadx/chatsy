@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
-export const CreateWorkspaceOnboard = () => {
+export const CreateWorkspaceOnboarding = () => {
   const { nextStep } = useStepperStore();
   const [formData, setFormData] = useState({
     name: "",
@@ -18,7 +18,6 @@ export const CreateWorkspaceOnboard = () => {
   const [error, setError] = useState("");
   const [slugManuallyChanged, setSlugManuallyChanged] = useState(false);
 
-  // Helper function to generate slug from name
   const generateSlug = (name: string) => {
     return name.toLowerCase().trim().replace(/\s+/g, "-").replace(/^-|-$/g, "");
   };

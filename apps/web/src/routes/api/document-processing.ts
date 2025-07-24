@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { documentChunk, documentSource } from "@/db/schema";
+import { documentSource, knowledge } from "@/db/schema";
 import {
   chunkDocument,
   extractTextFromDocument,
@@ -58,6 +58,16 @@ export const ServerRoute = createServerFileRoute(
         return json({ error: "Document not found" }, { status: 404 });
       }
 
+      // Delete existing chunks for this document to prevent duplicates
+      await db
+        .delete(knowledge)
+        .where(
+          and(
+            eq(knowledge.source, "document"),
+            eq(knowledge.sourceId, document.id),
+          ),
+        );
+
       // Extract text from document
       const text = await extractTextFromDocument(document.url, document.type);
 
@@ -70,13 +80,15 @@ export const ServerRoute = createServerFileRoute(
       for (let i = 0; i < chunks.length; i++) {
         const embedding = await generateAnswerEmbedding(chunks[i]);
 
-        await db.insert(documentChunk).values({
-          documentSourceId: document.id,
+        await db.insert(knowledge).values({
+          source: "document",
+          sourceId: document.id,
+          userId,
           organizationId,
           content: chunks[i],
           embedding,
-          chunkIndex: i,
           metadata: {
+            chunkIndex: i,
             startChar: text.indexOf(chunks[i]),
             endChar: text.indexOf(chunks[i]) + chunks[i].length,
           },

@@ -22,7 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
-import { useBranding, useUpdateBranding } from "@/hooks/use-bot-branding";
+import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
 import { useFileUpload } from "@/hooks/use-file-upload";
 
 // Define type for pixel crop area
@@ -80,9 +80,9 @@ async function getCroppedImg(
 }
 
 export function AvatarUpload() {
-  // Branding hooks
-  const { data: branding, isLoading: isBrandingLoading } = useBranding();
-  const updateBrandingMutation = useUpdateBranding();
+  // Chatbot hooks
+  const { data: chatbot, isLoading: isChatbotLoading } = useChatbot();
+  const updateChatbotMutation = useUpdateChatbot();
 
   const [
     { files, isDragging },
@@ -110,24 +110,24 @@ export function AvatarUpload() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [zoom, setZoom] = useState(1);
 
-  // Set initial image from branding data
+  // Set initial image from chatbot data
   useEffect(() => {
-    if (branding?.image && !finalImageUrl) {
-      setFinalImageUrl(branding.image);
+    if (chatbot?.image && !finalImageUrl) {
+      setFinalImageUrl(chatbot.image);
     }
-  }, [branding?.image, finalImageUrl]);
+  }, [chatbot?.image, finalImageUrl]);
 
   const handleCropChange = useCallback((pixels: Area | null) => {
     setCroppedAreaPixels(pixels);
   }, []);
 
   const handleApply = async () => {
-    if (!previewUrl || !fileId || !croppedAreaPixels || !branding) {
+    if (!previewUrl || !fileId || !croppedAreaPixels || !chatbot) {
       console.error("Missing data for apply:", {
         previewUrl,
         fileId,
         croppedAreaPixels,
-        branding,
+        chatbot,
       });
       if (fileId) {
         removeFile(fileId);
@@ -162,13 +162,13 @@ export function AvatarUpload() {
 
       const { url: uploadedImageUrl } = await uploadResponse.json();
 
-      // 4. Update branding with new image URL
-      const updatedBranding = {
-        ...branding,
+      // 4. Update chatbot with new image URL
+      const updatedChatbot = {
+        ...chatbot,
         image: uploadedImageUrl,
       };
 
-      await updateBrandingMutation.mutateAsync(updatedBranding);
+      await updateChatbotMutation.mutateAsync(updatedChatbot);
 
       // 6. Update local state
       if (finalImageUrl?.startsWith("blob:")) {
@@ -189,16 +189,16 @@ export function AvatarUpload() {
   };
 
   const handleRemoveFinalImage = async () => {
-    if (!branding) return;
+    if (!chatbot) return;
 
     try {
-      // Update branding to remove image
-      const updatedBranding = {
-        ...branding,
+      // Update chatbot to remove image
+      const updatedChatbot = {
+        ...chatbot,
         image: null,
       };
 
-      await updateBrandingMutation.mutateAsync(updatedBranding);
+      await updateChatbotMutation.mutateAsync(updatedChatbot);
 
       // Clean up local state
       if (finalImageUrl?.startsWith("blob:")) {
@@ -229,8 +229,8 @@ export function AvatarUpload() {
     previousFileIdRef.current = fileId;
   }, [fileId]);
 
-  // Show loading state while branding is loading
-  if (isBrandingLoading) {
+  // Show loading state while chatbot is loading
+  if (isChatbotLoading) {
     return (
       <div className="flex flex-col gap-2">
         <div className="relative inline-flex">
@@ -253,13 +253,13 @@ export function AvatarUpload() {
           onDrop={handleDrop}
           data-dragging={isDragging || undefined}
           aria-label={finalImageUrl ? "Change image" : "Upload image"}
-          disabled={isUploading || updateBrandingMutation.isPending}
+          disabled={isUploading || updateChatbotMutation.isPending}
         >
           {finalImageUrl ? (
             <img
               className="size-full object-cover"
               src={finalImageUrl}
-              alt="Branding"
+              alt="Chatbot"
               width={64}
               height={64}
               style={{ objectFit: "cover" }}
@@ -269,21 +269,21 @@ export function AvatarUpload() {
               <CircleUserRoundIcon className="size-4 opacity-60" />
             </div>
           )}
-          {(isUploading || updateBrandingMutation.isPending) && (
+          {(isUploading || updateChatbotMutation.isPending) && (
             <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
               <div className="size-4 animate-spin rounded-full border-2 border-primary border-r-transparent" />
             </div>
           )}
         </button>
 
-        {finalImageUrl && !isUploading && !updateBrandingMutation.isPending && (
+        {finalImageUrl && !isUploading && !updateChatbotMutation.isPending && (
           <Button
             onClick={handleRemoveFinalImage}
             size="icon"
-            className="border-background focus-visible:border-background absolute -top-1 -right-1 size-6 rounded-full border-2 shadow-none"
+            className="border-background focus-visible:border-background absolute -top-1 -right-1 size-6 rounded-full border-2 shadow-none bg-red-500 hover:bg-red-600"
             aria-label="Remove image"
           >
-            <XIcon className="size-3.5" />
+            <XIcon className="size-3.5 text-white" />
           </Button>
         )}
         <input
@@ -316,7 +316,7 @@ export function AvatarUpload() {
               <Button
                 className="-my-1"
                 onClick={handleApply}
-                disabled={!previewUrl || isUploading || !branding}
+                disabled={!previewUrl || isUploading || !chatbot}
                 autoFocus
               >
                 {isUploading ? "Uploading..." : "Apply"}

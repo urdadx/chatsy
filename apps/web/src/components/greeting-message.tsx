@@ -1,11 +1,11 @@
-import { useBranding } from "@/hooks/use-bot-branding";
+import { useChatbot } from "@/hooks/use-chatbot";
 import { sanitizeText } from "@/lib/utils";
 import { SparklesIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Markdown } from "./markdown";
 
 export const GreetingMessage = ({ title }: any) => {
-  const { data: branding } = useBranding();
+  const { data: chatbot } = useChatbot();
 
   return (
     <>
@@ -17,9 +17,9 @@ export const GreetingMessage = ({ title }: any) => {
         >
           <div className="flex items-center gap-3 w-full  group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl">
             <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
-              {branding?.image ? (
+              {chatbot?.image ? (
                 <img
-                  src={branding.image}
+                  src={chatbot.image}
                   alt="Assistant"
                   className="rounded-full"
                 />

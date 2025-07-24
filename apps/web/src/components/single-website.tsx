@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PlayIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import { Spinner } from "./ui/spinner";
 
 export const SingleWebsite = () => {
   const [url, setUrl] = useState("");
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async (url: string) => {
@@ -17,6 +18,7 @@ export const SingleWebsite = () => {
     },
     onSuccess: (data) => {
       if (data.success) {
+        queryClient.invalidateQueries({ queryKey: ["website-sources"] });
         toast.success("Content extracted successfully!");
       } else {
         toast.error(data.error || "Failed to extract content.");

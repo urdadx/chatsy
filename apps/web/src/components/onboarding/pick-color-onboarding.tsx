@@ -7,7 +7,7 @@ import { useStepperStore } from "../store/stepper-store";
 import { Button } from "../ui/button";
 import { ColorPickerDialog } from "./pick-color-onboard";
 
-export const StepTwo = () => {
+export const PickColorOnboarding = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>("#8b5cf6");
   const updatePrimaryColorMutation = useUpdatePrimaryColor();
 
@@ -40,7 +40,7 @@ export const StepTwo = () => {
     >
       <div className="flex flex-col gap-6 pt-6 flex-1 min-h-[350px]">
         <div className="flex flex-col">
-          <h1 className="text-2xl text-start font-semibold">Branding</h1>
+          <h1 className="text-2xl text-start font-semibold">Chatbot</h1>
           <p className="text-start text-muted-foreground">
             Customize your bot to your brand
           </p>

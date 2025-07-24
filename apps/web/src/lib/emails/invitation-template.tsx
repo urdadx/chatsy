@@ -19,7 +19,6 @@ interface OrganizationInvitationEmailProps {
 }
 
 export const OrganizationInvitationEmail = ({
-  invitedByUsername = "John Doe",
   invitedByEmail = "john@example.com",
   teamName = "Acme Corp",
   inviteLink = "https://example.com/accept-invitation/123",
@@ -35,8 +34,8 @@ export const OrganizationInvitationEmail = ({
           <Text style={text}>Hello,</Text>
 
           <Text style={text}>
-            <strong>{invitedByUsername}</strong> ({invitedByEmail}) has invited
-            you to join the organization <strong>{teamName}</strong>.
+            {invitedByEmail} has invited you to join the organization{" "}
+            <strong>{teamName}</strong>.
           </Text>
 
           <Section style={buttonContainer}>

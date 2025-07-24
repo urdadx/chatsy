@@ -84,7 +84,7 @@ export const WorkspaceLogoSettings = () => {
           <div className="space-y-2">
             <h2 className="text-base font-semibold mb-2">Workspace Logo</h2>
             <p className="text-gray-600 text-sm">
-              Update your organization's photo.
+              Update your workspace's photo.
             </p>
           </div>
           <div>

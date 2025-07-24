@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useBranding, useUpdateBranding } from "@/hooks/use-bot-branding";
+import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
 import { InfoIcon, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -19,33 +19,33 @@ import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 
 export function ChatbotSettings() {
-  const { data: branding, error, refetch } = useBranding();
-  const updateBrandingMutation = useUpdateBranding();
+  const { data: chatbot, error, refetch } = useChatbot();
+  const updateChatbotMutation = useUpdateChatbot();
 
   const [name, setName] = useState("");
   const [hidePoweredBy, setHidePoweredBy] = useState(
-    branding?.hidePoweredBy || false,
+    chatbot?.hidePoweredBy || false,
   );
   const [initialMessage, setInitialMessage] = useState("");
   const [suggestedMessages, setSuggestedMessages] = useState<string[]>([]);
   const [showSuggestedInput, setShowSuggestedInput] = useState(false);
 
   useEffect(() => {
-    setName(branding?.name || "");
-    setHidePoweredBy(branding?.hidePoweredBy || false);
-    setInitialMessage(branding?.initialMessage || "");
-    setSuggestedMessages(branding?.suggestedMessages || []);
-  }, [branding]);
+    setName(chatbot?.name || "");
+    setHidePoweredBy(chatbot?.hidePoweredBy || false);
+    setInitialMessage(chatbot?.initialMessage || "");
+    setSuggestedMessages(chatbot?.suggestedMessages || []);
+  }, [chatbot]);
 
-  const updateBranding = async (updates: Partial<typeof branding>) => {
-    if (!branding) return;
+  const updateChatbot = async (updates: Partial<typeof chatbot>) => {
+    if (!chatbot) return;
 
     try {
-      const updatedBranding = {
-        ...branding,
+      const updatedChatbot = {
+        ...chatbot,
         ...updates,
       };
-      await updateBrandingMutation.mutateAsync(updatedBranding);
+      await updateChatbotMutation.mutateAsync(updatedChatbot);
     } catch (error) {
       toast.error("Failed to update");
       console.error("Error updating branding:", error);
@@ -53,18 +53,18 @@ export function ChatbotSettings() {
   };
 
   const handleNameBlur = () => {
-    if (!branding || name === branding.name) return;
-    updateBranding({ name });
+    if (!chatbot || name === chatbot.name) return;
+    updateChatbot({ name });
   };
 
   const handleHidePoweredByChange = (checked: boolean) => {
     setHidePoweredBy(checked);
-    updateBranding({ hidePoweredBy: checked });
+    updateChatbot({ hidePoweredBy: checked });
   };
 
   const handleInitialMessageBlur = () => {
-    if (!branding || initialMessage === branding.initialMessage) return;
-    updateBranding({ initialMessage });
+    if (!chatbot || initialMessage === chatbot.initialMessage) return;
+    updateChatbot({ initialMessage });
   };
 
   const handleSuggestedMessageChange = (index: number, value: string) => {
@@ -77,11 +77,11 @@ export function ChatbotSettings() {
     const filteredMessages = suggestedMessages.filter(
       (msg) => msg.trim() !== "",
     );
-    updateBranding({ suggestedMessages: filteredMessages });
+    updateChatbot({ suggestedMessages: filteredMessages });
   };
 
   const addSuggestedMessage = () => {
-    if (suggestedMessages.length < 3) {
+    if (suggestedMessages.length < 4) {
       setSuggestedMessages([...suggestedMessages, ""]);
       setShowSuggestedInput(true);
     }
@@ -90,7 +90,7 @@ export function ChatbotSettings() {
   const removeSuggestedMessage = (index: number) => {
     const newMessages = suggestedMessages.filter((_, i) => i !== index);
     setSuggestedMessages(newMessages);
-    updateBranding({
+    updateChatbot({
       suggestedMessages: newMessages.filter((msg) => msg.trim() !== ""),
     });
     if (newMessages.length === 0) {
@@ -138,9 +138,9 @@ export function ChatbotSettings() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               onBlur={handleNameBlur}
-              disabled={updateBrandingMutation.isPending}
+              disabled={updateChatbotMutation.isPending}
             />
-            {updateBrandingMutation.isPending && name !== branding?.name && (
+            {updateChatbotMutation.isPending && name !== chatbot?.name && (
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
                 <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-r-transparent" />
               </div>
@@ -166,7 +166,7 @@ export function ChatbotSettings() {
                   <InfoIcon className="h-4 w-4 text-muted-foreground" />
                 </TooltipTrigger>
                 <TooltipContent className="bg-white shadow-sm">
-                  <p className="text-black">First message the user sees</p>
+                  <p className="text-black">The first message users sees</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -178,10 +178,10 @@ export function ChatbotSettings() {
               onChange={(e) => setInitialMessage(e.target.value)}
               onBlur={handleInitialMessageBlur}
               placeholder="Add initial message"
-              disabled={updateBrandingMutation.isPending}
+              disabled={updateChatbotMutation.isPending}
             />
-            {updateBrandingMutation.isPending &&
-              initialMessage !== branding?.initialMessage && (
+            {updateChatbotMutation.isPending &&
+              initialMessage !== chatbot?.initialMessage && (
                 <div className="absolute right-2 top-2">
                   <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-r-transparent" />
                 </div>
@@ -218,7 +218,7 @@ export function ChatbotSettings() {
                     }
                     onBlur={handleSuggestedMessageBlur}
                     placeholder={`Suggested message ${index + 1}`}
-                    disabled={updateBrandingMutation.isPending}
+                    disabled={updateChatbotMutation.isPending}
                   />
                   <Button
                     variant="ghost"
@@ -234,7 +234,7 @@ export function ChatbotSettings() {
                 onClick={addSuggestedMessage}
                 className="w-fit"
               >
-                <Plus className="h-4 w-4 mr-1" />
+                <Plus className="h-4 w-4" />
                 Add suggested message
               </Button>
             )}
@@ -263,10 +263,10 @@ export function ChatbotSettings() {
               id="hide-powered-by"
               checked={hidePoweredBy}
               onCheckedChange={handleHidePoweredByChange}
-              disabled={updateBrandingMutation.isPending}
+              disabled={updateChatbotMutation.isPending}
             />
-            {updateBrandingMutation.isPending &&
-              hidePoweredBy !== branding?.hidePoweredBy && (
+            {updateChatbotMutation.isPending &&
+              hidePoweredBy !== chatbot?.hidePoweredBy && (
                 <Spinner className="text-primary" />
               )}
           </div>

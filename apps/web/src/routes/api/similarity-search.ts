@@ -1,4 +1,4 @@
-import { searchSimilarQuestions } from "@/lib/search";
+import { searchKnowledge } from "@/lib/search";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -6,7 +6,7 @@ import { z } from "zod";
 
 const searchSchema = z.object({
   query: z.string().min(1),
-  limit: z.number().optional().default(5),
+  limit: z.number().optional().default(10),
 });
 
 export const ServerRoute = createServerFileRoute("/api/similarity-search").methods({
@@ -27,7 +27,7 @@ export const ServerRoute = createServerFileRoute("/api/similarity-search").metho
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
-    const results = await searchSimilarQuestions(
+    const results = await searchKnowledge(
       parsed.data.query,
       organizationId,
       parsed.data.limit,

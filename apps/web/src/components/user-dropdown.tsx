@@ -14,7 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useBranding } from "@/hooks/use-bot-branding";
+import { useChatbot } from "@/hooks/use-chatbot";
 import { signOut } from "@/lib/auth-client";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -37,7 +37,7 @@ export function UserDropdown({ user }: any) {
     });
   };
 
-  const { data: branding } = useBranding();
+  const { data: chatbot } = useChatbot();
 
   return (
     <SidebarMenu>
@@ -51,7 +51,7 @@ export function UserDropdown({ user }: any) {
               <Avatar className="h-10 w-10 rounded-full border-2 border-primary">
                 <AvatarImage
                   src={user?.image}
-                  alt={branding?.name || user?.username}
+                  alt={chatbot?.name || user?.username}
                 />
                 <AvatarFallback>
                   <User className="h-5 w-5 text-gray-600" />

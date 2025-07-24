@@ -32,21 +32,33 @@ export async function extractTextFromDocument(
   }
 }
 
-export function chunkDocument(text: string, chunkSize = 1000): string[] {
+// Enhanced chunking with overlap
+export function chunkDocument(
+  text: string,
+  chunkSize = 1000,
+  overlapSize = 200,
+): string[] {
   const chunks: string[] = [];
   const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 0);
 
   let currentChunk = "";
+  let previousChunk = "";
 
   for (const sentence of sentences) {
+    const trimmedSentence = sentence.trim();
+
     if (
-      (currentChunk + sentence).length > chunkSize &&
+      (currentChunk + trimmedSentence).length > chunkSize &&
       currentChunk.length > 0
     ) {
       chunks.push(currentChunk.trim());
-      currentChunk = sentence;
+
+      // Add overlap from previous chunk
+      const overlapWords = previousChunk.split(" ").slice(-overlapSize / 10);
+      currentChunk = `${overlapWords.join(" ")} ${trimmedSentence}`;
+      previousChunk = currentChunk;
     } else {
-      currentChunk += `${sentence}. `;
+      currentChunk += `${trimmedSentence}. `;
     }
   }
 
