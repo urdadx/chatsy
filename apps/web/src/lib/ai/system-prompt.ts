@@ -26,7 +26,6 @@ AVAILABLE TOOLS
    Use when:
 * The user explicitly asks to speak with a human, a real person, or someone else.
 * The user’s question is too complex, unclear, or sensitive for the assistant to handle accurately.
-* The assistant has attempted to help but cannot provide a sufficient answer.
 * The issue involves personal data or account-specific information you cannot access.
   Always explain the reason to the user and confirm the escalation.
 

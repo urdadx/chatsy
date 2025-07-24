@@ -246,16 +246,18 @@ export async function getVotesByChatId({ id }: { id: string }) {
   }
 }
 
-export async function getTotalVotes() {
+export async function getTotalVotes({ organizationId }: { organizationId: string }) {
   try {
     const upvotes = await db
       .select({ count: count(vote.messageId) })
       .from(vote)
-      .where(eq(vote.isUpvoted, true));
+      .innerJoin(chat, eq(vote.chatId, chat.id))
+      .where(and(eq(vote.isUpvoted, true), eq(chat.organizationId, organizationId)));
     const downvotes = await db
       .select({ count: count(vote.messageId) })
       .from(vote)
-      .where(eq(vote.isUpvoted, false));
+      .innerJoin(chat, eq(vote.chatId, chat.id))
+      .where(and(eq(vote.isUpvoted, false), eq(chat.organizationId, organizationId)));
     return { upvotes: upvotes[0].count, downvotes: downvotes[0].count };
   } catch (error) {
     throw new ChatSDKError("bad_request:database", "Failed to get total votes");

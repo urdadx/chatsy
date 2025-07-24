@@ -8,6 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { ArrowRight, Users } from "lucide-react";
 import { motion } from "motion/react";
@@ -27,7 +28,7 @@ export const InviteMembers = ({ open, setOpen }: any) => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("member");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,13 +52,12 @@ export const InviteMembers = ({ open, setOpen }: any) => {
       }
 
       toast.success(`Invitation sent to ${email}`);
+      queryClient.invalidateQueries({ queryKey: ["invitations"] });
 
       setEmail("");
       setRole("member");
 
       setOpen(false);
-
-      router.invalidate();
     } catch (error) {
       console.error("Error sending invitation:", error);
       toast.error("Failed to send invitation. Please try again.");

@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { SparklesIcon } from "lucide-react";
 import { memo } from "react";
 import { MessageActions } from "./message-actions";
+import { Loader } from "./ui/loader";
 
 const PurePreviewMessage = ({
   chatId,
@@ -39,7 +40,7 @@ const PurePreviewMessage = ({
       >
         <div
           className={cn(
-            "flex items-center gap-3 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:w-fit",
+            "flex items-start gap-3 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:w-fit",
           )}
         >
           {message.role === "assistant" && (
@@ -142,7 +143,7 @@ export const ThinkingMessage = () => {
     >
       <div
         className={cx(
-          "flex gap-4 group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:py-2 rounded-xl",
+          "flex gap-4 items-start group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:py-2 rounded-xl",
           {
             "group-data-[role=user]/message:bg-muted": true,
           },
@@ -153,9 +154,7 @@ export const ThinkingMessage = () => {
         </div>
 
         <div className="flex flex-col gap-2 w-full">
-          <div className="flex flex-col gap-4 text-muted-foreground">
-            Thinking...
-          </div>
+          <Loader variant="dots" className="text-muted-foreground text-base" />
         </div>
       </div>
     </motion.div>

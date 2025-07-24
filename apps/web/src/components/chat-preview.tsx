@@ -10,7 +10,7 @@ import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UIMessage } from "ai";
-import { ArrowUp, RefreshCcw } from "lucide-react";
+import { ArrowUp, RefreshCcw, SparklesIcon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { GreetingMessage } from "./greeting-message";
@@ -110,19 +110,31 @@ export function ChatPreview() {
     enabled: messages.length >= 2,
   });
 
-  console.log("votes ", votes);
-
   return (
     <div className="flex-1 flex items-center justify-center">
-      <Card className="w-[400px] h-[550px] shadow-lg border-1 py-0">
+      <Card className="w-[400px] h-[560px] shadow-lg border-1 py-0">
         {/* Header */}
         <div
-          className="p-3 text-white flex items-center justify-between border-b rounded-t-xl bg-primary"
+          className="p-4 text-white flex items-center justify-between border-b rounded-t-xl bg-primary"
           style={{ backgroundColor: chatbot?.primaryColor }}
         >
-          <p className="font-normal text-base">
-            {chatbot?.name || "Chat Preview"}
-          </p>
+          <div className="flex items-center gap-3">
+            {chatbot?.image ? (
+              <img
+                src={chatbot.image}
+                alt="Assistant"
+                style={{
+                  borderColor: chatbot?.primaryColor,
+                }}
+                className="rounded-full w-10 h-10"
+              />
+            ) : (
+              <SparklesIcon size={17} />
+            )}
+            <p className="font-normal text-base">
+              {chatbot?.name || "Chat Preview"}
+            </p>
+          </div>
           <div className="flex">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -229,7 +241,7 @@ export function ChatPreview() {
           </form>
 
           {showPoweredBy ? (
-            <div className="flex py-2 items-center justify-center text-xs text-muted-foreground">
+            <div className="flex pt-1 pb-3 items-center justify-center text-xs text-muted-foreground">
               <span>Powered by </span>
               <a
                 href="https://padyna.com"

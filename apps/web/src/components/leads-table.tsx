@@ -28,7 +28,8 @@ import {
   PlusIcon,
   TrashIcon,
 } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
+import { AddLeadForm } from "./add-lead-form";
 
 import {
   AlertDialog,
@@ -74,6 +75,9 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+
+import { type Lead } from "@/db/schema";
+import { useQuery } from "@tanstack/react-query";
 
 type Item = {
   id: string;

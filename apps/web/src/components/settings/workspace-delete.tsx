@@ -12,21 +12,23 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { authClient, useSession } from "@/lib/auth-client";
+import { authClient, signOut, useSession } from "@/lib/auth-client";
+import { sleep } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { CircleAlert, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export const WorkspaceDelete = () => {
-  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
 
   const { data: session } = useSession();
   const organizationId = session?.session?.activeOrganizationId ?? "";
   const { data: activeOrganization } = authClient.useActiveOrganization();
+
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const deleteWorkspace = useMutation({
     mutationFn: async () => {
@@ -54,8 +56,25 @@ export const WorkspaceDelete = () => {
     },
   });
 
-  const handleDelete = () => {
+  const handleLogout = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          navigate({
+            to: "/login",
+          });
+        },
+        onError: () => {
+          toast.error("Failed to log out. Please try again.");
+        },
+      },
+    });
+  };
+
+  const handleDelete = async () => {
     deleteWorkspace.mutate();
+    await sleep(1);
+    handleLogout();
   };
 
   const workspaceName = activeOrganization?.name || "workspace";

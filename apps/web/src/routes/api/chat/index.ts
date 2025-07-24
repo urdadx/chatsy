@@ -84,7 +84,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         }
       }
       // get the chatbot name for the organization
-      const [chatbotName] = await db
+      const [chatbotDetails] = await db
         .select({
           name: chatbot.name,
         })
@@ -97,7 +97,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
 
       const resultStream = streamText({
         model: google("gemini-2.5-flash"),
-        system: systemPrompt(chatbotName.name ?? "Assistant"),
+        system: systemPrompt(chatbotDetails.name ?? "Assistant"),
         messages,
         maxSteps: 5,
         tools: {

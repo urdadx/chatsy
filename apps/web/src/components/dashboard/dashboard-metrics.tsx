@@ -1,5 +1,6 @@
 import { useChatHistory } from "@/hooks/use-chat-history";
 import { api } from "@/lib/api";
+import NumberFlow from "@number-flow/react";
 import { useQuery } from "@tanstack/react-query";
 import {
   BrainCog,
@@ -19,7 +20,7 @@ export function DashboardMetrics() {
     },
   });
 
-  const { data: chatHistoryData } = useChatHistory("all");
+  const { data: chatHistoryData } = useChatHistory("90d");
   const conversationsCount = chatHistoryData?.pages.reduce(
     (acc, page) => acc + page.chats.length,
     0,
@@ -28,7 +29,7 @@ export function DashboardMetrics() {
   const { data: voteCounts } = useQuery({
     queryKey: ["vote-counts"],
     queryFn: async () => {
-      const response = await api.get("/votesCount");
+      const response = await api.get("/vote-count");
       return response.data;
     },
   });
@@ -67,9 +68,10 @@ export function DashboardMetrics() {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-3xl font-bold text-gray-700 px-10">
-            {conversationsCount ?? 0}
-          </div>
+          <NumberFlow
+            className="text-3xl font-bold text-gray-700 px-10 pt-0"
+            value={conversationsCount ?? 0}
+          />
         </div>
       </div>
       <div className="bg-white rounded-lg p-4 border">
@@ -81,9 +83,10 @@ export function DashboardMetrics() {
             <h3 className="text-sm font-medium text-gray-600">Credits used</h3>
           </div>
         </div>
-        <div className="flex items-center justify-between">
-          <div className="text-3xl font-bold text-gray-700 px-10">12</div>
-        </div>
+        <NumberFlow
+          className="text-3xl font-bold text-gray-700 px-10 pt-0"
+          value={53}
+        />
       </div>
       {/* Leads generated */}
       <div className="bg-white rounded-lg p-4 border">
@@ -98,7 +101,10 @@ export function DashboardMetrics() {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-3xl font-bold text-gray-700 px-10">12</div>
+          <NumberFlow
+            className="text-3xl font-bold text-gray-700 px-10 pt-0"
+            value={12}
+          />{" "}
         </div>
       </div>
 
@@ -115,9 +121,10 @@ export function DashboardMetrics() {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-3xl font-bold text-gray-700 px-10">
-            {voteCounts?.upvotes ?? 0}
-          </div>
+          <NumberFlow
+            className="text-3xl font-bold text-gray-700 px-10 pt-0"
+            value={voteCounts?.upvotes ?? 0}
+          />
         </div>
       </div>
       {/* Negative sentiments */}
@@ -133,9 +140,10 @@ export function DashboardMetrics() {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-3xl font-bold text-gray-700 px-10">
-            {voteCounts?.downvotes ?? 0}
-          </div>
+          <NumberFlow
+            className="text-3xl font-bold text-gray-700 px-10 pt-0"
+            value={voteCounts?.downvotes ?? 0}
+          />
         </div>
       </div>
     </div>

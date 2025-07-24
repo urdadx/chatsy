@@ -1,4 +1,3 @@
-
 import { tool } from 'ai';
 import { z } from 'zod';
 
@@ -12,20 +11,7 @@ export const collectLeads = tool({
     message: z.string().optional().describe('Any message from the lead'),
   }),
   execute: async ({ name, email, phone, company, message }) => {
-    const response = await fetch("/api/leads", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, phone, company, message }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      console.error("Failed to collect lead:", error);
-      return { success: false, message: "Failed to collect lead." };
-    }
-
-    return { success: true, message: "Lead collected successfully." };
+    console.log(`New lead collected: Name - ${name}, Email - ${email}, Phone - ${phone || 'N/A'}, Company - ${company || 'N/A'}, Message - ${message || 'N/A'}`);
+    return { success: true, message: 'Lead collected successfully.' };
   },
 });

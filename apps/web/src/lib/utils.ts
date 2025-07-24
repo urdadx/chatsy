@@ -1,5 +1,4 @@
 import { type ClassValue, clsx } from "clsx";
-import ms from "ms";
 import { twMerge } from "tailwind-merge";
 
 import type { CoreAssistantMessage, CoreToolMessage, UIMessage } from "ai";
@@ -35,6 +34,10 @@ export function getLocalStorage(key: string) {
     return JSON.parse(localStorage.getItem(key) || "[]");
   }
   return [];
+}
+
+export async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export async function fetchWithErrorHandlers(

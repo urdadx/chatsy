@@ -246,6 +246,8 @@ export const lead = pgTable("lead", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export type Lead = InferSelectModel<typeof lead>;
+
 export const product = pgTable("product", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   userId: uuid("user_id")

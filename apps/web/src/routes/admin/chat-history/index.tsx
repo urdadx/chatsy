@@ -6,7 +6,7 @@ import {
   useNavigate,
   useSearch,
 } from "@tanstack/react-router";
-import { RefreshCw, Search } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 
 import { ChatConversation } from "@/components/chat-history/chat-conversation";
 import { ChatLogItem } from "@/components/chat-history/chat-log-item";
@@ -56,7 +56,7 @@ function RouteComponent() {
   const handleFilterChange = (value: string) => {
     navigate({
       search: {
-        filter: value as "24h" | "7d" | "30d" | "90d" | "all",
+        filter: value as "24h" | "7d" | "30d" | "90d",
         chatId: undefined,
       },
     });
@@ -78,7 +78,6 @@ function RouteComponent() {
                   <SelectItem value="7d">Last 7 days</SelectItem>
                   <SelectItem value="30d">Last month</SelectItem>
                   <SelectItem value="90d">Last 3 months</SelectItem>
-                  <SelectItem value="all">All time</SelectItem>
                 </SelectContent>
               </Select>
               <Button
@@ -126,7 +125,6 @@ function RouteComponent() {
                     <SelectItem value="7d">Last 7 days</SelectItem>
                     <SelectItem value="30d">Last month</SelectItem>
                     <SelectItem value="90d">Last 3 months</SelectItem>
-                    <SelectItem value="all">All time</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

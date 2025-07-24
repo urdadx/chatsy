@@ -26,7 +26,7 @@ import { Route as AdminActionsRouteImport } from './routes/admin/actions'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
-import { ServerRoute as ApiVotesCountServerRouteImport } from './routes/api/votesCount'
+import { ServerRoute as ApiVoteCountServerRouteImport } from './routes/api/vote-count'
 import { ServerRoute as ApiVoteServerRouteImport } from './routes/api/vote'
 import { ServerRoute as ApiUploadImagesServerRouteImport } from './routes/api/upload-images'
 import { ServerRoute as ApiUploadDocumentsServerRouteImport } from './routes/api/upload-documents'
@@ -127,9 +127,9 @@ const AdminChatHistoryIndexRoute = AdminChatHistoryIndexRouteImport.update({
   path: '/chat-history/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const ApiVotesCountServerRoute = ApiVotesCountServerRouteImport.update({
-  id: '/api/votesCount',
-  path: '/api/votesCount',
+const ApiVoteCountServerRoute = ApiVoteCountServerRouteImport.update({
+  id: '/api/vote-count',
+  path: '/api/vote-count',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiVoteServerRoute = ApiVoteServerRouteImport.update({
@@ -373,7 +373,7 @@ export interface FileServerRoutesByFullPath {
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/vote': typeof ApiVoteServerRoute
-  '/api/votesCount': typeof ApiVotesCountServerRoute
+  '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
@@ -397,7 +397,7 @@ export interface FileServerRoutesByTo {
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/vote': typeof ApiVoteServerRoute
-  '/api/votesCount': typeof ApiVotesCountServerRoute
+  '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
@@ -422,7 +422,7 @@ export interface FileServerRoutesById {
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/vote': typeof ApiVoteServerRoute
-  '/api/votesCount': typeof ApiVotesCountServerRoute
+  '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
@@ -448,7 +448,7 @@ export interface FileServerRouteTypes {
     | '/api/upload-documents'
     | '/api/upload-images'
     | '/api/vote'
-    | '/api/votesCount'
+    | '/api/vote-count'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/sources/count'
@@ -472,7 +472,7 @@ export interface FileServerRouteTypes {
     | '/api/upload-documents'
     | '/api/upload-images'
     | '/api/vote'
-    | '/api/votesCount'
+    | '/api/vote-count'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/sources/count'
@@ -496,7 +496,7 @@ export interface FileServerRouteTypes {
     | '/api/upload-documents'
     | '/api/upload-images'
     | '/api/vote'
-    | '/api/votesCount'
+    | '/api/vote-count'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/sources/count'
@@ -521,7 +521,7 @@ export interface RootServerRouteChildren {
   ApiUploadDocumentsServerRoute: typeof ApiUploadDocumentsServerRoute
   ApiUploadImagesServerRoute: typeof ApiUploadImagesServerRoute
   ApiVoteServerRoute: typeof ApiVoteServerRoute
-  ApiVotesCountServerRoute: typeof ApiVotesCountServerRoute
+  ApiVoteCountServerRoute: typeof ApiVoteCountServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
   ApiSourcesCountServerRoute: typeof ApiSourcesCountServerRoute
@@ -639,11 +639,11 @@ declare module '@tanstack/react-router' {
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
-    '/api/votesCount': {
-      id: '/api/votesCount'
-      path: '/api/votesCount'
-      fullPath: '/api/votesCount'
-      preLoaderRoute: typeof ApiVotesCountServerRouteImport
+    '/api/vote-count': {
+      id: '/api/vote-count'
+      path: '/api/vote-count'
+      fullPath: '/api/vote-count'
+      preLoaderRoute: typeof ApiVoteCountServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/vote': {
@@ -853,7 +853,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiUploadDocumentsServerRoute: ApiUploadDocumentsServerRoute,
   ApiUploadImagesServerRoute: ApiUploadImagesServerRoute,
   ApiVoteServerRoute: ApiVoteServerRoute,
-  ApiVotesCountServerRoute: ApiVotesCountServerRoute,
+  ApiVoteCountServerRoute: ApiVoteCountServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
   ApiSourcesCountServerRoute: ApiSourcesCountServerRoute,
