@@ -13,10 +13,11 @@ import { InfoIcon, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AvatarUpload } from "../avatar-upload";
-import { PickColor } from "../onboarding/pick-color";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
+import { EmbeddingSettings } from "./embedding-settings";
+import { PickColor } from "./pick-color";
 
 export function ChatbotSettings() {
   const { data: chatbot, error, refetch } = useChatbot();
@@ -240,6 +241,11 @@ export function ChatbotSettings() {
             )}
           </div>
         </div>
+
+        <Separator className="my-6" />
+
+        {/* Embedding Settings Section */}
+        <EmbeddingSettings />
         <Separator className="my-3" />
 
         <div className="flex items-center justify-between">

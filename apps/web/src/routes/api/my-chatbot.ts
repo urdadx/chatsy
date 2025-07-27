@@ -44,6 +44,9 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         hidePoweredBy: chatbot.hidePoweredBy,
         initialMessage: chatbot.initialMessage,
         suggestedMessages: chatbot.suggestedMessages,
+        isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
+        embedToken: chatbot.embedToken,
+        allowedDomains: chatbot.allowedDomains,
         createdAt: chatbot.createdAt,
         updatedAt: chatbot.updatedAt,
       })
@@ -106,6 +109,11 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         ...(body.suggestedMessages && {
           suggestedMessages: body.suggestedMessages,
         }),
+        ...(typeof body.isEmbeddingEnabled === "boolean" && {
+          isEmbeddingEnabled: body.isEmbeddingEnabled,
+        }),
+        ...(body.embedToken && { embedToken: body.embedToken }),
+        ...(body.allowedDomains && { allowedDomains: body.allowedDomains }),
         updatedAt: new Date(),
       };
 
@@ -133,6 +141,9 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
           hidePoweredBy: chatbot.hidePoweredBy,
           initialMessage: chatbot.initialMessage,
           suggestedMessages: chatbot.suggestedMessages,
+          isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
+          embedToken: chatbot.embedToken,
+          allowedDomains: chatbot.allowedDomains,
           createdAt: chatbot.createdAt,
           updatedAt: chatbot.updatedAt,
         })

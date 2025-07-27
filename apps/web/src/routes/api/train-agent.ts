@@ -10,11 +10,11 @@ import {
 import {
   chunkDocument,
   extractTextFromDocument,
-} from "@/lib/document-chunking";
+} from "@/lib/ai/document-chunking";
 import {
   generateAnswerEmbedding,
   generateQuestionEmbedding,
-} from "@/lib/embeddings";
+} from "@/lib/ai/embeddings";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -51,7 +51,10 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
         await db
           .delete(knowledge)
           .where(
-            and(eq(knowledge.source, "document"), eq(knowledge.sourceId, doc.id)),
+            and(
+              eq(knowledge.source, "document"),
+              eq(knowledge.sourceId, doc.id),
+            ),
           );
         const text = await extractTextFromDocument(doc.url, doc.type);
         const chunks = await chunkDocument(text);
@@ -77,7 +80,9 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
       for (const q of questions) {
         await db
           .delete(knowledge)
-          .where(and(eq(knowledge.source, "qna"), eq(knowledge.sourceId, q.id)));
+          .where(
+            and(eq(knowledge.source, "qna"), eq(knowledge.sourceId, q.id)),
+          );
         const questionEmbedding = await generateQuestionEmbedding(q.question);
         await db.insert(knowledge).values({
           source: "qna",
@@ -98,7 +103,9 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
       for (const t of texts) {
         await db
           .delete(knowledge)
-          .where(and(eq(knowledge.source, "text"), eq(knowledge.sourceId, t.id)));
+          .where(
+            and(eq(knowledge.source, "text"), eq(knowledge.sourceId, t.id)),
+          );
         const chunks = await chunkDocument(t.content);
         for (let i = 0; i < chunks.length; i++) {
           const embedding = await generateAnswerEmbedding(chunks[i]);

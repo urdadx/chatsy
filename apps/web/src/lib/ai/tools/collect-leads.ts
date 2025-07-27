@@ -1,31 +1,32 @@
+import { api } from "@/lib/api";
+import { tool } from "ai";
+import { z } from "zod";
 
-import { tool } from 'ai';
-import { z } from 'zod';
-
-export const collectLeads = tool({
-  description: 'Captures leads from conversations with customers.',
+export const collectLeadsTool = tool({
+  description: "Capture leads from conversations with customers.",
   parameters: z.object({
-    name: z.string().describe('The name of the lead'),
-    email: z.string().email().describe('The email of the lead'),
-    phone: z.string().optional().describe('The phone number of the lead'),
-    company: z.string().optional().describe('The company of the lead'),
-    message: z.string().optional().describe('Any message from the lead'),
+    name: z.string().describe("The name of the lead"),
+    email: z.string().describe("The email of the lead"),
+    phone: z.string().optional().describe("The phone number of the lead"),
+    company: z.string().optional().describe("The company of the lead"),
+    message: z.string().optional().describe("Any message from the lead"),
+    location: z.string().optional().describe("The location of the lead"),
   }),
-  execute: async ({ name, email, phone, company, message }) => {
-    const response = await fetch("/api/leads", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, phone, company, message }),
-    });
+  execute: async ({ name, email, phone, company, message, location }) => {
+    try {
+      await api.post("/api/leads", {
+        name,
+        email,
+        phone,
+        company,
+        message,
+        location,
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
+      return { success: true, message: "Lead collected successfully." };
+    } catch (error) {
       console.error("Failed to collect lead:", error);
       return { success: false, message: "Failed to collect lead." };
     }
-
-    return { success: true, message: "Lead collected successfully." };
   },
 });

@@ -98,6 +98,8 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
             markdown,
             metadata,
             type: "scrape",
+            urlsCrawled: 1,
+            creditsUsed: 1,
           })
           .returning();
 
@@ -170,7 +172,8 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
       if (!source) {
         return json(
           {
-            error: "Source not found or you don't have permission to delete it.",
+            error:
+              "Source not found or you don't have permission to delete it.",
           },
           { status: 404 },
         );

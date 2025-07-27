@@ -18,5 +18,17 @@ export const scheduleAppointmentTool = tool({
     console.log(
       `Appointment scheduled for ${customerName} (${customerEmail})  on ${preferredDate} at ${preferredTime}`,
     );
+
+    return {
+      success: true,
+      message: "Appointment scheduled successfully",
+      appointment: {
+        customerName,
+        customerEmail,
+        preferredDate,
+        preferredTime,
+        timestamp: new Date().toISOString(),
+      },
+    };
   },
 });

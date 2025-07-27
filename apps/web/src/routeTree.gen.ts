@@ -16,6 +16,7 @@ import { Route as WebsiteSourcesRouteImport } from './routes/website-sources'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
+import { Route as EmbedEmbedTokenRouteImport } from './routes/embed/$embedToken'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminPlaygroundRouteImport } from './routes/admin/playground'
 import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
@@ -38,16 +39,21 @@ import { ServerRoute as ApiScrapeServerRouteImport } from './routes/api/scrape'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
 import { ServerRoute as ApiMyLinksServerRouteImport } from './routes/api/my-links'
 import { ServerRoute as ApiMyChatbotServerRouteImport } from './routes/api/my-chatbot'
+import { ServerRoute as ApiLeadsServerRouteImport } from './routes/api/leads'
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
 import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-og-info'
+import { ServerRoute as ApiFirecrawlWebhookServerRouteImport } from './routes/api/firecrawl-webhook'
 import { ServerRoute as ApiFeedbackServerRouteImport } from './routes/api/feedback'
 import { ServerRoute as ApiDocumentSourceServerRouteImport } from './routes/api/document-source'
 import { ServerRoute as ApiDocumentProcessingServerRouteImport } from './routes/api/document-processing'
 import { ServerRoute as ApiCrawlServerRouteImport } from './routes/api/crawl'
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
 import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/sources/count'
+import { ServerRoute as ApiEmbedGenerateTokenServerRouteImport } from './routes/api/embed/generate-token'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
+import { ServerRoute as ApiEmbedChatbotEmbedTokenServerRouteImport } from './routes/api/embed/chatbot/$embedToken'
+import { ServerRoute as ApiEmbedChatEmbedTokenServerRouteImport } from './routes/api/embed/chat/$embedToken'
 
 const AdminTestLazyRouteImport = createFileRoute('/admin/test')()
 const rootServerRouteImport = createServerRootRoute()
@@ -77,6 +83,11 @@ const AdminTestLazyRoute = AdminTestLazyRouteImport.update({
   path: '/test',
   getParentRoute: () => AdminRouteRoute,
 } as any).lazy(() => import('./routes/admin/test.lazy').then((d) => d.Route))
+const EmbedEmbedTokenRoute = EmbedEmbedTokenRouteImport.update({
+  id: '/embed/$embedToken',
+  path: '/embed/$embedToken',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -189,6 +200,11 @@ const ApiMyChatbotServerRoute = ApiMyChatbotServerRouteImport.update({
   path: '/api/my-chatbot',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiLeadsServerRoute = ApiLeadsServerRouteImport.update({
+  id: '/api/leads',
+  path: '/api/leads',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiHelloServerRoute = ApiHelloServerRouteImport.update({
   id: '/api/hello',
   path: '/api/hello',
@@ -199,6 +215,12 @@ const ApiGetOgInfoServerRoute = ApiGetOgInfoServerRouteImport.update({
   path: '/api/get-og-info',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiFirecrawlWebhookServerRoute =
+  ApiFirecrawlWebhookServerRouteImport.update({
+    id: '/api/firecrawl-webhook',
+    path: '/api/firecrawl-webhook',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiFeedbackServerRoute = ApiFeedbackServerRouteImport.update({
   id: '/api/feedback',
   path: '/api/feedback',
@@ -230,6 +252,12 @@ const ApiSourcesCountServerRoute = ApiSourcesCountServerRouteImport.update({
   path: '/api/sources/count',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiEmbedGenerateTokenServerRoute =
+  ApiEmbedGenerateTokenServerRouteImport.update({
+    id: '/api/embed/generate-token',
+    path: '/api/embed/generate-token',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiChatHistoryServerRoute = ApiChatHistoryServerRouteImport.update({
   id: '/api/chat/history',
   path: '/api/chat/history',
@@ -240,6 +268,18 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiEmbedChatbotEmbedTokenServerRoute =
+  ApiEmbedChatbotEmbedTokenServerRouteImport.update({
+    id: '/api/embed/chatbot/$embedToken',
+    path: '/api/embed/chatbot/$embedToken',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiEmbedChatEmbedTokenServerRoute =
+  ApiEmbedChatEmbedTokenServerRouteImport.update({
+    id: '/api/embed/chat/$embedToken',
+    path: '/api/embed/chat/$embedToken',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -254,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/embed/$embedToken': typeof EmbedEmbedTokenRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
@@ -271,6 +312,7 @@ export interface FileRoutesByTo {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/embed/$embedToken': typeof EmbedEmbedTokenRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
@@ -289,6 +331,7 @@ export interface FileRoutesById {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/embed/$embedToken': typeof EmbedEmbedTokenRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
@@ -308,6 +351,7 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
+    | '/embed/$embedToken'
     | '/admin/test'
     | '/onboarding'
     | '/admin/chat-history'
@@ -325,6 +369,7 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
+    | '/embed/$embedToken'
     | '/admin/test'
     | '/onboarding'
     | '/admin/chat-history'
@@ -342,6 +387,7 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
+    | '/embed/$embedToken'
     | '/admin/test'
     | '/onboarding/'
     | '/admin/chat-history/'
@@ -353,6 +399,7 @@ export interface RootRouteChildren {
   WebsiteSourcesRoute: typeof WebsiteSourcesRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
+  EmbedEmbedTokenRoute: typeof EmbedEmbedTokenRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -360,8 +407,10 @@ export interface FileServerRoutesByFullPath {
   '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
+  '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
+  '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -376,16 +425,21 @@ export interface FileServerRoutesByFullPath {
   '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
+  '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
+  '/api/embed/chat/$embedToken': typeof ApiEmbedChatEmbedTokenServerRoute
+  '/api/embed/chatbot/$embedToken': typeof ApiEmbedChatbotEmbedTokenServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/crawl': typeof ApiCrawlServerRoute
   '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
+  '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
+  '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -400,8 +454,11 @@ export interface FileServerRoutesByTo {
   '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
+  '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
+  '/api/embed/chat/$embedToken': typeof ApiEmbedChatEmbedTokenServerRoute
+  '/api/embed/chatbot/$embedToken': typeof ApiEmbedChatbotEmbedTokenServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
@@ -409,8 +466,10 @@ export interface FileServerRoutesById {
   '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
+  '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
+  '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -425,8 +484,11 @@ export interface FileServerRoutesById {
   '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
+  '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/chat/': typeof ApiChatIndexServerRoute
+  '/api/embed/chat/$embedToken': typeof ApiEmbedChatEmbedTokenServerRoute
+  '/api/embed/chatbot/$embedToken': typeof ApiEmbedChatbotEmbedTokenServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
@@ -435,8 +497,10 @@ export interface FileServerRouteTypes {
     | '/api/document-processing'
     | '/api/document-source'
     | '/api/feedback'
+    | '/api/firecrawl-webhook'
     | '/api/get-og-info'
     | '/api/hello'
+    | '/api/leads'
     | '/api/my-chatbot'
     | '/api/my-links'
     | '/api/questions'
@@ -451,16 +515,21 @@ export interface FileServerRouteTypes {
     | '/api/vote-count'
     | '/api/auth/$'
     | '/api/chat/history'
+    | '/api/embed/generate-token'
     | '/api/sources/count'
     | '/api/chat'
+    | '/api/embed/chat/$embedToken'
+    | '/api/embed/chatbot/$embedToken'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/crawl'
     | '/api/document-processing'
     | '/api/document-source'
     | '/api/feedback'
+    | '/api/firecrawl-webhook'
     | '/api/get-og-info'
     | '/api/hello'
+    | '/api/leads'
     | '/api/my-chatbot'
     | '/api/my-links'
     | '/api/questions'
@@ -475,16 +544,21 @@ export interface FileServerRouteTypes {
     | '/api/vote-count'
     | '/api/auth/$'
     | '/api/chat/history'
+    | '/api/embed/generate-token'
     | '/api/sources/count'
     | '/api/chat'
+    | '/api/embed/chat/$embedToken'
+    | '/api/embed/chatbot/$embedToken'
   id:
     | '__root__'
     | '/api/crawl'
     | '/api/document-processing'
     | '/api/document-source'
     | '/api/feedback'
+    | '/api/firecrawl-webhook'
     | '/api/get-og-info'
     | '/api/hello'
+    | '/api/leads'
     | '/api/my-chatbot'
     | '/api/my-links'
     | '/api/questions'
@@ -499,8 +573,11 @@ export interface FileServerRouteTypes {
     | '/api/vote-count'
     | '/api/auth/$'
     | '/api/chat/history'
+    | '/api/embed/generate-token'
     | '/api/sources/count'
     | '/api/chat/'
+    | '/api/embed/chat/$embedToken'
+    | '/api/embed/chatbot/$embedToken'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
@@ -508,8 +585,10 @@ export interface RootServerRouteChildren {
   ApiDocumentProcessingServerRoute: typeof ApiDocumentProcessingServerRoute
   ApiDocumentSourceServerRoute: typeof ApiDocumentSourceServerRoute
   ApiFeedbackServerRoute: typeof ApiFeedbackServerRoute
+  ApiFirecrawlWebhookServerRoute: typeof ApiFirecrawlWebhookServerRoute
   ApiGetOgInfoServerRoute: typeof ApiGetOgInfoServerRoute
   ApiHelloServerRoute: typeof ApiHelloServerRoute
+  ApiLeadsServerRoute: typeof ApiLeadsServerRoute
   ApiMyChatbotServerRoute: typeof ApiMyChatbotServerRoute
   ApiMyLinksServerRoute: typeof ApiMyLinksServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
@@ -524,8 +603,11 @@ export interface RootServerRouteChildren {
   ApiVoteCountServerRoute: typeof ApiVoteCountServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
+  ApiEmbedGenerateTokenServerRoute: typeof ApiEmbedGenerateTokenServerRoute
   ApiSourcesCountServerRoute: typeof ApiSourcesCountServerRoute
   ApiChatIndexServerRoute: typeof ApiChatIndexServerRoute
+  ApiEmbedChatEmbedTokenServerRoute: typeof ApiEmbedChatEmbedTokenServerRoute
+  ApiEmbedChatbotEmbedTokenServerRoute: typeof ApiEmbedChatbotEmbedTokenServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -564,6 +646,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/test'
       preLoaderRoute: typeof AdminTestLazyRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/embed/$embedToken': {
+      id: '/embed/$embedToken'
+      path: '/embed/$embedToken'
+      fullPath: '/embed/$embedToken'
+      preLoaderRoute: typeof EmbedEmbedTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/settings': {
       id: '/admin/settings'
@@ -723,6 +812,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiMyChatbotServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/leads': {
+      id: '/api/leads'
+      path: '/api/leads'
+      fullPath: '/api/leads'
+      preLoaderRoute: typeof ApiLeadsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/hello': {
       id: '/api/hello'
       path: '/api/hello'
@@ -735,6 +831,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/get-og-info'
       fullPath: '/api/get-og-info'
       preLoaderRoute: typeof ApiGetOgInfoServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/firecrawl-webhook': {
+      id: '/api/firecrawl-webhook'
+      path: '/api/firecrawl-webhook'
+      fullPath: '/api/firecrawl-webhook'
+      preLoaderRoute: typeof ApiFirecrawlWebhookServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/feedback': {
@@ -779,6 +882,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiSourcesCountServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/embed/generate-token': {
+      id: '/api/embed/generate-token'
+      path: '/api/embed/generate-token'
+      fullPath: '/api/embed/generate-token'
+      preLoaderRoute: typeof ApiEmbedGenerateTokenServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/chat/history': {
       id: '/api/chat/history'
       path: '/api/chat/history'
@@ -791,6 +901,20 @@ declare module '@tanstack/react-start/server' {
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/embed/chatbot/$embedToken': {
+      id: '/api/embed/chatbot/$embedToken'
+      path: '/api/embed/chatbot/$embedToken'
+      fullPath: '/api/embed/chatbot/$embedToken'
+      preLoaderRoute: typeof ApiEmbedChatbotEmbedTokenServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/embed/chat/$embedToken': {
+      id: '/api/embed/chat/$embedToken'
+      path: '/api/embed/chat/$embedToken'
+      fullPath: '/api/embed/chat/$embedToken'
+      preLoaderRoute: typeof ApiEmbedChatEmbedTokenServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
   }
@@ -830,6 +954,7 @@ const rootRouteChildren: RootRouteChildren = {
   WebsiteSourcesRoute: WebsiteSourcesRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
+  EmbedEmbedTokenRoute: EmbedEmbedTokenRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
 }
 export const routeTree = rootRouteImport
@@ -840,8 +965,10 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiDocumentProcessingServerRoute: ApiDocumentProcessingServerRoute,
   ApiDocumentSourceServerRoute: ApiDocumentSourceServerRoute,
   ApiFeedbackServerRoute: ApiFeedbackServerRoute,
+  ApiFirecrawlWebhookServerRoute: ApiFirecrawlWebhookServerRoute,
   ApiGetOgInfoServerRoute: ApiGetOgInfoServerRoute,
   ApiHelloServerRoute: ApiHelloServerRoute,
+  ApiLeadsServerRoute: ApiLeadsServerRoute,
   ApiMyChatbotServerRoute: ApiMyChatbotServerRoute,
   ApiMyLinksServerRoute: ApiMyLinksServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,
@@ -856,8 +983,11 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiVoteCountServerRoute: ApiVoteCountServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
+  ApiEmbedGenerateTokenServerRoute: ApiEmbedGenerateTokenServerRoute,
   ApiSourcesCountServerRoute: ApiSourcesCountServerRoute,
   ApiChatIndexServerRoute: ApiChatIndexServerRoute,
+  ApiEmbedChatEmbedTokenServerRoute: ApiEmbedChatEmbedTokenServerRoute,
+  ApiEmbedChatbotEmbedTokenServerRoute: ApiEmbedChatbotEmbedTokenServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

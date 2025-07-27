@@ -48,7 +48,6 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
     }
 
     const { limit, cursor, filter } = result.data;
-    const userId = session.user.id;
 
     // Time filtering
     let timeFilter: SQL<any> | undefined;
@@ -65,10 +64,8 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
 
     try {
       // Modified where conditions to include organization scoping
-      const whereConditions = [
-        eq(chat.userId, userId),
-        eq(chat.organizationId, organizationId),
-      ];
+      // Include both user's personal chats AND embedded chats (userId = null) for the organization
+      const whereConditions = [eq(chat.organizationId, organizationId)];
 
       if (timeFilter) whereConditions.push(timeFilter);
 
@@ -77,11 +74,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
           .select()
           .from(chat)
           .where(
-            and(
-              eq(chat.id, cursor),
-              eq(chat.organizationId, organizationId),
-              eq(chat.userId, userId),
-            ),
+            and(eq(chat.id, cursor), eq(chat.organizationId, organizationId)),
           )
           .limit(1);
 

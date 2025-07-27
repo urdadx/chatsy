@@ -4,31 +4,31 @@ import { Button } from "../../ui/button";
 
 export const CompletedStatus = () => {
   return (
-    <>
-      <div className="flex flex-col space-y-5">
-        <p className="text-md font-semibold">Training status</p>
+    <div className="flex flex-col gap-4">
+      <p className="text-lg font-semibold text-gray-800">Training Status</p>
 
-        <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-          <div className="flex items-center gap-2 text-green-700">
-            <RiCheckboxCircleFill className="h-5 w-5 text-green-600 flex-shrink-0" />
-            <p className="text-md">Your chatbot is ready!</p>
+      <div className="p-4 bg-green-50 border border-green-200 rounded-xl shadow-xs">
+        <div className="flex items-start gap-3">
+          <RiCheckboxCircleFill className="h-6 w-6 text-green-600 mt-0.5" />
+          <div>
+            <p className="text-base font-medium text-green-700">
+              Your chatbot is ready!
+            </p>
+            <p className="text-sm text-green-600 mt-1 leading-relaxed max-w-2xl">
+              All the data you provided has been processed, and your chatbot is
+              now ready to answer questions. You can test it in the playground
+              or add more training data to improve performance.
+            </p>
+            <Button
+              variant="outline"
+              className="mt-2 border-green-500 text-green-700 hover:text-green-800 hover:border-green-600"
+            >
+              <Hammer className="w-4 h-4 " />
+              Test in Playground
+            </Button>
           </div>
-          <p className="text-sm text-green-600 max-w-3xl leading-relaxed mt-2 ml-7">
-            All the data provided have been processed and your chatbot is ready
-            to answer questions. You can add more data for training or test the
-            bot in playground
-          </p>
-          <Button
-            className="ml-7 text-green-600 mt-2 border border-green-400"
-            variant="outline"
-          >
-            <Hammer className="text-green-600 hover:text-green-600" />
-            <span className="text-green-600 hover:text-green-500">
-              Test in playground
-            </span>
-          </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 };

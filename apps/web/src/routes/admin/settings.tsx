@@ -1,12 +1,12 @@
 import { Billing } from "@/components/settings/billing-page";
-import { WorkspaceDelete } from "@/components/settings/workspace-delete";
-import { WorkspaceLogoSettings } from "@/components/settings/workspace-logo-settings";
-import { WorkspaceNameSettings } from "@/components/settings/workspace-name-settings";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InvitationsTable } from "@/components/workspace/invitations-table";
 import { InviteMembers } from "@/components/workspace/invite-members";
 import { MembersTable } from "@/components/workspace/members-table";
+import { WorkspaceDelete } from "@/components/workspace/workspace-delete";
+import { WorkspaceLogoSettings } from "@/components/workspace/workspace-logo-settings";
+import { WorkspaceNameSettings } from "@/components/workspace/workspace-name-settings";
 import {
   createFileRoute,
   useNavigate,

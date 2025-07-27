@@ -1,185 +1,87 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
+import { useUpdatePrimaryColor } from "@/lib/hooks/use-primary-color";
+import { cn, containerVariants } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { ArrowRight, Palette } from "lucide-react";
-import { useEffect, useState } from "react";
-import { HexColorPicker } from "react-colorful";
+import { ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { useStepperStore } from "../store/stepper-store";
 import { Button } from "../ui/button";
-import { Label } from "../ui/label";
+import { ColorPickerDialog } from "./pick-color-onboard";
 
-export const PickColor = () => {
-  const { data: chatbot, isLoading: isChatbotLoading } = useChatbot();
-  const updateChatbotMutation = useUpdateChatbot();
+export const PickColorOnboarding = () => {
+  const [selectedColor, setSelectedColor] = useState<string | null>("#8b5cf6");
+  const updatePrimaryColorMutation = useUpdatePrimaryColor();
 
-  const [selectedColor, setSelectedColor] = useState(
-    chatbot?.primaryColor || "#9333ea",
-  );
+  const colors = [
+    "#8b5cf6",
+    "#6366f1",
+    "#3b82f6",
+    "#10b981",
+    "#f97316",
+    "#ec4899",
+  ];
 
-  useEffect(() => {
-    if (chatbot?.primaryColor) {
-      setSelectedColor(chatbot.primaryColor);
-    }
-  }, [chatbot]);
+  const { nextStep, previousStep } = useStepperStore();
 
-  const [tempColor, setTempColor] = useState(selectedColor);
-  const [hexInput, setHexInput] = useState(selectedColor);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const isValidHex = (hex: string) => {
-    return /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(hex);
+  const handleColorSelect = async (color: string) => {
+    setSelectedColor(color);
   };
 
-  const normalizeHex = (hex: string) => {
-    let normalized = hex.startsWith("#") ? hex : `#${hex}`;
-    if (normalized.length === 4) {
-      normalized = `#${normalized[1]}${normalized[1]}${normalized[2]}${normalized[2]}${normalized[3]}${normalized[3]}`;
-    }
-    return normalized.toUpperCase();
+  const handleContinue = async (color: string) => {
+    await updatePrimaryColorMutation.mutateAsync(color);
+    nextStep();
   };
-
-  const handleColorChange = (newColor: string) => {
-    setTempColor(newColor);
-    setHexInput(newColor);
-  };
-
-  const handleHexInputChange = (value: string) => {
-    setHexInput(value);
-    if (isValidHex(value)) {
-      const normalized = normalizeHex(value);
-      setTempColor(normalized);
-    }
-  };
-
-  const handleConfirmColor = async () => {
-    if (!isValidHex(hexInput) || !chatbot) return;
-
-    try {
-      const normalizedColor = normalizeHex(hexInput);
-
-      const updatedChatbot = {
-        ...chatbot,
-        primaryColor: normalizedColor,
-      };
-
-      await updateChatbotMutation.mutateAsync(updatedChatbot);
-
-      setSelectedColor(normalizedColor);
-      setIsOpen(false);
-    } catch (error) {
-      console.error("Error updating color:", error);
-    }
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    if (open) {
-      setTempColor(selectedColor);
-      setHexInput(selectedColor);
-    }
-  };
-
-  // Show loading state while chatbot is loading
-  if (isChatbotLoading) {
-    return (
-      <div className="flex items-center gap-2">
-        <div className="w-16 h-4 bg-muted animate-pulse rounded" />
-        <div className="w-8 h-8 bg-muted animate-pulse rounded-full" />
-      </div>
-    );
-  }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-mono">{selectedColor}</span>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            style={{
-              backgroundColor: selectedColor,
-            }}
-            className="w-8 h-8 rounded-full cursor-pointer border-2 border-white shadow-md hover:shadow-lg transition-shadow"
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="flex flex-col h-full"
+    >
+      <div className="flex flex-col gap-6 pt-6 flex-1 min-h-[350px]">
+        <div className="flex flex-col">
+          <h1 className="text-2xl text-start font-semibold">Chatbot</h1>
+          <p className="text-start text-muted-foreground">
+            Customize your bot to your brand
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {colors.map((color, index) => (
+            <button
+              type="button"
+              key={index}
+              className={cn(
+                "w-8 h-8 rounded-full transition-all duration-200",
+                selectedColor === color && "ring-2 ring-offset-2",
+                updatePrimaryColorMutation.isPending &&
+                  "opacity-50 cursor-not-allowed",
+              )}
+              style={{
+                backgroundColor: color,
+              }}
+              onClick={() => handleColorSelect(color)}
+              disabled={updatePrimaryColorMutation.isPending}
+            />
+          ))}
+          <ColorPickerDialog
+            onColorSelect={handleColorSelect}
+            isUpdating={updatePrimaryColorMutation.isPending}
           />
         </div>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex text-md items-center gap-2">
-            <Palette className="w-5 h-5 text-purple-600" />
-            Pick a color
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          <div className="flex justify-center">
-            <div className="relative">
-              <HexColorPicker
-                color={tempColor}
-                onChange={handleColorChange}
-                style={{ width: "200px", height: "200px" }}
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="hex-input"
-              className="text-sm font-medium text-gray-700"
-            >
-              Or type the color code here👇
-            </Label>
-            <div className="flex gap-2">
-              <Input
-                id="hex-input"
-                value={hexInput}
-                onChange={(e) => handleHexInputChange(e.target.value)}
-                placeholder="#6366f1"
-                className="font-mono"
-                disabled={updateChatbotMutation.isPending}
-              />
-              <div
-                className="w-10 h-10 rounded-full border-2 border-gray-200 flex-shrink-0"
-                style={{ backgroundColor: tempColor }}
-              />
-            </div>
-            {hexInput && !isValidHex(hexInput) && (
-              <p className="text-xs text-red-500">
-                Please enter a valid color code (e.g., #6366f1 or 6366f1)
-              </p>
-            )}
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                className="w-full"
-                onClick={handleConfirmColor}
-                disabled={
-                  !isValidHex(hexInput) ||
-                  updateChatbotMutation.isPending ||
-                  !chatbot
-                }
-              >
-                {updateChatbotMutation.isPending ? (
-                  <>
-                    <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-r-transparent" />
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    Submit
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </>
-                )}
-              </Button>
-            </motion.div>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+      <div className="flex gap-2">
+        <Button variant="outline" type="button" onClick={previousStep}>
+          Previous
+        </Button>
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            onClick={() => handleContinue(selectedColor || "#8b5cf6")}
+            disabled={updatePrimaryColorMutation.isPending}
+          >
+            Continue <ArrowRight className="h-4 w-4" />
+          </Button>
+        </motion.div>
+      </div>
+    </motion.div>
   );
 };

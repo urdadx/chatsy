@@ -1,0 +1,1 @@
+ALTER TABLE "website_source" ADD COLUMN "crawl_job_id" text;

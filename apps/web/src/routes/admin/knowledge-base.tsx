@@ -1,9 +1,9 @@
-import { DocumentSource } from "@/components/documents-source";
+import { DocumentSource } from "@/components/knowledge-base/document-source/documents-source";
+import { QuestionSource } from "@/components/knowledge-base/question-source/questions-source";
+import { TextSource } from "@/components/knowledge-base/text-source/text-source";
 import { TrainAgent } from "@/components/knowledge-base/train-agent";
-import { QuestionSource } from "@/components/questions-source";
-import { TextSource } from "@/components/text-source";
+import { WebsiteSource } from "@/components/knowledge-base/website-source/website-source";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WebsiteSource } from "@/components/website-source";
 import {
   createFileRoute,
   useNavigate,

@@ -13,6 +13,7 @@ interface ChatLogItemProps {
   description: string;
   onClick?: () => void;
   isSelected?: boolean;
+  userId?: string | null;
 }
 
 export const ChatLogItem = ({
@@ -69,6 +70,7 @@ export const ChatLogItem = ({
               <TooltipContent>This is a chat you created</TooltipContent>
             </Tooltip>
           )}
+
           <Button
             size="icon"
             onClick={handleDelete}

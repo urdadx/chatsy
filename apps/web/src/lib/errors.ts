@@ -10,7 +10,6 @@ export type Surface =
   | "chat"
   | "auth"
   | "api"
-  | "stream"
   | "database"
   | "history"
   | "vote"
@@ -25,7 +24,6 @@ export const visibilityBySurface: Record<Surface, ErrorVisibility> = {
   database: "log",
   chat: "response",
   auth: "response",
-  stream: "response",
   api: "response",
   history: "response",
   vote: "response",

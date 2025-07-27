@@ -1,7 +1,6 @@
 import type { InferSelectModel } from "drizzle-orm";
 import {
   boolean,
-  foreignKey,
   integer,
   json,
   jsonb,
@@ -125,9 +124,7 @@ export const chat = pgTable("Chat", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   title: text("title").notNull(),
-  userId: uuid("userId")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+  userId: uuid("userId").references(() => user.id, { onDelete: "cascade" }), // Allow null for anonymous embedded chats
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
@@ -168,21 +165,6 @@ export const vote = pgTable(
 );
 export type DBMessage = InferSelectModel<typeof message>;
 
-export const stream = pgTable(
-  "Stream",
-  {
-    id: uuid("id").notNull().defaultRandom(),
-    chatId: uuid("chatId").notNull(),
-    createdAt: timestamp("createdAt").notNull().defaultNow(), // Added defaultNow()
-  },
-  (table) => [
-    primaryKey({ columns: [table.id] }),
-    foreignKey({
-      columns: [table.chatId],
-      foreignColumns: [chat.id],
-    }),
-  ],
-);
 export type Vote = InferSelectModel<typeof vote>;
 
 export const question = pgTable("question", {
@@ -203,8 +185,6 @@ export const question = pgTable("question", {
     .$defaultFn(() => new Date()),
 });
 
-export type Stream = InferSelectModel<typeof stream>;
-
 export const chatbot = pgTable("chatbot", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   organizationId: text("organization_id")
@@ -220,6 +200,12 @@ export const chatbot = pgTable("chatbot", {
     .notNull()
     .default("Hello there👋, how can i help you today?"),
   suggestedMessages: text("suggested_messages").array(),
+
+  // Embedding configuration
+  isEmbeddingEnabled: boolean("is_embedding_enabled").notNull().default(true),
+  embedToken: text("embed_token").unique(), // Public token for accessing this bot
+  allowedDomains: text("allowed_domains").array(), // Domains allowed to embed this widget
+
   createdAt: timestamp("created_at")
     .notNull()
     .$defaultFn(() => new Date()),
@@ -241,6 +227,9 @@ export const lead = pgTable("lead", {
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
+  phone: text("phone"),
+  company: text("company"),
+  message: text("message"),
   email: text("email").notNull(),
   location: text("location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -314,6 +303,9 @@ export const websiteSource = pgTable("website_source", {
   markdown: text("markdown").notNull(),
   metadata: json("metadata"),
   type: varchar("type", { enum: ["scrape", "crawl"] }).notNull(),
+  urlsCrawled: integer("urls_crawled").notNull().default(1),
+  creditsUsed: integer("credits_used").notNull().default(1),
+  crawlJobId: text("crawl_job_id"), // Optional field to track crawl jobs
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -76,7 +76,7 @@ import {
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-import { type Lead } from "@/db/schema";
+import type { Lead } from "@/db/schema";
 import { useQuery } from "@tanstack/react-query";
 
 type Item = {
@@ -287,12 +287,7 @@ export function LeadsTable() {
           )}
           {/* Add leads button */}
           <div className="flex items-center gap-3">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button className="ml-auto">
-                <PlusIcon size={16} aria-hidden="true" />
-                Add Leads
-              </Button>
-            </motion.div>
+            <AddLeadForm />
             <Button variant="outline">Export CSV</Button>
           </div>
         </div>

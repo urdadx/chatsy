@@ -21,7 +21,7 @@ import type * as React from "react";
 import { NavMain } from "./nav-main";
 import { Navbar } from "./navbar";
 import { UsageBanner } from "./usage-banner";
-import { WorkspaceSwitcher } from "./workspace-switcher";
+import { WorkspaceSwitcher } from "./workspace/workspace-switcher";
 
 const data = {
   navMain: [

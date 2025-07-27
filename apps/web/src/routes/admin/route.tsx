@@ -6,8 +6,13 @@ export const Route = createFileRoute("/admin")({
   component: RouteComponent,
   beforeLoad: async ({ location }) => {
     const session = await getSession();
+
     if (!session) {
       throw redirect({ to: "/login", search: location.search });
+    }
+    // maybe they haven't created an organization after signing up
+    if (!session.session.activeOrganizationId) {
+      throw redirect({ to: "/onboarding", search: location.search });
     }
   },
 });

@@ -1,5 +1,6 @@
 import { formatBytes } from "@/hooks/use-file-upload";
 import { api } from "@/lib/api";
+import { useSession } from "@/lib/auth-client";
 import { RiQuestionFill } from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileText, Globe, Hammer, InfoIcon, Paperclip } from "lucide-react";
@@ -11,6 +12,8 @@ import { Button } from "../ui/button";
 export const TrainAgent = () => {
   const queryClient = useQueryClient();
   const [lastTrainedAt, setLastTrainedAt] = useState<Date | null>(null);
+  const { data: session } = useSession();
+  const organizationId = session?.session?.activeOrganizationId;
 
   useEffect(() => {
     const storedTimestamp = localStorage.getItem("lastTrainedAt");
@@ -20,36 +23,42 @@ export const TrainAgent = () => {
   }, []);
 
   const { data: documentSources } = useQuery({
-    queryKey: ["document-sources"],
+    queryKey: ["document-sources", organizationId],
     queryFn: async () => {
       const response = await api.get("/document-source");
       return response.data;
     },
+    enabled: !!organizationId,
   });
 
   const { data: questionSources } = useQuery({
-    queryKey: ["questions"],
+    queryKey: ["questions", organizationId],
     queryFn: async () => {
       const response = await api.get("/questions");
       return response.data;
     },
+    enabled: !!organizationId,
   });
 
   const { data: textSources } = useQuery({
-    queryKey: ["text-sources"],
+    queryKey: ["text-sources", organizationId],
     queryFn: async () => {
       const response = await api.get("/text-sources");
       return response.data;
     },
+    enabled: !!organizationId,
   });
 
-  const { data: websiteSources } = useQuery({
-    queryKey: ["website-sources"],
+  const { data: websiteSourcesData } = useQuery({
+    queryKey: ["website-sources", organizationId],
     queryFn: async () => {
-      const response = await api.get("/website-sources");
+      const response = await api.get("/scrape");
       return response.data;
     },
+    enabled: !!organizationId,
   });
+
+  const websiteSources = websiteSourcesData?.data || [];
 
   const isStale = useMemo(() => {
     if (!lastTrainedAt) {
@@ -120,7 +129,8 @@ export const TrainAgent = () => {
   const totalWebsiteSize = useMemo(() => {
     if (!websiteSources) return 0;
     return websiteSources.reduce(
-      (acc: any, source: any) => acc + source.size,
+      (acc: any, source: any) =>
+        acc + (source.markdown ? source.markdown.length : 0),
       0,
     );
   }, [websiteSources]);
@@ -198,6 +208,9 @@ function FileStatCard({
   label: string;
   size: string;
 }) {
+  const formattedSize =
+    typeof size === "string" ? size.replace(/(\d)([A-Za-z])/, "$1 $2") : size;
+
   return (
     <div className="w-full border bg-white rounded-lg ">
       <div className="p-4 flex justify-between items-center">
@@ -205,7 +218,7 @@ function FileStatCard({
           {icon}
           <h2 className="text-sm font-normal">{label}</h2>
         </div>
-        <h2 className="text-sm font-semibold">{size}</h2>
+        <h2 className="text-sm font-semibold">{formattedSize}</h2>
       </div>
     </div>
   );

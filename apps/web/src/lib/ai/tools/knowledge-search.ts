@@ -1,4 +1,4 @@
-import { searchKnowledge } from "@/lib/search";
+import { searchKnowledge } from "@/lib/ai/search";
 import { tool } from "ai";
 import z from "zod";
 

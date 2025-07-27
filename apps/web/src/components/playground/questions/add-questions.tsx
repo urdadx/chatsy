@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import { api } from "@/lib/api";
 import { motion } from "framer-motion";
-import { CirclePlus, InfoIcon } from "lucide-react";
+import { InfoIcon } from "lucide-react";
 
 export const AddQuestions = () => {
   const [isOpen, setIsOpen] = useState(false);

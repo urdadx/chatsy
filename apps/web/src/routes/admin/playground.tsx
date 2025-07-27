@@ -1,4 +1,4 @@
-import { ChatPreview } from "@/components/chat-preview";
+import { ChatPreview } from "@/components/chat/chat-preview";
 import { ChatbotSettings } from "@/components/chatbot-settings/chatbot-settings";
 import { createFileRoute } from "@tanstack/react-router";
 

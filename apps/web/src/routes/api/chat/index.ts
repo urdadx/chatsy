@@ -172,12 +172,9 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
     try {
       const chat = await getChatById({ id });
 
-      // Check if chat exists and belongs to the user AND the organization
-      if (
-        !chat ||
-        chat.userId !== session.user.id ||
-        chat.organizationId !== organizationId
-      ) {
+      // Check if chat exists and belongs to the organization
+      // Allow organization members to delete any chat in their organization
+      if (!chat || chat.organizationId !== organizationId) {
         return new Response("Forbidden", { status: 403 });
       }
 

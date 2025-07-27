@@ -12,4 +12,7 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart(),
   ],
+  server: {
+    allowedHosts: ["ec17fb630313.ngrok-free.app"],
+  },
 });

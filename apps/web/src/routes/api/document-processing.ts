@@ -3,9 +3,9 @@ import { documentSource, knowledge } from "@/db/schema";
 import {
   chunkDocument,
   extractTextFromDocument,
-} from "@/lib/document-chunking";
+} from "@/lib/ai/document-chunking";
 
-import { generateAnswerEmbedding } from "@/lib/embeddings";
+import { generateAnswerEmbedding } from "@/lib/ai/embeddings";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";

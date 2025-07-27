@@ -4,12 +4,12 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/onboarding/")({
   component: RouteComponent,
-  // beforeLoad: async ({ location }) => {
-  //   const session = await getSession();
-  //   if (!session) {
-  //     throw redirect({ to: "/register", search: location.search });
-  //   }
-  // },
+  beforeLoad: async ({ location }) => {
+    const session = await getSession();
+    if (!session) {
+      throw redirect({ to: "/register", search: location.search });
+    }
+  },
 });
 
 function RouteComponent() {

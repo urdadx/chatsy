@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { stream, chat, message, user, vote } from "@/db/schema";
+import { chat, message, user, vote } from "@/db/schema";
 import type { Chat, DBMessage } from "@/db/schema";
 import {
   type SQL,
@@ -75,7 +75,6 @@ export const deleteChatById = async ({ id }: { id: string }) => {
   try {
     await db.delete(vote).where(eq(vote.chatId, id));
     await db.delete(message).where(eq(message.chatId, id));
-    await db.delete(stream).where(eq(stream.chatId, id));
 
     const [chatsDeleted] = await db
       .delete(chat)
@@ -216,7 +215,7 @@ export async function voteMessage({
     const [existingVote] = await db
       .select()
       .from(vote)
-      .where(and(eq(vote.messageId, messageId)));
+      .where(and(eq(vote.messageId, messageId), eq(vote.chatId, chatId)));
 
     if (existingVote) {
       return await db
@@ -246,18 +245,24 @@ export async function getVotesByChatId({ id }: { id: string }) {
   }
 }
 
-export async function getTotalVotes({ organizationId }: { organizationId: string }) {
+export async function getTotalVotes({
+  organizationId,
+}: { organizationId: string }) {
   try {
     const upvotes = await db
       .select({ count: count(vote.messageId) })
       .from(vote)
       .innerJoin(chat, eq(vote.chatId, chat.id))
-      .where(and(eq(vote.isUpvoted, true), eq(chat.organizationId, organizationId)));
+      .where(
+        and(eq(vote.isUpvoted, true), eq(chat.organizationId, organizationId)),
+      );
     const downvotes = await db
       .select({ count: count(vote.messageId) })
       .from(vote)
       .innerJoin(chat, eq(vote.chatId, chat.id))
-      .where(and(eq(vote.isUpvoted, false), eq(chat.organizationId, organizationId)));
+      .where(
+        and(eq(vote.isUpvoted, false), eq(chat.organizationId, organizationId)),
+      );
     return { upvotes: upvotes[0].count, downvotes: downvotes[0].count };
   } catch (error) {
     throw new ChatSDKError("bad_request:database", "Failed to get total votes");

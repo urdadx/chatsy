@@ -12,5 +12,17 @@ export const collectFeedbackTool = tool({
     console.log(
       `Feedback received from ${email} with subject "${subject}": ${message}`,
     );
+
+    // Return a result to indicate successful feedback collection
+    return {
+      success: true,
+      message: "Feedback collected successfully",
+      feedback: {
+        email,
+        subject: subject || "No subject",
+        message,
+        timestamp: new Date().toISOString(),
+      },
+    };
   },
 });

@@ -1,5 +1,3 @@
-import { db } from "@/db";
-import { websiteSource } from "@/db/schema";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -37,46 +35,45 @@ export const ServerRoute = createServerFileRoute("/api/crawl").methods({
     }
 
     const { url } = parsed.data;
-
     try {
       const client = new FirecrawlApp({
         apiKey: process.env.FIRECRAWL_API_KEY,
       });
       const fullUrl = url.startsWith("http") ? url : `https://${url}`;
-      const response = (await client.crawlUrl(fullUrl, {
+
+      // Get the webhook URL - use WEBHOOK_BASE_URL if set (for ngrok), otherwise construct from request
+      const requestUrl = new URL(request.url);
+      const baseUrl =
+        process.env.WEBHOOK_BASE_URL ||
+        `${requestUrl.protocol}//${requestUrl.host}`;
+      const webhookUrl = `${baseUrl}/api/firecrawl-webhook`;
+
+      console.log("Using webhook URL:", webhookUrl);
+
+      const response = (await client.asyncCrawlUrl(fullUrl, {
         limit: 100,
         scrapeOptions: {
           formats: ["markdown"],
         },
+        webhook: {
+          url: webhookUrl,
+          metadata: {
+            userId,
+            organizationId,
+            originalUrl: fullUrl,
+          },
+        },
       })) as any;
 
-      const scrapedData = response.data;
-      console.log("Scraped Data:", scrapedData);
+      console.log("Async crawl response:", response);
 
-      if (scrapedData.length === 0) {
-        const insertedSources = [];
-        for (const item of scrapedData) {
-          const { markdown, metadata } = item;
-          if (markdown) {
-            const [inserted] = await db
-              .insert(websiteSource)
-              .values({
-                userId,
-                organizationId,
-                url: fullUrl,
-                markdown,
-                metadata,
-                type: "crawl",
-              })
-              .returning();
-            insertedSources.push(inserted);
-          }
-        }
-        return json({ success: true, data: insertedSources });
-      }
+      // Return the job ID for tracking
       return json({
-        success: false,
-        error: "Failed to extract content.",
+        success: true,
+        jobId: response.id,
+        message:
+          "Crawl started. You will see pages appear as they are processed.",
+        url: fullUrl,
       });
     } catch (error) {
       console.error("Crawling error:", error);

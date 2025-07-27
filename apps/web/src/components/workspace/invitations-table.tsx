@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -19,6 +20,21 @@ export function InvitationsTable() {
     queryKey: ["invitations"],
     queryFn: () => authClient.organization.listInvitations(),
   });
+
+  const getStatusBadgeClassName = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "accepted":
+        return "bg-green-100 text-green-800 border-green-300";
+      case "canceled":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "expired":
+        return "bg-red-100 text-red-800 border-red-300";
+      default:
+        return "";
+    }
+  };
 
   if (isLoading) {
     return (
@@ -71,7 +87,14 @@ export function InvitationsTable() {
                 </div>
               </TableCell>
               <TableCell>{invitation.role}</TableCell>
-              <TableCell>{invitation.status}</TableCell>
+              <TableCell>
+                <Badge
+                  variant="outline"
+                  className={getStatusBadgeClassName(invitation.status)}
+                >
+                  {invitation.status}
+                </Badge>
+              </TableCell>
               <TableCell>
                 <InvitationActions invitation={invitation} />
               </TableCell>

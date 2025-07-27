@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { chat, message } from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import { asc, eq } from "drizzle-orm";
+
 export const getChatById = createServerFn({ method: "GET" })
   .validator((data: string) => data)
   .handler(async (ctx) => {
@@ -19,6 +20,7 @@ export const getChatById = createServerFn({ method: "GET" })
       throw new Error("Failed to get chat by ID");
     }
   });
+
 export const getMessagesByChatId = createServerFn({ method: "GET" })
   .validator((data: string) => data)
   .handler(async (ctx) => {

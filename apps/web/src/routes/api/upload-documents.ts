@@ -1,4 +1,4 @@
-import { uploadFileToStorage } from "@/lib/upload-to-storage";
+import { uploadFileToStorage } from "@/lib/hooks/upload-to-storage";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 

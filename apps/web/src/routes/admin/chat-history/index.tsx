@@ -182,6 +182,7 @@ function RouteComponent() {
                     key={chat.id}
                     id={chat.id}
                     type={chat.visibility}
+                    userId={chat.userId}
                     onClick={() => handleChatIdChange(chat.id)}
                     title={chat.title || "Untitled Chat"}
                     isSelected={chatId === chat.id}
