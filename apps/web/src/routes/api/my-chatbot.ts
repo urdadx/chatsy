@@ -7,30 +7,11 @@ import { and, eq } from "drizzle-orm";
 
 export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
   GET: async ({ request }) => {
-    const session = await auth.api.getSession({ headers: request.headers });
-    if (!session?.user?.id) {
-      return new Response("Unauthorized", { status: 401 });
-    }
+    const url = new URL(request.url);
+    const organizationId = url.searchParams.get("organizationId");
 
-    // Get user's active organization from session
-    const organizationId = session?.session?.activeOrganizationId;
     if (!organizationId) {
-      return new Response("No active organization", { status: 400 });
-    }
-
-    // Verify user is a member of the organization
-    const [membership] = await db
-      .select()
-      .from(member)
-      .where(
-        and(
-          eq(member.userId, session.user.id),
-          eq(member.organizationId, organizationId),
-        ),
-      );
-
-    if (!membership) {
-      return new Response("Forbidden", { status: 403 });
+      return new Response("Organization ID is required", { status: 400 });
     }
 
     const [userChatbot] = await db

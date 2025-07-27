@@ -1,6 +1,6 @@
 import { useSession } from "@/lib/auth-client";
 import { useLocation } from "@tanstack/react-router";
-import { ShareBot } from "./share-bot";
+import { ShareBot } from "./share-bot/share-bot";
 import { SidebarTrigger } from "./ui/sidebar";
 import { UserDropdown } from "./user-dropdown";
 

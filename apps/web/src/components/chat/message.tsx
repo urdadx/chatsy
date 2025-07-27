@@ -20,14 +20,18 @@ const PurePreviewMessage = ({
   message,
   isLoading,
   vote,
+  chatbot,
 }: {
   chatId: string;
   message: UIMessage;
   vote: Vote | undefined;
   isLoading: boolean;
   setMessages: UseChatHelpers["setMessages"];
+  chatbot?: any;
 }) => {
-  const { data: chatbot } = useChatbot();
+  // Fallback to useChatbot hook if chatbot is not provided (for non-embedded contexts)
+  const { data: fallbackChatbot } = useChatbot();
+  const activeChatbot = chatbot || fallbackChatbot;
 
   return (
     <AnimatePresence>
@@ -45,7 +49,10 @@ const PurePreviewMessage = ({
         >
           {message.role === "assistant" && (
             <Avatar className="size-8 shrink-0">
-              <AvatarImage src={chatbot?.image || undefined} alt="Assistant" />
+              <AvatarImage
+                src={activeChatbot?.image || undefined}
+                alt="Assistant"
+              />
               <AvatarFallback>
                 <SparklesIcon size={14} />
               </AvatarFallback>
@@ -66,7 +73,7 @@ const PurePreviewMessage = ({
                       style={{
                         backgroundColor:
                           message.role === "user"
-                            ? chatbot?.primaryColor
+                            ? activeChatbot?.primaryColor
                             : undefined,
                       }}
                       data-testid="message-content"
@@ -130,6 +137,7 @@ export const PreviewMessage = memo(
     if (prevProps.isLoading !== nextProps.isLoading) return false;
     if (prevProps.message.id !== nextProps.message.id) return false;
     if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
+    if (!equal(prevProps.chatbot, nextProps.chatbot)) return false;
 
     return true;
   },

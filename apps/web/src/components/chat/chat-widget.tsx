@@ -3,16 +3,16 @@ import { Card, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { Vote } from "@/db/schema";
 import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
+import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowUp,
   ChevronDown,
   MessageCircle,
-  Minimize2,
   RefreshCcw,
   SparklesIcon,
   X,
@@ -32,32 +32,17 @@ import { convertToUIMessages } from "./chat-preview";
 import { GreetingMessage } from "./greeting-message";
 import { PreviewMessage, ThinkingMessage } from "./message";
 
-interface EmbeddedChatWidgetProps {
+interface ChatWidgetProps {
   embedToken: string;
   isOpen?: boolean;
   onToggle?: (isOpen: boolean) => void;
 }
 
-// Custom chatbot fetcher for embedded widgets
-const fetchEmbeddedChatbot = async (embedToken: string) => {
-  const response = await fetch(`/api/embed/chatbot/${embedToken}`, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch chatbot: ${response.status}`);
-  }
-
-  return response.json();
-};
-
-export function EmbeddedChatWidget({
+export function ChatWidget({
   embedToken,
   isOpen = false,
   onToggle,
-}: EmbeddedChatWidgetProps) {
+}: ChatWidgetProps) {
   const [isWidgetOpen, setIsWidgetOpen] = useState(isOpen);
   const { chatId } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
@@ -66,15 +51,13 @@ export function EmbeddedChatWidget({
     ? convertToUIMessages(messagesFromDb)
     : [];
 
+  const queryClient = useQueryClient();
+
   const {
     data: chatbot,
     isLoading: isChatbotLoading,
     error: chatbotError,
-  } = useQuery({
-    queryKey: ["embedded-chatbot", embedToken],
-    queryFn: () => fetchEmbeddedChatbot(embedToken),
-    retry: 1,
-  });
+  } = useChatWidget(embedToken);
 
   const { messages, setMessages, status, handleSubmit, input, setInput } =
     useChat({
@@ -87,6 +70,9 @@ export function EmbeddedChatWidget({
         }
       },
       api: `/api/embed/chat/${embedToken}`,
+      onFinish: () => {
+        queryClient.invalidateQueries({ queryKey: ["messages"] });
+      },
     });
 
   const inputLength = input.trim().length;
@@ -144,7 +130,7 @@ export function EmbeddedChatWidget({
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className=" fixed bottom-4 z-1 right-4">
       {/* Chat Widget */}
       {isWidgetOpen && (
         <div className="mb-4">
@@ -187,21 +173,7 @@ export function EmbeddedChatWidget({
                     Reset chat
                   </TooltipContent>
                 </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={handleToggleWidget}
-                    >
-                      <Minimize2 className="h-4 w-4" />
-                      <span className="sr-only">Minimize chat</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-white text-primary" side="top">
-                    Minimize
-                  </TooltipContent>
-                </Tooltip>
+
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -259,6 +231,7 @@ export function EmbeddedChatWidget({
                                 : undefined
                             }
                             setMessages={setMessages}
+                            chatbot={chatbot}
                           />
                         </div>
                       ))}

@@ -7,10 +7,10 @@ export const collectLeadsTool = tool({
   parameters: z.object({
     name: z.string().describe("The name of the lead"),
     email: z.string().describe("The email of the lead"),
-    phone: z.string().optional().describe("The phone number of the lead"),
-    company: z.string().optional().describe("The company of the lead"),
-    message: z.string().optional().describe("Any message from the lead"),
-    location: z.string().optional().describe("The location of the lead"),
+    phone: z.string().nullable().describe("The phone number of the lead"),
+    company: z.string().nullable().describe("The company of the lead"),
+    message: z.string().nullable().describe("Any message from the lead"),
+    location: z.string().nullable().describe("The location of the lead"),
   }),
   execute: async ({ name, email, phone, company, message, location }) => {
     try {

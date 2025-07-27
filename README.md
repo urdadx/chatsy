@@ -1,1 +1,1 @@
-# Padyna: AI companies for creators
+# Padyna: AI customer support bot for everyone

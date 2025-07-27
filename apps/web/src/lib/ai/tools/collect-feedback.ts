@@ -5,7 +5,7 @@ export const collectFeedbackTool = tool({
   description: "Collects feedback from users using a form.",
   parameters: z.object({
     email: z.string().describe("The email of the user giving feedback"),
-    subject: z.string().optional().describe("The subject of the feedback"),
+    subject: z.string().nullable().describe("The subject of the feedback"),
     message: z.string().describe("The feedback message from the user"),
   }),
   execute: async ({ email, subject, message }) => {

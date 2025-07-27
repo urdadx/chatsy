@@ -61,6 +61,7 @@ export function PureMessageActions({
       toast.success(
         variables.type === "up" ? "Upvoted Response!" : "Downvoted Response!",
       );
+      queryClient.invalidateQueries({ queryKey: ["votes", chatId] });
     },
     onError: (_, variables) => {
       toast.error(

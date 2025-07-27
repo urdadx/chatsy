@@ -59,6 +59,7 @@ export function ChatPreview() {
       },
       onFinish: () => {
         queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+        queryClient.invalidateQueries({ queryKey: ["messages"] });
       },
     });
 
@@ -138,7 +139,7 @@ export function ChatPreview() {
           </div>
         </div>
 
-        <div className="relative flex-1 h-[320px]">
+        <div className="relative flex-1 h-[350px]">
           <ChatContainerRoot className="h-full">
             <ChatContainerContent className="p-4">
               {isLoading ? (

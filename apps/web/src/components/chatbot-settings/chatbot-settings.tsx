@@ -9,15 +9,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
-import { InfoIcon, Plus, X } from "lucide-react";
+import { InfoIcon, Plus, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AvatarUpload } from "../avatar-upload";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
-import { EmbeddingSettings } from "./embedding-settings";
+
 import { PickColor } from "./pick-color";
+import { WidgetSettings } from "./widget-settings";
 
 export function ChatbotSettings() {
   const { data: chatbot, error, refetch } = useChatbot();
@@ -108,7 +109,7 @@ export function ChatbotSettings() {
           </div>
           <div className="text-center space-y-2">
             <h3 className="text-lg font-semibold text-gray-700">
-              Unable to load branding settings
+              Unable to load chatbot settings
             </h3>
           </div>
           <Button variant="outline" onClick={() => refetch()} className="mt-4">
@@ -225,7 +226,7 @@ export function ChatbotSettings() {
                     variant="ghost"
                     onClick={() => removeSuggestedMessage(index)}
                   >
-                    <X className="h-4 w-4 text-red-500" />
+                    <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
                 </div>
               ))}
@@ -243,10 +244,8 @@ export function ChatbotSettings() {
         </div>
 
         <Separator className="my-6" />
-
-        {/* Embedding Settings Section */}
-        <EmbeddingSettings />
-        <Separator className="my-3" />
+        <WidgetSettings />
+        <Separator className="my-6" />
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

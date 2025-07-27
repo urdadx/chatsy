@@ -16,7 +16,7 @@ import { Route as WebsiteSourcesRouteImport } from './routes/website-sources'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
-import { Route as EmbedEmbedTokenRouteImport } from './routes/embed/$embedToken'
+import { Route as EmbedWidgetIdRouteImport } from './routes/embed/$widgetId'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminPlaygroundRouteImport } from './routes/admin/playground'
 import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
@@ -83,9 +83,9 @@ const AdminTestLazyRoute = AdminTestLazyRouteImport.update({
   path: '/test',
   getParentRoute: () => AdminRouteRoute,
 } as any).lazy(() => import('./routes/admin/test.lazy').then((d) => d.Route))
-const EmbedEmbedTokenRoute = EmbedEmbedTokenRouteImport.update({
-  id: '/embed/$embedToken',
-  path: '/embed/$embedToken',
+const EmbedWidgetIdRoute = EmbedWidgetIdRouteImport.update({
+  id: '/embed/$widgetId',
+  path: '/embed/$widgetId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -294,7 +294,7 @@ export interface FileRoutesByFullPath {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/embed/$embedToken': typeof EmbedEmbedTokenRoute
+  '/embed/$widgetId': typeof EmbedWidgetIdRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
@@ -312,7 +312,7 @@ export interface FileRoutesByTo {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/embed/$embedToken': typeof EmbedEmbedTokenRoute
+  '/embed/$widgetId': typeof EmbedWidgetIdRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
@@ -331,7 +331,7 @@ export interface FileRoutesById {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/embed/$embedToken': typeof EmbedEmbedTokenRoute
+  '/embed/$widgetId': typeof EmbedWidgetIdRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
@@ -351,7 +351,7 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
-    | '/embed/$embedToken'
+    | '/embed/$widgetId'
     | '/admin/test'
     | '/onboarding'
     | '/admin/chat-history'
@@ -369,7 +369,7 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
-    | '/embed/$embedToken'
+    | '/embed/$widgetId'
     | '/admin/test'
     | '/onboarding'
     | '/admin/chat-history'
@@ -387,7 +387,7 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
-    | '/embed/$embedToken'
+    | '/embed/$widgetId'
     | '/admin/test'
     | '/onboarding/'
     | '/admin/chat-history/'
@@ -399,7 +399,7 @@ export interface RootRouteChildren {
   WebsiteSourcesRoute: typeof WebsiteSourcesRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
-  EmbedEmbedTokenRoute: typeof EmbedEmbedTokenRoute
+  EmbedWidgetIdRoute: typeof EmbedWidgetIdRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -647,11 +647,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTestLazyRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/embed/$embedToken': {
-      id: '/embed/$embedToken'
-      path: '/embed/$embedToken'
-      fullPath: '/embed/$embedToken'
-      preLoaderRoute: typeof EmbedEmbedTokenRouteImport
+    '/embed/$widgetId': {
+      id: '/embed/$widgetId'
+      path: '/embed/$widgetId'
+      fullPath: '/embed/$widgetId'
+      preLoaderRoute: typeof EmbedWidgetIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/settings': {
@@ -954,7 +954,7 @@ const rootRouteChildren: RootRouteChildren = {
   WebsiteSourcesRoute: WebsiteSourcesRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
-  EmbedEmbedTokenRoute: EmbedEmbedTokenRoute,
+  EmbedWidgetIdRoute: EmbedWidgetIdRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,15 +1,25 @@
 import type { Chatbot } from "@/db/schema";
 import { api } from "@/lib/api";
+import { useSession } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export function useChatbot() {
+  const { data: session } = useSession();
+  const organizationId = session?.session?.activeOrganizationId;
+
   return useQuery<Chatbot>({
-    queryKey: ["chatbot"],
+    queryKey: ["chatbot", organizationId],
     queryFn: async () => {
-      const response = await api.get("/my-chatbot");
+      if (!organizationId) {
+        throw new Error("No active organization");
+      }
+      const response = await api.get("/my-chatbot", {
+        params: { organizationId },
+      });
       return response.data;
     },
+    enabled: !!organizationId,
   });
 }
 

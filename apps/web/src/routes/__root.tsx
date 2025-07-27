@@ -61,11 +61,11 @@ function RootDocument() {
         <Toaster richColors theme="light" />
 
         <Scripts />
-        <ReactQueryDevtools
+        {/* <ReactQueryDevtools
           buttonPosition="bottom-left"
           position="left"
           initialIsOpen={false}
-        />
+        /> */}
       </body>
     </html>
   );

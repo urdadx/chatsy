@@ -6,7 +6,7 @@
     constructor(config) {
       this.config = {
         embedToken: config.embedToken,
-        baseUrl: config.baseUrl || window.location.origin,
+        baseUrl: "http://localhost:3001", // Default base URL, can be overridden
         containerId: config.containerId || "chatsy-widget",
         theme: config.theme || "light",
         position: config.position || "bottom-right",
@@ -104,9 +104,8 @@
 
     handleResize(data) {
       if (this.container) {
-        // biome-ignore lint/style/useTemplate: <explanation>
-        this.container.style.width = data.width + "px";
-        this.container.style.height = data.height + "px";
+        this.container.style.width = `${data.width}px`;
+        this.container.style.height = `${data.height}px`;
       }
     }
 
@@ -128,7 +127,7 @@
     }
 
     destroy() {
-      if (this.container && this.container.parentNode) {
+      if (this.container?.parentNode) {
         this.container.parentNode.removeChild(this.container);
       }
       this.isLoaded = false;

@@ -110,7 +110,7 @@ export function DocumentSource() {
 
             <div className="flex flex-col items-center justify-center text-center">
               <div
-                className="bg-background mb-2 flex size-16 shrink-0 items-center justify-center rounded-full border"
+                className="bg-white mb-2 flex size-16 shrink-0 items-center justify-center rounded-full border"
                 aria-hidden="true"
               >
                 <FileUpIcon className="size-6 opacity-60" />

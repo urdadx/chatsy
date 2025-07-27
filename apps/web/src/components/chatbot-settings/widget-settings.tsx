@@ -10,18 +10,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
-import {
-  Copy,
-  ExternalLink,
-  InfoIcon,
-  Plus,
-  RefreshCcw,
-  X,
-} from "lucide-react";
+import { InfoIcon, Plus, RefreshCcw, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export function EmbeddingSettings() {
+export function WidgetSettings() {
   const { data: chatbot, error, refetch } = useChatbot();
   const updateChatbotMutation = useUpdateChatbot();
 
@@ -84,38 +77,6 @@ export function EmbeddingSettings() {
     updateChatbot({ allowedDomains: updatedDomains });
   };
 
-  const copyEmbedCode = () => {
-    if (!embedToken) return;
-
-    const embedCode = `<!-- Chatsy Embedded Widget -->
-<div id="chatsy-widget"></div>
-<script>
-  (function() {
-    const script = document.createElement('script');
-    script.src = '${window.location.origin}/embed.js';
-    script.async = true;
-    script.onload = function() {
-      ChatsyWidget.init({
-        embedToken: '${embedToken}',
-        containerId: 'chatsy-widget'
-      });
-    };
-    document.head.appendChild(script);
-  })();
-</script>`;
-
-    navigator.clipboard.writeText(embedCode);
-    toast.success("Embed code copied to clipboard!");
-  };
-
-  const copyWidgetUrl = () => {
-    if (!embedToken) return;
-
-    const widgetUrl = `${window.location.origin}/embed/${embedToken}`;
-    navigator.clipboard.writeText(widgetUrl);
-    toast.success("Widget URL copied to clipboard!");
-  };
-
   if (error) {
     return (
       <div className="w-full mx-auto px-2 sm:px-0">
@@ -142,7 +103,7 @@ export function EmbeddingSettings() {
         {/* Enable Embedding */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Label htmlFor="enable-embedding">Enable Widget Embedding</Label>
+            <Label htmlFor="enable-embedding">Activate Widget </Label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -166,6 +127,62 @@ export function EmbeddingSettings() {
             {updateChatbotMutation.isPending && (
               <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-r-transparent" />
             )}
+          </div>
+        </div>
+
+        <Separator className="my-6" />
+
+        {/* Allowed Domains */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <Label>Allowed Domains</Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent className="bg-white shadow-sm">
+                  <p className="text-black">
+                    Domains where your widget can be embedded. Leave empty to
+                    allow all domains.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
+          <div className="space-y-2">
+            {allowedDomains.map((domain, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input className="flex-1" value={domain} readOnly />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeDomain(index)}
+                  disabled={updateChatbotMutation.isPending}
+                >
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+            ))}
+
+            <div className="flex items-center gap-2">
+              <Input
+                className="flex-1"
+                placeholder="example.com"
+                value={newDomain}
+                onChange={(e) => setNewDomain(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && addDomain()}
+              />
+              <Button
+                variant="outline"
+                onClick={addDomain}
+                disabled={!newDomain.trim() || updateChatbotMutation.isPending}
+              >
+                <Plus className="h-4 w-4" />
+                Add
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -207,102 +224,6 @@ export function EmbeddingSettings() {
                 </Button>
               </div>
             </div>
-
-            <Separator className="my-6" />
-
-            {/* Allowed Domains */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <Label>Allowed Domains</Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <InfoIcon className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent className="bg-white shadow-sm">
-                      <p className="text-black">
-                        Domains where your widget can be embedded. Leave empty
-                        to allow all domains.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-
-              <div className="space-y-2">
-                {allowedDomains.map((domain, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Input className="flex-1" value={domain} readOnly />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeDomain(index)}
-                      disabled={updateChatbotMutation.isPending}
-                    >
-                      <X className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </div>
-                ))}
-
-                <div className="flex items-center gap-2">
-                  <Input
-                    className="flex-1"
-                    placeholder="example.com"
-                    value={newDomain}
-                    onChange={(e) => setNewDomain(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && addDomain()}
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={addDomain}
-                    disabled={
-                      !newDomain.trim() || updateChatbotMutation.isPending
-                    }
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {embedToken && (
-              <>
-                <Separator className="my-6" />
-
-                {/* Integration Code */}
-                <div className="flex flex-col gap-3">
-                  <Label>Integration</Label>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={copyEmbedCode}
-                        className="flex items-center gap-2"
-                      >
-                        <Copy className="h-4 w-4" />
-                        Copy Embed Code
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={copyWidgetUrl}
-                        className="flex items-center gap-2"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        Copy Widget URL
-                      </Button>
-                    </div>
-
-                    <div className="text-sm text-muted-foreground">
-                      <p>
-                        Add the embed code to your website's HTML, or use the
-                        widget URL for iframe embedding.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
           </>
         )}
       </div>
