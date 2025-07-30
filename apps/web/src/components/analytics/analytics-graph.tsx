@@ -20,23 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useChatHistory } from "@/hooks/use-chat-history";
+import { getVisitorAnalytics } from "@/hooks/use-visitor-analytics";
 import NumberFlow from "@number-flow/react";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Checkbox } from "../ui/checkbox";
 
 export const description = "An interactive area chart";
-
-const chartData = [
-  { date: "2024-04-01", chats: 150 },
-  { date: "2024-04-02", chats: 180 },
-  { date: "2024-04-03", chats: 120 },
-  { date: "2024-04-04", chats: 260 },
-  { date: "2024-04-05", chats: 290 },
-  { date: "2024-04-06", chats: 340 },
-  { date: "2024-04-07", chats: 180 },
-  { date: "2024-04-08", chats: 320 },
-  { date: "2024-04-09", chats: 110 },
-  { date: "2024-04-10", chats: 190 },
-];
 
 const chartConfig = {
   visitors: {
@@ -50,28 +40,91 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ChatAnalytics() {
-  const [timeRange, setTimeRange] = React.useState("24h");
+  const navigate = useNavigate({ from: "/admin/analytics" });
+  const { timeRange } = useSearch({ from: "/admin/analytics" });
+  const selectedTimeRange =
+    (timeRange as "24h" | "7d" | "30d" | "90d") || "24h";
 
-  const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date);
-    const referenceDate = new Date("2024-06-30");
-    let daysToSubtract = 90;
-    if (timeRange === "30d") {
-      daysToSubtract = 30;
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7;
-    }
-    const startDate = new Date(referenceDate);
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return date >= startDate;
-  });
+  const handleTimeRangeChange = (value: string) => {
+    navigate({ search: { timeRange: value as "24h" | "7d" | "30d" | "90d" } });
+  };
+
+  const { data, isLoading } = useChatHistory(selectedTimeRange);
+
+  const { data: visitorData, isLoading: isLoadingVisitors } =
+    getVisitorAnalytics(selectedTimeRange);
+
+  // Flatten all pages of chats
+  const allChats = React.useMemo(() => {
+    if (!data) return [];
+    return data.pages.flatMap((page) => page.chats || []);
+  }, [data]);
+
+  // Aggregate chats per day for the chart
+  const chartData = React.useMemo(() => {
+    const map = new Map();
+    allChats.forEach((chat) => {
+      const date = new Date(chat.createdAt || chat.date)
+        .toISOString()
+        .slice(0, 10);
+      map.set(date, (map.get(date) || 0) + 1);
+    });
+    // Sort by date ascending
+    return Array.from(map.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, chats]) => ({ date, chats }));
+  }, [allChats]);
+
+  // Aggregate visits per day for the graph
+  const visitsChartData = React.useMemo(() => {
+    if (!Array.isArray(visitorData)) return [];
+    const map = new Map();
+    visitorData.forEach((visit) => {
+      const date = new Date(visit.createdAt || visit.date)
+        .toISOString()
+        .slice(0, 10);
+      map.set(date, (map.get(date) || 0) + 1);
+    });
+    return Array.from(map.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, visitors]) => ({ date, visitors }));
+  }, [visitorData]);
+
+  // Merge chats and visits data by date for the chart
+  const mergedChartData = React.useMemo(() => {
+    const map = new Map();
+    chartData.forEach((item) => {
+      map.set(item.date, { date: item.date, chats: item.chats, visitors: 0 });
+    });
+    visitsChartData.forEach((item) => {
+      if (map.has(item.date)) {
+        map.get(item.date).visitors = item.visitors;
+      } else {
+        map.set(item.date, {
+          date: item.date,
+          chats: 0,
+          visitors: item.visitors,
+        });
+      }
+    });
+    return Array.from(map.values()).sort((a, b) =>
+      a.date.localeCompare(b.date),
+    );
+  }, [chartData, visitsChartData]);
+
+  const totalVisits = Array.isArray(visitorData) ? visitorData.length : 0;
+
+  const totalChats = allChats.length;
+
+  const [showChats, setShowChats] = React.useState(true);
+  const [showVisitors, setShowVisitors] = React.useState(true);
 
   return (
     <div className="mt-4 flex flex-col space-y-4 w-full">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold mb-2">Analytics</h1>
 
-        <Select value={timeRange} onValueChange={setTimeRange}>
+        <Select value={selectedTimeRange} onValueChange={handleTimeRangeChange}>
           <SelectTrigger
             className="hidden w-[250px] rounded-lg sm:ml-auto sm:flex"
             aria-label="Select a value"
@@ -102,10 +155,13 @@ export function ChatAnalytics() {
                 <div className="inset-0 size-2 items-center justify-center rounded-full group-hover:animate-none bg-green-500" />
                 <span>Total visits</span>
               </div>
-              <Checkbox checked={true} />
+              <Checkbox
+                checked={showVisitors}
+                onCheckedChange={(checked) => setShowVisitors(checked === true)}
+              />
             </CardTitle>
             <CardDescription className="text-xl md:text-2xl font-semibold text-black">
-              <NumberFlow value={12} />
+              {isLoadingVisitors ? "..." : <NumberFlow value={totalVisits} />}
             </CardDescription>
           </div>
           <div className="flex flex-col gap-1 text-left min-w-24">
@@ -114,10 +170,13 @@ export function ChatAnalytics() {
                 <div className="inset-0 size-2 items-center justify-center rounded-full group-hover:animate-none bg-purple-500" />
                 <span>Total chats</span>
               </div>
-              <Checkbox checked={true} />
+              <Checkbox
+                checked={showChats}
+                onCheckedChange={(checked) => setShowChats(checked === true)}
+              />
             </CardTitle>
             <CardDescription className="text-xl md:text-2xl font-semibold text-black">
-              <NumberFlow value={234} />
+              {isLoading ? "..." : <NumberFlow value={totalChats} />}
             </CardDescription>
           </div>
           <div className="flex flex-col gap-1 text-left min-w-24">
@@ -148,7 +207,7 @@ export function ChatAnalytics() {
             config={chartConfig}
             className="aspect-auto h-[300px] w-full"
           >
-            <AreaChart data={filteredData}>
+            <AreaChart data={mergedChartData}>
               <defs>
                 <linearGradient id="fillChats" x1="0" y1="0" x2="0" y2="1">
                   <stop
@@ -159,6 +218,18 @@ export function ChatAnalytics() {
                   <stop
                     offset="95%"
                     stopColor="var(--color-chats)"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient id="fillVisitors" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--chart-4)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--chart-4)"
                     stopOpacity={0.1}
                   />
                 </linearGradient>
@@ -192,14 +263,24 @@ export function ChatAnalytics() {
                   />
                 }
               />
-              <Area
-                dataKey="chats"
-                type="natural"
-                fill="url(#fillChats)"
-                stroke="var(--color-chats)"
-                stackId="a"
-              />
-
+              {showChats && (
+                <Area
+                  dataKey="chats"
+                  type="natural"
+                  fill="url(#fillChats)"
+                  stroke="var(--color-chats)"
+                  stackId="a"
+                />
+              )}
+              {showVisitors && (
+                <Area
+                  dataKey="visitors"
+                  type="natural"
+                  fill="url(#fillVisitors)"
+                  stroke="var(--chart-4)"
+                  stackId="a"
+                />
+              )}
               {/* <ChartLegend content={<ChartLegendContent />} /> */}
             </AreaChart>
           </ChartContainer>

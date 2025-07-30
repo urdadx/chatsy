@@ -29,12 +29,11 @@ function RouteComponent() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="">
       {/* Main content scrollable */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 lg:pr-[360px]">
+      <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:pr-[360px] bg-white">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-xl font-semibold mb-6">Knowledge Base</h1>
-
           <Tabs value={tab} onValueChange={handleTabChange}>
             <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0">
               <TabsTrigger

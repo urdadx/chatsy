@@ -7,10 +7,9 @@ import {
   RiTwitterXFill,
   RiWhatsappFill,
 } from "@remixicon/react";
-import Avatar from "boring-avatars";
 import { Check, Copy } from "lucide-react";
 import { useRef, useState } from "react";
-import { AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -88,7 +87,7 @@ export const LinkInBio = ({ embedToken }: { embedToken: string }) => {
     linkedin: "https://www.linkedin.com/",
   };
 
-  const baseUrl = `${window.location.origin}/embed/${embedToken}`;
+  const baseUrl = `${window.location.origin}/bio-page/${embedToken}`;
 
   const handleShare = (platform: keyof typeof socialShareContent) => {
     const text = `Check out my profile on ${platform}!`;
@@ -156,7 +155,7 @@ export const LinkInBio = ({ embedToken }: { embedToken: string }) => {
           </div>
         ))}
       </div>
-      <div className="flex flex-col gap-2 sm:gap-3 pt-2 text-start">
+      <div className="flex flex-col gap-1 text-start">
         <div className="space-y-1 sm:space-y-2">
           <div className="relative">
             <Input

@@ -5,6 +5,7 @@ import type { Vote } from "@/db/schema";
 import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
+import { useSendVisitorAnalytics } from "@/hooks/use-visitor-analytics";
 import { ChatSDKError } from "@/lib/errors";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
@@ -17,7 +18,7 @@ import {
   SparklesIcon,
   X,
 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AISuggestion, AISuggestions } from "../ui/ai-suggestions";
 import {
@@ -44,6 +45,17 @@ export function ChatWidget({
   onToggle,
 }: ChatWidgetProps) {
   const [isWidgetOpen, setIsWidgetOpen] = useState(isOpen);
+  const {
+    data: chatbot,
+    isLoading: isChatbotLoading,
+    error: chatbotError,
+  } = useChatWidget(embedToken);
+
+  const organizationId = chatbot?.organizationId || "";
+  // Only initialize analytics when organizationId is available
+  const { logVisitorAnalytics, mountTimestampRef } = useSendVisitorAnalytics(
+    organizationId ? { organizationId } : { organizationId: "placeholder" },
+  );
   const { chatId } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
 
@@ -52,12 +64,6 @@ export function ChatWidget({
     : [];
 
   const queryClient = useQueryClient();
-
-  const {
-    data: chatbot,
-    isLoading: isChatbotLoading,
-    error: chatbotError,
-  } = useChatWidget(embedToken);
 
   const { messages, setMessages, status, handleSubmit, input, setInput } =
     useChat({
@@ -81,7 +87,30 @@ export function ChatWidget({
     const newState = !isWidgetOpen;
     setIsWidgetOpen(newState);
     onToggle?.(newState);
-  }, [isWidgetOpen, onToggle]);
+    if (!isWidgetOpen && newState) {
+      // Only log when opening
+      mountTimestampRef.current = Date.now();
+      logVisitorAnalytics();
+    }
+    if (isWidgetOpen && !newState && mountTimestampRef.current) {
+      // Widget is being closed, log time spent
+      const durationMs = Date.now() - mountTimestampRef.current;
+      logVisitorAnalytics({ durationMs });
+      mountTimestampRef.current = null;
+    }
+  }, [isWidgetOpen, onToggle, logVisitorAnalytics, mountTimestampRef]);
+
+  // Log time spent if user closes page with widget open
+  useEffect(() => {
+    function handleBeforeUnload() {
+      if (isWidgetOpen && mountTimestampRef.current) {
+        const durationMs = Date.now() - mountTimestampRef.current;
+        logVisitorAnalytics({ durationMs, event: "page_unload" });
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isWidgetOpen, logVisitorAnalytics, mountTimestampRef]);
 
   const handleResetChat = useCallback(() => {
     setMessages([]);
@@ -134,7 +163,7 @@ export function ChatWidget({
       {/* Chat Widget */}
       {isWidgetOpen && (
         <div className="mb-4">
-          <Card className="w-[400px] h-[560px] shadow-xl border-1 py-0 animate-in slide-in-from-bottom-2 duration-300">
+          <Card className="w-[400px] h-[560px] shadow-xl border-1 py-0 animate-in slide-in-from-bottom-2 duration-300 flex flex-col">
             {/* Header */}
             <div
               className="p-4 text-white flex items-center justify-between border-b rounded-t-xl bg-primary"
@@ -192,7 +221,8 @@ export function ChatWidget({
               </div>
             </div>
 
-            <div className="relative flex-1 h-[320px]">
+            {/* Make message area grow and scrollable */}
+            <div className="relative flex-1 h-0 min-h-0 overflow-y-auto">
               <ChatContainerRoot className="h-full">
                 <ChatContainerContent className="p-4">
                   {isLoading ? (
@@ -244,14 +274,13 @@ export function ChatWidget({
                     </div>
                   )}
                 </ChatContainerContent>
-
                 <div className="absolute bottom-4 right-4 z-10">
                   <ScrollButton className="shadow-lg" />
                 </div>
               </ChatContainerRoot>
             </div>
 
-            {/* Footer */}
+            {/* Footer always at bottom */}
             <CardFooter className="flex flex-col space-y-2">
               {SUGGESTIONS.length > 0 && (
                 <AISuggestions>

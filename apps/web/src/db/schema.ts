@@ -88,8 +88,6 @@ export const organization = pgTable("organization", {
   sourcesCount: integer("sources_count").default(0).notNull(),
 });
 
-export type Organization = InferSelectModel<typeof organization>;
-
 export const member = pgTable("member", {
   id: text("id").primaryKey(),
   organizationId: text("organization_id")
@@ -101,8 +99,6 @@ export const member = pgTable("member", {
   role: text("role").default("member").notNull(),
   createdAt: timestamp("created_at").notNull(),
 });
-
-export type Member = InferSelectModel<typeof member>;
 
 export const invitation = pgTable("invitation", {
   id: text("id").primaryKey(),
@@ -118,8 +114,6 @@ export const invitation = pgTable("invitation", {
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
-export type Invitation = InferSelectModel<typeof invitation>;
-
 export const chat = pgTable("Chat", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
@@ -132,8 +126,6 @@ export const chat = pgTable("Chat", {
     .notNull()
     .default("private"),
 });
-
-export type User = InferSelectModel<typeof user>;
 
 export const message = pgTable("Message", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -148,8 +140,6 @@ export const message = pgTable("Message", {
     .$defaultFn(() => new Date()),
 });
 
-export type Chat = InferSelectModel<typeof chat>;
-
 export const vote = pgTable(
   "vote",
   {
@@ -163,9 +153,6 @@ export const vote = pgTable(
   },
   (table) => [primaryKey({ columns: [table.chatId, table.messageId] })],
 );
-export type DBMessage = InferSelectModel<typeof message>;
-
-export type Vote = InferSelectModel<typeof vote>;
 
 export const question = pgTable("question", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -214,10 +201,6 @@ export const chatbot = pgTable("chatbot", {
     .$defaultFn(() => new Date()),
 });
 
-export type Chatbot = InferSelectModel<typeof chatbot> & {
-  name: string;
-};
-
 export const lead = pgTable("lead", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   userId: uuid("user_id")
@@ -234,8 +217,6 @@ export const lead = pgTable("lead", {
   location: text("location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
-export type Lead = InferSelectModel<typeof lead>;
 
 export const product = pgTable("product", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -271,7 +252,6 @@ export const textSource = pgTable("text_source", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
-export type TextSource = InferSelectModel<typeof textSource>;
 
 export const documentSource = pgTable("document_source", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -288,8 +268,6 @@ export const documentSource = pgTable("document_source", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
-
-export type DocumentSource = InferSelectModel<typeof documentSource>;
 
 export const websiteSource = pgTable("website_source", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -310,8 +288,6 @@ export const websiteSource = pgTable("website_source", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export type WebsiteSource = InferSelectModel<typeof websiteSource>;
-
 export const knowledge = pgTable("knowledge", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   userId: uuid("user_id")
@@ -331,8 +307,6 @@ export const knowledge = pgTable("knowledge", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export type Knowledge = InferSelectModel<typeof knowledge>;
-
 export const feedback = pgTable("feedback", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   email: text("email").notNull(),
@@ -342,4 +316,43 @@ export const feedback = pgTable("feedback", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const visitorAnalytics = pgTable("visitor_analytics", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  visitorId: text("visitor_id").notNull(),
+  userAgent: text("user_agent"),
+  deviceType: text("device_type"),
+  platform: text("platform"),
+  city: text("city"),
+  region: text("region"),
+  country: text("country"),
+  countryCode: text("country_code"),
+  continent: text("continent"),
+  ip: text("ip"),
+  referer: text("referer"),
+  event: text("event"),
+  durationMs: integer("duration_ms"),
+  extra: jsonb("extra"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// TYPES
+export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;
 export type Feedback = InferSelectModel<typeof feedback>;
+export type Knowledge = InferSelectModel<typeof knowledge>;
+export type WebsiteSource = InferSelectModel<typeof websiteSource>;
+export type DocumentSource = InferSelectModel<typeof documentSource>;
+export type TextSource = InferSelectModel<typeof textSource>;
+export type Lead = InferSelectModel<typeof lead>;
+export type DBMessage = InferSelectModel<typeof message>;
+export type Vote = InferSelectModel<typeof vote>;
+export type Chat = InferSelectModel<typeof chat>;
+export type User = InferSelectModel<typeof user>;
+export type Member = InferSelectModel<typeof member>;
+export type Invitation = InferSelectModel<typeof invitation>;
+export type Organization = InferSelectModel<typeof organization>;
+export type Chatbot = InferSelectModel<typeof chatbot> & {
+  name: string;
+};

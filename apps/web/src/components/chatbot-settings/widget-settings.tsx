@@ -104,18 +104,6 @@ export function WidgetSettings() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Label htmlFor="enable-embedding">Activate Widget </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent className="bg-white shadow-sm">
-                  <p className="text-black">
-                    Allow your chatbot to be embedded on external websites
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
           </div>
           <div className="flex items-center gap-2">
             <Switch
@@ -194,18 +182,6 @@ export function WidgetSettings() {
             <div className="flex flex-col sm:flex-row gap-3 justify-between">
               <div className="flex items-center gap-2">
                 <Label>Embed Token</Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <InfoIcon className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent className="bg-white shadow-sm">
-                      <p className="text-black">
-                        Unique token used to access your chatbot publicly
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
               <div className="flex items-center gap-2">
                 <Input

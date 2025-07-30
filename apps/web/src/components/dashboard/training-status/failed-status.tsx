@@ -5,7 +5,7 @@ import { RotateCcw } from "lucide-react";
 export const FailedStatus = () => {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-lg font-semibold text-gray-800">Training Status</p>
+      <p className="text-lg font-semibold text-gray-800">Training status</p>
 
       <div className="p-4 bg-red-50 border border-red-200 rounded-xl shadow-sm">
         <div className="flex items-start gap-3">

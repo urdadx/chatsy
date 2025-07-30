@@ -1,5 +1,3 @@
-import type { WebsiteSource } from "@/db/schema";
-
 interface EmptyStateProps {
   hasAllSources: boolean;
   hasFilteredSources: boolean;

@@ -8,7 +8,10 @@ import {
 
 type SpinnerVariantProps = Omit<SpinnerProps, "variant">;
 const Default = ({ className, ...props }: SpinnerVariantProps) => (
-  <LoaderIcon className={cn("animate-spin", className)} {...props} />
+  <LoaderIcon
+    className={cn("animate-spin text-primary", className)}
+    {...props}
+  />
 );
 const Circle = ({ className, ...props }: SpinnerVariantProps) => (
   <LoaderCircleIcon className={cn("animate-spin", className)} {...props} />

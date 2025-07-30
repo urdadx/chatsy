@@ -5,7 +5,7 @@ import { Button } from "../../ui/button";
 export const CompletedStatus = () => {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-lg font-semibold text-gray-800">Training Status</p>
+      <p className="text-lg font-semibold text-gray-800">Training status</p>
 
       <div className="p-4 bg-green-50 border border-green-200 rounded-xl shadow-xs">
         <div className="flex items-start gap-3">

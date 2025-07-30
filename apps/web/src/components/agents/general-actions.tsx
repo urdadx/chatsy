@@ -34,7 +34,7 @@ export const Actions = () => {
           <Headset className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
         </ActionIcon>
       ),
-      name: "Escalete to human",
+      name: "Escalate to human",
       description: "Transfers conversation to a human agent",
     },
     {

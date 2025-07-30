@@ -5,7 +5,7 @@ import { Eye } from "lucide-react";
 export const InProgressStatus = () => {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-lg font-semibold text-gray-800">Training Status</p>
+      <p className="text-lg font-semibold text-gray-800">Training status</p>
 
       <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl shadow-xs">
         <div className="flex items-start gap-3">

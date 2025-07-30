@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 
-export function CollectFeedbackForm() {
+export function CollectFeedbackForm({ color }: { color?: string }) {
   const [formData, setFormData] = useState({
     email: "",
     subject: "",
@@ -22,23 +24,25 @@ export function CollectFeedbackForm() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const mutation = useMutation({
-      mutationFn: async (data: typeof formData) => {
-        const response = await api.post("/feedback", data);
-        return response.data;
-      },
-      onSuccess: () => {
-        alert("Feedback sent successfully!");
-        setFormData({ email: "", subject: "", message: "" });
-      },
-      onError: (error: any) => {
-        console.error("Error sending feedback:", error);
-        alert(error.response?.data?.message || "An unexpected error occurred.");
-      },
-    });
+  const mutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      const response = await api.post("/feedback", data);
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Feedback sent successfully!");
+      setFormData({ email: "", subject: "", message: "" });
+    },
+    onError: (error: any) => {
+      console.error("Error sending feedback:", error);
+      toast.error(
+        error.response?.data?.message || "An unexpected error occurred.",
+      );
+    },
+  });
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     mutation.mutate(formData);
   };
 
@@ -46,7 +50,7 @@ export function CollectFeedbackForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="email" className="block text-sm font-medium mb-1">
-          Email
+          Your Email
         </label>
         <Input
           id="email"
@@ -79,6 +83,7 @@ export function CollectFeedbackForm() {
         <Textarea
           id="message"
           name="message"
+          className="w-full"
           placeholder="Your feedback here..."
           value={formData.message}
           onChange={handleChange}
@@ -86,7 +91,23 @@ export function CollectFeedbackForm() {
         />
       </div>
 
-      <Button type="submit">Send Feedback</Button>
+      <Button
+        style={{
+          backgroundColor: color,
+          color: "#FFFFFF",
+        }}
+        type="submit"
+        disabled={mutation.isPending}
+      >
+        {mutation.isPending ? (
+          <>
+            <Spinner className="text-white h-4 w-4 inline-block" />
+            Sending...
+          </>
+        ) : (
+          "Send Feedback"
+        )}
+      </Button>
     </form>
   );
 }

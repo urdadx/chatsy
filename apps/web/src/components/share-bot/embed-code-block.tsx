@@ -23,7 +23,7 @@ export const EmbedCodeBlock = ({
       ? [
           {
             language: "html",
-            filename: "embed-iframe.html",
+            filename: "iframe.html",
             code: `<!-- Padyna Embedded Iframe -->
 <iframe
   src="${window.location.origin}/embed/${embedToken}"

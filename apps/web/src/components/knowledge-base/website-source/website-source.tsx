@@ -22,7 +22,7 @@ export const WebsiteSource = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-2 rounded-md p-8 border">
+      <div className="flex flex-col gap-2 rounded-md p-8 border bg-white">
         <div className="flex justify-between items-center mb-3">
           <div className="flex flex-col gap-2">
             <h2 className="font-semibold text-lg">Website</h2>

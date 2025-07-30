@@ -1,10 +1,11 @@
 import { useChatHistory } from "@/hooks/use-chat-history";
+import { getVisitorAnalytics } from "@/hooks/use-visitor-analytics";
 import { api } from "@/lib/api";
 import NumberFlow from "@number-flow/react";
 import { useQuery } from "@tanstack/react-query";
 import {
   BrainCog,
-  MagnetIcon,
+  Globe,
   MessageCircle,
   Star,
   ThumbsDown,
@@ -33,6 +34,9 @@ export function DashboardMetrics() {
       return response.data;
     },
   });
+
+  const { data: visitorData } = getVisitorAnalytics("90d");
+  const totalVisits = Array.isArray(visitorData) ? visitorData.length : 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -93,17 +97,15 @@ export function DashboardMetrics() {
         <div className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-              <MagnetIcon className="w-4 h-4 text-blue-600" />
+              <Globe className="w-4 h-4 text-blue-600" />
             </div>
-            <h3 className="text-sm font-medium text-gray-600">
-              Leads generated
-            </h3>
+            <h3 className="text-sm font-medium text-gray-600">Total visits</h3>
           </div>
         </div>
         <div className="flex items-center justify-between">
           <NumberFlow
             className="text-3xl font-bold text-gray-700 px-10 pt-0"
-            value={12}
+            value={totalVisits}
           />{" "}
         </div>
       </div>

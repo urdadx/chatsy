@@ -16,7 +16,7 @@ import { Route as WebsiteSourcesRouteImport } from './routes/website-sources'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
-import { Route as EmbedWidgetIdRouteImport } from './routes/embed/$widgetId'
+import { Route as BioPagePageIdRouteImport } from './routes/bio-page/$pageId'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminPlaygroundRouteImport } from './routes/admin/playground'
 import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
@@ -29,6 +29,7 @@ import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
 import { ServerRoute as ApiVoteCountServerRouteImport } from './routes/api/vote-count'
 import { ServerRoute as ApiVoteServerRouteImport } from './routes/api/vote'
+import { ServerRoute as ApiVisitorAnalyticsServerRouteImport } from './routes/api/visitor-analytics'
 import { ServerRoute as ApiUploadImagesServerRouteImport } from './routes/api/upload-images'
 import { ServerRoute as ApiUploadDocumentsServerRouteImport } from './routes/api/upload-documents'
 import { ServerRoute as ApiTrainingStatusServerRouteImport } from './routes/api/training-status'
@@ -37,7 +38,6 @@ import { ServerRoute as ApiTextSourcesServerRouteImport } from './routes/api/tex
 import { ServerRoute as ApiSimilaritySearchServerRouteImport } from './routes/api/similarity-search'
 import { ServerRoute as ApiScrapeServerRouteImport } from './routes/api/scrape'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
-import { ServerRoute as ApiMyLinksServerRouteImport } from './routes/api/my-links'
 import { ServerRoute as ApiMyChatbotServerRouteImport } from './routes/api/my-chatbot'
 import { ServerRoute as ApiLeadsServerRouteImport } from './routes/api/leads'
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
@@ -83,9 +83,9 @@ const AdminTestLazyRoute = AdminTestLazyRouteImport.update({
   path: '/test',
   getParentRoute: () => AdminRouteRoute,
 } as any).lazy(() => import('./routes/admin/test.lazy').then((d) => d.Route))
-const EmbedWidgetIdRoute = EmbedWidgetIdRouteImport.update({
-  id: '/embed/$widgetId',
-  path: '/embed/$widgetId',
+const BioPagePageIdRoute = BioPagePageIdRouteImport.update({
+  id: '/bio-page/$pageId',
+  path: '/bio-page/$pageId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -148,6 +148,12 @@ const ApiVoteServerRoute = ApiVoteServerRouteImport.update({
   path: '/api/vote',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiVisitorAnalyticsServerRoute =
+  ApiVisitorAnalyticsServerRouteImport.update({
+    id: '/api/visitor-analytics',
+    path: '/api/visitor-analytics',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiUploadImagesServerRoute = ApiUploadImagesServerRouteImport.update({
   id: '/api/upload-images',
   path: '/api/upload-images',
@@ -188,11 +194,6 @@ const ApiScrapeServerRoute = ApiScrapeServerRouteImport.update({
 const ApiQuestionsServerRoute = ApiQuestionsServerRouteImport.update({
   id: '/api/questions',
   path: '/api/questions',
-  getParentRoute: () => rootServerRouteImport,
-} as any)
-const ApiMyLinksServerRoute = ApiMyLinksServerRouteImport.update({
-  id: '/api/my-links',
-  path: '/api/my-links',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiMyChatbotServerRoute = ApiMyChatbotServerRouteImport.update({
@@ -294,7 +295,7 @@ export interface FileRoutesByFullPath {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/embed/$widgetId': typeof EmbedWidgetIdRoute
+  '/bio-page/$pageId': typeof BioPagePageIdRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
@@ -312,7 +313,7 @@ export interface FileRoutesByTo {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/embed/$widgetId': typeof EmbedWidgetIdRoute
+  '/bio-page/$pageId': typeof BioPagePageIdRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
@@ -331,7 +332,7 @@ export interface FileRoutesById {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/embed/$widgetId': typeof EmbedWidgetIdRoute
+  '/bio-page/$pageId': typeof BioPagePageIdRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
@@ -351,7 +352,7 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
-    | '/embed/$widgetId'
+    | '/bio-page/$pageId'
     | '/admin/test'
     | '/onboarding'
     | '/admin/chat-history'
@@ -369,7 +370,7 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
-    | '/embed/$widgetId'
+    | '/bio-page/$pageId'
     | '/admin/test'
     | '/onboarding'
     | '/admin/chat-history'
@@ -387,7 +388,7 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
-    | '/embed/$widgetId'
+    | '/bio-page/$pageId'
     | '/admin/test'
     | '/onboarding/'
     | '/admin/chat-history/'
@@ -399,7 +400,7 @@ export interface RootRouteChildren {
   WebsiteSourcesRoute: typeof WebsiteSourcesRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
-  EmbedWidgetIdRoute: typeof EmbedWidgetIdRoute
+  BioPagePageIdRoute: typeof BioPagePageIdRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -412,7 +413,6 @@ export interface FileServerRoutesByFullPath {
   '/api/hello': typeof ApiHelloServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
-  '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
@@ -421,6 +421,7 @@ export interface FileServerRoutesByFullPath {
   '/api/training-status': typeof ApiTrainingStatusServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
+  '/api/visitor-analytics': typeof ApiVisitorAnalyticsServerRoute
   '/api/vote': typeof ApiVoteServerRoute
   '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -441,7 +442,6 @@ export interface FileServerRoutesByTo {
   '/api/hello': typeof ApiHelloServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
-  '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
@@ -450,6 +450,7 @@ export interface FileServerRoutesByTo {
   '/api/training-status': typeof ApiTrainingStatusServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
+  '/api/visitor-analytics': typeof ApiVisitorAnalyticsServerRoute
   '/api/vote': typeof ApiVoteServerRoute
   '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -471,7 +472,6 @@ export interface FileServerRoutesById {
   '/api/hello': typeof ApiHelloServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
-  '/api/my-links': typeof ApiMyLinksServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
@@ -480,6 +480,7 @@ export interface FileServerRoutesById {
   '/api/training-status': typeof ApiTrainingStatusServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
+  '/api/visitor-analytics': typeof ApiVisitorAnalyticsServerRoute
   '/api/vote': typeof ApiVoteServerRoute
   '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -502,7 +503,6 @@ export interface FileServerRouteTypes {
     | '/api/hello'
     | '/api/leads'
     | '/api/my-chatbot'
-    | '/api/my-links'
     | '/api/questions'
     | '/api/scrape'
     | '/api/similarity-search'
@@ -511,6 +511,7 @@ export interface FileServerRouteTypes {
     | '/api/training-status'
     | '/api/upload-documents'
     | '/api/upload-images'
+    | '/api/visitor-analytics'
     | '/api/vote'
     | '/api/vote-count'
     | '/api/auth/$'
@@ -531,7 +532,6 @@ export interface FileServerRouteTypes {
     | '/api/hello'
     | '/api/leads'
     | '/api/my-chatbot'
-    | '/api/my-links'
     | '/api/questions'
     | '/api/scrape'
     | '/api/similarity-search'
@@ -540,6 +540,7 @@ export interface FileServerRouteTypes {
     | '/api/training-status'
     | '/api/upload-documents'
     | '/api/upload-images'
+    | '/api/visitor-analytics'
     | '/api/vote'
     | '/api/vote-count'
     | '/api/auth/$'
@@ -560,7 +561,6 @@ export interface FileServerRouteTypes {
     | '/api/hello'
     | '/api/leads'
     | '/api/my-chatbot'
-    | '/api/my-links'
     | '/api/questions'
     | '/api/scrape'
     | '/api/similarity-search'
@@ -569,6 +569,7 @@ export interface FileServerRouteTypes {
     | '/api/training-status'
     | '/api/upload-documents'
     | '/api/upload-images'
+    | '/api/visitor-analytics'
     | '/api/vote'
     | '/api/vote-count'
     | '/api/auth/$'
@@ -590,7 +591,6 @@ export interface RootServerRouteChildren {
   ApiHelloServerRoute: typeof ApiHelloServerRoute
   ApiLeadsServerRoute: typeof ApiLeadsServerRoute
   ApiMyChatbotServerRoute: typeof ApiMyChatbotServerRoute
-  ApiMyLinksServerRoute: typeof ApiMyLinksServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
   ApiScrapeServerRoute: typeof ApiScrapeServerRoute
   ApiSimilaritySearchServerRoute: typeof ApiSimilaritySearchServerRoute
@@ -599,6 +599,7 @@ export interface RootServerRouteChildren {
   ApiTrainingStatusServerRoute: typeof ApiTrainingStatusServerRoute
   ApiUploadDocumentsServerRoute: typeof ApiUploadDocumentsServerRoute
   ApiUploadImagesServerRoute: typeof ApiUploadImagesServerRoute
+  ApiVisitorAnalyticsServerRoute: typeof ApiVisitorAnalyticsServerRoute
   ApiVoteServerRoute: typeof ApiVoteServerRoute
   ApiVoteCountServerRoute: typeof ApiVoteCountServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
@@ -647,11 +648,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTestLazyRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/embed/$widgetId': {
-      id: '/embed/$widgetId'
-      path: '/embed/$widgetId'
-      fullPath: '/embed/$widgetId'
-      preLoaderRoute: typeof EmbedWidgetIdRouteImport
+    '/bio-page/$pageId': {
+      id: '/bio-page/$pageId'
+      path: '/bio-page/$pageId'
+      fullPath: '/bio-page/$pageId'
+      preLoaderRoute: typeof BioPagePageIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/settings': {
@@ -742,6 +743,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiVoteServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/visitor-analytics': {
+      id: '/api/visitor-analytics'
+      path: '/api/visitor-analytics'
+      fullPath: '/api/visitor-analytics'
+      preLoaderRoute: typeof ApiVisitorAnalyticsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/upload-images': {
       id: '/api/upload-images'
       path: '/api/upload-images'
@@ -796,13 +804,6 @@ declare module '@tanstack/react-start/server' {
       path: '/api/questions'
       fullPath: '/api/questions'
       preLoaderRoute: typeof ApiQuestionsServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/api/my-links': {
-      id: '/api/my-links'
-      path: '/api/my-links'
-      fullPath: '/api/my-links'
-      preLoaderRoute: typeof ApiMyLinksServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/my-chatbot': {
@@ -954,7 +955,7 @@ const rootRouteChildren: RootRouteChildren = {
   WebsiteSourcesRoute: WebsiteSourcesRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
-  EmbedWidgetIdRoute: EmbedWidgetIdRoute,
+  BioPagePageIdRoute: BioPagePageIdRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
 }
 export const routeTree = rootRouteImport
@@ -970,7 +971,6 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiHelloServerRoute: ApiHelloServerRoute,
   ApiLeadsServerRoute: ApiLeadsServerRoute,
   ApiMyChatbotServerRoute: ApiMyChatbotServerRoute,
-  ApiMyLinksServerRoute: ApiMyLinksServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,
   ApiScrapeServerRoute: ApiScrapeServerRoute,
   ApiSimilaritySearchServerRoute: ApiSimilaritySearchServerRoute,
@@ -979,6 +979,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiTrainingStatusServerRoute: ApiTrainingStatusServerRoute,
   ApiUploadDocumentsServerRoute: ApiUploadDocumentsServerRoute,
   ApiUploadImagesServerRoute: ApiUploadImagesServerRoute,
+  ApiVisitorAnalyticsServerRoute: ApiVisitorAnalyticsServerRoute,
   ApiVoteServerRoute: ApiVoteServerRoute,
   ApiVoteCountServerRoute: ApiVoteCountServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,

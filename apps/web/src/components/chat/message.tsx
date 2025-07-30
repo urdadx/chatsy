@@ -2,7 +2,6 @@ import { Markdown } from "@/components/chat/markdown";
 import type { Vote } from "@/db/schema";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { CollectFeedbackForm } from "@/lib/ai/tools-ui/collect-feedback-form";
-import { CollectLeadsForm } from "@/lib/ai/tools-ui/collect-leads-form";
 import { cn, sanitizeText } from "@/lib/utils";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
@@ -29,7 +28,6 @@ const PurePreviewMessage = ({
   setMessages: UseChatHelpers["setMessages"];
   chatbot?: any;
 }) => {
-  // Fallback to useChatbot hook if chatbot is not provided (for non-embedded contexts)
   const { data: fallbackChatbot } = useChatbot();
   const activeChatbot = chatbot || fallbackChatbot;
 
@@ -96,15 +94,9 @@ const PurePreviewMessage = ({
                   if (toolName === "collect_feedback") {
                     return (
                       <div key={toolCallId}>
-                        <CollectFeedbackForm />
-                      </div>
-                    );
-                  }
-
-                  if (toolName === "collect_leads") {
-                    return (
-                      <div key={toolCallId}>
-                        <CollectLeadsForm />
+                        <CollectFeedbackForm
+                          color={activeChatbot?.primaryColor}
+                        />
                       </div>
                     );
                   }
@@ -149,14 +141,14 @@ export const ThinkingMessage = () => {
   return (
     <motion.div
       data-testid="message-assistant-loading"
-      className="w-full mx-auto max-w-3xl px-4 group/message "
+      className="w-full mx-auto max-w-3xl px-2 group/message "
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1, transition: { delay: 1 } }}
       data-role={role}
     >
       <div
         className={cx(
-          "flex gap-4 items-start group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:py-2 rounded-xl",
+          "flex gap-3 items-start group-data-[role=user]/message:px-1 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:py-2 rounded-xl",
           {
             "group-data-[role=user]/message:bg-muted": true,
           },
@@ -166,9 +158,7 @@ export const ThinkingMessage = () => {
           <SparklesIcon className="text-muted-foreground" size={14} />
         </div>
 
-        <div className="flex flex-col gap-2 w-full">
-          <Loader variant="dots" className="text-muted-foreground" />
-        </div>
+        <Loader variant="dots" className="text-muted-foreground" />
       </div>
     </motion.div>
   );

@@ -1,8 +1,9 @@
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { EmptyState } from "../../knowledge-base/website-source/components/empty-state";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
@@ -26,6 +27,16 @@ export const TextSource = () => {
         queryKey: ["text-sources", organizationId],
       });
     },
+  });
+
+  // Fetch text sources
+  const { data: textSources = [], isLoading } = useQuery({
+    queryKey: ["text-sources", organizationId],
+    queryFn: async () => {
+      const { data } = await api.get("/text-sources");
+      return data;
+    },
+    enabled: !!organizationId,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,7 +98,13 @@ export const TextSource = () => {
           </div>
         </form>
       </div>
-      <TextSourceList />
+      {isLoading ? null : textSources.length === 0 ? (
+        <div className="my-5 border  rounded-md p-6">
+          No texts found. Add some to get started!
+        </div>
+      ) : (
+        <TextSourceList />
+      )}
     </>
   );
 };

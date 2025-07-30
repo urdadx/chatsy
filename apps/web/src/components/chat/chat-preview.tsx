@@ -101,7 +101,7 @@ export function ChatPreview() {
 
   return (
     <div className="flex-1 flex items-center justify-center">
-      <Card className="w-[400px] h-[560px] shadow-lg border-1 py-0">
+      <Card className="w-[400px] h-[560px] shadow-lg border-1 py-0 flex flex-col">
         {/* Header */}
         <div
           className="p-4 text-white flex items-center justify-between border-b rounded-t-xl bg-primary"
@@ -139,7 +139,8 @@ export function ChatPreview() {
           </div>
         </div>
 
-        <div className="relative flex-1 h-[350px]">
+        {/* Make message area grow and scrollable */}
+        <div className="relative flex-1 h-0 min-h-0 overflow-y-auto">
           <ChatContainerRoot className="h-full">
             <ChatContainerContent className="p-4">
               {isLoading ? (
@@ -190,14 +191,10 @@ export function ChatPreview() {
                 </div>
               )}
             </ChatContainerContent>
-
-            <div className="absolute bottom-4 right-4 z-10">
-              <ScrollButton className="shadow-lg" />
-            </div>
           </ChatContainerRoot>
         </div>
 
-        {/* Footer */}
+        {/* Footer always at bottom */}
         <CardFooter className="flex flex-col space-y-2">
           {SUGGESTIONS.length > 0 && (
             <AISuggestions>

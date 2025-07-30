@@ -1,4 +1,4 @@
-import QRCode from "react-qr-code";
+import { QRCodeCanvas } from "qrcode.react";
 import { Button } from "../ui/button";
 
 export const QRCodeExport = ({ embedToken }: { embedToken: string }) => {
@@ -20,7 +20,7 @@ export const QRCodeExport = ({ embedToken }: { embedToken: string }) => {
   return (
     <>
       <div className="space-y-3 sm:space-y-4 p-2 sm:p-3">
-        <QRCode
+        <QRCodeCanvas
           className="mx-auto w-full qr-code"
           id="qr-code"
           level="H"

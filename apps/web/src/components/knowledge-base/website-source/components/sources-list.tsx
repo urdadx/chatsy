@@ -14,7 +14,7 @@ export const SourcesList = ({ sources, onDeleteClick }: SourcesListProps) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       {sources.map((source) => (
         <SourceItem
           key={source.id}

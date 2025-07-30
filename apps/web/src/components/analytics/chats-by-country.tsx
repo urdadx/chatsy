@@ -8,11 +8,15 @@ import {
 } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useMemo } from "react";
 import BarList from "./bar-list";
 
 import { getCountryCode, getCountryCodeFromCity } from "@/constants/counties";
+import { getVisitorAnalytics } from "@/hooks/use-visitor-analytics";
+import { useSearch } from "@tanstack/react-router";
 import { Maximize2, MousePointerClick } from "lucide-react";
 import { useState } from "react";
+import { Spinner } from "../ui/spinner";
 import { ViewAllStats } from "./view-all-stats";
 
 export function ChatsByCountry() {
@@ -20,28 +24,46 @@ export function ChatsByCountry() {
   const [citiesDialogOpen, setCitiesDialogOpen] = useState(false);
   const [continentsDialogOpen, setContinentsDialogOpen] = useState(false);
 
-  const dummyCountries = [
-    { country: "United States", totalCount: 120 },
-    { country: "Canada", totalCount: 95 },
-    { country: "Germany", totalCount: 75 },
-  ];
+  const { timeRange } = useSearch({ from: "/admin/analytics" });
+  const { data: analytics } = getVisitorAnalytics(
+    (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
+  );
 
-  const dummyCities = [
-    { city: "New York", totalCount: 80 },
-    { city: "Toronto", totalCount: 70 },
-    { city: "Berlin", totalCount: 65 },
-  ];
+  // Always call hooks before any early return!
+  const { countryStats, cityStats, continentStats } = useMemo(() => {
+    const countryMap: Record<string, number> = {};
+    const cityMap: Record<string, number> = {};
+    const continentMap: Record<string, number> = {};
+    analytics?.forEach((row) => {
+      if (row.country) {
+        countryMap[row.country] = (countryMap[row.country] || 0) + 1;
+      }
+      if (row.city) {
+        cityMap[row.city] = (cityMap[row.city] || 0) + 1;
+      }
+      if (row.continent) {
+        continentMap[row.continent] = (continentMap[row.continent] || 0) + 1;
+      }
+    });
+    return {
+      countryStats: Object.entries(countryMap).map(([country, totalCount]) => ({
+        country,
+        totalCount,
+      })),
+      cityStats: Object.entries(cityMap).map(([city, totalCount]) => ({
+        city,
+        totalCount,
+      })),
+      continentStats: Object.entries(continentMap).map(
+        ([continent, totalCount]) => ({ continent, totalCount }),
+      ),
+    };
+  }, [analytics]);
 
-  const dummyContinents = [
-    { continent: "North America", totalCount: 200 },
-    { continent: "Europe", totalCount: 150 },
-    { continent: "South America", totalCount: 100 },
-  ];
-
-  const mapCountries = dummyCountries.map((country) => {
+  // Replace dummy data with fetched/aggregated data
+  const mapCountries = countryStats.map((country) => {
     const countryCode = getCountryCode(country.country) || "unknown";
     const iconSrc = `https://flag.vercel.app/m/${countryCode}.svg`;
-
     return {
       icon: (
         <img
@@ -58,10 +80,9 @@ export function ChatsByCountry() {
     };
   });
 
-  const mapCities = dummyCities.map((city) => {
+  const mapCities = cityStats.map((city) => {
     const countryCode = getCountryCodeFromCity(city.city) || "unknown";
     const iconSrc = `https://flag.vercel.app/m/${countryCode}.svg`;
-
     return {
       icon: (
         <img
@@ -74,28 +95,55 @@ export function ChatsByCountry() {
       title: city.city,
       href: "",
       value: city.totalCount,
-      linkId: "",
     };
   });
 
-  const mapContinents = dummyContinents.map((continent) => {
+  const mapContinents = continentStats.map((continent) => {
     let icon = null;
     const name = continent.continent;
-    if (name === "Africa") icon = <Africa className="w-4" />;
-    else if (name === "Asia") icon = <Asia className="w-4" />;
-    else if (name === "Europe") icon = <Europe className="w-4" />;
-    else if (name === "North America" || name === "NorthAmerica")
+    const actualName =
+      continent.continent === "AF"
+        ? "Africa"
+        : continent.continent === "AS"
+          ? "Asia"
+          : continent.continent === "EU"
+            ? "Europe"
+            : continent.continent === "NA"
+              ? "North America"
+              : continent.continent === "OC"
+                ? "Oceania"
+                : continent.continent === "SA"
+                  ? "South America"
+                  : continent.continent;
+
+    // Use initials for continent icon mapping
+    if (name === "AF" || name === "Africa") {
+      icon = <Africa className="w-4" />;
+    } else if (name === "AS" || name === "Asia") {
+      icon = <Asia className="w-4" />;
+    } else if (name === "EU" || name === "Europe") {
+      icon = <Europe className="w-4" />;
+    } else if (
+      name === "NA" ||
+      name === "North America" ||
+      name === "NorthAmerica"
+    ) {
       icon = <NorthAmerica className="w-4" />;
-    else if (name === "Oceania") icon = <Oceania className="w-4" />;
-    else if (name === "South America" || name === "SouthAmerica")
+    } else if (name === "OC" || name === "Oceania") {
+      icon = <Oceania className="w-4" />;
+    } else if (
+      name === "SA" ||
+      name === "South America" ||
+      name === "SouthAmerica"
+    ) {
       icon = <SouthAmerica className="w-4" />;
+    }
 
     return {
       icon,
-      title: name,
+      title: actualName,
       href: "",
       value: continent.totalCount,
-      linkId: "",
     };
   });
 
@@ -144,7 +192,7 @@ export function ChatsByCountry() {
           </TabsList>
           <div className="flex items-center gap-1">
             <div className="text-muted-foreground text-sm flex items-center gap-1">
-              <MousePointerClick className="h-4 w-4" /> Chats
+              <MousePointerClick className="h-4 w-4" /> Destination
             </div>
           </div>
         </div>
@@ -152,15 +200,25 @@ export function ChatsByCountry() {
         <TabsContent value="countries">
           <div className="px-4 relative">
             <div className="relative">
-              <BarList
-                tab="Websites"
-                unit="visits"
-                data={topCountries}
-                barBackground="bg-green-200"
-                hoverBackground="hover:bg-green-50"
-                maxValue={maxCountryCount}
-              />
-              {hasMoreCountries && (
+              {analytics === undefined ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <Spinner />
+                </div>
+              ) : topCountries.length === 0 ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <span className="text-sm opacity-80">No data available</span>
+                </div>
+              ) : (
+                <BarList
+                  tab="Websites"
+                  unit="visits"
+                  data={topCountries}
+                  barBackground="bg-green-200"
+                  hoverBackground="hover:bg-green-50"
+                  maxValue={maxCountryCount}
+                />
+              )}
+              {hasMoreCountries && analytics && topCountries.length > 0 && (
                 <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
                   <Button
                     variant="outline"
@@ -186,15 +244,25 @@ export function ChatsByCountry() {
         <TabsContent value="cities">
           <div className="px-4 relative">
             <div className="relative">
-              <BarList
-                tab="Websites"
-                unit="visits"
-                data={topCities}
-                barBackground="bg-green-200"
-                hoverBackground="hover:bg-green-50"
-                maxValue={maxCityCount}
-              />
-              {hasMoreCities && (
+              {analytics === undefined ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <Spinner />
+                </div>
+              ) : topCities.length === 0 ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <span className="text-sm opacity-80">No data available</span>
+                </div>
+              ) : (
+                <BarList
+                  tab="Websites"
+                  unit="visits"
+                  data={topCities}
+                  barBackground="bg-green-200"
+                  hoverBackground="hover:bg-green-50"
+                  maxValue={maxCityCount}
+                />
+              )}
+              {hasMoreCities && analytics && topCities.length > 0 && (
                 <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
                   <Button
                     variant="outline"
@@ -220,15 +288,25 @@ export function ChatsByCountry() {
         <TabsContent value="continents">
           <div className="px-4 relative">
             <div className="relative">
-              <BarList
-                tab="Websites"
-                unit="visits"
-                data={topContinents}
-                barBackground="bg-green-200"
-                hoverBackground="hover:bg-green-50"
-                maxValue={maxContinentCount}
-              />
-              {hasMoreContinents && (
+              {analytics === undefined ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <Spinner />
+                </div>
+              ) : topContinents.length === 0 ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <span className="text-sm opacity-80">No data available</span>
+                </div>
+              ) : (
+                <BarList
+                  tab="Websites"
+                  unit="visits"
+                  data={topContinents}
+                  barBackground="bg-green-200"
+                  hoverBackground="hover:bg-green-50"
+                  maxValue={maxContinentCount}
+                />
+              )}
+              {hasMoreContinents && analytics && topContinents.length > 0 && (
                 <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
                   <Button
                     variant="outline"

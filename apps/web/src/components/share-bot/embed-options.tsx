@@ -10,12 +10,12 @@ export function EmbedOptions({ embedToken }: { embedToken: string }) {
   return (
     <div className="space-y-4">
       <RadioGroup
-        className="w-full flex items-center gap-2"
+        className="w-full flex flex-row gap-4"
         defaultValue="1"
         value={option}
         onValueChange={setOption}
       >
-        <div className="border-input has-data-[state=checked]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
+        <div className="border-input has-data-[state=checked]:border-primary/50 has-data-[state=checked]:border-2 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
           <RadioGroupItem
             value="1"
             id={`${id}-1`}
@@ -28,11 +28,11 @@ export function EmbedOptions({ embedToken }: { embedToken: string }) {
               id={`${id}-1-description`}
               className="text-muted-foreground text-xs"
             >
-              Embed as a chat bubble that expands on click.
+              Embed as a bubble that expands on click on your page.
             </p>
           </div>
         </div>
-        <div className="border-input has-data-[state=checked]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
+        <div className="border-input has-data-[state=checked]:border-primary/50 has-data-[state=checked]:border-2 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
           <RadioGroupItem
             value="2"
             id={`${id}-2`}
@@ -45,7 +45,7 @@ export function EmbedOptions({ embedToken }: { embedToken: string }) {
               id={`${id}-2-description`}
               className="text-muted-foreground text-xs"
             >
-              Embed as a full iframe that displays the chatbot interface.
+              Embed as an iframe that displays the chatbot on your page.
             </p>
           </div>
         </div>

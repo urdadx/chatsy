@@ -40,6 +40,16 @@ export async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export function capitalizeFirst(str: string): string {
+  // Handle empty strings
+  if (!str || str.length === 0) {
+    return str;
+  }
+
+  // Capitalize the first letter and keep the rest of the string unchanged
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export async function fetchWithErrorHandlers(
   input: RequestInfo | URL,
   init?: RequestInit,

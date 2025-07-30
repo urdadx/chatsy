@@ -96,7 +96,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
       });
 
       const resultStream = streamText({
-        model: google("gemini-2.5-flash"),
+        model: google("gemini-2.5-pro"),
         system: systemPrompt(chatbotDetails.name ?? "Assistant"),
         messages,
         maxSteps: 5,
