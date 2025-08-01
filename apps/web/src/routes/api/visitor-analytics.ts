@@ -3,7 +3,7 @@ import { visitorAnalytics } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { z } from "zod";
+import z from "zod";
 
 const analyticsSchema = z.object({
   organizationId: z.string().min(1),

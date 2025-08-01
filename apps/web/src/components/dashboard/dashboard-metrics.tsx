@@ -1,4 +1,5 @@
 import { useChatHistory } from "@/hooks/use-chat-history";
+import { useUsage } from "@/hooks/use-usage-meters";
 import { getVisitorAnalytics } from "@/hooks/use-visitor-analytics";
 import { api } from "@/lib/api";
 import NumberFlow from "@number-flow/react";
@@ -34,6 +35,10 @@ export function DashboardMetrics() {
       return response.data;
     },
   });
+
+  const { data } = useUsage();
+
+  const balance = data?.balance ?? 0;
 
   const { data: visitorData } = getVisitorAnalytics("90d");
   const totalVisits = Array.isArray(visitorData) ? visitorData.length : 0;
@@ -84,12 +89,14 @@ export function DashboardMetrics() {
             <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
               <Star className="w-4 h-4 text-orange-600" />
             </div>
-            <h3 className="text-sm font-medium text-gray-600">Credits used</h3>
+            <h3 className="text-sm font-medium text-gray-600">
+              Credits remaining
+            </h3>
           </div>
         </div>
         <NumberFlow
           className="text-3xl font-bold text-gray-700 px-10 pt-0"
-          value={53}
+          value={balance}
         />
       </div>
       {/* Leads generated */}

@@ -162,7 +162,7 @@ export function LoginForm({
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
-                      <Spinner />
+                      <Spinner className="text-white" />
                     ) : (
                       <>
                         <Mail className="h-4 w-4" />

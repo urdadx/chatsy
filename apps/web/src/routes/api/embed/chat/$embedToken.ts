@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chat, chatbot, message } from "@/db/schema";
+import { chat, chatbot, member, message } from "@/db/schema";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import {
   type Message,
@@ -9,10 +9,24 @@ import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { Ingestion } from "@polar-sh/ingestion";
+import { LLMStrategy } from "@polar-sh/ingestion/strategies/LLM";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { streamText } from "ai";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY!,
+});
+
+// Setup the LLM Ingestion Strategy (same as /api/chat/index.ts)
+const llmIngestion = Ingestion({
+  accessToken: process.env.POLAR_ACCESS_TOKEN!,
+  server: "sandbox",
+})
+  .strategy(new LLMStrategy(google("gemini-2.5-pro")))
+  .ingest("ai_usage");
 
 export const ServerRoute = createServerFileRoute(
   "/api/embed/chat/$embedToken",
@@ -45,6 +59,23 @@ export const ServerRoute = createServerFileRoute(
       if (!chatbotData.isEmbeddingEnabled) {
         return new Response("Embedding is not enabled for this chatbot", {
           status: 403,
+        });
+      }
+
+      // Fetch the owner userId for the organization
+      const [owner] = await db
+        .select({ userId: member.userId })
+        .from(member)
+        .where(
+          and(
+            eq(member.organizationId, chatbotData.organizationId),
+            eq(member.role, "owner"),
+          ),
+        );
+
+      if (!owner) {
+        return new Response("No owner found for this organization", {
+          status: 500,
         });
       }
 
@@ -83,7 +114,7 @@ export const ServerRoute = createServerFileRoute(
           .values({
             id,
             createdAt: new Date(),
-            userId: null, // Anonymous chat for embedded widget
+            userId: null,
             organizationId: chatbotData.organizationId,
             title,
             visibility: "public",
@@ -108,12 +139,13 @@ export const ServerRoute = createServerFileRoute(
         }
       }
 
-      const google = createGoogleGenerativeAI({
-        apiKey: process.env.GEMINI_API_KEY!,
+      // Use llmIngestion for LLM analytics/tracking, using owner userId as externalCustomerId
+      const model = llmIngestion.client({
+        externalCustomerId: owner.userId,
       });
 
       const resultStream = streamText({
-        model: google("gemini-2.5-pro"),
+        model,
         system: systemPrompt(chatbotData.name ?? "Assistant"),
         messages,
         maxSteps: 5,

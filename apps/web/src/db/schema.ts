@@ -30,6 +30,7 @@ export const user = pgTable("user", {
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
   username: text("username").unique(),
+  externalId: text("external_id").unique(),
 });
 
 export const session = pgTable("session", {
@@ -190,9 +191,8 @@ export const chatbot = pgTable("chatbot", {
 
   // Embedding configuration
   isEmbeddingEnabled: boolean("is_embedding_enabled").notNull().default(true),
-  embedToken: text("embed_token").unique(), // Public token for accessing this bot
-  allowedDomains: text("allowed_domains").array(), // Domains allowed to embed this widget
-
+  embedToken: text("embed_token").unique(),
+  allowedDomains: text("allowed_domains").array(),
   createdAt: timestamp("created_at")
     .notNull()
     .$defaultFn(() => new Date()),
@@ -338,6 +338,46 @@ export const visitorAnalytics = pgTable("visitor_analytics", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const subscription = pgTable("subscription", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  createdAt: timestamp("createdAt").notNull(),
+  modifiedAt: timestamp("modifiedAt"),
+  amount: integer("amount").notNull(),
+  currency: text("currency").notNull(),
+  recurringInterval: text("recurringInterval").notNull(),
+  status: text("status").notNull(),
+  currentPeriodStart: timestamp("currentPeriodStart").notNull(),
+  currentPeriodEnd: timestamp("currentPeriodEnd").notNull(),
+  cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").notNull().default(false),
+  canceledAt: timestamp("canceledAt"),
+  startedAt: timestamp("startedAt").notNull(),
+  endsAt: timestamp("endsAt"),
+  endedAt: timestamp("endedAt"),
+  customerId: text("customerId").notNull(),
+  productId: text("productId").notNull(),
+  discountId: text("discountId"),
+  checkoutId: text("checkoutId").notNull(),
+  customerCancellationReason: text("customerCancellationReason"),
+  customerCancellationComment: text("customerCancellationComment"),
+  metadata: text("metadata"), // JSON string
+  customFieldData: text("customFieldData"), // JSON string
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
+export const creditsUsage = pgTable("credits_usage", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  creditCount: integer("credit_count").notNull().default(0),
+  date: timestamp("date").notNull().defaultNow(),
+  resetAt: timestamp("reset_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // TYPES
 export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;
 export type Feedback = InferSelectModel<typeof feedback>;
@@ -353,6 +393,11 @@ export type User = InferSelectModel<typeof user>;
 export type Member = InferSelectModel<typeof member>;
 export type Invitation = InferSelectModel<typeof invitation>;
 export type Organization = InferSelectModel<typeof organization>;
+export type Session = InferSelectModel<typeof session>;
+export type Account = InferSelectModel<typeof account>;
+export type Product = InferSelectModel<typeof product>;
+export type Question = InferSelectModel<typeof question>;
+export type CreditsUsage = InferSelectModel<typeof creditsUsage>;
 export type Chatbot = InferSelectModel<typeof chatbot> & {
   name: string;
 };

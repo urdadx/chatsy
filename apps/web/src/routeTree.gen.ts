@@ -13,6 +13,7 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebsiteSourcesRouteImport } from './routes/website-sources'
+import { Route as SuccessRouteImport } from './routes/success'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
@@ -61,6 +62,11 @@ const rootServerRouteImport = createServerRootRoute()
 const WebsiteSourcesRoute = WebsiteSourcesRouteImport.update({
   id: '/website-sources',
   path: '/website-sources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuccessRoute = SuccessRouteImport.update({
+  id: '/success',
+  path: '/success',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -285,6 +291,7 @@ const ApiEmbedChatEmbedTokenServerRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/success': typeof SuccessRoute
   '/website-sources': typeof WebsiteSourcesRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
@@ -303,6 +310,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/success': typeof SuccessRoute
   '/website-sources': typeof WebsiteSourcesRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
@@ -322,6 +330,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/success': typeof SuccessRoute
   '/website-sources': typeof WebsiteSourcesRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
@@ -342,6 +351,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/success'
     | '/website-sources'
     | '/login'
     | '/register'
@@ -360,6 +370,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/success'
     | '/website-sources'
     | '/login'
     | '/register'
@@ -378,6 +389,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/success'
     | '/website-sources'
     | '/(auth)/login'
     | '/(auth)/register'
@@ -397,6 +409,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  SuccessRoute: typeof SuccessRoute
   WebsiteSourcesRoute: typeof WebsiteSourcesRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
@@ -618,6 +631,13 @@ declare module '@tanstack/react-router' {
       path: '/website-sources'
       fullPath: '/website-sources'
       preLoaderRoute: typeof WebsiteSourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/success': {
+      id: '/success'
+      path: '/success'
+      fullPath: '/success'
+      preLoaderRoute: typeof SuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -952,6 +972,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  SuccessRoute: SuccessRoute,
   WebsiteSourcesRoute: WebsiteSourcesRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,

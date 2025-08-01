@@ -62,7 +62,6 @@ export function RegisterForm({
       },
       {
         onSuccess: () => {
-          toast.success("Navigateed to Google");
           navigate({
             to: "/onboarding",
           });
@@ -158,7 +157,7 @@ export function RegisterForm({
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
-                      <Spinner />
+                      <Spinner className="text-white" />
                     ) : (
                       <>
                         <Mail className="h-4 w-4" />

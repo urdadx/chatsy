@@ -64,7 +64,7 @@ function RouteComponent() {
 
   if (!isLoading && !isError && chats.length === 0) {
     return (
-      <div className="max-w-5xl my-4 w-full overflow-hidden max-h-screen mx-auto px-2 sm:px-0 py-4">
+      <div className="max-w-5xl my-4 w-full overflow-hidden max-h-screen mx-auto p-3 sm:p-6">
         <div className="bg-white border rounded-lg my-4 py-2">
           <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white">
             <h1 className="text-md font-semibold">Chat Logs</h1>
@@ -105,7 +105,7 @@ function RouteComponent() {
 
   return (
     <>
-      <div className="max-w-5xl w-full overflow-hidden max-h-screen mx-auto px-2 sm:px-0 py-4">
+      <div className="max-w-5xl w-full overflow-hidden max-h-screen mx-auto p-6">
         <span className="text-md text-muted-foreground">
           View and manage your bot's chat history
         </span>

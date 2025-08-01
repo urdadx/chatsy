@@ -10,17 +10,30 @@ import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { Ingestion } from "@polar-sh/ingestion";
+import { LLMStrategy } from "@polar-sh/ingestion/strategies/LLM";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { streamText } from "ai";
 import { auth } from "auth";
 import { and, eq } from "drizzle-orm";
 
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY!,
+});
+
+// Setup the LLM Ingestion Strategy
+const llmIngestion = Ingestion({
+  accessToken: process.env.POLAR_ACCESS_TOKEN!,
+  server: "sandbox",
+})
+  .strategy(new LLMStrategy(google("gemini-2.5-pro")))
+  .ingest("ai_usage");
+
 export const ServerRoute = createServerFileRoute("/api/chat/").methods({
   POST: async ({ request }) => {
     try {
       const { id, messages } = await request.json();
-      console.log("Received chat ID:", id);
 
       const session = await auth.api.getSession({ headers: request.headers });
       if (!session) {
@@ -31,6 +44,8 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
       if (!organizationId) {
         return new Response("No active organization", { status: 400 });
       }
+
+      const externalCustomerId = session.user.id;
 
       // Verify user is a member of the organization
       const [membership] = await db
@@ -91,14 +106,16 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         .from(chatbot)
         .where(eq(chatbot.organizationId, organizationId));
 
-      const google = createGoogleGenerativeAI({
-        apiKey: process.env.GEMINI_API_KEY!,
+      const model = llmIngestion.client({
+        externalCustomerId:
+          request.headers.get("X-Polar-Customer-Id") ?? externalCustomerId,
       });
 
       const resultStream = streamText({
-        model: google("gemini-2.5-pro"),
+        model,
         system: systemPrompt(chatbotDetails.name ?? "Assistant"),
         messages,
+        maxTokens: 300,
         maxSteps: 5,
         tools: {
           knowledge_base: knowledgeSearchTool(organizationId),

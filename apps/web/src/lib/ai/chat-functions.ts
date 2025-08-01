@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chat, message, user, vote } from "@/db/schema";
+import { chat, message, vote } from "@/db/schema";
 import type { Chat, DBMessage } from "@/db/schema";
 import {
   type SQL,
@@ -15,29 +15,6 @@ import {
 } from "drizzle-orm";
 import { ChatSDKError } from "../errors";
 import type { VisibilityType } from "../types";
-
-// FUNCTION TO GET USER ID FROM USERNAME
-export const getUserIdFromUsername = async ({ handle }: { handle: string }) => {
-  try {
-    const result = await db
-      .select({ id: user.id })
-      .from(user)
-      .where(eq(user.username, handle))
-      .limit(1);
-
-    if (!result.length) {
-      throw new Error("User not found");
-    }
-
-    return {
-      success: true,
-      userId: result[0].id,
-    };
-  } catch (error) {
-    console.error("Error fetching user ID:", error);
-    throw new Error("Failed to retrieve user ID");
-  }
-};
 
 // FUNCTION TO SAVE A CHAT
 export async function saveChat({
