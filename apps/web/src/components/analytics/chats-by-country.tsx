@@ -12,7 +12,7 @@ import { useMemo } from "react";
 import BarList from "./bar-list";
 
 import { getCountryCode, getCountryCodeFromCity } from "@/constants/counties";
-import { getVisitorAnalytics } from "@/hooks/use-visitor-analytics";
+import { useVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { useSearch } from "@tanstack/react-router";
 import { Maximize2, MousePointerClick } from "lucide-react";
 import { useState } from "react";
@@ -25,8 +25,9 @@ export function ChatsByCountry() {
   const [continentsDialogOpen, setContinentsDialogOpen] = useState(false);
 
   const { timeRange } = useSearch({ from: "/admin/analytics" });
-  const { data: analytics } = getVisitorAnalytics(
+  const { data: analytics } = useVisitorHistory(
     (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
+    true, // Enable real-time updates via SSE for consistency
   );
 
   // Always call hooks before any early return!

@@ -78,7 +78,7 @@ export function DocumentSource() {
 
   return (
     <>
-      <div className="flex flex-col gap-2 rounded-md p-6 border">
+      <div className="flex flex-col gap-2 rounded-md p-5 border">
         <div className="flex justify-between items-center mb-2">
           <div className="flex flex-col gap-2">
             <h2 className="font-semibold text-lg">Files</h2>

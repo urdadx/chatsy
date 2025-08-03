@@ -1,5 +1,3 @@
-import { BadgeCheck, CreditCard, LogOut, Sparkles, User } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -16,7 +14,8 @@ import {
 } from "@/components/ui/sidebar";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { signOut } from "@/lib/auth-client";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { BadgeCheck, CreditCard, LogOut, User } from "lucide-react";
 import { toast } from "sonner";
 
 export function UserDropdown({ user }: any) {
@@ -65,22 +64,22 @@ export function UserDropdown({ user }: any) {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuGroup>
-              <DropdownMenuItem className="text-primary hover:text-primary">
-                <Sparkles className="text-primary" />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
+              <Link to="/admin/settings">
+                <DropdownMenuItem>
+                  <BadgeCheck />
+                  Account
+                </DropdownMenuItem>
+              </Link>
+
+              {/* @ts-ignore */}
+              <Link to="/admin/settings?tab=billing">
+                <DropdownMenuItem>
+                  <CreditCard />
+                  Billing
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>

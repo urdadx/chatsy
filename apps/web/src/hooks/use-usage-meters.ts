@@ -1,14 +1,20 @@
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 
-export function useUsage() {
+export function useUsage(meterName = "all") {
   return useQuery({
-    queryKey: ["customerMeters"],
+    queryKey: ["customerMeters", meterName],
     queryFn: async () => {
       const { data } = await authClient.usage.meters.list({
         query: { page: 1, limit: 10 },
       });
-      return data?.result?.items?.[0];
+      const items = data?.result?.items ?? [];
+      if (meterName && meterName !== "all") {
+        return (
+          items.find((item: any) => item.meter?.name === meterName) ?? null
+        );
+      }
+      return items;
     },
   });
 }

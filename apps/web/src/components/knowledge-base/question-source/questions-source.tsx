@@ -41,7 +41,7 @@ export const QuestionSource = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-2 rounded-md p-8 border">
+      <div className="flex flex-col gap-2 rounded-md p-6 border">
         <div className="flex flex-col gap-2 mb-3">
           <h2 className="font-semibold text-lg">Q&A</h2>
           <p className="text-semibold text-base text-muted-foreground">

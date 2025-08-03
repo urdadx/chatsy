@@ -20,11 +20,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { useChatHistory } from "@/hooks/use-chat-history";
-import { getVisitorAnalytics } from "@/hooks/use-visitor-analytics";
+import {
+  formatDuration,
+  useRealTimeAnalytics,
+} from "@/hooks/use-real-time-analytics";
 import NumberFlow from "@number-flow/react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { RefreshCcw } from "lucide-react";
+import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
+import { Loader } from "../ui/loader";
 
 export const description = "An interactive area chart";
 
@@ -51,8 +58,13 @@ export function ChatAnalytics() {
 
   const { data, isLoading } = useChatHistory(selectedTimeRange);
 
-  const { data: visitorData, isLoading: isLoadingVisitors } =
-    getVisitorAnalytics(selectedTimeRange);
+  const { data: visitorData } = getVisitorHistory(selectedTimeRange);
+
+  const {
+    data: realTimeData,
+    isConnected,
+    error: realtimeError,
+  } = useRealTimeAnalytics();
 
   // Flatten all pages of chats
   const allChats = React.useMemo(() => {
@@ -112,9 +124,18 @@ export function ChatAnalytics() {
     );
   }, [chartData, visitsChartData]);
 
-  const totalVisits = Array.isArray(visitorData) ? visitorData.length : 0;
+  // Use real-time data for all metrics
+  const totalVisits = isConnected
+    ? realTimeData.totalVisits
+    : Array.isArray(visitorData)
+      ? visitorData.length
+      : 0;
 
   const totalChats = allChats.length;
+
+  // All metrics come from real-time data
+  const averageSessionTime = realTimeData.averageSessionTime;
+  const activeVisitors = realTimeData.activeVisitors;
 
   const [showChats, setShowChats] = React.useState(true);
   const [showVisitors, setShowVisitors] = React.useState(true);
@@ -122,7 +143,23 @@ export function ChatAnalytics() {
   return (
     <div className="mt-4 flex flex-col space-y-4 w-full">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold mb-2">Analytics</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-xl font-semibold ">Analytics</h1>
+          {/* Real-time connection status */}
+          {realtimeError && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              <RefreshCcw />
+              Refresh for latest data
+            </Button>
+          )}
+        </div>
 
         <Select value={selectedTimeRange} onValueChange={handleTimeRangeChange}>
           <SelectTrigger
@@ -152,7 +189,7 @@ export function ChatAnalytics() {
           <div className="flex flex-col gap-1 text-left min-w-24">
             <CardTitle className="flex items-center gap-3 text-muted-foreground text-xs">
               <div className="flex items-center gap-1">
-                <div className="inset-0 size-2 items-center justify-center rounded-full group-hover:animate-none bg-green-500" />
+                <div className="inset-0 size-2 items-center justify-center rounded-full group-hover:animate-none bg-yellow-500" />
                 <span>Total visits</span>
               </div>
               <Checkbox
@@ -161,7 +198,13 @@ export function ChatAnalytics() {
               />
             </CardTitle>
             <CardDescription className="text-xl md:text-2xl font-semibold text-black">
-              {isLoadingVisitors ? "..." : <NumberFlow value={totalVisits} />}
+              {!isConnected ? (
+                "..."
+              ) : (
+                <div className="flex items-center gap-2">
+                  <NumberFlow value={totalVisits} />
+                </div>
+              )}
             </CardDescription>
           </div>
           <div className="flex flex-col gap-1 text-left min-w-24">
@@ -187,18 +230,33 @@ export function ChatAnalytics() {
               </div>
             </CardTitle>
             <CardDescription className="text-xl md:text-2xl font-semibold text-black">
-              1m 6s
+              {!isConnected ? (
+                "..."
+              ) : (
+                <div className="flex items-center gap-2">
+                  {formatDuration(averageSessionTime)}
+                </div>
+              )}
             </CardDescription>
           </div>
           <div className="flex flex-col gap-1 text-left min-w-24">
             <CardTitle className="flex items-center gap-3 text-muted-foreground text-xs">
               <div className="flex items-center gap-1">
-                <div className="inset-0 size-2 items-center justify-center rounded-full group-hover:animate-none bg-blue-500" />
-                <span>Visitors now </span>
+                <Loader
+                  variant="pulse-dot"
+                  className="inset-0 size-2 bg-green-500"
+                />
+                <span>Live users </span>
               </div>
             </CardTitle>
             <CardDescription className="text-xl md:text-2xl font-semibold text-black">
-              <NumberFlow value={4} />
+              {!isConnected ? (
+                <NumberFlow value={0} />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <NumberFlow value={activeVisitors} />
+                </div>
+              )}
             </CardDescription>
           </div>
         </CardHeader>

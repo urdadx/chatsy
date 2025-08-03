@@ -20,13 +20,12 @@ const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY!,
 });
 
-// Setup the LLM Ingestion Strategy (same as /api/chat/index.ts)
 const llmIngestion = Ingestion({
   accessToken: process.env.POLAR_ACCESS_TOKEN!,
   server: "sandbox",
 })
   .strategy(new LLMStrategy(google("gemini-2.5-pro")))
-  .ingest("ai_usage");
+  .ingest("ai_usage_two");
 
 export const ServerRoute = createServerFileRoute(
   "/api/embed/chat/$embedToken",

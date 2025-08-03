@@ -17,10 +17,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { Vote } from "@/db/schema";
+import { useSendVisitorAnalytics } from "@/hooks/log-visitor-analytics";
 import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
-import { useSendVisitorAnalytics } from "@/hooks/use-visitor-analytics";
 import { ChatSDKError } from "@/lib/errors";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
@@ -64,22 +64,37 @@ function RouteComponent() {
       api: `/api/embed/chat/${pageId}`,
       onFinish: () => {
         queryClient.invalidateQueries({ queryKey: ["messages"] });
+        // Track detailed message analytics
+        if (messages.length === 0) {
+          logVisitorAnalytics({
+            event: "bio_first_message_sent",
+            page_engagement: "first_message",
+          });
+        } else {
+          logVisitorAnalytics({
+            event: "bio_message_sent",
+            page_engagement: "continued_chat",
+            message_count: messages.length + 1,
+          });
+        }
       },
     });
 
   const inputLength = input.trim().length;
   const organizationId = chatbot?.organizationId;
 
-  // send analytics when the component mounts
-  useSendVisitorAnalytics({
+  // Track visitor analytics with time spent
+  const { logVisitorAnalytics } = useSendVisitorAnalytics({
     organizationId: organizationId || "placeholder",
+    extra: { page_type: "bio_page", page_id: pageId },
   });
 
   const handleResetChat = useCallback(() => {
     setMessages([]);
     setInput("");
     toast.success("Chat reset successfully");
-  }, [setMessages, setInput]);
+    logVisitorAnalytics({ event: "bio_page_chat_reset" });
+  }, [setMessages, setInput, logVisitorAnalytics]);
 
   const isLastMessageFromUser =
     messages.length > 0 && messages[messages.length - 1].role === "user";
@@ -122,8 +137,8 @@ function RouteComponent() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-muted">
-      <Card className="w-full max-w-lg h-[80vh] shadow-xl border-1 py-0 flex flex-col">
+    <div className="flex items-center  justify-center min-h-screen ">
+      <Card className="w-[95%] max-w-lg h-[80vh] shadow-xl border-1 py-0 flex flex-col">
         {/* Header */}
         <div
           className="p-4 text-white flex items-center justify-between border-b rounded-t-xl bg-primary"

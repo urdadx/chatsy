@@ -28,7 +28,7 @@ const llmIngestion = Ingestion({
   server: "sandbox",
 })
   .strategy(new LLMStrategy(google("gemini-2.5-pro")))
-  .ingest("ai_usage");
+  .ingest("ai_usage_two");
 
 export const ServerRoute = createServerFileRoute("/api/chat/").methods({
   POST: async ({ request }) => {
@@ -115,7 +115,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         model,
         system: systemPrompt(chatbotDetails.name ?? "Assistant"),
         messages,
-        maxTokens: 300,
+        maxTokens: 500,
         maxSteps: 5,
         tools: {
           knowledge_base: knowledgeSearchTool(organizationId),

@@ -1,6 +1,6 @@
+import { getVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { useChatHistory } from "@/hooks/use-chat-history";
 import { useUsage } from "@/hooks/use-usage-meters";
-import { getVisitorAnalytics } from "@/hooks/use-visitor-analytics";
 import { api } from "@/lib/api";
 import NumberFlow from "@number-flow/react";
 import { useQuery } from "@tanstack/react-query";
@@ -38,9 +38,11 @@ export function DashboardMetrics() {
 
   const { data } = useUsage();
 
-  const balance = data?.balance ?? 0;
+  const meter = Array.isArray(data) ? data[0] : data;
 
-  const { data: visitorData } = getVisitorAnalytics("90d");
+  const balance = meter?.balance ?? 0;
+
+  const { data: visitorData } = getVisitorHistory("90d");
   const totalVisits = Array.isArray(visitorData) ? visitorData.length : 0;
 
   return (

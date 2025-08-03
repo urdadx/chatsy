@@ -2,7 +2,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { Button } from "../ui/button";
 
 export const QRCodeExport = ({ embedToken }: { embedToken: string }) => {
-  const baseUrl = `${window.location.origin}/embed/${embedToken}`;
+  const baseUrl = `${window.location.origin}/bio-page/${embedToken}`;
   const downloadQRCode = () => {
     const canvas = document.getElementById("qr-code") as HTMLCanvasElement;
     if (!canvas) return;

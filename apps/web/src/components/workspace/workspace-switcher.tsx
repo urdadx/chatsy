@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
 import { RiCheckboxCircleFill } from "@remixicon/react";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import Avatar from "boring-avatars";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -24,7 +24,7 @@ import { InviteMembers } from "./invite-members";
 import { CreateWorkspace } from "./new-workspace";
 
 export function WorkspaceSwitcher() {
-  const { data: activeOrganization, isLoading } = useQuery({
+  const { data: activeOrganization, isLoading } = useSuspenseQuery({
     queryKey: ["activeOrganization"],
     queryFn: async () => {
       const result = await authClient.organization.getFullOrganization();
@@ -114,7 +114,7 @@ export function WorkspaceSwitcher() {
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-58 rounded-lg"
               side="bottom"
               align="end"
             >
@@ -149,7 +149,9 @@ export function WorkspaceSwitcher() {
                           className="h-8 w-8 rounded-full"
                         />
 
-                        <span className="truncate">{org.name}</span>
+                        <span className="truncate max-w-[120px] block">
+                          {org.name}
+                        </span>
                         {org.id === activeOrganization?.id && (
                           <RiCheckboxCircleFill className="ml-auto h-4 w-4 text-primary" />
                         )}

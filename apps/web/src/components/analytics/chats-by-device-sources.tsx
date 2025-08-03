@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import {} from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { osCodes } from "@/constants/os";
-import { getVisitorAnalytics } from "@/hooks/use-visitor-analytics";
+import { useVisitorHistory } from "@/hooks/log-visitor-analytics";
+import { detectDevice } from "@/lib/utils";
 import { useSearch } from "@tanstack/react-router";
 import {
   Bot,
@@ -19,42 +20,51 @@ import { ViewAllStats } from "./view-all-stats";
 
 export function ChatsByDeviceSources() {
   const { timeRange } = useSearch({ from: "/admin/analytics" });
-  const { data: analytics, isLoading: metricsPending } = getVisitorAnalytics(
+  const { data: analytics, isLoading: metricsPending } = useVisitorHistory(
     (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
+    true,
   );
   const [devicesDialogOpen, setDevicesDialogOpen] = useState(false);
   const [browsersDialogOpen, setBrowsersDialogOpen] = useState(false);
   const [osDialogOpen, setOsDialogOpen] = useState(false);
 
-  // Aggregate device, browser, and OS metrics from analytics
   const metrics = useMemo(() => {
     if (!analytics) return null;
     const deviceCounts: Record<string, number> = {};
     const browserCounts: Record<string, number> = {};
     const osCounts: Record<string, number> = {};
+
     analytics.forEach((rec: any) => {
-      // Device Type
-      const deviceType = rec.deviceType || "other";
-      deviceCounts[deviceType] = (deviceCounts[deviceType] || 0) + 1;
-      // Browser (userAgent)
-      let browser = "Unknown";
       if (rec.userAgent) {
-        if (rec.userAgent.includes("Chrome")) browser = "Chrome";
-        else if (rec.userAgent.includes("Firefox")) browser = "Firefox";
-        else if (
-          rec.userAgent.includes("Safari") &&
-          !rec.userAgent.includes("Chrome")
-        )
-          browser = "Safari";
-        else if (rec.userAgent.includes("Edge")) browser = "Edge";
-        else if (rec.userAgent.includes("Opera")) browser = "Opera";
-        else if (rec.userAgent.includes("Bot") || rec.deviceType === "bot")
-          browser = "Bot";
+        const originalUserAgent = navigator.userAgent;
+        Object.defineProperty(navigator, "userAgent", {
+          value: rec.userAgent,
+          configurable: true,
+        });
+
+        try {
+          const deviceInfo = detectDevice();
+
+          let deviceType = rec.deviceType || "other";
+          if (deviceInfo.type === "mobile") deviceType = "Mobile";
+          else if (deviceInfo.type === "desktop") deviceType = "Desktop";
+          else if (deviceInfo.type === "tablet") deviceType = "Tablet";
+          else if (rec.deviceType === "bot") deviceType = "Bot";
+
+          deviceCounts[deviceType] = (deviceCounts[deviceType] || 0) + 1;
+
+          const browser = deviceInfo.browser || "Unknown";
+          browserCounts[browser] = (browserCounts[browser] || 0) + 1;
+
+          const os = deviceInfo.os || "Unknown";
+          osCounts[os] = (osCounts[os] || 0) + 1;
+        } finally {
+          Object.defineProperty(navigator, "userAgent", {
+            value: originalUserAgent,
+            configurable: true,
+          });
+        }
       }
-      browserCounts[browser] = (browserCounts[browser] || 0) + 1;
-      // OS/Platform
-      const os = rec.platform || "Unknown";
-      osCounts[os] = (osCounts[os] || 0) + 1;
     });
     return {
       devices: Object.entries(deviceCounts).map(([deviceType, totalCount]) => ({
@@ -75,6 +85,7 @@ export function ChatsByDeviceSources() {
         const deviceIcon = {
           Mobile: <MobilePhone className="w-4" />,
           Desktop: <Monitor className="w-4" />,
+          Tablet: <TabletSmartphone className="w-4" />,
           Bot: <Bot className="w-4" />,
           other: <TabletSmartphone className="w-4" />,
         };
@@ -84,7 +95,7 @@ export function ChatsByDeviceSources() {
           icon,
           title:
             device.deviceType === "other" || device.deviceType == null
-              ? "Unkown"
+              ? "Unknown"
               : device.deviceType,
           href: "",
           value: device.totalCount,

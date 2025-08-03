@@ -19,7 +19,6 @@ export function useChatbot() {
       });
       return response.data;
     },
-    enabled: !!organizationId,
   });
 }
 

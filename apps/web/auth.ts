@@ -17,7 +17,7 @@ if (!POLAR_ACCESS_TOKEN) {
   throw new Error("Polar access token is not set in environment variables");
 }
 
-const polarClient = new Polar({
+export const polarClient = new Polar({
   accessToken: POLAR_ACCESS_TOKEN!,
   // Use 'sandbox' if you're using the Polar Sandbox environment
   // Remember that access tokens, products, etc. are completely separated between environments.

@@ -60,6 +60,9 @@ export function ChatPreview() {
       onFinish: () => {
         queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
         queryClient.invalidateQueries({ queryKey: ["messages"] });
+        queryClient.invalidateQueries({
+          queryKey: ["customerMeters", "ai_usage_two"],
+        });
       },
     });
 
@@ -191,6 +194,9 @@ export function ChatPreview() {
                 </div>
               )}
             </ChatContainerContent>
+            <div className="absolute bottom-4 right-4 z-10">
+              <ScrollButton className="shadow-lg" />
+            </div>
           </ChatContainerRoot>
         </div>
 

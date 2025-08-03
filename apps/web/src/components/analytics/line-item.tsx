@@ -19,7 +19,6 @@ interface LineItemProps {
 export function LineItem({
   icon,
   title,
-  href,
   value,
   maxValue,
   unit,
@@ -64,8 +63,7 @@ export function LineItem({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <a
-        href={href}
+      <div
         className="block cursor-pointer"
         title={`${title}: ${formattedValue} ${unit}`}
       >
@@ -90,7 +88,7 @@ export function LineItem({
             {formattedValue}
           </div>
         </div>
-      </a>
+      </div>
     </div>
   );
 }

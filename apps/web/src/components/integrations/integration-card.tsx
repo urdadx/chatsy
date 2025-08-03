@@ -1,8 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { DialogContent } from "@radix-ui/react-dialog";
 
 interface IntegrationCardProps {
   icon: React.ReactNode;
@@ -17,7 +14,6 @@ export const IntegrationCard = ({
   description,
   badgeText,
 }: IntegrationCardProps) => {
-  const isMobile = useIsMobile();
   return (
     <div className="bg-white rounded-md p-3 sm:p-4 border border-gray-200 shadow-sm w-full max-w-xs mx-auto h-full">
       <div className="flex flex-col gap-3 sm:gap-4 h-full">
@@ -35,32 +31,16 @@ export const IntegrationCard = ({
         <p className="text-gray-600 text-xs sm:text-sm flex-grow">
           {description}
         </p>
-        {!isMobile ? (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                className="mt-1 sm:mt-2 w-full rounded-lg transition-colors text-sm"
-              >
-                Connect
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="w-full sm:max-w-md">
-              yooo my guy
-            </DialogContent>
-          </Dialog>
-        ) : (
-          <Drawer>
-            <DrawerTrigger asChild>
-              <Button className="mt-1 sm:mt-2 w-full rounded-lg transition-colors text-sm">
-                Connect
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent className="w-full sm:max-w-md">
-              yooo my guy
-            </DrawerContent>
-          </Drawer>
-        )}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              className="mt-1 sm:mt-2 w-fit rounded-lg text-sm "
+            >
+              Connect
+            </Button>
+          </DialogTrigger>
+        </Dialog>
       </div>
     </div>
   );

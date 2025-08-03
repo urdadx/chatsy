@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GOOGLE_FAVICON_URL } from "@/constants/domains";
-import { getVisitorAnalytics } from "@/hooks/use-visitor-analytics";
+import { useVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { getApexDomain } from "@/lib/utils";
 import { useSearch } from "@tanstack/react-router";
 import { Maximize2, MousePointerClick } from "lucide-react";
@@ -12,9 +12,21 @@ import { ViewAllStats } from "./view-all-stats";
 
 export function ChatsByReferrers() {
   const { timeRange } = useSearch({ from: "/admin/analytics" });
-  const { data: analytics, isLoading: metricsPending } = getVisitorAnalytics(
+
+  // Option A: Use real-time version (recommended for live dashboards)
+  const result = useVisitorHistory(
     (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
+    true, // Enable real-time updates via SSE
   );
+
+  const { data: analytics, isLoading: metricsPending } = result;
+
+  // Option B: Use static version (for historical charts that don't need real-time updates)
+  // const { data: analytics, isLoading: metricsPending } = useVisitorHistory(
+  //   (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
+  //   false // Static version
+  // );
+
   const [referrersDialogOpen, setReferrersDialogOpen] = useState(false);
   const [referrerURLsDialogOpen, setReferrerURLsDialogOpen] = useState(false);
 
@@ -96,7 +108,7 @@ export function ChatsByReferrers() {
               Referrer URL
             </TabsTrigger>
           </TabsList>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <div className="text-muted-foreground text-sm flex items-center gap-1">
               <MousePointerClick className="h-4 w-4" /> Referrers
             </div>

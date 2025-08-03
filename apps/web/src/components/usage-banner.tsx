@@ -4,23 +4,15 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUsage } from "@/hooks/use-usage-meters";
 import { authClient } from "@/lib/auth-client";
-
-export function getDaysUntilReset(createdAt?: Date) {
-  if (!createdAt) return "-";
-  const created = new Date(createdAt);
-  const reset = new Date(created);
-  reset.setMonth(reset.getMonth() + 1);
-  const now = new Date();
-  const diffTime = reset.getTime() - now.getTime();
-  const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-  return `${diffDays} day${diffDays !== 1 ? "s" : ""}`;
-}
+import { getDaysUntilReset } from "@/lib/utils";
 
 export function UsageBanner() {
-  const { data, isLoading, isError } = useUsage();
+  const { data, isLoading, isError } = useUsage("ai_usage_two");
 
-  const creditedUnits = data?.creditedUnits ?? 0;
-  const balance = data?.balance ?? 0;
+  const meter = Array.isArray(data) ? data[0] : data;
+
+  const creditedUnits = meter?.creditedUnits ?? 0;
+  const balance = meter?.balance ?? 0;
   const totalUsage = creditedUnits;
   const currentUsage = creditedUnits - balance;
   const usagePercentage =
@@ -66,7 +58,7 @@ export function UsageBanner() {
         <div className="mb-2">
           <div className="flex justify-between text-xs">
             <span className="mb-2">
-              Resets in {getDaysUntilReset(data?.createdAt)}
+              Resets in {getDaysUntilReset(meter?.createdAt)}
             </span>
           </div>
           <Progress value={usagePercentage} />

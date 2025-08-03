@@ -7,13 +7,13 @@ import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Mail } from "lucide-react";
-import { nanoid } from "nanoid";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 import { GoogleSVG } from "./google-svg";
 
 interface RegisterFormData {
+  name: string;
   email: string;
   password: string;
 }
@@ -34,7 +34,7 @@ export function RegisterForm({
     await signUp.email(
       {
         email: data.email,
-        name: `user-${nanoid(6)}`,
+        name: data.name,
         password: data.password,
       },
       {
@@ -100,6 +100,27 @@ export function RegisterForm({
                 </span>
               </div>
               <div className="grid gap-6">
+                <div className="grid gap-3">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    className="sm:text-xs text-sm"
+                    placeholder="Enter your name"
+                    {...register("name", {
+                      required: "Name is required",
+                      minLength: {
+                        value: 2,
+                        message: "Name must be at least 2 characters",
+                      },
+                    })}
+                  />
+                  {errors.name && (
+                    <p className="text-sm text-red-500">
+                      {errors.name.message}
+                    </p>
+                  )}
+                </div>
                 <div className="grid gap-3">
                   <Label htmlFor="email">Email</Label>
                   <Input

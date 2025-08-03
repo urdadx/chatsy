@@ -1,7 +1,5 @@
-import { motion } from "framer-motion";
 import { Calendar, Headset, MessageCircle, Users } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../ui/button";
 import { ActionIcon } from "./action-icon";
 import { ActionCard } from "./actions-card";
 import { SearchActions } from "./search-actions";
@@ -59,11 +57,8 @@ export const Actions = () => {
       <div className="pt-4 flex flex-col justify-between items-center w-full gap-3">
         <div className="flex justify-between items-center w-full ">
           <SearchActions value={searchTerm} onChange={setSearchTerm} />
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button>Create custom action</Button>
-          </motion.div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-3">
           {filteredActions.map((action) => (
             <ActionCard
               key={action.name}

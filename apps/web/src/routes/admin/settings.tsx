@@ -81,11 +81,12 @@ function RouteComponent() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="account">
-            <div className="space-y-6 py-4">
+            <div className="space-y-6 mt-5">
               <WorkspaceNameSettings />
               <WorkspaceLogoSettings />
               <WorkspaceDelete />
             </div>
+            <div className="h-14" />
           </TabsContent>
 
           <TabsContent value="billing">

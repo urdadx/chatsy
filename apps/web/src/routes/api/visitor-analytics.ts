@@ -3,6 +3,7 @@ import { visitorAnalytics } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
+import { and, eq } from "drizzle-orm";
 import z from "zod";
 
 const analyticsSchema = z.object({
@@ -76,10 +77,10 @@ export const ServerRoute = createServerFileRoute(
     }
     try {
       const records = await db.query.visitorAnalytics.findMany({
-        where: (
-          fields: typeof visitorAnalytics._.columns,
-          { eq }: { eq: any },
-        ) => eq(fields.organizationId, organizationId),
+        where: and(
+          eq(visitorAnalytics.organizationId, organizationId),
+          eq(visitorAnalytics.event, "page_visit"), // Only return actual visits, not unload events
+        ),
         orderBy: (
           fields: typeof visitorAnalytics._.columns,
           { desc }: { desc: any },

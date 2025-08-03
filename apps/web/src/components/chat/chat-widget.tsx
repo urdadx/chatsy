@@ -1,11 +1,27 @@
+import { convertToUIMessages } from "@/components/chat/chat-preview";
+import { GreetingMessage } from "@/components/chat/greeting-message";
+import { PreviewMessage, ThinkingMessage } from "@/components/chat/message";
+import { AISuggestion, AISuggestions } from "@/components/ui/ai-suggestions";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter } from "@/components/ui/card";
+import {
+  ChatContainerContent,
+  ChatContainerRoot,
+  ChatContainerScrollAnchor,
+} from "@/components/ui/chat-container";
 import { Input } from "@/components/ui/input";
+import { ScrollButton } from "@/components/ui/scroll-button";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { Vote } from "@/db/schema";
+import { useSendVisitorAnalytics } from "@/hooks/log-visitor-analytics";
 import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
-import { useSendVisitorAnalytics } from "@/hooks/use-visitor-analytics";
 import { ChatSDKError } from "@/lib/errors";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
@@ -20,18 +36,6 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { AISuggestion, AISuggestions } from "../ui/ai-suggestions";
-import {
-  ChatContainerContent,
-  ChatContainerRoot,
-  ChatContainerScrollAnchor,
-} from "../ui/chat-container";
-import { ScrollButton } from "../ui/scroll-button";
-import { Spinner } from "../ui/spinner";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { convertToUIMessages } from "./chat-preview";
-import { GreetingMessage } from "./greeting-message";
-import { PreviewMessage, ThinkingMessage } from "./message";
 
 interface ChatWidgetProps {
   embedToken: string;
@@ -52,10 +56,16 @@ export function ChatWidget({
   } = useChatWidget(embedToken);
 
   const organizationId = chatbot?.organizationId || "";
-  // Only initialize analytics when organizationId is available
-  const { logVisitorAnalytics, mountTimestampRef } = useSendVisitorAnalytics(
-    organizationId ? { organizationId } : { organizationId: "placeholder" },
-  );
+  // Track visitor analytics with widget-specific data
+  const { logVisitorAnalytics, mountTimestampRef } = useSendVisitorAnalytics({
+    organizationId: organizationId || "placeholder",
+    extra: {
+      widget_type: "chat_widget",
+      embed_token: embedToken,
+      trigger_on_mount: false, // We'll manually track widget interactions
+    },
+    triggerOnMount: false, // Don't auto-trigger on mount for widgets
+  });
   const { chatId } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
 
@@ -78,6 +88,19 @@ export function ChatWidget({
       api: `/api/embed/chat/${embedToken}`,
       onFinish: () => {
         queryClient.invalidateQueries({ queryKey: ["messages"] });
+        // Track first message and widget engagement
+        if (messages.length === 0) {
+          logVisitorAnalytics({
+            event: "widget_first_message_sent",
+            widget_engagement: "first_message",
+          });
+        } else {
+          logVisitorAnalytics({
+            event: "widget_message_sent",
+            widget_engagement: "continued_chat",
+            message_count: messages.length + 1,
+          });
+        }
       },
     });
 
@@ -87,15 +110,24 @@ export function ChatWidget({
     const newState = !isWidgetOpen;
     setIsWidgetOpen(newState);
     onToggle?.(newState);
+
     if (!isWidgetOpen && newState) {
-      // Only log when opening
+      // Widget is being opened
       mountTimestampRef.current = Date.now();
-      logVisitorAnalytics();
+      logVisitorAnalytics({
+        event: "widget_opened",
+        widget_state: "opened",
+      });
     }
+
     if (isWidgetOpen && !newState && mountTimestampRef.current) {
       // Widget is being closed, log time spent
       const durationMs = Date.now() - mountTimestampRef.current;
-      logVisitorAnalytics({ durationMs });
+      logVisitorAnalytics({
+        durationMs,
+        event: "widget_closed",
+        widget_state: "closed",
+      });
       mountTimestampRef.current = null;
     }
   }, [isWidgetOpen, onToggle, logVisitorAnalytics, mountTimestampRef]);
@@ -105,7 +137,11 @@ export function ChatWidget({
     function handleBeforeUnload() {
       if (isWidgetOpen && mountTimestampRef.current) {
         const durationMs = Date.now() - mountTimestampRef.current;
-        logVisitorAnalytics({ durationMs, event: "page_unload" });
+        logVisitorAnalytics({
+          durationMs,
+          event: "widget_page_unload",
+          widget_state: "open_on_unload",
+        });
       }
     }
     window.addEventListener("beforeunload", handleBeforeUnload);

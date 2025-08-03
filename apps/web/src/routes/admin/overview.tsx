@@ -18,12 +18,11 @@ function RouteComponent() {
       const response = await api.get<{ status: string }>("/training-status");
       return response.data;
     },
-    refetchOnMount: true,
   });
 
   const renderStatus = () => {
     if (isLoading) {
-      return <InProgressStatus />;
+      return <CompletedStatus />;
     }
 
     switch (data?.status) {
