@@ -13,6 +13,6 @@ export default defineConfig({
     tanstackStart(),
   ],
   server: {
-    allowedHosts: ["ec17fb630313.ngrok-free.app"],
+    allowedHosts: ["f053b365c875.ngrok-free.app"],
   },
 });

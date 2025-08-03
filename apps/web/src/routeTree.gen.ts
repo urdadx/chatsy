@@ -56,6 +56,11 @@ import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/cha
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 import { ServerRoute as ApiEmbedChatbotEmbedTokenServerRouteImport } from './routes/api/embed/chatbot/$embedToken'
 import { ServerRoute as ApiEmbedChatEmbedTokenServerRouteImport } from './routes/api/embed/chat/$embedToken'
+import { ServerRoute as ApiIntegrationsWhatsappWebhooksVerifyServerRouteImport } from './routes/api/integrations/whatsapp/webhooks/verify'
+import { ServerRoute as ApiIntegrationsWhatsappWebhooksReceiveServerRouteImport } from './routes/api/integrations/whatsapp/webhooks/receive'
+import { ServerRoute as ApiIntegrationsWhatsappSettingsChatbotIdServerRouteImport } from './routes/api/integrations/whatsapp/settings/$chatbotId'
+import { ServerRoute as ApiIntegrationsWhatsappAuthConnectServerRouteImport } from './routes/api/integrations/whatsapp/auth/connect'
+import { ServerRoute as ApiIntegrationsWhatsappAuthCallbackServerRouteImport } from './routes/api/integrations/whatsapp/auth/callback'
 
 const AdminTestLazyRouteImport = createFileRoute('/admin/test')()
 const rootServerRouteImport = createServerRootRoute()
@@ -294,6 +299,36 @@ const ApiEmbedChatEmbedTokenServerRoute =
     path: '/api/embed/chat/$embedToken',
     getParentRoute: () => rootServerRouteImport,
   } as any)
+const ApiIntegrationsWhatsappWebhooksVerifyServerRoute =
+  ApiIntegrationsWhatsappWebhooksVerifyServerRouteImport.update({
+    id: '/api/integrations/whatsapp/webhooks/verify',
+    path: '/api/integrations/whatsapp/webhooks/verify',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiIntegrationsWhatsappWebhooksReceiveServerRoute =
+  ApiIntegrationsWhatsappWebhooksReceiveServerRouteImport.update({
+    id: '/api/integrations/whatsapp/webhooks/receive',
+    path: '/api/integrations/whatsapp/webhooks/receive',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiIntegrationsWhatsappSettingsChatbotIdServerRoute =
+  ApiIntegrationsWhatsappSettingsChatbotIdServerRouteImport.update({
+    id: '/api/integrations/whatsapp/settings/$chatbotId',
+    path: '/api/integrations/whatsapp/settings/$chatbotId',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiIntegrationsWhatsappAuthConnectServerRoute =
+  ApiIntegrationsWhatsappAuthConnectServerRouteImport.update({
+    id: '/api/integrations/whatsapp/auth/connect',
+    path: '/api/integrations/whatsapp/auth/connect',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiIntegrationsWhatsappAuthCallbackServerRoute =
+  ApiIntegrationsWhatsappAuthCallbackServerRouteImport.update({
+    id: '/api/integrations/whatsapp/auth/callback',
+    path: '/api/integrations/whatsapp/auth/callback',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -452,6 +487,11 @@ export interface FileServerRoutesByFullPath {
   '/api/chat': typeof ApiChatIndexServerRoute
   '/api/embed/chat/$embedToken': typeof ApiEmbedChatEmbedTokenServerRoute
   '/api/embed/chatbot/$embedToken': typeof ApiEmbedChatbotEmbedTokenServerRoute
+  '/api/integrations/whatsapp/auth/callback': typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
+  '/api/integrations/whatsapp/auth/connect': typeof ApiIntegrationsWhatsappAuthConnectServerRoute
+  '/api/integrations/whatsapp/settings/$chatbotId': typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
+  '/api/integrations/whatsapp/webhooks/receive': typeof ApiIntegrationsWhatsappWebhooksReceiveServerRoute
+  '/api/integrations/whatsapp/webhooks/verify': typeof ApiIntegrationsWhatsappWebhooksVerifyServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
@@ -482,6 +522,11 @@ export interface FileServerRoutesByTo {
   '/api/chat': typeof ApiChatIndexServerRoute
   '/api/embed/chat/$embedToken': typeof ApiEmbedChatEmbedTokenServerRoute
   '/api/embed/chatbot/$embedToken': typeof ApiEmbedChatbotEmbedTokenServerRoute
+  '/api/integrations/whatsapp/auth/callback': typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
+  '/api/integrations/whatsapp/auth/connect': typeof ApiIntegrationsWhatsappAuthConnectServerRoute
+  '/api/integrations/whatsapp/settings/$chatbotId': typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
+  '/api/integrations/whatsapp/webhooks/receive': typeof ApiIntegrationsWhatsappWebhooksReceiveServerRoute
+  '/api/integrations/whatsapp/webhooks/verify': typeof ApiIntegrationsWhatsappWebhooksVerifyServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
@@ -513,6 +558,11 @@ export interface FileServerRoutesById {
   '/api/chat/': typeof ApiChatIndexServerRoute
   '/api/embed/chat/$embedToken': typeof ApiEmbedChatEmbedTokenServerRoute
   '/api/embed/chatbot/$embedToken': typeof ApiEmbedChatbotEmbedTokenServerRoute
+  '/api/integrations/whatsapp/auth/callback': typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
+  '/api/integrations/whatsapp/auth/connect': typeof ApiIntegrationsWhatsappAuthConnectServerRoute
+  '/api/integrations/whatsapp/settings/$chatbotId': typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
+  '/api/integrations/whatsapp/webhooks/receive': typeof ApiIntegrationsWhatsappWebhooksReceiveServerRoute
+  '/api/integrations/whatsapp/webhooks/verify': typeof ApiIntegrationsWhatsappWebhooksVerifyServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
@@ -545,6 +595,11 @@ export interface FileServerRouteTypes {
     | '/api/chat'
     | '/api/embed/chat/$embedToken'
     | '/api/embed/chatbot/$embedToken'
+    | '/api/integrations/whatsapp/auth/callback'
+    | '/api/integrations/whatsapp/auth/connect'
+    | '/api/integrations/whatsapp/settings/$chatbotId'
+    | '/api/integrations/whatsapp/webhooks/receive'
+    | '/api/integrations/whatsapp/webhooks/verify'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/analytics-stream'
@@ -575,6 +630,11 @@ export interface FileServerRouteTypes {
     | '/api/chat'
     | '/api/embed/chat/$embedToken'
     | '/api/embed/chatbot/$embedToken'
+    | '/api/integrations/whatsapp/auth/callback'
+    | '/api/integrations/whatsapp/auth/connect'
+    | '/api/integrations/whatsapp/settings/$chatbotId'
+    | '/api/integrations/whatsapp/webhooks/receive'
+    | '/api/integrations/whatsapp/webhooks/verify'
   id:
     | '__root__'
     | '/api/analytics-stream'
@@ -605,6 +665,11 @@ export interface FileServerRouteTypes {
     | '/api/chat/'
     | '/api/embed/chat/$embedToken'
     | '/api/embed/chatbot/$embedToken'
+    | '/api/integrations/whatsapp/auth/callback'
+    | '/api/integrations/whatsapp/auth/connect'
+    | '/api/integrations/whatsapp/settings/$chatbotId'
+    | '/api/integrations/whatsapp/webhooks/receive'
+    | '/api/integrations/whatsapp/webhooks/verify'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
@@ -636,6 +701,11 @@ export interface RootServerRouteChildren {
   ApiChatIndexServerRoute: typeof ApiChatIndexServerRoute
   ApiEmbedChatEmbedTokenServerRoute: typeof ApiEmbedChatEmbedTokenServerRoute
   ApiEmbedChatbotEmbedTokenServerRoute: typeof ApiEmbedChatbotEmbedTokenServerRoute
+  ApiIntegrationsWhatsappAuthCallbackServerRoute: typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
+  ApiIntegrationsWhatsappAuthConnectServerRoute: typeof ApiIntegrationsWhatsappAuthConnectServerRoute
+  ApiIntegrationsWhatsappSettingsChatbotIdServerRoute: typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
+  ApiIntegrationsWhatsappWebhooksReceiveServerRoute: typeof ApiIntegrationsWhatsappWebhooksReceiveServerRoute
+  ApiIntegrationsWhatsappWebhooksVerifyServerRoute: typeof ApiIntegrationsWhatsappWebhooksVerifyServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -959,6 +1029,41 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiEmbedChatEmbedTokenServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/integrations/whatsapp/webhooks/verify': {
+      id: '/api/integrations/whatsapp/webhooks/verify'
+      path: '/api/integrations/whatsapp/webhooks/verify'
+      fullPath: '/api/integrations/whatsapp/webhooks/verify'
+      preLoaderRoute: typeof ApiIntegrationsWhatsappWebhooksVerifyServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/integrations/whatsapp/webhooks/receive': {
+      id: '/api/integrations/whatsapp/webhooks/receive'
+      path: '/api/integrations/whatsapp/webhooks/receive'
+      fullPath: '/api/integrations/whatsapp/webhooks/receive'
+      preLoaderRoute: typeof ApiIntegrationsWhatsappWebhooksReceiveServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/integrations/whatsapp/settings/$chatbotId': {
+      id: '/api/integrations/whatsapp/settings/$chatbotId'
+      path: '/api/integrations/whatsapp/settings/$chatbotId'
+      fullPath: '/api/integrations/whatsapp/settings/$chatbotId'
+      preLoaderRoute: typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/integrations/whatsapp/auth/connect': {
+      id: '/api/integrations/whatsapp/auth/connect'
+      path: '/api/integrations/whatsapp/auth/connect'
+      fullPath: '/api/integrations/whatsapp/auth/connect'
+      preLoaderRoute: typeof ApiIntegrationsWhatsappAuthConnectServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/integrations/whatsapp/auth/callback': {
+      id: '/api/integrations/whatsapp/auth/callback'
+      path: '/api/integrations/whatsapp/auth/callback'
+      fullPath: '/api/integrations/whatsapp/auth/callback'
+      preLoaderRoute: typeof ApiIntegrationsWhatsappAuthCallbackServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
   }
 }
 
@@ -1032,6 +1137,16 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiChatIndexServerRoute: ApiChatIndexServerRoute,
   ApiEmbedChatEmbedTokenServerRoute: ApiEmbedChatEmbedTokenServerRoute,
   ApiEmbedChatbotEmbedTokenServerRoute: ApiEmbedChatbotEmbedTokenServerRoute,
+  ApiIntegrationsWhatsappAuthCallbackServerRoute:
+    ApiIntegrationsWhatsappAuthCallbackServerRoute,
+  ApiIntegrationsWhatsappAuthConnectServerRoute:
+    ApiIntegrationsWhatsappAuthConnectServerRoute,
+  ApiIntegrationsWhatsappSettingsChatbotIdServerRoute:
+    ApiIntegrationsWhatsappSettingsChatbotIdServerRoute,
+  ApiIntegrationsWhatsappWebhooksReceiveServerRoute:
+    ApiIntegrationsWhatsappWebhooksReceiveServerRoute,
+  ApiIntegrationsWhatsappWebhooksVerifyServerRoute:
+    ApiIntegrationsWhatsappWebhooksVerifyServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

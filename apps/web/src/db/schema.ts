@@ -126,6 +126,13 @@ export const chat = pgTable("Chat", {
   visibility: varchar("visibility", { enum: ["public", "private"] })
     .notNull()
     .default("private"),
+
+  // Multi-channel support
+  channel: varchar("channel", { enum: ["web", "whatsapp", "telegram"] })
+    .notNull()
+    .default("web"),
+  externalUserId: text("external_user_id"), // WhatsApp phone number, Telegram user ID, etc.
+  externalUserName: text("external_user_name"), // External platform display name
 });
 
 export const message = pgTable("Message", {
@@ -193,6 +200,14 @@ export const chatbot = pgTable("chatbot", {
   isEmbeddingEnabled: boolean("is_embedding_enabled").notNull().default(true),
   embedToken: text("embed_token").unique(),
   allowedDomains: text("allowed_domains").array(),
+
+  // WhatsApp integration fields
+  whatsappEnabled: boolean("whatsapp_enabled").notNull().default(false),
+  whatsappPhoneNumberId: text("whatsapp_phone_number_id"),
+  whatsappBusinessAccountId: text("whatsapp_business_account_id"),
+  whatsappWelcomeMessage: text("whatsapp_welcome_message"),
+  whatsappSettings: jsonb("whatsapp_settings"),
+
   createdAt: timestamp("created_at")
     .notNull()
     .$defaultFn(() => new Date()),
@@ -378,6 +393,39 @@ export const creditsUsage = pgTable("credits_usage", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// WhatsApp message metadata (extends existing message table)
+export const whatsappMessageMetadata = pgTable("whatsapp_message_metadata", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  messageId: uuid("message_id")
+    .notNull()
+    .references(() => message.id, { onDelete: "cascade" }),
+  whatsappMessageId: text("whatsapp_message_id").unique(),
+  status: varchar("status").notNull().default("sent"),
+  timestamp: timestamp("timestamp").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// WhatsApp Business integration table
+export const whatsappIntegration = pgTable("whatsapp_integration", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  businessAccountId: text("business_account_id").notNull(),
+  accessToken: text("access_token").notNull(),
+  refreshToken: text("refresh_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  scope: text("scope"),
+  phoneNumbers: jsonb("phone_numbers"), // Store phone number data as JSON
+  primaryPhoneNumberId: text("primary_phone_number_id"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // TYPES
 export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;
 export type Feedback = InferSelectModel<typeof feedback>;
@@ -401,3 +449,7 @@ export type CreditsUsage = InferSelectModel<typeof creditsUsage>;
 export type Chatbot = InferSelectModel<typeof chatbot> & {
   name: string;
 };
+export type WhatsappMessageMetadata = InferSelectModel<
+  typeof whatsappMessageMetadata
+>;
+export type WhatsappIntegration = InferSelectModel<typeof whatsappIntegration>;

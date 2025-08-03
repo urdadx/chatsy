@@ -32,7 +32,7 @@ export function WidgetSettings() {
   }, [chatbot]);
 
   const generateEmbedToken = () => {
-    const token = `embed_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const token = `embed_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     setEmbedToken(token);
     updateChatbot({ embedToken: token });
   };
@@ -55,16 +55,19 @@ export function WidgetSettings() {
   const handleEmbeddingToggle = (checked: boolean) => {
     setIsEmbeddingEnabled(checked);
     updateChatbot({ isEmbeddingEnabled: checked });
-
-    // Generate token if enabling for the first time
-    if (checked && !embedToken) {
-      generateEmbedToken();
-    }
   };
 
   const addDomain = () => {
-    if (newDomain.trim() && !allowedDomains.includes(newDomain.trim())) {
-      const updatedDomains = [...allowedDomains, newDomain.trim()];
+    let domain = newDomain.trim();
+    if (!domain) return;
+
+    // Auto-prepend https:// if not present
+    if (!/^https?:\/\//i.test(domain)) {
+      domain = `https://${domain}`;
+    }
+
+    if (!allowedDomains.includes(domain)) {
+      const updatedDomains = [...allowedDomains, domain];
       setAllowedDomains(updatedDomains);
       updateChatbot({ allowedDomains: updatedDomains });
       setNewDomain("");
@@ -157,10 +160,10 @@ export function WidgetSettings() {
             <div className="flex items-center gap-2">
               <Input
                 className="flex-1"
-                placeholder="example.com"
+                placeholder="https://example.com"
                 value={newDomain}
                 onChange={(e) => setNewDomain(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && addDomain()}
+                onKeyDown={(e) => e.key === "Enter" && addDomain()}
               />
               <Button
                 variant="outline"
