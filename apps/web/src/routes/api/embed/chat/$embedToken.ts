@@ -7,6 +7,7 @@ import {
 } from "@/lib/ai/save-assistant-message";
 import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
+import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Ingestion } from "@polar-sh/ingestion";
@@ -138,7 +139,6 @@ export const ServerRoute = createServerFileRoute(
         }
       }
 
-      // Use llmIngestion for LLM analytics/tracking, using owner userId as externalCustomerId
       const model = llmIngestion.client({
         externalCustomerId: owner.userId,
       });
@@ -151,6 +151,7 @@ export const ServerRoute = createServerFileRoute(
         tools: {
           knowledge_base: knowledgeSearchTool(chatbotData.organizationId),
           collect_feedback: collectFeedbackTool,
+          collect_leads: collectLeadsTool,
         },
         onError: (err) => {
           console.error("🛑 streamText error:", err);

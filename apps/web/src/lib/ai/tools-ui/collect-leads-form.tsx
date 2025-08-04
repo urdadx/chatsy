@@ -1,11 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
+import { useEmbedToken } from "@/lib/contexts/embed-token-context";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function CollectLeadsForm() {
+  const embedToken = useEmbedToken();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,29 +29,36 @@ export function CollectLeadsForm() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const mutation = useMutation({
-      mutationFn: async (data: typeof formData) => {
-        const response = await api.post("/leads", data);
-        return response.data;
-      },
-      onSuccess: () => {
-        alert("Lead information collected successfully!");
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          company: "",
-          message: "",
-        });
-      },
-      onError: (error: any) => {
-        console.error("Error collecting lead:", error);
-        alert(error.response?.data?.message || "An unexpected error occurred.");
-      },
-    });
+  const mutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      const requestData = {
+        ...data,
+        ...(embedToken && { embedToken }),
+      };
 
+      const response = await api.post("/leads", requestData);
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Lead information collected successfully!");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        message: "",
+      });
+    },
+    onError: (error: any) => {
+      console.error("Error collecting lead:", error);
+      toast.error(
+        error.response?.data?.message || "An unexpected error occurred.",
+      );
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     mutation.mutate(formData);
   };
 
@@ -67,9 +79,7 @@ export function CollectLeadsForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
-          Email
-        </label>
+        <Label htmlFor="email">Email</Label>
         <Input
           id="email"
           name="email"
@@ -82,23 +92,19 @@ export function CollectLeadsForm() {
       </div>
 
       <div>
-        <label htmlFor="phone" className="block text-sm font-medium mb-1">
-          Phone (Optional)
-        </label>
+        <Label htmlFor="phone">Phone (Optional)</Label>
         <Input
           id="phone"
           name="phone"
           type="tel"
-          placeholder="Your phone number"
+          placeholder="+1 (555) 123-4567"
           value={formData.phone}
           onChange={handleChange}
         />
       </div>
 
       <div>
-        <label htmlFor="company" className="block text-sm font-medium mb-1">
-          Company (Optional)
-        </label>
+        <Label htmlFor="company">Company (Optional)</Label>
         <Input
           id="company"
           name="company"
@@ -121,7 +127,16 @@ export function CollectLeadsForm() {
         />
       </div>
 
-      <Button type="submit">Submit Information</Button>
+      <Button type="submit" disabled={mutation.isPending}>
+        {mutation.isPending ? (
+          <>
+            <Spinner className="text-white h-4 w-4 inline-block" />
+            Submitting...
+          </>
+        ) : (
+          "Submit Information"
+        )}
+      </Button>
     </form>
   );
 }

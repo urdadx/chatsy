@@ -8,6 +8,7 @@ import {
 } from "@/lib/ai/save-assistant-message";
 import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
+import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Ingestion } from "@polar-sh/ingestion";
@@ -120,6 +121,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         tools: {
           knowledge_base: knowledgeSearchTool(organizationId),
           collect_feedback: collectFeedbackTool,
+          collect_leads: collectLeadsTool,
         },
         onError: (err) => {
           console.error("🛑 streamText error:", err);

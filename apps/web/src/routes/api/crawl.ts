@@ -2,7 +2,7 @@ import FirecrawlApp from "@mendable/firecrawl-js";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { z } from "zod";
+import z from "zod";
 
 const crawlRequestSchema = z.object({
   url: z.string().min(1),

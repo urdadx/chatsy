@@ -1,4 +1,4 @@
-import { Calendar, Headset, MessageCircle, Users } from "lucide-react";
+import { Calendar, MessageCircle, Users } from "lucide-react";
 import { useState } from "react";
 import { ActionIcon } from "./action-icon";
 import { ActionCard } from "./actions-card";
@@ -26,15 +26,7 @@ export const Actions = () => {
       name: "Collect leads",
       description: "Captures leads from conversations with customers",
     },
-    {
-      icon: (
-        <ActionIcon>
-          <Headset className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
-        </ActionIcon>
-      ),
-      name: "Escalate to human",
-      description: "Transfers conversation to a human agent",
-    },
+
     {
       icon: (
         <ActionIcon>

@@ -4,7 +4,7 @@ import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { and, eq, sql } from "drizzle-orm";
-import { z } from "zod";
+import z from "zod";
 
 const createQuestionSchema = z.object({
   question: z.string().min(1),

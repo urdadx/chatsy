@@ -193,7 +193,7 @@ export function WhatsAppDialog({ children }: WhatsAppDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center text-base font-medium gap-2">
+          <DialogTitle className="flex items-center text-base font-medium gap-1">
             <IntegrationIcon>
               <img
                 src="https://img.icons8.com/color/48/whatsapp--v1.png"
@@ -203,7 +203,7 @@ export function WhatsAppDialog({ children }: WhatsAppDialogProps) {
             </IntegrationIcon>{" "}
             WhatsApp Business
           </DialogTitle>
-          <DialogDescription className="pt-2">
+          <DialogDescription className="pt-2 leading-normal">
             Connect your WhatsApp Business account to enable customers to chat
             with your bot via WhatsApp.
           </DialogDescription>
@@ -222,7 +222,7 @@ export function WhatsAppDialog({ children }: WhatsAppDialogProps) {
                   <div
                     className={`w-3 h-3 rounded-full ${isConnected ? "bg-green-500" : "bg-orange-300"}`}
                   />
-                  <span className="font-medium">
+                  <span className="font-medium text-sm">
                     {isConnected ? "Connected" : "Not Connected"}
                   </span>
                 </div>
@@ -232,7 +232,11 @@ export function WhatsAppDialog({ children }: WhatsAppDialogProps) {
                     WhatsApp Business connected
                   </div>
                 ) : (
-                  <Button onClick={connectWhatsApp} disabled={isConnecting}>
+                  <Button
+                    variant="outline"
+                    onClick={connectWhatsApp}
+                    disabled={isConnecting}
+                  >
                     {isConnecting ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -240,7 +244,7 @@ export function WhatsAppDialog({ children }: WhatsAppDialogProps) {
                       </>
                     ) : (
                       <>
-                        <ExternalLink className="h-4 w-4 mr-2" />
+                        <ExternalLink className="h-4 w-4 " />
                         Connect WhatsApp
                       </>
                     )}

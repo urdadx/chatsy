@@ -3,11 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
+import { useEmbedToken } from "@/lib/contexts/embed-token-context";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export function CollectFeedbackForm({ color }: { color?: string }) {
+  const embedToken = useEmbedToken();
   const [formData, setFormData] = useState({
     email: "",
     subject: "",
@@ -26,7 +28,12 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
 
   const mutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await api.post("/feedback", data);
+      const requestData = {
+        ...data,
+        ...(embedToken && { embedToken }),
+      };
+
+      const response = await api.post("/feedback", requestData);
       return response.data;
     },
     onSuccess: () => {

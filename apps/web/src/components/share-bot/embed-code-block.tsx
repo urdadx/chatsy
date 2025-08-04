@@ -23,23 +23,27 @@ export const EmbedCodeBlock = ({
       ? [
           {
             language: "html",
-            filename: "iframe.html",
+            filename: "iframe-embed.html",
             code: `<!-- Padyna Embedded Iframe -->
+            <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+
 <iframe
-  src="${window.location.origin}/embed/${embedToken}"
+  src="${window.location.origin}/bio-page/${embedToken}"
   width="400"
-  height="600"
-  style="border:none;"
+  height="700"
   title="Chatsy Chatbot"
-></iframe>`,
+  style="border:none; background-color: none;"
+  allow="clipboard-read; clipboard-write">
+</iframe>
+</div>
+`,
           },
         ]
       : [
           {
-            language: "js",
-            filename: "embed.js",
-            code: `<!-- Padyna Embedded Widget -->
-<div id="chatsy-widget"></div>
+            language: "html",
+            filename: "bubble-widget.html",
+            code: `<!-- Padyna Chat Bubble Widget -->
 <script>
   (function() {
     const script = document.createElement('script');
@@ -48,7 +52,11 @@ export const EmbedCodeBlock = ({
     script.onload = function() {
       ChatsyWidget.init({
         embedToken: '${embedToken}',
-        containerId: 'chatsy-widget'
+        mode: 'bubble',
+        position: 'bottom-right',
+        bubbleSize: 'medium',
+        showBadge: true,
+        autoOpen: false
       });
     };
     document.head.appendChild(script);

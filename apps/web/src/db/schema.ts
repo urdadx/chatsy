@@ -119,7 +119,7 @@ export const chat = pgTable("Chat", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   title: text("title").notNull(),
-  userId: uuid("userId").references(() => user.id, { onDelete: "cascade" }), // Allow null for anonymous embedded chats
+  userId: uuid("userId").references(() => user.id, { onDelete: "cascade" }),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
@@ -131,8 +131,8 @@ export const chat = pgTable("Chat", {
   channel: varchar("channel", { enum: ["web", "whatsapp", "telegram"] })
     .notNull()
     .default("web"),
-  externalUserId: text("external_user_id"), // WhatsApp phone number, Telegram user ID, etc.
-  externalUserName: text("external_user_name"), // External platform display name
+  externalUserId: text("external_user_id"),
+  externalUserName: text("external_user_name"),
 });
 
 export const message = pgTable("Message", {
@@ -218,18 +218,12 @@ export const chatbot = pgTable("chatbot", {
 
 export const lead = pgTable("lead", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-  phone: text("phone"),
-  company: text("company"),
+  contact: text("contact").notNull(),
   message: text("message"),
-  email: text("email").notNull(),
-  location: text("location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -324,6 +318,9 @@ export const knowledge = pgTable("knowledge", {
 
 export const feedback = pgTable("feedback", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
   email: text("email").notNull(),
   subject: text("subject"),
   message: text("message").notNull(),
@@ -419,7 +416,7 @@ export const whatsappIntegration = pgTable("whatsapp_integration", {
   refreshToken: text("refresh_token"),
   accessTokenExpiresAt: timestamp("access_token_expires_at"),
   scope: text("scope"),
-  phoneNumbers: jsonb("phone_numbers"), // Store phone number data as JSON
+  phoneNumbers: jsonb("phone_numbers"),
   primaryPhoneNumberId: text("primary_phone_number_id"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),

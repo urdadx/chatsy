@@ -1,11 +1,10 @@
-
 import { db } from "@/db";
 import { organization, textSource } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { and, eq, sql } from "drizzle-orm";
-import { z } from "zod";
+import z from "zod";
 
 const createTextSourceSchema = z.object({
   title: z.string().min(1),
@@ -44,7 +43,10 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       .select()
       .from(textSource)
       .where(
-        and(eq(textSource.userId, userId), eq(textSource.organizationId, organizationId)),
+        and(
+          eq(textSource.userId, userId),
+          eq(textSource.organizationId, organizationId),
+        ),
       );
 
     return json(results);

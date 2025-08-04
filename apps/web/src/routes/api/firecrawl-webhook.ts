@@ -3,7 +3,7 @@ import { organization, websiteSource } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { eq, sql } from "drizzle-orm";
-import { z } from "zod";
+import z from "zod";
 
 // Webhook payload schema based on Firecrawl documentation
 const webhookPayloadSchema = z.object({

@@ -1,7 +1,6 @@
 import { db } from "@/db";
 import { message, whatsappIntegration } from "@/db/schema";
 import { systemPrompt } from "@/lib/ai/system-prompt";
-import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
@@ -40,7 +39,6 @@ export async function generateAIResponse(
       messages,
       tools: {
         knowledge_base: knowledgeSearchTool(chatbotData.organizationId),
-        collect_feedback: collectFeedbackTool,
       },
     });
 

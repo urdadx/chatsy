@@ -34,8 +34,20 @@ const Integrations = () => {
             </div>
           </div>
         </WhatsAppDialog>
-
         <IntegrationCard
+          icon={
+            <IntegrationIcon>
+              <img
+                src="https://img.icons8.com/color/48/facebook-messenger--v1.png"
+                alt="Facebook Messenger"
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+              />
+            </IntegrationIcon>
+          }
+          name="Facebook Messenger"
+          description="Connect your facebook messenger account to your chabot"
+        />
+        {/* <IntegrationCard
           icon={
             <IntegrationIcon>
               <img
@@ -47,7 +59,7 @@ const Integrations = () => {
           }
           name="Instagram"
           description="Connect your Instagram account to your chatbot"
-        />
+        /> */}
         <IntegrationCard
           icon={
             <IntegrationIcon>
@@ -62,19 +74,6 @@ const Integrations = () => {
           description="Connect your slack account to your chabot"
         />
 
-        <IntegrationCard
-          icon={
-            <IntegrationIcon>
-              <img
-                src="https://img.icons8.com/color/48/facebook-messenger--v1.png"
-                alt="Facebook Messenger"
-                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
-              />
-            </IntegrationIcon>
-          }
-          name="Facebook Messenger"
-          description="Connect your facebook messenger account to your chabot"
-        />
         <IntegrationCard
           icon={
             <IntegrationIcon>

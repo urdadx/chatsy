@@ -53,7 +53,7 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body>
-        <div className="grid h-svh grid-rows-[auto_1fr]">
+        <div className="">
           <TooltipProvider>
             <Outlet />
           </TooltipProvider>
@@ -61,11 +61,11 @@ function RootDocument() {
         <Toaster richColors theme="light" />
 
         <Scripts />
-        <ReactQueryDevtools
+        {/* <ReactQueryDevtools
           buttonPosition="bottom-left"
           position="left"
           initialIsOpen={false}
-        />
+        /> */}
       </body>
     </html>
   );

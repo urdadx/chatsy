@@ -4,7 +4,7 @@ import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { type SQL, and, desc, eq, gt, lt } from "drizzle-orm";
-import { z } from "zod";
+import z from "zod";
 
 const querySchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(20),

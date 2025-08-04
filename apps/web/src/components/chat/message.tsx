@@ -2,6 +2,7 @@ import { Markdown } from "@/components/chat/markdown";
 import type { Vote } from "@/db/schema";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { CollectFeedbackForm } from "@/lib/ai/tools-ui/collect-feedback-form";
+import { CollectLeadsForm } from "@/lib/ai/tools-ui/collect-leads-form";
 import { cn, sanitizeText } from "@/lib/utils";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
@@ -97,6 +98,15 @@ const PurePreviewMessage = ({
                         <CollectFeedbackForm
                           color={activeChatbot?.primaryColor}
                         />
+                      </div>
+                    );
+                  }
+                }
+                if (state === "call") {
+                  if (toolName === "collect_leads") {
+                    return (
+                      <div key={toolCallId}>
+                        <CollectLeadsForm />
                       </div>
                     );
                   }

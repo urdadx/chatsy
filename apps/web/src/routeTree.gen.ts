@@ -17,6 +17,7 @@ import { Route as SuccessRouteImport } from './routes/success'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
+import { Route as BubbleEmbedTokenRouteImport } from './routes/bubble/$embedToken'
 import { Route as BioPagePageIdRouteImport } from './routes/bio-page/$pageId'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminPlaygroundRouteImport } from './routes/admin/playground'
@@ -95,6 +96,11 @@ const AdminTestLazyRoute = AdminTestLazyRouteImport.update({
   path: '/test',
   getParentRoute: () => AdminRouteRoute,
 } as any).lazy(() => import('./routes/admin/test.lazy').then((d) => d.Route))
+const BubbleEmbedTokenRoute = BubbleEmbedTokenRouteImport.update({
+  id: '/bubble/$embedToken',
+  path: '/bubble/$embedToken',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BioPagePageIdRoute = BioPagePageIdRouteImport.update({
   id: '/bio-page/$pageId',
   path: '/bio-page/$pageId',
@@ -345,6 +351,7 @@ export interface FileRoutesByFullPath {
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/bio-page/$pageId': typeof BioPagePageIdRoute
+  '/bubble/$embedToken': typeof BubbleEmbedTokenRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
@@ -364,6 +371,7 @@ export interface FileRoutesByTo {
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/bio-page/$pageId': typeof BioPagePageIdRoute
+  '/bubble/$embedToken': typeof BubbleEmbedTokenRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
@@ -384,6 +392,7 @@ export interface FileRoutesById {
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/bio-page/$pageId': typeof BioPagePageIdRoute
+  '/bubble/$embedToken': typeof BubbleEmbedTokenRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
@@ -405,6 +414,7 @@ export interface FileRouteTypes {
     | '/admin/playground'
     | '/admin/settings'
     | '/bio-page/$pageId'
+    | '/bubble/$embedToken'
     | '/admin/test'
     | '/onboarding'
     | '/admin/chat-history'
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/admin/playground'
     | '/admin/settings'
     | '/bio-page/$pageId'
+    | '/bubble/$embedToken'
     | '/admin/test'
     | '/onboarding'
     | '/admin/chat-history'
@@ -443,6 +454,7 @@ export interface FileRouteTypes {
     | '/admin/playground'
     | '/admin/settings'
     | '/bio-page/$pageId'
+    | '/bubble/$embedToken'
     | '/admin/test'
     | '/onboarding/'
     | '/admin/chat-history/'
@@ -456,6 +468,7 @@ export interface RootRouteChildren {
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
   BioPagePageIdRoute: typeof BioPagePageIdRoute
+  BubbleEmbedTokenRoute: typeof BubbleEmbedTokenRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -751,6 +764,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/test'
       preLoaderRoute: typeof AdminTestLazyRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/bubble/$embedToken': {
+      id: '/bubble/$embedToken'
+      path: '/bubble/$embedToken'
+      fullPath: '/bubble/$embedToken'
+      preLoaderRoute: typeof BubbleEmbedTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/bio-page/$pageId': {
       id: '/bio-page/$pageId'
@@ -1103,6 +1123,7 @@ const rootRouteChildren: RootRouteChildren = {
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
   BioPagePageIdRoute: BioPagePageIdRoute,
+  BubbleEmbedTokenRoute: BubbleEmbedTokenRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
 }
 export const routeTree = rootRouteImport

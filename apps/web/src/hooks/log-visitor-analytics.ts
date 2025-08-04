@@ -430,6 +430,12 @@ export function useRealTimeVisitorHistory(
   });
 
   const connectSSE = () => {
+    // Check if we're in a browser environment
+    if (typeof window === "undefined" || typeof EventSource === "undefined") {
+      console.warn("EventSource not available in this environment");
+      return;
+    }
+
     if (sseRef.current) {
       sseRef.current.close();
     }
@@ -497,7 +503,10 @@ export function useRealTimeVisitorHistory(
   };
 
   useEffect(() => {
-    connectSSE();
+    // Only connect SSE in browser environment
+    if (typeof window !== "undefined") {
+      connectSSE();
+    }
 
     // Cleanup on unmount
     return () => {
@@ -507,6 +516,11 @@ export function useRealTimeVisitorHistory(
 
   // Visibility API to pause/resume connection when tab is hidden/visible
   useEffect(() => {
+    // Only add visibility change listener in browser environment
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return;
+    }
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // Tab is hidden, disconnect to save resources
@@ -532,7 +546,9 @@ export function useRealTimeVisitorHistory(
     isError: query.isError,
     error: query.error,
     refetch: query.refetch,
-    isConnected: sseRef.current?.readyState === EventSource.OPEN,
+    isConnected:
+      typeof window !== "undefined" &&
+      sseRef.current?.readyState === EventSource.OPEN,
     reconnect: connectSSE,
     disconnect: disconnectSSE,
   };

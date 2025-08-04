@@ -4,7 +4,7 @@ import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { and, eq } from "drizzle-orm";
-import { z } from "zod";
+import z from "zod";
 
 const updateSettingsSchema = z.object({
   whatsappEnabled: z.boolean().optional(),

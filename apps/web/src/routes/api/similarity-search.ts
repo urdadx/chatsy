@@ -2,7 +2,7 @@ import { searchKnowledge } from "@/lib/ai/search";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { z } from "zod";
+import z from "zod";
 
 const searchSchema = z.object({
   query: z.string().min(1),
