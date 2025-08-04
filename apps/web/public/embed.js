@@ -88,8 +88,15 @@
       this.container.style.zIndex = this.config.zIndex.toString();
       this.container.style.fontFamily =
         'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    }
 
+      // Ensure container doesn't clip mobile iframe
+      if (window.innerWidth <= 768) {
+        this.container.style.width = "100vw";
+        this.container.style.height = "100vh";
+        this.container.style.top = "0";
+        this.container.style.left = "0";
+      }
+    }
     createBubble() {
       // Create bubble trigger
       this.bubble = document.createElement("div");
@@ -243,18 +250,22 @@
         transformOrigin: "bottom right",
       });
 
-      // Mobile responsive
       if (window.innerWidth <= 768) {
+        // Mobile responsive
+        // Mobile responsive
         Object.assign(this.iframe.style, {
           width: "100vw",
-          height: "100vh",
-          maxHeight: "100vh",
+          height: "calc(100vh - 80px)",
+          maxHeight: "calc(100vh - 80px)",
           borderRadius: "0",
-          bottom: "0",
-          right: "0",
-          left: "0",
-          transform: "translateY(100%)",
+          position: "fixed", // Changed from absolute to fixed
+          top: "0", // Position from top instead of bottom
+          left: "0", // Ensure it starts from left edge
+          right: "0", // Ensure it spans full width
+          bottom: "80px", // Leave space for bubble
+          transform: "translateY(100%)", // Start hidden below viewport
           transformOrigin: "bottom center",
+          zIndex: this.config.zIndex + 1, // Ensure it's above everything
         });
       }
     }
@@ -323,10 +334,13 @@
         this.iframe.style.transform = "scale(1) translateY(0)";
       });
 
-      // Hide bubble or show minimized state
-      if (window.innerWidth <= 768) {
-        this.bubble.style.display = "none";
-      }
+      // DON'T hide bubble on mobile - comment out or remove this block
+      // if (window.innerWidth <= 768) {
+      //   this.bubble.style.display = "none";
+      // }
+
+      // Clear unread count when opened
+      this.clearUnreadCount();
 
       this.dispatchEvent("chatsy-bubble-opened", { isOpen: true });
     }
@@ -346,14 +360,14 @@
       // Hide iframe after animation
       setTimeout(() => {
         this.iframe.style.display = "none";
-        if (window.innerWidth <= 768) {
-          this.bubble.style.display = "flex";
-        }
+        // Remove this block - keep bubble always visible
+        // if (window.innerWidth <= 768) {
+        //   this.bubble.style.display = "flex";
+        // }
       }, 300);
 
       this.dispatchEvent("chatsy-bubble-closed", { isOpen: false });
     }
-
     handleAutoOpen() {
       if (this.config.autoOpen && this.config.openDelay > 0) {
         setTimeout(() => {
@@ -412,26 +426,32 @@
         // Mobile styles
         Object.assign(this.iframe.style, {
           width: "100vw",
-          height: "100vh",
-          maxHeight: "100vh",
+          height: "calc(100vh - 80px)",
+          maxHeight: "calc(100vh - 80px)",
           borderRadius: "0",
-          bottom: "0",
-          right: "0",
+          position: "fixed",
+          top: "0",
           left: "0",
+          right: "0",
+          bottom: "80px",
+          zIndex: this.config.zIndex + 1,
         });
       } else {
         // Desktop styles
         Object.assign(this.iframe.style, {
-          width: "380px",
-          height: "600px",
+          width: "450px",
+          height: "550px",
           maxHeight: "80vh",
           borderRadius: "16px",
+          position: "absolute",
           bottom: "80px",
+          right: "0",
           left: "auto",
+          top: "auto",
+          zIndex: this.config.zIndex,
         });
       }
     }
-
     handleResize(data) {
       if (this.iframe && this.config.mode !== "bubble") {
         this.iframe.style.width = `${data.width}px`;

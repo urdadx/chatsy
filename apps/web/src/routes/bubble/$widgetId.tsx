@@ -2,6 +2,7 @@ import { convertToUIMessages } from "@/components/chat/chat-preview";
 import { GreetingMessage } from "@/components/chat/greeting-message";
 import { PreviewMessage, ThinkingMessage } from "@/components/chat/message";
 import { AISuggestion, AISuggestions } from "@/components/ui/ai-suggestions";
+import { Button } from "@/components/ui/button";
 import {
   ChatContainerContent,
   ChatContainerRoot,
@@ -20,16 +21,16 @@ import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUp, SparklesIcon } from "lucide-react";
+import { ArrowUp, SparklesIcon, X } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/bubble/$embedToken")({
+export const Route = createFileRoute("/bubble/$widgetId")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { embedToken } = Route.useParams();
+  const { widgetId } = Route.useParams();
   const { chatId } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
 
@@ -43,7 +44,7 @@ function RouteComponent() {
     data: chatbot,
     isLoading: isChatbotLoading,
     error: chatbotError,
-  } = useChatWidget(embedToken);
+  } = useChatWidget(widgetId);
 
   const { messages, setMessages, status, handleSubmit, input, setInput } =
     useChat({
@@ -55,7 +56,7 @@ function RouteComponent() {
           toast.error(error.message);
         }
       },
-      api: `/api/embed/chat/${embedToken}`,
+      api: `/api/embed/chat/${widgetId}`,
       onFinish: () => {
         queryClient.invalidateQueries({ queryKey: ["messages"] });
         // Track analytics
@@ -86,8 +87,14 @@ function RouteComponent() {
   // Track visitor analytics
   const { logVisitorAnalytics } = useSendVisitorAnalytics({
     organizationId: organizationId || "placeholder",
-    extra: { page_type: "bubble_chat", embed_token: embedToken },
+    extra: { page_type: "bubble_chat", embed_token: widgetId },
   });
+
+  const handleCloseWidget = () => {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: "chatsy-widget-close" }, "*");
+    }
+  };
 
   const isLastMessageFromUser =
     messages.length > 0 && messages[messages.length - 1].role === "user";
@@ -147,7 +154,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="flex flex-col w-full h-[550px]  rounded-2xl overflow-hidden ">
+    <div className="flex flex-col w-full h-screen md:h-[550px] md:rounded-2xl overflow-hidden">
       <div
         className="flex items-center justify-between p-4 text-white border-b"
         style={{ backgroundColor: chatbot?.primaryColor || "#2563eb" }}
@@ -164,12 +171,24 @@ function RouteComponent() {
               <SparklesIcon size={16} />
             </div>
           )}
+          <p className="font-normal text-base">
+            {chatbot?.name || "AI Assistant"}
+          </p>
         </div>
+        <Button
+          size="icon"
+          onClick={handleCloseWidget}
+          className="md:hidden p-1 hover:bg-white/10 rounded-full transition-colors"
+          aria-label="Close chat"
+          variant="ghost"
+        >
+          <X className="text-white" size={20} />
+        </Button>
       </div>
 
       {/* Chat area */}
       <div className="relative flex-1 min-h-0 overflow-hidden">
-        <ChatContainerRoot className="h-full">
+        <ChatContainerRoot className="w-full h-full smooth-div">
           <ChatContainerContent className="p-3">
             {isLoading ? (
               <div className="fixed inset-0 flex items-center justify-center bg-white">
@@ -254,12 +273,7 @@ function RouteComponent() {
           />
           <button
             className="rounded-full p-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            style={{
-              backgroundColor:
-                inputLength > 0
-                  ? chatbot?.primaryColor || "#2563eb"
-                  : "#e5e7eb",
-            }}
+            style={{ backgroundColor: chatbot?.primaryColor }}
             type="submit"
             disabled={inputLength === 0}
             aria-label="Send message"

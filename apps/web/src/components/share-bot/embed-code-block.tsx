@@ -23,10 +23,8 @@ export const EmbedCodeBlock = ({
       ? [
           {
             language: "html",
-            filename: "iframe-embed.html",
+            filename: "iframe.html",
             code: `<!-- Padyna Embedded Iframe -->
-            <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
-
 <iframe
   src="${window.location.origin}/bio-page/${embedToken}"
   width="400"
@@ -35,14 +33,13 @@ export const EmbedCodeBlock = ({
   style="border:none; background-color: none;"
   allow="clipboard-read; clipboard-write">
 </iframe>
-</div>
 `,
           },
         ]
       : [
           {
             language: "html",
-            filename: "bubble-widget.html",
+            filename: "widget.html",
             code: `<!-- Padyna Chat Bubble Widget -->
 <script>
   (function() {

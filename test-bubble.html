@@ -29,7 +29,6 @@
         }
         .test-content {
             height: 200vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 40px;
             margin: 20px 0;
@@ -39,7 +38,7 @@
 </head>
 <body>
     <div class="content">
-        <h1>Test Page for Chatsy Bubble Widget</h1>
+        <h1>Test Page for Padyna Bubble Widget</h1>
         <p>This is a test page to verify that the Chatsy bubble widget works correctly when embedded on external websites.</p>
         
         <p>The chat bubble should appear in the bottom-right corner of the page. Click on it to open the chat interface.</p>
@@ -54,17 +53,25 @@
         </div>
     </div>
 
-  <!-- Padyna Embedded Iframe -->
-<div style="display: flex; justify-content: center; align-items: center; width: 100%;">
-  <iframe
-    src="http://localhost:3001/bio-page/embed_1754331405875_nh8stlibp"
-    width="500"
-    height="700"
-    title="Chatsy Chatbot"
-    style="border:none; background-color: none;"
-    allow="clipboard-read; clipboard-write">
-  </iframe>
-</div>
+<script>
+  (function() {
+    const script = document.createElement('script');
+    script.src = 'http://localhost:3001/embed.js';
+    script.async = true;
+    script.onload = function() {
+      ChatsyWidget.init({
+        embedToken: 'embed_1754340094139_llu1a0r4d',
+        mode: 'bubble',
+        position: 'bottom-right',
+        bubbleSize: 'medium',
+        showBadge: true,
+        baseUrl: 'http://localhost:3001',
+        autoOpen: false
+      });
+    };
+    document.head.appendChild(script);
+  })();
+</script>
 
 </body>
 </html>

@@ -158,7 +158,7 @@ function RouteComponent() {
               <SparklesIcon size={17} />
             )}
             <p className="font-normal text-base">
-              {chatbot?.name || "Chat Widget"}
+              {chatbot?.name || "AI Assistant"}
             </p>
           </div>
           <div className="flex gap-1">
@@ -182,7 +182,7 @@ function RouteComponent() {
 
         {/* Chat area */}
         <div className="relative flex-1 h-0 min-h-0 overflow-y-hidden">
-          <ChatContainerRoot className="h-full">
+          <ChatContainerRoot className="h-full smooth-div">
             <ChatContainerContent className="p-4">
               {isLoading ? (
                 <div className="flex items-center justify-center h-full">

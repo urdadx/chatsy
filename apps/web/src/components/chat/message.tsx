@@ -52,7 +52,7 @@ const PurePreviewMessage = ({
                 src={activeChatbot?.image || undefined}
                 alt="Assistant"
               />
-              <AvatarFallback>
+              <AvatarFallback className="bg-background border">
                 <SparklesIcon size={14} />
               </AvatarFallback>
             </Avatar>

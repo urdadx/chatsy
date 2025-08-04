@@ -333,3 +333,37 @@ html {
     opacity: 1;
   }
 }
+
+/* TRANSPARENT SCROLLBAR */
+.smooth-div {
+  /* Make sure the container has overflow scroll */
+  overflow-y: auto;
+
+  /* Firefox */
+  scrollbar-width: none;
+  scrollbar-color: #f0eeee transparent;
+}
+
+/* WebKit browsers */
+.smooth-div::-webkit-scrollbar {
+  width: 4px;
+}
+
+.smooth-div::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.smooth-div::-webkit-scrollbar-thumb {
+  background: #cecccc;
+  border-radius: 3px;
+}
+
+.smooth-div::-webkit-scrollbar-thumb:hover {
+  background: #cfcece;
+}
+
+@media (max-width: 768px) {
+  .smooth-div {
+    -webkit-overflow-scrolling: touch;
+  }
+}
