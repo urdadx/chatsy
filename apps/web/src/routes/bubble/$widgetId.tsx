@@ -187,9 +187,9 @@ function RouteComponent() {
       </div>
 
       {/* Chat area */}
-      <div className="relative flex-1 min-h-0 overflow-hidden">
+      <div className="relative flex-1 min-h-0 overflow-y-hidden">
         <ChatContainerRoot className="w-full h-full smooth-div">
-          <ChatContainerContent className="p-3">
+          <ChatContainerContent className="p-4">
             {isLoading ? (
               <div className="fixed inset-0 flex items-center justify-center bg-white">
                 <Spinner className="text-primary" />

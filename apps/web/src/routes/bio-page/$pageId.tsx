@@ -2,7 +2,7 @@ import { convertToUIMessages } from "@/components/chat/chat-preview";
 import { GreetingMessage } from "@/components/chat/greeting-message";
 import { PreviewMessage, ThinkingMessage } from "@/components/chat/message";
 import { AISuggestion, AISuggestions } from "@/components/ui/ai-suggestions";
-import { Card, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   ChatContainerContent,
   ChatContainerRoot,
@@ -11,11 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollButton } from "@/components/ui/scroll-button";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+
 import type { Vote } from "@/db/schema";
 import { useSendVisitorAnalytics } from "@/hooks/log-visitor-analytics";
 import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
@@ -26,7 +22,7 @@ import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUp, RefreshCcw, SparklesIcon } from "lucide-react";
+import { ArrowUp, RefreshCcw, SparklesIcon, X } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
@@ -96,6 +92,16 @@ function RouteComponent() {
     logVisitorAnalytics({ event: "bio_page_chat_reset" });
   }, [setMessages, setInput, logVisitorAnalytics]);
 
+  const handleCloseChat = useCallback(() => {
+    // Close the chat by going back in history or closing the window/tab
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.close();
+    }
+    logVisitorAnalytics({ event: "bio_page_chat_closed" });
+  }, [logVisitorAnalytics]);
+
   const isLastMessageFromUser =
     messages.length > 0 && messages[messages.length - 1].role === "user";
   const isStreamingLastMessage = status === "streaming" && messages.length > 0;
@@ -137,46 +143,50 @@ function RouteComponent() {
   }
 
   return (
-    <div className="flex items-center  justify-center min-h-screen ">
-      <Card className="w-[95%] max-w-lg h-[80vh] shadow-xl border-1 py-0 flex flex-col">
+    <div className="flex items-center justify-center min-h-screen bg-muted">
+      <div className="flex flex-col w-[500px] h-screen md:h-[80vh] md:rounded-2xl overflow-hidden bg-white shadow-lg">
         {/* Header */}
         <div
-          className="p-4 text-white flex items-center justify-between border-b rounded-t-xl bg-primary"
-          style={{ backgroundColor: chatbot?.primaryColor }}
+          className="flex items-center justify-between p-4 text-white border-b"
+          style={{ backgroundColor: chatbot?.primaryColor || "#2563eb" }}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             {chatbot?.image ? (
               <img
                 src={chatbot.image}
                 alt="Assistant"
-                style={{
-                  borderColor: chatbot?.primaryColor,
-                }}
-                className="rounded-full w-10 h-10"
+                className="rounded-full w-8 h-8 flex-shrink-0"
               />
             ) : (
-              <SparklesIcon size={17} />
+              <div className="rounded-full w-8 h-8 bg-white/20 flex items-center justify-center flex-shrink-0">
+                <SparklesIcon size={16} />
+              </div>
             )}
             <p className="font-normal text-base">
               {chatbot?.name || "AI Assistant"}
             </p>
           </div>
-          <div className="flex gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  className="p-2 rounded-full hover:bg-white/10"
-                  onClick={handleResetChat}
-                  aria-label="Reset chat"
-                  type="button"
-                >
-                  <RefreshCcw className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-white text-primary" side="top">
-                Reset chat
-              </TooltipContent>
-            </Tooltip>
+          <div className="flex items-center gap-2">
+            {/* Close button - only visible on mobile */}
+            <Button
+              size="icon"
+              className="p-1 hover:bg-white/10 rounded-full transition-colors md:hidden"
+              aria-label="Close chat"
+              variant="ghost"
+              onClick={handleCloseChat}
+            >
+              <X className="text-white" size={20} />
+            </Button>
+            {/* Reset button */}
+            <Button
+              size="icon"
+              className="p-1 hover:bg-white/10 rounded-full transition-colors"
+              aria-label="Reset chat"
+              variant="ghost"
+              onClick={handleResetChat}
+            >
+              <RefreshCcw className="text-white" size={20} />
+            </Button>
           </div>
         </div>
 
@@ -239,7 +249,7 @@ function RouteComponent() {
         </div>
 
         {/* Footer always at bottom */}
-        <CardFooter className="flex flex-col space-y-2">
+        <div className="border-t bg-gray-50/50 p-3 space-y-2">
           {SUGGESTIONS.length > 0 && (
             <AISuggestions>
               {SUGGESTIONS.map((suggestion: string) => (
@@ -259,7 +269,7 @@ function RouteComponent() {
             <Input
               id="message"
               placeholder="Chat with me..."
-              className="flex-1 text-sm sm:text-base"
+              className="flex-1 text-sm bg-white sm:text-base"
               style={
                 {
                   "--tw-ring-color": chatbot?.primaryColor,
@@ -281,8 +291,8 @@ function RouteComponent() {
             </button>
           </form>
 
-          {showPoweredBy ? (
-            <div className="flex pt-1 pb-3 items-center justify-center text-xs text-muted-foreground">
+          {showPoweredBy && (
+            <div className="flex items-center justify-center text-xs text-muted-foreground">
               <span>Powered by </span>
               <a
                 href="https://padyna.com"
@@ -294,11 +304,9 @@ function RouteComponent() {
                 Padyna
               </a>
             </div>
-          ) : (
-            <div className="h-4" />
           )}
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

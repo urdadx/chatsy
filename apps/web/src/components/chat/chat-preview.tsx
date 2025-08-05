@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { DBMessage, Vote } from "@/db/schema";
 import { useChatWithReset } from "@/hooks/use-chat-reset";
@@ -103,165 +102,161 @@ export function ChatPreview() {
   });
 
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <Card className="w-[400px] h-[560px] shadow-lg border-1 py-0 flex flex-col">
-        {/* Header */}
-        <div
-          className="p-4 text-white flex items-center justify-between border-b rounded-t-xl bg-primary"
-          style={{ backgroundColor: chatbot?.primaryColor }}
-        >
-          <div className="flex items-center gap-3">
-            {chatbot?.image ? (
-              <img
-                src={chatbot.image}
-                alt="Assistant"
-                style={{
-                  borderColor: chatbot?.primaryColor,
-                }}
-                className="rounded-full w-10 h-10"
-              />
-            ) : (
-              <SparklesIcon size={17} />
-            )}
-            <p className="font-normal text-base">
-              {chatbot?.name || "Chat Preview"}
-            </p>
-          </div>
-          <div className="flex">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button size="icon" variant="ghost" onClick={handleResetChat}>
-                  <RefreshCcw className="h-4 w-4" />
-                  <span className="sr-only">Reset chat</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-white text-primary" side="top">
-                Reset chat
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-
-        {/* Make message area grow and scrollable */}
-        <div className="relative flex-1 h-0 min-h-0 overflow-y-hidden">
-          <ChatContainerRoot className="h-full smooth-div ">
-            <ChatContainerContent className="p-4">
-              {isLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <Spinner className="text-primary" />
-                </div>
-              ) : error ? (
-                <div className="flex items-center justify-center h-full text-red-500">
-                  <div>Error loading messages</div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {messages.length === 0 && (
-                    <GreetingMessage title={greetingMessage} />
-                  )}
-
-                  {/* Render messages */}
-
-                  {messages.map((message, index) => (
-                    <div
-                      key={message.id}
-                      className="w-full overflow-hidden p-1"
-                    >
-                      <PreviewMessage
-                        chatId={chatId}
-                        message={message}
-                        isLoading={
-                          isStreamingLastMessage &&
-                          messages.length - 1 === index
-                        }
-                        vote={
-                          votes
-                            ? votes.find(
-                                (vote) => vote.messageId === message.id,
-                              )
-                            : undefined
-                        }
-                        setMessages={setMessages}
-                      />
-                    </div>
-                  ))}
-
-                  {status === "submitted" && isLastMessageFromUser && (
-                    <ThinkingMessage />
-                  )}
-
-                  <ChatContainerScrollAnchor />
-                </div>
-              )}
-            </ChatContainerContent>
-            <div className="absolute bottom-4 right-4 z-10">
-              <ScrollButton className="shadow-lg" />
-            </div>
-          </ChatContainerRoot>
-        </div>
-
-        {/* Footer always at bottom */}
-        <CardFooter className="flex flex-col space-y-2">
-          {SUGGESTIONS.length > 0 && (
-            <AISuggestions>
-              {SUGGESTIONS.map((suggestion) => (
-                <AISuggestion
-                  onClick={handleSuggestionClick}
-                  key={suggestion}
-                  suggestion={suggestion}
-                />
-              ))}
-            </AISuggestions>
-          )}
-
-          <form
-            onSubmit={handleSubmit}
-            className="flex w-full items-center space-x-2"
-          >
-            <Input
-              id="message"
-              placeholder="Chat with me..."
-              className="flex-1 text-sm sm:text-base"
-              style={
-                {
-                  "--tw-ring-color": chatbot?.primaryColor,
-                } as React.CSSProperties
-              }
-              autoComplete="off"
-              autoFocus
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
+    <div className="flex flex-col w-full h-screen shadow-sm md:h-[550px] md:rounded-2xl overflow-hidden">
+      {" "}
+      {/* Header */}
+      <div
+        className="flex items-center justify-between p-4 "
+        style={{
+          backgroundColor: chatbot?.primaryColor || "#e5e7eb",
+          borderTopLeftRadius: "1rem",
+          borderTopRightRadius: "1rem",
+        }}
+      >
+        <div className="flex items-center gap-3">
+          {chatbot?.image ? (
+            <img
+              src={chatbot.image}
+              alt="Assistant"
+              className="rounded-full w-9 h-9 border"
+              style={{
+                borderColor: chatbot?.primaryColor || "#e5e7eb",
+                borderWidth: "2px",
+              }}
             />
-            <Button
-              className="rounded-full"
-              style={{ backgroundColor: chatbot?.primaryColor }}
-              type="submit"
-              size="icon"
-              disabled={inputLength === 0}
-            >
-              <ArrowUp className="h-4 w-4" />
-              <span className="sr-only">Send</span>
-            </Button>
-          </form>
-
-          {showPoweredBy ? (
-            <div className="flex pt-1 pb-3 items-center justify-center text-xs text-muted-foreground">
-              <span>Powered by </span>
-              <a
-                href="https://padyna.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: chatbot?.primaryColor }}
-                className="ml-1 hover:underline font-semibold"
-              >
-                Padyna
-              </a>
-            </div>
           ) : (
-            <div className="h-4" />
+            <SparklesIcon size={20} className="text-primary" />
           )}
-        </CardFooter>
-      </Card>
+          <span className="font-normal text-base text-white">
+            {chatbot?.name || "Chat Preview"}
+          </span>
+        </div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={handleResetChat}
+              className="hover:bg-muted"
+            >
+              <RefreshCcw className="h-4 w-4 text-white" />
+              <span className="sr-only">Reset chat</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="top">Reset chat</TooltipContent>
+        </Tooltip>
+      </div>
+      {/* Make message area grow and scrollable */}
+      <div className="relative flex-1 min-h-0 overflow-y-hidden">
+        <ChatContainerRoot className="h-full smooth-div ">
+          <ChatContainerContent className="p-4">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <Spinner className="text-primary" />
+              </div>
+            ) : error ? (
+              <div className="flex items-center justify-center h-full text-red-500">
+                <div>Error loading messages</div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.length === 0 && (
+                  <GreetingMessage title={greetingMessage} />
+                )}
+
+                {/* Render messages */}
+
+                {messages.map((message, index) => (
+                  <div key={message.id} className="w-full overflow-hidden p-1">
+                    <PreviewMessage
+                      chatId={chatId}
+                      message={message}
+                      isLoading={
+                        isStreamingLastMessage && messages.length - 1 === index
+                      }
+                      vote={
+                        votes
+                          ? votes.find((vote) => vote.messageId === message.id)
+                          : undefined
+                      }
+                      setMessages={setMessages}
+                    />
+                  </div>
+                ))}
+
+                {status === "submitted" && isLastMessageFromUser && (
+                  <ThinkingMessage />
+                )}
+
+                <ChatContainerScrollAnchor />
+              </div>
+            )}
+          </ChatContainerContent>
+          <div className="absolute bottom-4 right-4 z-10">
+            <ScrollButton className="shadow-lg" />
+          </div>
+        </ChatContainerRoot>
+      </div>
+      {/* Footer always at bottom */}
+      <div className="border-t bg-gray-50/40 p-3 space-y-2">
+        {SUGGESTIONS.length > 0 && (
+          <AISuggestions>
+            {SUGGESTIONS.map((suggestion: string) => (
+              <AISuggestion
+                onClick={handleSuggestionClick}
+                key={suggestion}
+                suggestion={suggestion}
+              />
+            ))}
+          </AISuggestions>
+        )}
+
+        <form
+          onSubmit={handleSubmit}
+          className="flex w-full items-center space-x-2"
+        >
+          <Input
+            id="message"
+            placeholder="Chat with me..."
+            className="flex-1 text-sm bg-white sm:text-base"
+            style={
+              {
+                "--tw-ring-color": chatbot?.primaryColor,
+              } as React.CSSProperties
+            }
+            autoComplete="off"
+            autoFocus
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+          />
+          <button
+            className="rounded-full p-2"
+            style={{ backgroundColor: chatbot?.primaryColor }}
+            type="submit"
+            disabled={inputLength === 0}
+            aria-label="Send"
+          >
+            <ArrowUp className="h-4 w-4 text-white" />
+          </button>
+        </form>
+
+        {showPoweredBy ? (
+          <div className="flex items-center justify-center text-xs text-muted-foreground">
+            <span>Powered by </span>
+            <a
+              href="https://padyna.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: chatbot?.primaryColor }}
+              className="ml-1 hover:underline font-semibold"
+            >
+              Padyna
+            </a>
+          </div>
+        ) : (
+          <div className="h-0" />
+        )}
+      </div>
     </div>
   );
 }
