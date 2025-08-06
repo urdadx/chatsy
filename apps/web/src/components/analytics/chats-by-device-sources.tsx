@@ -170,7 +170,7 @@ export function ChatsByDeviceSources() {
 
   return (
     <div className="h-[350px] w-full rounded-xl border bg-white">
-      <Tabs defaultValue="tab-1">
+      <Tabs defaultValue="tab-1" className="flex flex-col h-full">
         <div className="flex items-center justify-between px-4 py-3">
           <TabsList className="h-auto gap-2 rounded-none border-border bg-transparent px-0 text-foreground">
             <TabsTrigger
@@ -198,137 +198,145 @@ export function ChatsByDeviceSources() {
             </div>
           </div>
         </div>
-        <TabsContent value="tab-1">
-          <div className="px-4 relative">
-            {metricsPending ? (
-              <div className="w-full h-[210px] flex items-center justify-center">
-                <Spinner />
-              </div>
-            ) : !metrics || allDevices.length === 0 ? (
-              <div className="w-full h-[210px] flex items-center justify-center">
-                <span className="text-sm opacity-80">No data available</span>
-              </div>
-            ) : (
-              <div className="relative">
-                <BarList
-                  tab="Websites"
-                  unit="visits"
-                  data={topDevices}
-                  barBackground="bg-red-200"
-                  hoverBackground="hover:bg-red-50"
-                  maxValue={maxDeviceCount}
-                />
-                {hasMoreDevices && (
-                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => setDevicesDialogOpen(true)}
-                      className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
-                    >
-                      <Maximize2 className="h-4 w-4 mr-1" />
-                      View All
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          <ViewAllStats
-            name={"devices"}
-            dialogOpen={devicesDialogOpen}
-            setDialogOpen={setDevicesDialogOpen}
-            allLinks={allDevices}
-            maxTotalCount={maxDeviceCount}
-          />
-        </TabsContent>
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <TabsContent value="tab-1" className="h-full m-0 p-0">
+            <div className="px-2 relative">
+              {metricsPending ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <Spinner />
+                </div>
+              ) : !metrics || allDevices.length === 0 ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <span className="text-sm opacity-80">No data available</span>
+                </div>
+              ) : (
+                <div className="flex-1 min-h-0 px-4 pt-4 overflow-hidden">
+                  <BarList
+                    tab="Websites"
+                    unit="visits"
+                    data={topDevices}
+                    barBackground="bg-red-200"
+                    hoverBackground="hover:bg-red-50"
+                    maxValue={maxDeviceCount}
+                  />
+                  {hasMoreDevices && (
+                    <div className="flex-shrink-0 px-4 ">
+                      <div className="flex items-center justify-center">
+                        <Button
+                          variant="outline"
+                          onClick={() => setDevicesDialogOpen(true)}
+                          className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
+                        >
+                          <Maximize2 className="h-4 w-4 mr-1" />
+                          View All
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <ViewAllStats
+              name={"devices"}
+              dialogOpen={devicesDialogOpen}
+              setDialogOpen={setDevicesDialogOpen}
+              allLinks={allDevices}
+              maxTotalCount={maxDeviceCount}
+            />
+          </TabsContent>
 
-        <TabsContent value="tab-2">
-          <div className="px-4 relative">
-            {metricsPending ? (
-              <div className="w-full h-[210px] flex items-center justify-center">
-                <Spinner />
-              </div>
-            ) : !metrics || allBrowsers.length === 0 ? (
-              <div className="w-full h-[210px] flex items-center justify-center">
-                <span className="text-sm opacity-80">No data available</span>
-              </div>
-            ) : (
-              <div className="relative">
-                <BarList
-                  tab="Websites"
-                  unit="visits"
-                  data={topBrowsers}
-                  barBackground="bg-red-200"
-                  hoverBackground="hover:bg-red-50"
-                  maxValue={maxBrowserCount}
-                />
-                {hasMoreBrowsers && (
-                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => setBrowsersDialogOpen(true)}
-                      className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
-                    >
-                      <Maximize2 className="h-4 w-4 mr-1" />
-                      View All
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          <ViewAllStats
-            name={"browsers"}
-            dialogOpen={browsersDialogOpen}
-            setDialogOpen={setBrowsersDialogOpen}
-            allLinks={allBrowsers}
-            maxTotalCount={maxBrowserCount}
-          />
-        </TabsContent>
+          <TabsContent value="tab-2">
+            <div className="px-2 relative">
+              {metricsPending ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <Spinner />
+                </div>
+              ) : !metrics || allBrowsers.length === 0 ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <span className="text-sm opacity-80">No data available</span>
+                </div>
+              ) : (
+                <div className="flex-1 min-h-0 px-4 pt-4 overflow-hidden">
+                  <BarList
+                    tab="Websites"
+                    unit="visits"
+                    data={topBrowsers}
+                    barBackground="bg-red-200"
+                    hoverBackground="hover:bg-red-50"
+                    maxValue={maxBrowserCount}
+                  />
+                  {hasMoreBrowsers && (
+                    <div className="flex-shrink-0 px-4 ">
+                      <div className="flex items-center justify-center">
+                        <Button
+                          variant="outline"
+                          onClick={() => setBrowsersDialogOpen(true)}
+                          className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
+                        >
+                          <Maximize2 className="h-4 w-4 mr-1" />
+                          View All
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <ViewAllStats
+              name={"browsers"}
+              dialogOpen={browsersDialogOpen}
+              setDialogOpen={setBrowsersDialogOpen}
+              allLinks={allBrowsers}
+              maxTotalCount={maxBrowserCount}
+            />
+          </TabsContent>
 
-        <TabsContent value="tab-3">
-          <div className="px-4 relative">
-            {metricsPending ? (
-              <div className="w-full h-[210px] flex items-center justify-center">
-                <Spinner />
-              </div>
-            ) : !metrics || allOperatingSystems.length === 0 ? (
-              <div className="w-full h-[210px] flex items-center justify-center">
-                <span className="text-sm opacity-80">No data available</span>
-              </div>
-            ) : (
-              <div className="relative">
-                <BarList
-                  tab="Websites"
-                  unit="visits"
-                  data={topOperatingSystems}
-                  barBackground="bg-red-200"
-                  hoverBackground="hover:bg-red-50"
-                  maxValue={maxOSCount}
-                />
-                {hasMoreOS && (
-                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => setOsDialogOpen(true)}
-                      className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
-                    >
-                      <Maximize2 className="h-4 w-4 mr-1" />
-                      View All
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          <ViewAllStats
-            name={"operating systems"}
-            dialogOpen={osDialogOpen}
-            setDialogOpen={setOsDialogOpen}
-            allLinks={allOperatingSystems}
-            maxTotalCount={maxOSCount}
-          />
-        </TabsContent>
+          <TabsContent value="tab-3">
+            <div className="px-2 relative">
+              {metricsPending ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <Spinner />
+                </div>
+              ) : !metrics || allOperatingSystems.length === 0 ? (
+                <div className="w-full h-[210px] flex items-center justify-center">
+                  <span className="text-sm opacity-80">No data available</span>
+                </div>
+              ) : (
+                <div className="flex-1 min-h-0 px-4 pt-4 overflow-hidden">
+                  <BarList
+                    tab="Websites"
+                    unit="visits"
+                    data={topOperatingSystems}
+                    barBackground="bg-red-200"
+                    hoverBackground="hover:bg-red-50"
+                    maxValue={maxOSCount}
+                  />
+                  {hasMoreOS && (
+                    <div className="flex-shrink-0 px-4 ">
+                      <div className="flex items-center justify-center">
+                        <Button
+                          variant="outline"
+                          onClick={() => setOsDialogOpen(true)}
+                          className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
+                        >
+                          <Maximize2 className="h-4 w-4 mr-1" />
+                          View All
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <ViewAllStats
+              name={"operating systems"}
+              dialogOpen={osDialogOpen}
+              setDialogOpen={setOsDialogOpen}
+              allLinks={allOperatingSystems}
+              maxTotalCount={maxOSCount}
+            />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );

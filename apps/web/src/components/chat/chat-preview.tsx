@@ -108,7 +108,7 @@ export function ChatPreview() {
       <div
         className="flex items-center justify-between p-4 "
         style={{
-          backgroundColor: chatbot?.primaryColor || "#e5e7eb",
+          backgroundColor: chatbot?.primaryColor || "#4F46E5",
           borderTopLeftRadius: "1rem",
           borderTopRightRadius: "1rem",
         }}
@@ -118,14 +118,12 @@ export function ChatPreview() {
             <img
               src={chatbot.image}
               alt="Assistant"
-              className="rounded-full w-9 h-9 border"
-              style={{
-                borderColor: chatbot?.primaryColor || "#e5e7eb",
-                borderWidth: "2px",
-              }}
+              className="rounded-full w-9 h-9 "
             />
           ) : (
-            <SparklesIcon size={20} className="text-primary" />
+            <div className="rounded-full border border-white w-9 h-9 flex items-center justify-center">
+              <SparklesIcon size={20} className="text-white rounded-full" />
+            </div>
           )}
           <span className="font-normal text-base text-white">
             {chatbot?.name || "Chat Preview"}

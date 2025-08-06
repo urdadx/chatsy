@@ -24,7 +24,7 @@ export const ChatConversation = () => {
 
   return (
     <div className="relative flex-1 h-[320px]">
-      <ChatContainerRoot className="h-full">
+      <ChatContainerRoot className="h-full smooth-div">
         <ChatContainerContent className="p-4">
           <div className="w-full space-y-4">
             {isLoading ? (

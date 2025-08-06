@@ -367,3 +367,20 @@ html {
     -webkit-overflow-scrolling: touch;
   }
 }
+
+.mobile-full-height {
+  height: calc(var(--vh, 1vh) * 100);
+}
+
+@media (min-width: 768px) {
+  .mobile-full-height {
+    height: 85vh;
+  }
+}
+
+number-flow-react::part(suffix) {
+  margin-left: .0625em;
+  font-weight: normal;
+  font-size: 0.75em;
+  color: var(--muted-foreground);
+}

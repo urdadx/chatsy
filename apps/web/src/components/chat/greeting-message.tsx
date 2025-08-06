@@ -30,7 +30,7 @@ export const GreetingMessage = ({ title }: any) => {
             <div className="flex flex-row gap-2 items-start">
               <div
                 data-testid="message-content"
-                className="flex flex-col gap-4"
+                className="flex flex-col gap-4 text-foreground bg-gray-50 prose px-3 py-2 rounded-md break-words whitespace-normal"
               >
                 <Markdown>{sanitizeText(title)}</Markdown>
               </div>

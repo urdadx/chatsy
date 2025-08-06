@@ -21,7 +21,7 @@ import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUp, SparklesIcon, X } from "lucide-react";
+import { ArrowUp, RotateCcw, SparklesIcon, X } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/bubble/$widgetId")({
 
 function RouteComponent() {
   const { widgetId } = Route.useParams();
-  const { chatId } = useChatWithResetEmbed();
+  const { chatId, resetChat } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
 
   const initialMessages = messagesFromDb
@@ -135,6 +135,13 @@ function RouteComponent() {
     };
   }, [notifyParent, logVisitorAnalytics]);
 
+  const handleResetChat = () => {
+    resetChat();
+    setMessages([]);
+    setInput("");
+    logVisitorAnalytics({ event: "bubble_chat_reset" });
+  };
+
   if (chatbotError) {
     return (
       <div className="flex items-center justify-center h-full bg-red-50">
@@ -175,15 +182,28 @@ function RouteComponent() {
             {chatbot?.name || "AI Assistant"}
           </p>
         </div>
-        <Button
-          size="icon"
-          onClick={handleCloseWidget}
-          className="md:hidden p-1 hover:bg-white/10 rounded-full transition-colors"
-          aria-label="Close chat"
-          variant="ghost"
-        >
-          <X className="text-white" size={20} />
-        </Button>
+        <div className="flex items-center gap-2">
+          {messages.length > 0 && (
+            <Button
+              size="icon"
+              onClick={handleResetChat}
+              className="p-1 hover:bg-white/10 rounded-full transition-colors"
+              aria-label="Reset chat"
+              variant="ghost"
+            >
+              <RotateCcw className="text-white" size={16} />
+            </Button>
+          )}
+          <Button
+            size="icon"
+            onClick={handleCloseWidget}
+            className="md:hidden p-1 hover:bg-white/10 rounded-full transition-colors"
+            aria-label="Close chat"
+            variant="ghost"
+          >
+            <X className="text-white" size={20} />
+          </Button>
+        </div>
       </div>
 
       {/* Chat area */}
@@ -261,7 +281,7 @@ function RouteComponent() {
           <Input
             id="message"
             placeholder="Type a message..."
-            className="flex-1 text-sm border-gray-200 focus:border-gray-300"
+            className="flex-1 text-sm bg-white sm:text-base"
             style={
               {
                 "--tw-ring-color": chatbot?.primaryColor || "#2563eb",
@@ -282,19 +302,21 @@ function RouteComponent() {
           </button>
         </form>
 
-        {showPoweredBy && (
-          <div className="flex items-center justify-center text-xs text-gray-400">
+        {showPoweredBy ? (
+          <div className="flex items-center justify-center text-xs text-muted-foreground">
             <span>Powered by </span>
             <a
               href="https://padyna.com"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: chatbot?.primaryColor || "#2563eb" }}
-              className="ml-1 hover:underline font-medium"
+              style={{ color: chatbot?.primaryColor }}
+              className="ml-1 hover:underline font-semibold"
             >
               Padyna
             </a>
           </div>
+        ) : (
+          <div className="h-0" />
         )}
       </div>
     </div>

@@ -76,10 +76,12 @@ const PurePreviewMessage = ({
                             : undefined,
                       }}
                       data-testid="message-content"
-                      className={cn("flex flex-col gap-4", {
-                        " text-primary-foreground px-3 py-2 rounded-md":
-                          message.role === "user",
-                      })}
+                      className={cn(
+                        "flex flex-col gap-4 text-foreground bg-gray-50 prose px-3 py-2 rounded-md break-words whitespace-normal",
+                        {
+                          " text-primary-foreground": message.role === "user",
+                        },
+                      )}
                     >
                       <Markdown>{sanitizedText}</Markdown>
                     </div>

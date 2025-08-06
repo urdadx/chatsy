@@ -21,12 +21,6 @@ export function ChatsByReferrers() {
 
   const { data: analytics, isLoading: metricsPending } = result;
 
-  // Option B: Use static version (for historical charts that don't need real-time updates)
-  // const { data: analytics, isLoading: metricsPending } = useVisitorHistory(
-  //   (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
-  //   false // Static version
-  // );
-
   const [referrersDialogOpen, setReferrersDialogOpen] = useState(false);
   const [referrerURLsDialogOpen, setReferrerURLsDialogOpen] = useState(false);
 
@@ -91,9 +85,10 @@ export function ChatsByReferrers() {
       : 0;
 
   return (
-    <div className="h-[350px] w-full rounded-xl border bg-white">
-      <Tabs defaultValue="tab-1">
-        <div className="flex items-center justify-between px-4 py-3">
+    <div className="h-[350px] w-full rounded-xl border bg-white flex flex-col overflow-hidden">
+      <Tabs defaultValue="tab-1" className="flex flex-col h-full">
+        {/* Header - Fixed height */}
+        <div className="flex items-center justify-between px-4 py-3 flex-shrink-0 ">
           <TabsList className="h-auto gap-2 rounded-none border-border bg-transparent px-0 text-foreground">
             <TabsTrigger
               value="tab-1"
@@ -114,92 +109,105 @@ export function ChatsByReferrers() {
             </div>
           </div>
         </div>
-        <TabsContent value="tab-1">
-          <div className="px-4 relative">
+
+        {/* Content area - Takes remaining space */}
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <TabsContent value="tab-1" className="h-full m-0 p-0">
             {metricsPending ? (
-              <div className="w-full h-[210px] flex items-center justify-center">
+              <div className="h-full flex items-center justify-center">
                 <Spinner />
               </div>
             ) : allReferrers.length === 0 ? (
-              <div className="w-full h-[210px] flex items-center justify-center">
+              <div className="h-full flex items-center justify-center">
                 <span className="text-sm opacity-80">No data available</span>
               </div>
             ) : (
-              <div className="relative">
-                <BarList
-                  tab="Websites"
-                  unit="visits"
-                  data={topReferrers}
-                  barBackground="bg-purple-200"
-                  hoverBackground="hover:bg-purple-50"
-                  maxValue={maxReferrerCount}
-                />
+              <div className="h-full flex flex-col">
+                {/* Content area - scrollable if needed */}
+                <div className="flex-1 min-h-0 px-4 pt-4 overflow-hidden">
+                  <BarList
+                    tab="Websites"
+                    unit="visits"
+                    data={topReferrers}
+                    barBackground="bg-purple-200"
+                    hoverBackground="hover:bg-purple-50"
+                    maxValue={maxReferrerCount}
+                  />
+                </div>
+                {/* Button area - fixed at bottom */}
                 {hasMoreReferrers && (
-                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => setReferrersDialogOpen(true)}
-                      className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
-                    >
-                      <Maximize2 className="h-4 w-4 mr-1" />
-                      View All
-                    </Button>
+                  <div className="flex-shrink-0 px-4 py-3">
+                    <div className="flex items-center justify-center">
+                      <Button
+                        variant="outline"
+                        onClick={() => setReferrersDialogOpen(true)}
+                        className="text-sm py-2 px-4 rounded-full shadow-sm font-medium bg-white hover:bg-gray-50 transition-colors"
+                      >
+                        <Maximize2 className="h-4 w-4 mr-1" />
+                        View All
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
             )}
-          </div>
-          <ViewAllStats
-            name={"referrers"}
-            dialogOpen={referrersDialogOpen}
-            setDialogOpen={setReferrersDialogOpen}
-            allLinks={allReferrers}
-            maxTotalCount={maxReferrerCount}
-          />
-        </TabsContent>
-        <TabsContent value="tab-2">
-          <div className="px-4 relative">
+            <ViewAllStats
+              name={"referrers"}
+              dialogOpen={referrersDialogOpen}
+              setDialogOpen={setReferrersDialogOpen}
+              allLinks={allReferrers}
+              maxTotalCount={maxReferrerCount}
+            />
+          </TabsContent>
+
+          <TabsContent value="tab-2" className="h-full m-0 p-0">
             {metricsPending ? (
-              <div className="w-full h-[210px] flex items-center justify-center">
+              <div className="h-full flex items-center justify-center">
                 <Spinner />
               </div>
             ) : allReferrerURLs.length === 0 ? (
-              <div className="w-full h-[210px] flex items-center justify-center">
+              <div className="h-full flex items-center justify-center">
                 <span className="text-sm opacity-80">No data available</span>
               </div>
             ) : (
-              <div className="relative">
-                <BarList
-                  tab="Websites"
-                  unit="visits"
-                  data={topReferrerURLs}
-                  barBackground="bg-purple-200"
-                  hoverBackground="hover:bg-purple-50"
-                  maxValue={maxReferrerCount}
-                />
+              <div className="h-full flex flex-col">
+                {/* Content area - scrollable if needed */}
+                <div className="flex-1 min-h-0 px-4 pt-4 overflow-hidden">
+                  <BarList
+                    tab="Websites"
+                    unit="visits"
+                    data={topReferrerURLs}
+                    barBackground="bg-purple-200"
+                    hoverBackground="hover:bg-purple-50"
+                    maxValue={maxReferrerCount}
+                  />
+                </div>
+                {/* Button area - fixed at bottom */}
                 {hasMoreReferrerURLs && (
-                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => setReferrerURLsDialogOpen(true)}
-                      className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
-                    >
-                      <Maximize2 className="h-4 w-4 mr-1" />
-                      View All
-                    </Button>
+                  <div className="flex-shrink-0 px-4 py-3 ">
+                    <div className="flex items-center justify-center">
+                      <Button
+                        variant="outline"
+                        onClick={() => setReferrerURLsDialogOpen(true)}
+                        className="text-sm py-2 px-4 rounded-full shadow-sm font-medium bg-white hover:bg-gray-50 transition-colors"
+                      >
+                        <Maximize2 className="h-4 w-4 mr-1" />
+                        View All
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
             )}
-          </div>
-          <ViewAllStats
-            name={"referrer URLs"}
-            dialogOpen={referrerURLsDialogOpen}
-            setDialogOpen={setReferrerURLsDialogOpen}
-            allLinks={allReferrerURLs}
-            maxTotalCount={maxReferrerCount}
-          />
-        </TabsContent>
+            <ViewAllStats
+              name={"referrer URLs"}
+              dialogOpen={referrerURLsDialogOpen}
+              setDialogOpen={setReferrerURLsDialogOpen}
+              allLinks={allReferrerURLs}
+              maxTotalCount={maxReferrerCount}
+            />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );

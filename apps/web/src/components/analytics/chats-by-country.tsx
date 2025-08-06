@@ -168,9 +168,10 @@ export function ChatsByCountry() {
       : 1;
 
   return (
-    <div className="h-[350px] w-full rounded-xl border bg-white">
-      <Tabs defaultValue="countries">
-        <div className="flex items-center justify-between px-4 py-3">
+    <div className="h-[350px] w-full rounded-xl border bg-white flex flex-col overflow-hidden">
+      <Tabs defaultValue="countries" className="flex flex-col h-full">
+        {/* Header - Fixed height */}
+        <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
           <TabsList className="h-auto gap-2 rounded-none border-border bg-transparent px-0 text-foreground">
             <TabsTrigger
               value="countries"
@@ -198,137 +199,152 @@ export function ChatsByCountry() {
           </div>
         </div>
 
-        <TabsContent value="countries">
-          <div className="px-4 relative">
-            <div className="relative">
-              {analytics === undefined ? (
-                <div className="w-full h-[210px] flex items-center justify-center">
-                  <Spinner />
+        {/* Content area - Takes remaining space */}
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <TabsContent value="countries" className="h-full m-0 p-0">
+            {analytics === undefined ? (
+              <div className="h-full flex items-center justify-center">
+                <Spinner />
+              </div>
+            ) : topCountries.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <span className="text-sm opacity-80">No data available</span>
+              </div>
+            ) : (
+              <div className="h-full flex flex-col">
+                {/* Content area - scrollable if needed */}
+                <div className="flex-1 min-h-0 px-4 pt-4 overflow-hidden">
+                  <BarList
+                    tab="Websites"
+                    unit="visits"
+                    data={topCountries}
+                    barBackground="bg-green-200"
+                    hoverBackground="hover:bg-green-50"
+                    maxValue={maxCountryCount}
+                  />
                 </div>
-              ) : topCountries.length === 0 ? (
-                <div className="w-full h-[210px] flex items-center justify-center">
-                  <span className="text-sm opacity-80">No data available</span>
-                </div>
-              ) : (
-                <BarList
-                  tab="Websites"
-                  unit="visits"
-                  data={topCountries}
-                  barBackground="bg-green-200"
-                  hoverBackground="hover:bg-green-50"
-                  maxValue={maxCountryCount}
-                />
-              )}
-              {hasMoreCountries && analytics && topCountries.length > 0 && (
-                <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setCountriesDialogOpen(true)}
-                    className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
-                  >
-                    <Maximize2 className="h-4 w-4 mr-1" />
-                    View All
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-          <ViewAllStats
-            name="countries"
-            dialogOpen={countriesDialogOpen}
-            setDialogOpen={setCountriesDialogOpen}
-            allLinks={mapCountries}
-            maxTotalCount={maxCountryCount}
-          />
-        </TabsContent>
+                {/* Button area - fixed at bottom */}
+                {hasMoreCountries && (
+                  <div className="flex-shrink-0 px-4 py-3 ">
+                    <div className="flex items-center justify-center">
+                      <Button
+                        variant="outline"
+                        onClick={() => setCountriesDialogOpen(true)}
+                        className="text-sm py-2 px-4 rounded-full shadow-sm font-medium bg-white hover:bg-gray-50 transition-colors"
+                      >
+                        <Maximize2 className="h-4 w-4 mr-1" />
+                        View All
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            <ViewAllStats
+              name="countries"
+              dialogOpen={countriesDialogOpen}
+              setDialogOpen={setCountriesDialogOpen}
+              allLinks={mapCountries}
+              maxTotalCount={maxCountryCount}
+            />
+          </TabsContent>
 
-        <TabsContent value="cities">
-          <div className="px-4 relative">
-            <div className="relative">
-              {analytics === undefined ? (
-                <div className="w-full h-[210px] flex items-center justify-center">
-                  <Spinner />
+          <TabsContent value="cities" className="h-full m-0 p-0">
+            {analytics === undefined ? (
+              <div className="h-full flex items-center justify-center">
+                <Spinner />
+              </div>
+            ) : topCities.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <span className="text-sm opacity-80">No data available</span>
+              </div>
+            ) : (
+              <div className="h-full flex flex-col">
+                {/* Content area - scrollable if needed */}
+                <div className="flex-1 min-h-0 px-4 pt-4 overflow-hidden">
+                  <BarList
+                    tab="Websites"
+                    unit="visits"
+                    data={topCities}
+                    barBackground="bg-green-200"
+                    hoverBackground="hover:bg-green-50"
+                    maxValue={maxCityCount}
+                  />
                 </div>
-              ) : topCities.length === 0 ? (
-                <div className="w-full h-[210px] flex items-center justify-center">
-                  <span className="text-sm opacity-80">No data available</span>
-                </div>
-              ) : (
-                <BarList
-                  tab="Websites"
-                  unit="visits"
-                  data={topCities}
-                  barBackground="bg-green-200"
-                  hoverBackground="hover:bg-green-50"
-                  maxValue={maxCityCount}
-                />
-              )}
-              {hasMoreCities && analytics && topCities.length > 0 && (
-                <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setCitiesDialogOpen(true)}
-                    className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
-                  >
-                    <Maximize2 className="h-4 w-4 mr-1" />
-                    View All
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-          <ViewAllStats
-            name="cities"
-            dialogOpen={citiesDialogOpen}
-            setDialogOpen={setCitiesDialogOpen}
-            allLinks={mapCities}
-            maxTotalCount={maxCityCount}
-          />
-        </TabsContent>
+                {/* Button area - fixed at bottom */}
+                {hasMoreCities && (
+                  <div className="flex-shrink-0 px-4 py-3 ">
+                    <div className="flex items-center justify-center">
+                      <Button
+                        variant="outline"
+                        onClick={() => setCitiesDialogOpen(true)}
+                        className="text-sm py-2 px-4 rounded-full shadow-sm font-medium bg-white hover:bg-gray-50 transition-colors"
+                      >
+                        <Maximize2 className="h-4 w-4 mr-1" />
+                        View All
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            <ViewAllStats
+              name="cities"
+              dialogOpen={citiesDialogOpen}
+              setDialogOpen={setCitiesDialogOpen}
+              allLinks={mapCities}
+              maxTotalCount={maxCityCount}
+            />
+          </TabsContent>
 
-        <TabsContent value="continents">
-          <div className="px-4 relative">
-            <div className="relative">
-              {analytics === undefined ? (
-                <div className="w-full h-[210px] flex items-center justify-center">
-                  <Spinner />
+          <TabsContent value="continents" className="h-full m-0 p-0">
+            {analytics === undefined ? (
+              <div className="h-full flex items-center justify-center">
+                <Spinner />
+              </div>
+            ) : topContinents.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <span className="text-sm opacity-80">No data available</span>
+              </div>
+            ) : (
+              <div className="h-full flex flex-col">
+                {/* Content area - scrollable if needed */}
+                <div className="flex-1 min-h-0 px-4 pt-4 overflow-hidden">
+                  <BarList
+                    tab="Websites"
+                    unit="visits"
+                    data={topContinents}
+                    barBackground="bg-green-200"
+                    hoverBackground="hover:bg-green-50"
+                    maxValue={maxContinentCount}
+                  />
                 </div>
-              ) : topContinents.length === 0 ? (
-                <div className="w-full h-[210px] flex items-center justify-center">
-                  <span className="text-sm opacity-80">No data available</span>
-                </div>
-              ) : (
-                <BarList
-                  tab="Websites"
-                  unit="visits"
-                  data={topContinents}
-                  barBackground="bg-green-200"
-                  hoverBackground="hover:bg-green-50"
-                  maxValue={maxContinentCount}
-                />
-              )}
-              {hasMoreContinents && analytics && topContinents.length > 0 && (
-                <div className="absolute inset-x-0 bottom-0 flex items-center justify-center py-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setContinentsDialogOpen(true)}
-                    className="text-sm py-2 px-4 rounded-full shadow-md font-medium"
-                  >
-                    <Maximize2 className="h-4 w-4 mr-1" />
-                    View All
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-          <ViewAllStats
-            name="continents"
-            dialogOpen={continentsDialogOpen}
-            setDialogOpen={setContinentsDialogOpen}
-            allLinks={mapContinents}
-            maxTotalCount={maxContinentCount}
-          />
-        </TabsContent>
+                {/* Button area - fixed at bottom */}
+                {hasMoreContinents && (
+                  <div className="flex-shrink-0 px-4 py-3 border-t bg-gray-50/50">
+                    <div className="flex items-center justify-center">
+                      <Button
+                        variant="outline"
+                        onClick={() => setContinentsDialogOpen(true)}
+                        className="text-sm py-2 px-4 rounded-full shadow-sm font-medium bg-white hover:bg-gray-50 transition-colors"
+                      >
+                        <Maximize2 className="h-4 w-4 mr-1" />
+                        View All
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            <ViewAllStats
+              name="continents"
+              dialogOpen={continentsDialogOpen}
+              setDialogOpen={setContinentsDialogOpen}
+              allLinks={mapContinents}
+              maxTotalCount={maxContinentCount}
+            />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
