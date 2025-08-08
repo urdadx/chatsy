@@ -1,8 +1,8 @@
 import { Input } from "@/components/ui/input";
-import { useRecentSubscription } from "@/hooks/use-recent-subscription";
+import { useSubscription } from "@/hooks/use-subscription";
 
 export const BillingEmail = () => {
-  const { data: subscription } = useRecentSubscription();
+  const { data: subscription } = useSubscription();
 
   const billingEmail = subscription?.customer?.email || "Not available";
 

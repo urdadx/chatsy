@@ -1,5 +1,4 @@
 import { authClient } from "@/lib/auth-client";
-import { useSession } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 
 interface Subscription {
@@ -7,12 +6,11 @@ interface Subscription {
   [key: string]: any;
 }
 
-export function useRecentSubscription() {
-  const { data: session } = useSession();
-  const organizationId = session?.session?.activeOrganizationId;
+const organizationId = (await authClient.organization.list())?.data?.[0]?.id;
 
+export function useSubscription() {
   return useQuery<Subscription | null>({
-    queryKey: ["recent-subscription", organizationId],
+    queryKey: ["subscription", organizationId],
     queryFn: async () => {
       if (!organizationId) return null;
       const { data } = await authClient.customer.subscriptions.list({

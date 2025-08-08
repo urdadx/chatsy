@@ -45,6 +45,9 @@ export const session = pgTable("session", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   activeOrganizationId: text("active_organization_id"),
+  activeChatbotId: uuid("active_chatbot_id").references(() => chatbot.id, {
+    onDelete: "set null",
+  }),
 });
 
 export const account = pgTable("account", {
@@ -85,8 +88,10 @@ export const organization = pgTable("organization", {
   logo: text("logo"),
   createdAt: timestamp("created_at").notNull(),
   trainingStatus: text("training_status").default("idle"),
+  lastTrainedAt: timestamp("last_trained_at"),
   metadata: text("metadata"),
   sourcesCount: integer("sources_count").default(0).notNull(),
+  maxChatbots: integer("max_chatbots").default(1).notNull(),
 });
 
 export const member = pgTable("member", {
@@ -120,9 +125,9 @@ export const chat = pgTable("Chat", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   title: text("title").notNull(),
   userId: uuid("userId").references(() => user.id, { onDelete: "cascade" }),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   visibility: varchar("visibility", { enum: ["public", "private"] })
     .notNull()
     .default("private"),
@@ -167,9 +172,9 @@ export const question = pgTable("question", {
   userId: uuid("userId")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   createdAt: timestamp("createdAt")
@@ -218,9 +223,9 @@ export const chatbot = pgTable("chatbot", {
 
 export const lead = pgTable("lead", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   contact: text("contact").notNull(),
   message: text("message"),
@@ -232,9 +237,9 @@ export const product = pgTable("product", {
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   url: text("url").notNull(),
   image: text("image"),
@@ -253,9 +258,9 @@ export const textSource = pgTable("text_source", {
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -267,9 +272,9 @@ export const documentSource = pgTable("document_source", {
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   type: text("type").notNull(),
   size: integer("size").notNull(),
@@ -283,9 +288,9 @@ export const websiteSource = pgTable("website_source", {
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   url: text("url").notNull(),
   markdown: text("markdown").notNull(),
   metadata: json("metadata"),
@@ -302,9 +307,9 @@ export const knowledge = pgTable("knowledge", {
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   source: varchar("source", {
     enum: ["website", "text", "document", "qna"],
   }).notNull(),
@@ -330,9 +335,9 @@ export const feedback = pgTable("feedback", {
 
 export const visitorAnalytics = pgTable("visitor_analytics", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   visitorId: text("visitor_id").notNull(),
   userAgent: text("user_agent"),
   deviceType: text("device_type"),
@@ -371,11 +376,12 @@ export const subscription = pgTable("subscription", {
   checkoutId: text("checkoutId").notNull(),
   customerCancellationReason: text("customerCancellationReason"),
   customerCancellationComment: text("customerCancellationComment"),
-  metadata: text("metadata"), // JSON string
-  customFieldData: text("customFieldData"), // JSON string
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+  metadata: text("metadata"),
+  customFieldData: text("customFieldData"),
+  organizationId: text("organizationId").references(() => organization.id, {
+    onDelete: "cascade",
+  }),
+  userId: uuid("userId").references(() => user.id, { onDelete: "cascade" }),
 });
 
 export const creditsUsage = pgTable("credits_usage", {
@@ -408,9 +414,9 @@ export const whatsappIntegration = pgTable("whatsapp_integration", {
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   businessAccountId: text("business_account_id").notNull(),
   accessToken: text("access_token").notNull(),
   refreshToken: text("refresh_token"),

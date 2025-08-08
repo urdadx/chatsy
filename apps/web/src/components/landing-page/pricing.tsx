@@ -27,8 +27,8 @@ export function Pricing() {
       yearlySavings: 84,
       description: "For solopreneurs and early-stage startups",
       features: [
-        "2,000 message credits",
-        "100 scraping credits",
+        "3000 message credits",
+        "150 scraping credits",
         "1 chatbot",
         "1 team member",
         "10 file uploads (max 10MB each)",
@@ -61,12 +61,11 @@ export function Pricing() {
     {
       id: 3,
       name: "Professional",
-      tagline: "For scaling businesses and agencies needing advanced capacity",
+      tagline: "For scaling businesses and agencies",
       monthlyPrice: 399,
       yearlyPrice: 329,
       yearlySavings: 840,
-      description:
-        "For scaling businesses and agencies needing advanced capacity",
+      description: "For scaling businesses and agencies",
       features: [
         "30,000 message credits",
         "2,500 scraping credits",
@@ -91,7 +90,7 @@ export function Pricing() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-2xl space-y-2 text-center">
           <h1 className="text-center instrument-serif-regular-italic text-3xl font-semibold lg:text-4xl">
-            Pricing That Scales with You
+            Pricing That Scales With You
           </h1>
         </div>
 

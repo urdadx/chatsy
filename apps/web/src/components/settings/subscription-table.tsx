@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRecentSubscription } from "@/hooks/use-recent-subscription";
+import { useSubscription } from "@/hooks/use-subscription";
 import { addMonths, format, parseISO } from "date-fns";
 import { Wallet } from "lucide-react";
 
 export const SubscriptionTable = () => {
-  const { data: subscription, isLoading } = useRecentSubscription();
+  const { data: subscription, isLoading } = useSubscription();
 
   let nextBilling = "-";
   if (subscription?.currentPeriodEnd) {

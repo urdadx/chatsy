@@ -79,7 +79,7 @@ const PurePreviewMessage = ({
                       className={cn(
                         "flex flex-col gap-4 text-foreground bg-gray-50 prose px-3 py-2 rounded-md break-words whitespace-normal",
                         {
-                          " text-primary-foreground": message.role === "user",
+                          " text-white": message.role === "user",
                         },
                       )}
                     >
@@ -94,30 +94,36 @@ const PurePreviewMessage = ({
                 const { toolName, toolCallId, state } = toolInvocation;
 
                 if (state === "call") {
-                  if (toolName === "collect_feedback") {
-                    return (
-                      <div key={toolCallId}>
-                        <CollectFeedbackForm
-                          color={activeChatbot?.primaryColor}
-                        />
-                      </div>
-                    );
-                  }
-                }
-                if (state === "call") {
-                  if (toolName === "collect_leads") {
-                    return (
-                      <div key={toolCallId}>
-                        <CollectLeadsForm />
-                      </div>
-                    );
+                  switch (toolName) {
+                    case "collect_feedback":
+                      return (
+                        <div key={toolCallId}>
+                          <CollectFeedbackForm
+                            color={activeChatbot?.primaryColor}
+                          />
+                        </div>
+                      );
+                    case "collect_leads":
+                      return (
+                        <div key={toolCallId}>
+                          <CollectLeadsForm />
+                        </div>
+                      );
+                    case "knowledge_base":
+                      return (
+                        <div
+                          key={toolCallId}
+                          className="flex items-center gap-2 text-muted-foreground text-sm"
+                        >
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+                          Searching knowledge base...
+                        </div>
+                      );
                   }
                 }
 
-                if (state === "result") {
-                  if (toolName === "knowledge_base") {
-                    return null;
-                  }
+                if (state === "result" && toolName === "knowledge_base") {
+                  return null;
                 }
               }
             })}

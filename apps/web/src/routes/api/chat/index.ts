@@ -28,7 +28,7 @@ const llmIngestion = Ingestion({
   accessToken: process.env.POLAR_ACCESS_TOKEN!,
   server: "sandbox",
 })
-  .strategy(new LLMStrategy(google("gemini-2.5-pro")))
+  .strategy(new LLMStrategy(google("gemini-2.0-flash")))
   .ingest("ai_usage_two");
 
 export const ServerRoute = createServerFileRoute("/api/chat/").methods({
@@ -41,21 +41,34 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         return new Response("Unauthorized", { status: 401 });
       }
 
-      const organizationId = session?.session?.activeOrganizationId as string;
-      if (!organizationId) {
-        return new Response("No active organization", { status: 400 });
+      const chatbotId = session?.session?.activeChatbotId;
+      if (!chatbotId) {
+        return new Response("No active chatbot", { status: 400 });
+      }
+
+      // Verify the chatbot exists and user has access to its organization
+      const [chatbotData] = await db
+        .select({
+          organizationId: chatbot.organizationId,
+          name: chatbot.name,
+        })
+        .from(chatbot)
+        .where(eq(chatbot.id, chatbotId));
+
+      if (!chatbotData) {
+        return new Response("Chatbot not found", { status: 404 });
       }
 
       const externalCustomerId = session.user.id;
 
-      // Verify user is a member of the organization
+      // Verify user is a member of the chatbot's organization
       const [membership] = await db
         .select()
         .from(member)
         .where(
           and(
             eq(member.userId, session.user.id),
-            eq(member.organizationId, organizationId),
+            eq(member.organizationId, chatbotData.organizationId),
           ),
         );
 
@@ -73,13 +86,13 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         await saveChat({
           id,
           userId: session.user.id,
-          organizationId,
+          chatbotId,
           title,
           visibility: "private",
         });
       } else {
-        // Verify the chat belongs to the user's organization
-        if (chat.organizationId !== organizationId) {
+        // Verify the chat belongs to the same chatbot
+        if (chat.chatbotId !== chatbotId) {
           return new Response("Forbidden", { status: 403 });
         }
       }
@@ -99,14 +112,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
           console.error("Error saving user message:", error);
         }
       }
-      // get the chatbot name for the organization
-      const [chatbotDetails] = await db
-        .select({
-          name: chatbot.name,
-        })
-        .from(chatbot)
-        .where(eq(chatbot.organizationId, organizationId));
-
+      // get the chatbot name
       const model = llmIngestion.client({
         externalCustomerId:
           request.headers.get("X-Polar-Customer-Id") ?? externalCustomerId,
@@ -114,12 +120,11 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
 
       const resultStream = streamText({
         model,
-        system: systemPrompt(chatbotDetails.name ?? "Assistant"),
+        system: systemPrompt(chatbotData.name ?? "Assistant"),
         messages,
-        maxTokens: 500,
         maxSteps: 5,
         tools: {
-          knowledge_base: knowledgeSearchTool(organizationId),
+          knowledge_base: knowledgeSearchTool(chatbotId),
           collect_feedback: collectFeedbackTool,
           collect_leads: collectLeadsTool,
         },
@@ -141,13 +146,16 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         },
       });
 
-      resultStream.consumeStream();
-      const originalResponse = resultStream.toDataStreamResponse();
-      const headers = new Headers(originalResponse.headers);
-      headers.set("X-Chat-Id", id);
+      const response = resultStream.toDataStreamResponse();
 
-      return new Response(originalResponse.body, {
-        status: originalResponse.status,
+      // Add custom headers including chat ID
+      const headers = new Headers(response.headers);
+      headers.set("X-Chat-Id", id);
+      headers.set("Cache-Control", "no-cache");
+      headers.set("Connection", "keep-alive");
+
+      return new Response(response.body, {
+        status: response.status,
         headers,
       });
     } catch (err: any) {
@@ -168,19 +176,31 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session) return new Response("Unauthorized", { status: 401 });
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return new Response("No active organization", { status: 400 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return new Response("No active chatbot", { status: 400 });
     }
 
-    // Verify user is a member of the organization
+    // Verify the chatbot exists and get its organization
+    const [chatbotData] = await db
+      .select({
+        organizationId: chatbot.organizationId,
+      })
+      .from(chatbot)
+      .where(eq(chatbot.id, chatbotId));
+
+    if (!chatbotData) {
+      return new Response("Chatbot not found", { status: 404 });
+    }
+
+    // Verify user is a member of the chatbot's organization
     const [membership] = await db
       .select()
       .from(member)
       .where(
         and(
           eq(member.userId, session.user.id),
-          eq(member.organizationId, organizationId),
+          eq(member.organizationId, chatbotData.organizationId),
         ),
       );
 
@@ -191,9 +211,8 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
     try {
       const chat = await getChatById({ id });
 
-      // Check if chat exists and belongs to the organization
-      // Allow organization members to delete any chat in their organization
-      if (!chat || chat.organizationId !== organizationId) {
+      // Check if chat exists and belongs to the chatbot
+      if (!chat || chat.chatbotId !== chatbotId) {
         return new Response("Forbidden", { status: 403 });
       }
 

@@ -10,14 +10,14 @@ export const ServerRoute = createServerFileRoute("/api/vote-count").methods({
     });
 
     const userId = session?.user?.id;
-    const organizationId = session?.session?.activeOrganizationId;
+    const chatbotId = request.headers.get("X-Chatbot-Id");
 
-    if (!userId || !organizationId) {
+    if (!userId || !chatbotId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
     try {
-      const { upvotes, downvotes } = await getTotalVotes({ organizationId });
+      const { upvotes, downvotes } = await getTotalVotes({ chatbotId });
       return json({ upvotes, downvotes }, { status: 200 });
     } catch (error) {
       console.error("Error getting total votes:", error);

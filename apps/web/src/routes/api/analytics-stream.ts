@@ -21,9 +21,7 @@ interface AnalyticsData {
   }[];
 }
 
-async function getAnalyticsData(
-  organizationId: string,
-): Promise<AnalyticsData> {
+async function getAnalyticsData(chatbotId: string): Promise<AnalyticsData> {
   try {
     // Get total visits count (only count page_visit events, not unload events)
     const [totalVisitsResult] = await db
@@ -31,7 +29,7 @@ async function getAnalyticsData(
       .from(visitorAnalytics)
       .where(
         and(
-          eq(visitorAnalytics.organizationId, organizationId),
+          eq(visitorAnalytics.chatbotId, chatbotId),
           eq(visitorAnalytics.event, "page_visit"),
         ),
       );
@@ -44,7 +42,7 @@ async function getAnalyticsData(
     // Get all recent activity (both visits and unloads)
     const recentVisitorActivity = await db.query.visitorAnalytics.findMany({
       where: and(
-        eq(visitorAnalytics.organizationId, organizationId),
+        eq(visitorAnalytics.chatbotId, chatbotId),
         gte(visitorAnalytics.createdAt, fiveMinutesAgo),
       ),
       columns: {
@@ -83,7 +81,7 @@ async function getAnalyticsData(
     // Get session time data
     const records = await db.query.visitorAnalytics.findMany({
       where: and(
-        eq(visitorAnalytics.organizationId, organizationId),
+        eq(visitorAnalytics.chatbotId, chatbotId),
         isNotNull(visitorAnalytics.durationMs),
       ),
       columns: {
@@ -140,7 +138,7 @@ async function getAnalyticsData(
     const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const recentVisits = await db.query.visitorAnalytics.findMany({
       where: and(
-        eq(visitorAnalytics.organizationId, organizationId),
+        eq(visitorAnalytics.chatbotId, chatbotId),
         eq(visitorAnalytics.event, "page_visit"), // Only count actual visits
         gte(visitorAnalytics.createdAt, last24Hours),
       ),
@@ -194,8 +192,8 @@ export const ServerRoute = createServerFileRoute(
       headers: request.headers || new Headers(),
     });
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
       return new Response("Unauthorized", { status: 401 });
     }
 
@@ -206,7 +204,7 @@ export const ServerRoute = createServerFileRoute(
       start(controller) {
         const sendData = async () => {
           try {
-            const data = await getAnalyticsData(organizationId);
+            const data = await getAnalyticsData(chatbotId);
             const dataString = JSON.stringify(data);
             const currentHash = hashString(dataString);
 
