@@ -5,7 +5,7 @@ import { generateQuestionEmbedding } from "./embeddings";
 
 export async function searchKnowledge(
   query: string,
-  organizationId: string,
+  chatbotId: string,
   limit = 10,
   threshold = 0.5,
 ) {
@@ -25,7 +25,7 @@ export async function searchKnowledge(
     })
     .from(knowledge)
     .where(
-      sql`${knowledge.organizationId} = ${organizationId} AND ${similarity} > ${threshold}`,
+      sql`${knowledge.chatbotId} = ${chatbotId} AND ${similarity} > ${threshold}`,
     )
     .orderBy(sql`${knowledge.embedding} <=> ${embeddingString}::vector`)
     .limit(limit);

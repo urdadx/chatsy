@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { organization, websiteSource } from "@/db/schema";
+import { chatbot, member, websiteSource } from "@/db/schema";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -21,9 +21,9 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
       headers: request.headers || new Headers(),
     });
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return json({ error: "No active organization" }, { status: 400 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
 
     const userId = session?.user?.id;
@@ -31,11 +31,38 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
+    // Verify the chatbot exists and get its organization
+    const [chatbotData] = await db
+      .select({
+        organizationId: chatbot.organizationId,
+      })
+      .from(chatbot)
+      .where(eq(chatbot.id, chatbotId));
+
+    if (!chatbotData) {
+      return json({ error: "Chatbot not found" }, { status: 404 });
+    }
+
+    // Verify user is a member of the chatbot's organization
+    const [membership] = await db
+      .select()
+      .from(member)
+      .where(
+        and(
+          eq(member.userId, userId),
+          eq(member.organizationId, chatbotData.organizationId),
+        ),
+      );
+
+    if (!membership) {
+      return json({ error: "Forbidden" }, { status: 403 });
+    }
+
     try {
       const scrapedData = await db
         .select()
         .from(websiteSource)
-        .where(eq(websiteSource.organizationId, organizationId));
+        .where(eq(websiteSource.chatbotId, chatbotId));
 
       return json({ success: true, data: scrapedData });
     } catch (error) {
@@ -56,14 +83,26 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
     const session = await auth.api.getSession({
       headers: request.headers || new Headers(),
     });
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return json({ error: "No active organization" }, { status: 400 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
 
     const userId = session?.user?.id;
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+
+    // Verify the chatbot exists and get its info
+    const [chatbotData] = await db
+      .select({
+        id: chatbot.id,
+      })
+      .from(chatbot)
+      .where(eq(chatbot.id, chatbotId));
+
+    if (!chatbotData) {
+      return json({ error: "Chatbot not found" }, { status: 404 });
     }
 
     const body = await request.json();
@@ -93,7 +132,7 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
           .insert(websiteSource)
           .values({
             userId,
-            organizationId,
+            chatbotId,
             url: fullUrl,
             markdown,
             metadata,
@@ -105,11 +144,11 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
 
         if (inserted) {
           await db
-            .update(organization)
+            .update(chatbot)
             .set({
-              sourcesCount: sql`${organization.sourcesCount} + 1`,
+              sourcesCount: sql`${chatbot.sourcesCount} + 1`,
             })
-            .where(eq(organization.id, organizationId));
+            .where(eq(chatbot.id, chatbotData.id));
         }
 
         return json({ success: true, data: inserted });
@@ -139,14 +178,26 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
       headers: request.headers || new Headers(),
     });
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return json({ error: "No active organization" }, { status: 400 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
 
     const userId = session?.user?.id;
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+
+    // Verify the chatbot exists and get its info
+    const [chatbotData] = await db
+      .select({
+        id: chatbot.id,
+      })
+      .from(chatbot)
+      .where(eq(chatbot.id, chatbotId));
+
+    if (!chatbotData) {
+      return json({ error: "Chatbot not found" }, { status: 404 });
     }
 
     const body = await request.json();
@@ -163,10 +214,7 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
         .select()
         .from(websiteSource)
         .where(
-          and(
-            eq(websiteSource.id, id),
-            eq(websiteSource.organizationId, organizationId),
-          ),
+          and(eq(websiteSource.id, id), eq(websiteSource.chatbotId, chatbotId)),
         );
 
       if (!source) {
@@ -182,11 +230,11 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
       await db.delete(websiteSource).where(eq(websiteSource.id, id));
 
       await db
-        .update(organization)
+        .update(chatbot)
         .set({
-          sourcesCount: sql`greatest(0, ${organization.sourcesCount} - 1)`,
+          sourcesCount: sql`greatest(0, ${chatbot.sourcesCount} - 1)`,
         })
-        .where(eq(organization.id, organizationId));
+        .where(eq(chatbot.id, chatbotData.id));
 
       return json({ success: true });
     } catch (error) {

@@ -92,10 +92,10 @@ function RouteComponent() {
     });
 
   const inputLength = input.trim().length;
-  const organizationId = chatbot?.organizationId;
+  const chatbotId = chatbot?.id;
 
   const { logVisitorAnalytics } = useSendVisitorAnalytics({
-    organizationId: organizationId || "placeholder",
+    chatbotId: chatbotId || "placeholder",
     extra: { page_type: "bio_page", page_id: pageId },
   });
 

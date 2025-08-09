@@ -80,7 +80,11 @@ export const CrawlWebsites = () => {
             onClick={handleCrawl}
             disabled={mutation.isPending}
           >
-            {mutation.isPending ? <Spinner /> : <PlayIcon />}
+            {mutation.isPending ? (
+              <Spinner className="text-white" />
+            ) : (
+              <PlayIcon />
+            )}
             Crawl
           </Button>
         </div>

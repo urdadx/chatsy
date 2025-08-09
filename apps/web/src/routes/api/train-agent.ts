@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import {
+  chatbot,
   documentSource,
   knowledge,
   organization,
@@ -18,7 +19,7 @@ import {
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { and, eq } from "drizzle-orm";
+import { and, eq, gt, or } from "drizzle-orm";
 
 export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
   POST: async ({ request }) => {
@@ -26,27 +27,53 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
       headers: request.headers || new Headers(),
     });
 
-    const organizationId = session?.session?.activeOrganizationId;
+    const chatbotId = session?.session?.activeChatbotId;
     const userId = session?.user?.id;
 
-    if (!organizationId || !userId) {
+    if (!chatbotId || !userId) {
       return json(
-        { error: "Authentication or organization context is missing." },
+        { error: "Authentication or active chatbot context is missing." },
         { status: 400 },
       );
     }
 
-    try {
-      await db
-        .update(organization)
-        .set({ trainingStatus: "in-progress" })
-        .where(eq(organization.id, organizationId));
+    // Verify the chatbot exists and get its organization
+    const [chatbotData] = await db
+      .select({
+        id: chatbot.id,
+        lastTrainedAt: chatbot.lastTrainedAt,
+      })
+      .from(chatbot)
+      .innerJoin(organization, eq(chatbot.organizationId, organization.id))
+      .where(eq(chatbot.id, chatbotId));
 
-      // Retrain Documents
+    if (!chatbotData) {
+      return json({ error: "Chatbot not found." }, { status: 404 });
+    }
+    try {
+      // Get the chatbot's last training timestamp from its organization
+      const lastTrainedAt = chatbotData.lastTrainedAt;
+
+      await db
+        .update(chatbot)
+        .set({ trainingStatus: "in-progress" })
+        .where(eq(chatbot.id, chatbotData.id));
+
+      // Only retrain documents that are new or updated since last training
+      const documentFilter = lastTrainedAt
+        ? and(
+            eq(documentSource.chatbotId, chatbotId),
+            or(
+              gt(documentSource.createdAt, lastTrainedAt),
+              gt(documentSource.updatedAt, lastTrainedAt),
+            ),
+          )
+        : eq(documentSource.chatbotId, chatbotId);
+
       const documents = await db
         .select()
         .from(documentSource)
-        .where(eq(documentSource.organizationId, organizationId));
+        .where(documentFilter);
       for (const doc of documents) {
         await db
           .delete(knowledge)
@@ -60,23 +87,47 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
         const chunks = await chunkDocument(text);
         for (let i = 0; i < chunks.length; i++) {
           const embedding = await generateAnswerEmbedding(chunks[i]);
-          await db.insert(knowledge).values({
-            source: "document",
-            sourceId: doc.id,
-            organizationId,
-            userId,
-            content: chunks[i],
-            embedding,
-            metadata: { chunkIndex: i },
-          });
+          try {
+            await db.insert(knowledge).values({
+              userId,
+              chatbotId,
+              source: "document",
+              sourceId: doc.id,
+              content: chunks[i],
+              embedding,
+              metadata: { chunkIndex: i },
+            });
+          } catch (insertError) {
+            console.error(
+              `Failed to insert knowledge for document ${doc.id}, chunk ${i}:`,
+              insertError,
+            );
+            console.error("Data being inserted:", {
+              source: "document",
+              sourceId: doc.id,
+              chatbotId,
+              userId,
+              content: `${chunks[i].substring(0, 100)}...`,
+              embedding: embedding ? `[${embedding.length} dimensions]` : null,
+              metadata: { chunkIndex: i },
+            });
+            throw insertError;
+          }
         }
       }
 
-      // Retrain Questions
-      const questions = await db
-        .select()
-        .from(question)
-        .where(eq(question.organizationId, organizationId));
+      // Only retrain questions that are new or updated since last training
+      const questionFilter = lastTrainedAt
+        ? and(
+            eq(question.chatbotId, chatbotId),
+            or(
+              gt(question.createdAt, lastTrainedAt),
+              gt(question.updatedAt, lastTrainedAt),
+            ),
+          )
+        : eq(question.chatbotId, chatbotId);
+
+      const questions = await db.select().from(question).where(questionFilter);
       for (const q of questions) {
         await db
           .delete(knowledge)
@@ -85,21 +136,28 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
           );
         const questionEmbedding = await generateQuestionEmbedding(q.question);
         await db.insert(knowledge).values({
+          userId,
+          chatbotId,
           source: "qna",
           sourceId: q.id,
-          organizationId,
-          userId,
           content: q.question,
           embedding: questionEmbedding,
           metadata: { answer: q.answer },
         });
       }
 
-      // Retrain Text Sources
-      const texts = await db
-        .select()
-        .from(textSource)
-        .where(eq(textSource.organizationId, organizationId));
+      // Only retrain text sources that are new or updated since last training
+      const textFilter = lastTrainedAt
+        ? and(
+            eq(textSource.chatbotId, chatbotId),
+            or(
+              gt(textSource.createdAt, lastTrainedAt),
+              gt(textSource.updatedAt, lastTrainedAt),
+            ),
+          )
+        : eq(textSource.chatbotId, chatbotId);
+
+      const texts = await db.select().from(textSource).where(textFilter);
       for (const t of texts) {
         await db
           .delete(knowledge)
@@ -110,10 +168,10 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
         for (let i = 0; i < chunks.length; i++) {
           const embedding = await generateAnswerEmbedding(chunks[i]);
           await db.insert(knowledge).values({
+            userId,
+            chatbotId,
             source: "text",
             sourceId: t.id,
-            organizationId,
-            userId,
             content: chunks[i],
             embedding,
             metadata: { chunkIndex: i },
@@ -121,25 +179,35 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
         }
       }
 
-      // Retrain Website Sources
+      // Only retrain website sources that are new or updated since last training
+      const websiteFilter = lastTrainedAt
+        ? and(
+            eq(websiteSource.chatbotId, chatbotId),
+            or(
+              gt(websiteSource.createdAt, lastTrainedAt),
+              gt(websiteSource.updatedAt, lastTrainedAt),
+            ),
+          )
+        : eq(websiteSource.chatbotId, chatbotId);
+
       const websites = await db
         .select()
         .from(websiteSource)
-        .where(eq(websiteSource.organizationId, organizationId));
+        .where(websiteFilter);
       for (const w of websites) {
         await db
           .delete(knowledge)
           .where(
             and(eq(knowledge.source, "website"), eq(knowledge.sourceId, w.id)),
           );
-        const chunks = await chunkDocument(w.markdown); // Assuming chunkDocument works for markdown
+        const chunks = await chunkDocument(w.markdown);
         for (let i = 0; i < chunks.length; i++) {
           const embedding = await generateAnswerEmbedding(chunks[i]);
           await db.insert(knowledge).values({
+            userId,
+            chatbotId,
             source: "website",
             sourceId: w.id,
-            organizationId,
-            userId,
             content: chunks[i],
             embedding,
             metadata: { chunkIndex: i, url: w.url },
@@ -148,16 +216,19 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
       }
 
       await db
-        .update(organization)
-        .set({ trainingStatus: "completed" })
-        .where(eq(organization.id, organizationId));
+        .update(chatbot)
+        .set({
+          trainingStatus: "completed",
+          lastTrainedAt: new Date(),
+        })
+        .where(eq(chatbot.id, chatbotData.id));
 
       return json({ message: "Agent training initiated successfully." });
     } catch (error) {
       await db
-        .update(organization)
+        .update(chatbot)
         .set({ trainingStatus: "failed" })
-        .where(eq(organization.id, organizationId));
+        .where(eq(chatbot.id, chatbotData.id));
       console.error("Agent training error:", error);
       return json({ error: "Agent training failed." }, { status: 500 });
     }

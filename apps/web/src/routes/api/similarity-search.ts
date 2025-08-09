@@ -17,9 +17,9 @@ export const ServerRoute = createServerFileRoute(
       headers: request.headers || new Headers(),
     });
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return json({ error: "No active organization" }, { status: 400 });
+    const chatbotId = request.headers.get("X-Chatbot-Id");
+    if (!chatbotId) {
+      return json({ error: "No chatbot ID provided" }, { status: 400 });
     }
 
     const body = await request.json();
@@ -31,7 +31,7 @@ export const ServerRoute = createServerFileRoute(
 
     const results = await searchKnowledge(
       parsed.data.query,
-      organizationId,
+      chatbotId,
       parsed.data.limit,
     );
 

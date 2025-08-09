@@ -2,7 +2,7 @@ import { searchKnowledge } from "@/lib/ai/search";
 import { tool } from "ai";
 import z from "zod";
 
-export const knowledgeSearchTool = (organizationId: string) =>
+export const knowledgeSearchTool = (chatbotId: string) =>
   tool({
     description: "Search the knowledge base for relevant information.",
     parameters: z.object({
@@ -16,7 +16,7 @@ export const knowledgeSearchTool = (organizationId: string) =>
         .describe("Number of results to return"),
     }),
     execute: async ({ query, limit = 5 }) => {
-      const results = await searchKnowledge(query, organizationId, limit);
+      const results = await searchKnowledge(query, chatbotId, limit);
       return {
         results: results.map((r) => ({
           content: r.content,

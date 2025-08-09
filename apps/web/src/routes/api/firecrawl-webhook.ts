@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { organization, websiteSource } from "@/db/schema";
+import { chatbot, websiteSource } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { eq, sql } from "drizzle-orm";
@@ -33,7 +33,7 @@ const webhookPayloadSchema = z.object({
   metadata: z
     .object({
       userId: z.string().optional(),
-      organizationId: z.string().optional(),
+      chatbotId: z.string().optional(),
       originalUrl: z.string().optional(),
     })
     .optional(),
@@ -56,15 +56,22 @@ export const ServerRoute = createServerFileRoute(
         return json({ error: "Invalid payload" }, { status: 400 });
       }
 
-      const { type, data, metadata, error, id: jobId } = parsed.data;
+      const {
+        type,
+        data,
+        metadata,
+        error,
+        id: jobId,
+        success,
+        creditsUsed,
+      } = parsed.data;
 
-      // Extract metadata
       const userId = metadata?.userId;
-      const organizationId = metadata?.organizationId;
+      const chatbotId = metadata?.chatbotId;
       const originalUrl = metadata?.originalUrl;
 
-      if (!userId || !organizationId) {
-        console.error("Missing userId or organizationId in webhook metadata");
+      if (!userId || !chatbotId) {
+        console.error("Missing userId or chatbotId in webhook metadata");
         return json({ error: "Missing required metadata" }, { status: 400 });
       }
 
@@ -86,13 +93,13 @@ export const ServerRoute = createServerFileRoute(
                   .insert(websiteSource)
                   .values({
                     userId,
-                    organizationId,
+                    chatbotId,
                     url: pageMetadata?.sourceURL || originalUrl || "unknown",
                     markdown,
                     metadata: pageMetadata,
                     type: "crawl",
                     urlsCrawled: 1, // Individual page count
-                    creditsUsed: 1, // Will be updated on completion
+                    creditsUsed: 1,
                     crawlJobId: jobId, // Track which job this belongs to
                   })
                   .returning();
@@ -100,14 +107,14 @@ export const ServerRoute = createServerFileRoute(
               }
             }
 
-            // Update organization sources count
+            // Update chatbot sources count
             if (insertedSources.length > 0) {
               await db
-                .update(organization)
+                .update(chatbot)
                 .set({
-                  sourcesCount: sql`${organization.sourcesCount} + ${insertedSources.length}`,
+                  sourcesCount: sql`${chatbot.sourcesCount} + ${insertedSources.length}`,
                 })
-                .where(eq(organization.id, organizationId));
+                .where(eq(chatbot.id, chatbotId));
             }
 
             console.log(`Saved ${insertedSources.length} pages to database`);
@@ -116,12 +123,26 @@ export const ServerRoute = createServerFileRoute(
 
         case "crawl.completed":
           console.log(`Crawl completed for ${originalUrl}. Job ID: ${jobId}`);
-
-          // For completed events, we don't get creditsUsed in the webhook
-          // The credits are typically calculated based on the number of pages processed
-          // We could track this by counting the pages we've already stored for this job
-
           console.log(`Crawl job ${jobId} completed successfully`);
+
+          // Log the full crawl results
+          console.log("=== CRAWL COMPLETION RESULTS ===");
+          console.log("Success:", success);
+          console.log("Credits Used:", creditsUsed);
+          console.log("Job ID:", jobId);
+          console.log("Original URL:", originalUrl);
+
+          if (data && data.length > 0) {
+            console.log(`Total pages in completion data: ${data.length}`);
+            console.log("Sample page data:", JSON.stringify(data[0], null, 2));
+          }
+
+          // Log the full parsed data for debugging
+          console.log(
+            "Full crawl.completed payload:",
+            JSON.stringify(parsed.data, null, 2),
+          );
+          console.log("================================");
           break;
 
         case "crawl.failed":

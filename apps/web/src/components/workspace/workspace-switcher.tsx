@@ -33,6 +33,8 @@ export function WorkspaceSwitcher() {
     },
   });
 
+  console.log("Active Organization ID: ", activeOrganization?.id);
+
   const { data: organizations } = authClient.useListOrganizations();
   const currentLogo = useMemo(
     () => activeOrganization?.logo,

@@ -1,9 +1,5 @@
 import { db } from "@/db";
-import {
-  documentSource,
-  textSource,
-  websiteSource,
-} from "@/db/schema";
+import { documentSource, textSource, websiteSource } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -16,20 +12,20 @@ export const ServerRoute = createServerFileRoute("/api/sources/count").methods({
     });
 
     const userId = session?.user?.id;
-    const organizationId = session?.session?.activeOrganizationId;
+    const chatbotId = session?.session?.activeChatbotId;
 
-    if (!userId || !organizationId) {
-      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    if (!userId || !chatbotId) {
+      return json(
+        { error: "Unauthorized: Please log in or no active chatbot" },
+        { status: 401 },
+      );
     }
 
     const textSourcesCount = await db
       .select({ value: count() })
       .from(textSource)
       .where(
-        and(
-          eq(textSource.userId, userId),
-          eq(textSource.organizationId, organizationId),
-        ),
+        and(eq(textSource.userId, userId), eq(textSource.chatbotId, chatbotId)),
       );
 
     const documentSourcesCount = await db
@@ -38,7 +34,7 @@ export const ServerRoute = createServerFileRoute("/api/sources/count").methods({
       .where(
         and(
           eq(documentSource.userId, userId),
-          eq(documentSource.organizationId, organizationId),
+          eq(documentSource.chatbotId, chatbotId),
         ),
       );
 
@@ -48,7 +44,7 @@ export const ServerRoute = createServerFileRoute("/api/sources/count").methods({
       .where(
         and(
           eq(websiteSource.userId, userId),
-          eq(websiteSource.organizationId, organizationId),
+          eq(websiteSource.chatbotId, chatbotId),
         ),
       );
 

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chat, member } from "@/db/schema";
+import { chat, chatbot, member } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -20,19 +20,31 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
       return new Response("Unauthorized", { status: 401 });
     }
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return new Response("No active organization", { status: 400 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return new Response("No active chatbot", { status: 400 });
     }
 
-    // Verify user is a member of the organization
+    // Verify the chatbot exists and get its organization
+    const [chatbotData] = await db
+      .select({
+        organizationId: chatbot.organizationId,
+      })
+      .from(chatbot)
+      .where(eq(chatbot.id, chatbotId));
+
+    if (!chatbotData) {
+      return new Response("Chatbot not found", { status: 404 });
+    }
+
+    // Verify user is a member of the chatbot's organization
     const [membership] = await db
       .select()
       .from(member)
       .where(
         and(
           eq(member.userId, session.user.id),
-          eq(member.organizationId, organizationId),
+          eq(member.organizationId, chatbotData.organizationId),
         ),
       );
 
@@ -63,9 +75,9 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
     }
 
     try {
-      // Modified where conditions to include organization scoping
-      // Include both user's personal chats AND embedded chats (userId = null) for the organization
-      const whereConditions = [eq(chat.organizationId, organizationId)];
+      // Modified where conditions to include chatbot scoping
+      // Include both user's personal chats AND embedded chats (userId = null) for the chatbot
+      const whereConditions = [eq(chat.chatbotId, chatbotId)];
 
       if (timeFilter) whereConditions.push(timeFilter);
 
@@ -73,9 +85,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
         const [refChat] = await db
           .select()
           .from(chat)
-          .where(
-            and(eq(chat.id, cursor), eq(chat.organizationId, organizationId)),
-          )
+          .where(and(eq(chat.id, cursor), eq(chat.chatbotId, chatbotId)))
           .limit(1);
 
         if (!refChat) {

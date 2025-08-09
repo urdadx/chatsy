@@ -33,9 +33,6 @@ export function DocumentSource() {
         });
 
         const { id: documentSourceId } = documentSourceResponse.data;
-
-        // Trigger document processing
-        await api.post("/document-processing", { documentSourceId });
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["document-sources"] });

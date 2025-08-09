@@ -14,6 +14,7 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebsiteSourcesRouteImport } from './routes/website-sources'
 import { Route as SuccessRouteImport } from './routes/success'
+import { Route as ChoosePlanRouteImport } from './routes/choose-plan'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
@@ -38,6 +39,7 @@ import { ServerRoute as ApiTrainingStatusServerRouteImport } from './routes/api/
 import { ServerRoute as ApiTrainAgentServerRouteImport } from './routes/api/train-agent'
 import { ServerRoute as ApiTextSourcesServerRouteImport } from './routes/api/text-sources'
 import { ServerRoute as ApiSimilaritySearchServerRouteImport } from './routes/api/similarity-search'
+import { ServerRoute as ApiSetActiveChatbotServerRouteImport } from './routes/api/set-active-chatbot'
 import { ServerRoute as ApiScrapeServerRouteImport } from './routes/api/scrape'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
 import { ServerRoute as ApiMyChatbotServerRouteImport } from './routes/api/my-chatbot'
@@ -47,8 +49,8 @@ import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-o
 import { ServerRoute as ApiFirecrawlWebhookServerRouteImport } from './routes/api/firecrawl-webhook'
 import { ServerRoute as ApiFeedbackServerRouteImport } from './routes/api/feedback'
 import { ServerRoute as ApiDocumentSourceServerRouteImport } from './routes/api/document-source'
-import { ServerRoute as ApiDocumentProcessingServerRouteImport } from './routes/api/document-processing'
 import { ServerRoute as ApiCrawlServerRouteImport } from './routes/api/crawl'
+import { ServerRoute as ApiChatbotsServerRouteImport } from './routes/api/chatbots'
 import { ServerRoute as ApiAnalyticsStreamServerRouteImport } from './routes/api/analytics-stream'
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
 import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/sources/count'
@@ -74,6 +76,11 @@ const WebsiteSourcesRoute = WebsiteSourcesRouteImport.update({
 const SuccessRoute = SuccessRouteImport.update({
   id: '/success',
   path: '/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChoosePlanRoute = ChoosePlanRouteImport.update({
+  id: '/choose-plan',
+  path: '/choose-plan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -204,6 +211,12 @@ const ApiSimilaritySearchServerRoute =
     path: '/api/similarity-search',
     getParentRoute: () => rootServerRouteImport,
   } as any)
+const ApiSetActiveChatbotServerRoute =
+  ApiSetActiveChatbotServerRouteImport.update({
+    id: '/api/set-active-chatbot',
+    path: '/api/set-active-chatbot',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiScrapeServerRoute = ApiScrapeServerRouteImport.update({
   id: '/api/scrape',
   path: '/api/scrape',
@@ -250,15 +263,14 @@ const ApiDocumentSourceServerRoute = ApiDocumentSourceServerRouteImport.update({
   path: '/api/document-source',
   getParentRoute: () => rootServerRouteImport,
 } as any)
-const ApiDocumentProcessingServerRoute =
-  ApiDocumentProcessingServerRouteImport.update({
-    id: '/api/document-processing',
-    path: '/api/document-processing',
-    getParentRoute: () => rootServerRouteImport,
-  } as any)
 const ApiCrawlServerRoute = ApiCrawlServerRouteImport.update({
   id: '/api/crawl',
   path: '/api/crawl',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiChatbotsServerRoute = ApiChatbotsServerRouteImport.update({
+  id: '/api/chatbots',
+  path: '/api/chatbots',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiAnalyticsStreamServerRoute =
@@ -339,6 +351,7 @@ const ApiIntegrationsWhatsappAuthCallbackServerRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
   '/website-sources': typeof WebsiteSourcesRoute
   '/login': typeof authLoginRoute
@@ -359,6 +372,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
   '/website-sources': typeof WebsiteSourcesRoute
   '/login': typeof authLoginRoute
@@ -380,6 +394,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
   '/website-sources': typeof WebsiteSourcesRoute
   '/(auth)/login': typeof authLoginRoute
@@ -402,6 +417,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/choose-plan'
     | '/success'
     | '/website-sources'
     | '/login'
@@ -422,6 +438,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/choose-plan'
     | '/success'
     | '/website-sources'
     | '/login'
@@ -442,6 +459,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/choose-plan'
     | '/success'
     | '/website-sources'
     | '/(auth)/login'
@@ -463,6 +481,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  ChoosePlanRoute: typeof ChoosePlanRoute
   SuccessRoute: typeof SuccessRoute
   WebsiteSourcesRoute: typeof WebsiteSourcesRoute
   authLoginRoute: typeof authLoginRoute
@@ -473,8 +492,8 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
+  '/api/chatbots': typeof ApiChatbotsServerRoute
   '/api/crawl': typeof ApiCrawlServerRoute
-  '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
   '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
@@ -484,6 +503,7 @@ export interface FileServerRoutesByFullPath {
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
+  '/api/set-active-chatbot': typeof ApiSetActiveChatbotServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
   '/api/text-sources': typeof ApiTextSourcesServerRoute
   '/api/train-agent': typeof ApiTrainAgentServerRoute
@@ -508,8 +528,8 @@ export interface FileServerRoutesByFullPath {
 }
 export interface FileServerRoutesByTo {
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
+  '/api/chatbots': typeof ApiChatbotsServerRoute
   '/api/crawl': typeof ApiCrawlServerRoute
-  '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
   '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
@@ -519,6 +539,7 @@ export interface FileServerRoutesByTo {
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
+  '/api/set-active-chatbot': typeof ApiSetActiveChatbotServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
   '/api/text-sources': typeof ApiTextSourcesServerRoute
   '/api/train-agent': typeof ApiTrainAgentServerRoute
@@ -544,8 +565,8 @@ export interface FileServerRoutesByTo {
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
+  '/api/chatbots': typeof ApiChatbotsServerRoute
   '/api/crawl': typeof ApiCrawlServerRoute
-  '/api/document-processing': typeof ApiDocumentProcessingServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
   '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
@@ -555,6 +576,7 @@ export interface FileServerRoutesById {
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
+  '/api/set-active-chatbot': typeof ApiSetActiveChatbotServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
   '/api/text-sources': typeof ApiTextSourcesServerRoute
   '/api/train-agent': typeof ApiTrainAgentServerRoute
@@ -581,8 +603,8 @@ export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
   fullPaths:
     | '/api/analytics-stream'
+    | '/api/chatbots'
     | '/api/crawl'
-    | '/api/document-processing'
     | '/api/document-source'
     | '/api/feedback'
     | '/api/firecrawl-webhook'
@@ -592,6 +614,7 @@ export interface FileServerRouteTypes {
     | '/api/my-chatbot'
     | '/api/questions'
     | '/api/scrape'
+    | '/api/set-active-chatbot'
     | '/api/similarity-search'
     | '/api/text-sources'
     | '/api/train-agent'
@@ -616,8 +639,8 @@ export interface FileServerRouteTypes {
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/analytics-stream'
+    | '/api/chatbots'
     | '/api/crawl'
-    | '/api/document-processing'
     | '/api/document-source'
     | '/api/feedback'
     | '/api/firecrawl-webhook'
@@ -627,6 +650,7 @@ export interface FileServerRouteTypes {
     | '/api/my-chatbot'
     | '/api/questions'
     | '/api/scrape'
+    | '/api/set-active-chatbot'
     | '/api/similarity-search'
     | '/api/text-sources'
     | '/api/train-agent'
@@ -651,8 +675,8 @@ export interface FileServerRouteTypes {
   id:
     | '__root__'
     | '/api/analytics-stream'
+    | '/api/chatbots'
     | '/api/crawl'
-    | '/api/document-processing'
     | '/api/document-source'
     | '/api/feedback'
     | '/api/firecrawl-webhook'
@@ -662,6 +686,7 @@ export interface FileServerRouteTypes {
     | '/api/my-chatbot'
     | '/api/questions'
     | '/api/scrape'
+    | '/api/set-active-chatbot'
     | '/api/similarity-search'
     | '/api/text-sources'
     | '/api/train-agent'
@@ -687,8 +712,8 @@ export interface FileServerRouteTypes {
 }
 export interface RootServerRouteChildren {
   ApiAnalyticsStreamServerRoute: typeof ApiAnalyticsStreamServerRoute
+  ApiChatbotsServerRoute: typeof ApiChatbotsServerRoute
   ApiCrawlServerRoute: typeof ApiCrawlServerRoute
-  ApiDocumentProcessingServerRoute: typeof ApiDocumentProcessingServerRoute
   ApiDocumentSourceServerRoute: typeof ApiDocumentSourceServerRoute
   ApiFeedbackServerRoute: typeof ApiFeedbackServerRoute
   ApiFirecrawlWebhookServerRoute: typeof ApiFirecrawlWebhookServerRoute
@@ -698,6 +723,7 @@ export interface RootServerRouteChildren {
   ApiMyChatbotServerRoute: typeof ApiMyChatbotServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
   ApiScrapeServerRoute: typeof ApiScrapeServerRoute
+  ApiSetActiveChatbotServerRoute: typeof ApiSetActiveChatbotServerRoute
   ApiSimilaritySearchServerRoute: typeof ApiSimilaritySearchServerRoute
   ApiTextSourcesServerRoute: typeof ApiTextSourcesServerRoute
   ApiTrainAgentServerRoute: typeof ApiTrainAgentServerRoute
@@ -735,6 +761,13 @@ declare module '@tanstack/react-router' {
       path: '/success'
       fullPath: '/success'
       preLoaderRoute: typeof SuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/choose-plan': {
+      id: '/choose-plan'
+      path: '/choose-plan'
+      fullPath: '/choose-plan'
+      preLoaderRoute: typeof ChoosePlanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -916,6 +949,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiSimilaritySearchServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/set-active-chatbot': {
+      id: '/api/set-active-chatbot'
+      path: '/api/set-active-chatbot'
+      fullPath: '/api/set-active-chatbot'
+      preLoaderRoute: typeof ApiSetActiveChatbotServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/scrape': {
       id: '/api/scrape'
       path: '/api/scrape'
@@ -979,18 +1019,18 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiDocumentSourceServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/api/document-processing': {
-      id: '/api/document-processing'
-      path: '/api/document-processing'
-      fullPath: '/api/document-processing'
-      preLoaderRoute: typeof ApiDocumentProcessingServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
     '/api/crawl': {
       id: '/api/crawl'
       path: '/api/crawl'
       fullPath: '/api/crawl'
       preLoaderRoute: typeof ApiCrawlServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/chatbots': {
+      id: '/api/chatbots'
+      path: '/api/chatbots'
+      fullPath: '/api/chatbots'
+      preLoaderRoute: typeof ApiChatbotsServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/analytics-stream': {
@@ -1118,6 +1158,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  ChoosePlanRoute: ChoosePlanRoute,
   SuccessRoute: SuccessRoute,
   WebsiteSourcesRoute: WebsiteSourcesRoute,
   authLoginRoute: authLoginRoute,
@@ -1131,8 +1172,8 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAnalyticsStreamServerRoute: ApiAnalyticsStreamServerRoute,
+  ApiChatbotsServerRoute: ApiChatbotsServerRoute,
   ApiCrawlServerRoute: ApiCrawlServerRoute,
-  ApiDocumentProcessingServerRoute: ApiDocumentProcessingServerRoute,
   ApiDocumentSourceServerRoute: ApiDocumentSourceServerRoute,
   ApiFeedbackServerRoute: ApiFeedbackServerRoute,
   ApiFirecrawlWebhookServerRoute: ApiFirecrawlWebhookServerRoute,
@@ -1142,6 +1183,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiMyChatbotServerRoute: ApiMyChatbotServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,
   ApiScrapeServerRoute: ApiScrapeServerRoute,
+  ApiSetActiveChatbotServerRoute: ApiSetActiveChatbotServerRoute,
   ApiSimilaritySearchServerRoute: ApiSimilaritySearchServerRoute,
   ApiTextSourcesServerRoute: ApiTextSourcesServerRoute,
   ApiTrainAgentServerRoute: ApiTrainAgentServerRoute,

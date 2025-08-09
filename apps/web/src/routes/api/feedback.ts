@@ -1,9 +1,9 @@
 import { db } from "@/db";
-import { chatbot, feedback, member } from "@/db/schema";
+import { chatbot, feedback } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import z from "zod";
 
 const feedbackSchema = z.object({
@@ -23,13 +23,13 @@ export const ServerRoute = createServerFileRoute("/api/feedback").methods({
     }
 
     try {
-      let organizationId: string;
+      let chatbotId: string;
 
       if (parsed.data.embedToken) {
-        // Embedded widget scenario - use embedToken to find organization
+        // Embedded widget scenario - use embedToken to find chatbot
         const [chatbotData] = await db
           .select({
-            organizationId: chatbot.organizationId,
+            id: chatbot.id,
             isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
           })
           .from(chatbot)
@@ -46,39 +46,24 @@ export const ServerRoute = createServerFileRoute("/api/feedback").methods({
           );
         }
 
-        organizationId = chatbotData.organizationId;
+        chatbotId = chatbotData.id;
       } else {
-        // Chat preview scenario - use session to get organization
+        // Chat preview scenario - use session to get chatbot
         const session = await auth.api.getSession({ headers: request.headers });
         if (!session?.user?.id) {
           return json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const activeOrganizationId = session?.session?.activeOrganizationId;
-        if (!activeOrganizationId) {
-          return json({ error: "No active organization" }, { status: 400 });
+        const activeChabotId = session?.session?.activeChatbotId;
+        if (!activeChabotId) {
+          return json({ error: "No active chatbot" }, { status: 400 });
         }
 
-        // Verify user is a member of the organization
-        const [membership] = await db
-          .select()
-          .from(member)
-          .where(
-            and(
-              eq(member.userId, session.user.id),
-              eq(member.organizationId, activeOrganizationId),
-            ),
-          );
-
-        if (!membership) {
-          return json({ error: "Forbidden" }, { status: 403 });
-        }
-
-        organizationId = activeOrganizationId;
+        chatbotId = activeChabotId;
       }
 
       await db.insert(feedback).values({
-        organizationId,
+        chatbotId: chatbotId,
         email: parsed.data.email,
         subject: parsed.data.subject,
         message: parsed.data.message,

@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 
 export interface SendVisitorAnalyticsOptions {
-  organizationId: string;
+  chatbotId: string;
   extra?: any;
   triggerOnMount?: boolean;
   triggerOnUnmount?: boolean;
@@ -11,7 +11,7 @@ export interface SendVisitorAnalyticsOptions {
 }
 
 export function useSendVisitorAnalytics({
-  organizationId,
+  chatbotId,
   extra = {},
   triggerOnMount = true,
   triggerOnUnmount = true,
@@ -166,10 +166,10 @@ export function useSendVisitorAnalytics({
   }
 
   function logVisitorAnalytics(logExtra?: any) {
-    if (!organizationId || organizationId === "placeholder") {
+    if (!chatbotId || chatbotId === "placeholder") {
       console.debug(
-        "Visitor analytics not logged: invalid organizationId",
-        organizationId,
+        "Visitor analytics not logged: invalid chatbotId",
+        chatbotId,
       );
       return;
     }
@@ -177,7 +177,7 @@ export function useSendVisitorAnalytics({
     // Prevent duplicate logs within a short time window (deduplication)
     const now = Date.now();
     const event = logExtra?.event || "unknown";
-    const requestKey = `${organizationId}-${event}-${Math.floor(now / 1000)}`; // 1-second window
+    const requestKey = `${chatbotId}-${event}-${Math.floor(now / 1000)}`; // 1-second window
 
     if (pendingRequestsRef.current.has(requestKey)) {
       console.debug(`Skipping duplicate analytics log for ${event}`);
@@ -203,10 +203,7 @@ export function useSendVisitorAnalytics({
       pendingRequestsRef.current.delete(requestKey);
     }, 5000);
 
-    console.debug(
-      "Logging visitor analytics for organization:",
-      organizationId,
-    );
+    console.debug("Logging visitor analytics for organization:", chatbotId);
 
     const { id: visitorId, isFirstVisit } = getVisitorId();
     const userAgent = navigator.userAgent;
@@ -225,7 +222,7 @@ export function useSendVisitorAnalytics({
     if (shouldFetchLocation) {
       getLocationInfo((location) => {
         sendAnalyticsData({
-          organizationId,
+          chatbotId,
           visitorId,
           userAgent,
           deviceInfo,
@@ -239,7 +236,7 @@ export function useSendVisitorAnalytics({
     } else {
       // Use cached location data or send without location
       sendAnalyticsData({
-        organizationId,
+        chatbotId,
         visitorId,
         userAgent,
         deviceInfo,
@@ -335,7 +332,7 @@ export function useSendVisitorAnalytics({
   }
 
   useEffect(() => {
-    if (triggerOnMount && organizationId && organizationId !== "placeholder") {
+    if (triggerOnMount && chatbotId && chatbotId !== "placeholder") {
       mountTimestampRef.current = Date.now();
       logVisitorAnalytics({ event: "page_visit" });
     }
@@ -353,7 +350,7 @@ export function useSendVisitorAnalytics({
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [organizationId, triggerOnMount, triggerOnUnmount]);
+  }, [chatbotId, triggerOnMount, triggerOnUnmount]);
 
   // Expose for manual logging (e.g., on widget open/close)
   return {

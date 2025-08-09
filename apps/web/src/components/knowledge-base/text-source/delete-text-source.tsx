@@ -9,7 +9,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { api } from "@/lib/api";
-import { useSession } from "@/lib/auth-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleAlertIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -26,8 +25,6 @@ export function DeleteTextSource({
   onOpenChange,
 }: DeleteTextSourceProps) {
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
-  const organizationId = session?.session?.activeOrganizationId;
 
   const deleteTextSource = useMutation({
     mutationFn: async (id: string) => {
@@ -36,7 +33,7 @@ export function DeleteTextSource({
     onSuccess: () => {
       toast.success("Text source deleted");
       queryClient.invalidateQueries({
-        queryKey: ["text-sources", organizationId],
+        queryKey: ["text-sources"],
       });
     },
     onError: () => {

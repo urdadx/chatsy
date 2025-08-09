@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chat, chatbot, member, message } from "@/db/schema";
+import { chat, chatbot, message } from "@/db/schema";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import {
   type Message,
@@ -15,7 +15,7 @@ import { LLMStrategy } from "@polar-sh/ingestion/strategies/LLM";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { streamText } from "ai";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY!,
@@ -25,7 +25,7 @@ const llmIngestion = Ingestion({
   accessToken: process.env.POLAR_ACCESS_TOKEN!,
   server: "sandbox",
 })
-  .strategy(new LLMStrategy(google("gemini-2.5-pro")))
+  .strategy(new LLMStrategy(google("gemini-2.0-flash")))
   .ingest("ai_usage_two");
 
 export const ServerRoute = createServerFileRoute(
@@ -44,6 +44,7 @@ export const ServerRoute = createServerFileRoute(
       // Verify the chatbot exists and embedding is enabled
       const [chatbotData] = await db
         .select({
+          id: chatbot.id,
           organizationId: chatbot.organizationId,
           name: chatbot.name,
           isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
@@ -59,23 +60,6 @@ export const ServerRoute = createServerFileRoute(
       if (!chatbotData.isEmbeddingEnabled) {
         return new Response("Embedding is not enabled for this chatbot", {
           status: 403,
-        });
-      }
-
-      // Fetch the owner userId for the organization
-      const [owner] = await db
-        .select({ userId: member.userId })
-        .from(member)
-        .where(
-          and(
-            eq(member.organizationId, chatbotData.organizationId),
-            eq(member.role, "owner"),
-          ),
-        );
-
-      if (!owner) {
-        return new Response("No owner found for this organization", {
-          status: 500,
         });
       }
 
@@ -115,7 +99,7 @@ export const ServerRoute = createServerFileRoute(
             id,
             createdAt: new Date(),
             userId: null,
-            organizationId: chatbotData.organizationId,
+            chatbotId: chatbotData.id,
             title,
             visibility: "public",
           })
@@ -140,7 +124,7 @@ export const ServerRoute = createServerFileRoute(
       }
 
       const model = llmIngestion.client({
-        externalCustomerId: owner.userId,
+        externalCustomerId: chatbotData.organizationId,
       });
 
       const resultStream = streamText({
@@ -149,7 +133,7 @@ export const ServerRoute = createServerFileRoute(
         messages,
         maxSteps: 5,
         tools: {
-          knowledge_base: knowledgeSearchTool(chatbotData.organizationId),
+          knowledge_base: knowledgeSearchTool(chatbotData.id),
           collect_feedback: collectFeedbackTool,
           collect_leads: collectLeadsTool,
         },
@@ -171,12 +155,13 @@ export const ServerRoute = createServerFileRoute(
         },
       });
 
-      resultStream.consumeStream();
-      const originalResponse = resultStream.toDataStreamResponse();
+      const response = resultStream.toDataStreamResponse();
 
       // Add CORS headers for embedded widgets
-      const headers = new Headers(originalResponse.headers);
+      const headers = new Headers(response.headers);
       headers.set("X-Chat-Id", id);
+      headers.set("Cache-Control", "no-cache");
+      headers.set("Connection", "keep-alive");
       headers.set(
         "Access-Control-Allow-Origin",
         referer ? new URL(referer).origin : "*",
@@ -184,8 +169,8 @@ export const ServerRoute = createServerFileRoute(
       headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
       headers.set("Access-Control-Allow-Headers", "Content-Type");
 
-      return new Response(originalResponse.body, {
-        status: originalResponse.status,
+      return new Response(response.body, {
+        status: response.status,
         headers,
       });
     } catch (err: any) {

@@ -1,5 +1,4 @@
 import { api } from "@/lib/api";
-import { useSession } from "@/lib/auth-client";
 import { timeAgo } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Edit, FileText, MoreHorizontal, Trash2 } from "lucide-react";
@@ -22,19 +21,13 @@ export const TextSourceList = () => {
     null,
   );
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const { data: session } = useSession();
-  const organizationId = session?.session?.activeOrganizationId;
 
   const { data: textSources, isLoading } = useQuery<TextSource[]>({
-    queryKey: ["text-sources", organizationId],
+    queryKey: ["text-sources"],
     queryFn: async () => {
-      if (!organizationId) return [];
-      const response = await api.get(
-        `/text-sources?organizationId=${organizationId}`,
-      );
+      const response = await api.get("/text-sources");
       return response.data;
     },
-    enabled: !!organizationId,
   });
 
   const [deletingTextSourceId, setDeletingTextSourceId] = useState<

@@ -7,7 +7,7 @@ import { and, eq } from "drizzle-orm";
 import z from "zod";
 
 const analyticsSchema = z.object({
-  organizationId: z.string().min(1),
+  chatbotId: z.string().min(1),
   visitorId: z.string().min(1),
   userAgent: z.string().optional(),
   deviceInfo: z
@@ -44,7 +44,7 @@ export const ServerRoute = createServerFileRoute(
     const data = parsed.data;
     try {
       await db.insert(visitorAnalytics).values({
-        organizationId: data.organizationId,
+        chatbotId: data.chatbotId,
         visitorId: data.visitorId,
         userAgent: data.userAgent,
         deviceType: data.deviceInfo?.deviceType,
@@ -70,16 +70,15 @@ export const ServerRoute = createServerFileRoute(
     const session = await auth.api.getSession({
       headers: request.headers || new Headers(),
     });
-    const organizationId = session?.session?.activeOrganizationId;
-
-    if (!organizationId) {
-      return json({ error: "organizationId is required" }, { status: 400 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return new Response("No active chatbot", { status: 400 });
     }
     try {
       const records = await db.query.visitorAnalytics.findMany({
         where: and(
-          eq(visitorAnalytics.organizationId, organizationId),
-          eq(visitorAnalytics.event, "page_visit"), // Only return actual visits, not unload events
+          eq(visitorAnalytics.chatbotId, chatbotId),
+          eq(visitorAnalytics.event, "page_visit"),
         ),
         orderBy: (
           fields: typeof visitorAnalytics._.columns,
