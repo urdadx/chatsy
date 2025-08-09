@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chatbot, member, organization, question } from "@/db/schema";
+import { chatbot, member, question } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -73,9 +73,9 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       headers: request.headers || new Headers(),
     });
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return json({ error: "No active organization" }, { status: 400 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
 
     const userId = session?.user?.id;
@@ -94,18 +94,18 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       .insert(question)
       .values({
         userId,
-        organizationId,
+        chatbotId,
         ...parsed.data,
       })
       .returning();
 
     if (newQuestion) {
       await db
-        .update(organization)
+        .update(chatbot)
         .set({
-          sourcesCount: sql`${organization.sourcesCount} + 1`,
+          sourcesCount: sql`${chatbot.sourcesCount} + 1`,
         })
-        .where(eq(organization.id, organizationId));
+        .where(eq(chatbot.id, chatbotId));
     }
 
     return json(newQuestion);
@@ -116,9 +116,9 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       headers: request.headers || new Headers(),
     });
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return json({ error: "No active organization" }, { status: 400 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
 
     const userId = session?.user?.id;
@@ -141,7 +141,7 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
         and(
           eq(question.id, id),
           eq(question.userId, userId),
-          eq(question.organizationId, organizationId),
+          eq(question.chatbotId, chatbotId),
         ),
       )
       .returning();
@@ -152,11 +152,11 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
 
     if (deletedQuestion) {
       await db
-        .update(organization)
+        .update(chatbot)
         .set({
-          sourcesCount: sql`greatest(0, ${organization.sourcesCount} - 1)`,
+          sourcesCount: sql`greatest(0, ${chatbot.sourcesCount} - 1)`,
         })
-        .where(eq(organization.id, organizationId));
+        .where(eq(chatbot.id, chatbotId));
     }
 
     return json(deletedQuestion);

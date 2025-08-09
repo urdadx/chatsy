@@ -2,6 +2,7 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { chatbot, subscription, user } from "@/db/schema";
 import { sendOrganizationInvitation } from "@/lib/emails/email";
+import { getActiveChatbot } from "@/lib/hooks/get-active-chatbot";
 import { getActiveOrganization } from "@/lib/hooks/get-active-organization";
 import {
   checkout,
@@ -43,6 +44,23 @@ export const auth = betterAuth({
     schema,
   }),
 
+  session: {
+    additionalFields: {
+      activeOrganizationId: {
+        type: "string",
+        required: false,
+        defaultValue: null,
+        input: false, // don't allow user to set this directly
+      },
+      activeChatbotId: {
+        type: "string",
+        required: false,
+        defaultValue: null,
+        input: false, // don't allow user to set this directly
+      },
+    },
+  },
+
   trustedOrigins: [
     "http://localhost:3000",
     "http://localhost:3001",
@@ -76,20 +94,36 @@ export const auth = betterAuth({
             const organization = await getActiveOrganization(session.userId);
 
             if (organization?.id) {
-              // Get the first chatbot for this organization as default active chatbot
-              const [defaultChatbot] = await db
-                .select({ id: chatbot.id })
-                .from(chatbot)
-                .where(eq(chatbot.organizationId, organization.id))
-                .limit(1);
+              // Get the active chatbot for this organization
+              try {
+                const activeChatbot = await getActiveChatbot(
+                  session.userId,
+                  organization.id,
+                );
 
-              return {
-                data: {
-                  ...session,
-                  activeOrganizationId: organization.id,
-                  activeChatbotId: defaultChatbot?.id || null,
-                },
-              };
+                return {
+                  data: {
+                    ...session,
+                    activeOrganizationId: organization.id,
+                    activeChatbotId: activeChatbot.id,
+                  },
+                };
+              } catch (chatbotError) {
+                console.log(
+                  "No active chatbot found for user:",
+                  session.userId,
+                  "in organization:",
+                  organization.id,
+                );
+
+                return {
+                  data: {
+                    ...session,
+                    activeOrganizationId: organization.id,
+                    activeChatbotId: null,
+                  },
+                };
+              }
             }
           } catch (error) {
             console.log(

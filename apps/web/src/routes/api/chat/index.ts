@@ -41,7 +41,9 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         return new Response("Unauthorized", { status: 401 });
       }
 
-      const chatbotId = session?.session?.activeChatbotId;
+      const chatbotId = session?.session.activeChatbotId;
+      const activeOrganization = session?.session.activeOrganizationId;
+
       if (!chatbotId) {
         return new Response("No active chatbot", { status: 400 });
       }
@@ -59,7 +61,8 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         return new Response("Chatbot not found", { status: 404 });
       }
 
-      const externalCustomerId = session.user.id;
+      const externalCustomerId =
+        activeOrganization || chatbotData.organizationId;
 
       // Verify user is a member of the chatbot's organization
       const [membership] = await db

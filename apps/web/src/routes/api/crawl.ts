@@ -6,6 +6,8 @@ import z from "zod";
 
 const crawlRequestSchema = z.object({
   url: z.string().min(1),
+  // chatbotId is optional since we get it from session
+  chatbotId: z.string().min(1).optional(),
 });
 
 export const ServerRoute = createServerFileRoute("/api/crawl").methods({
@@ -14,16 +16,13 @@ export const ServerRoute = createServerFileRoute("/api/crawl").methods({
       headers: request.headers || new Headers(),
     });
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return json({ error: "No active organization" }, { status: 400 });
-    }
-
     const userId = session?.user?.id;
-    if (!userId) {
-      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    const activeChatbotId = session?.session.activeChatbotId;
+
+    if (!activeChatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
-    if (!userId || !organizationId) {
+    if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
@@ -34,17 +33,24 @@ export const ServerRoute = createServerFileRoute("/api/crawl").methods({
       return json({ error: parsed.error.format() }, { status: 400 });
     }
 
-    const { url } = parsed.data;
+    const { url, chatbotId: requestChatbotId } = parsed.data;
+
+    // Use chatbotId from request if provided, otherwise use active chatbot from session
+    const chatbotId = requestChatbotId || activeChatbotId;
+
+    if (!chatbotId) {
+      return json({ error: "No chatbot specified" }, { status: 400 });
+    }
     try {
       const client = new FirecrawlApp({
-        apiKey: process.env.FIRECRAWL_API_KEY,
+        apiKey: process.env.FIRECRAWL_API_KEY!,
       });
       const fullUrl = url.startsWith("http") ? url : `https://${url}`;
 
       // Get the webhook URL - use WEBHOOK_BASE_URL if set (for ngrok), otherwise construct from request
       const requestUrl = new URL(request.url);
       const baseUrl =
-        process.env.WEBHOOK_BASE_URL ||
+        process.env.WEBHOOK_BASE_URL! ||
         `${requestUrl.protocol}//${requestUrl.host}`;
       const webhookUrl = `${baseUrl}/api/firecrawl-webhook`;
 
@@ -59,7 +65,7 @@ export const ServerRoute = createServerFileRoute("/api/crawl").methods({
           url: webhookUrl,
           metadata: {
             userId,
-            organizationId,
+            chatbotId: chatbotId,
             originalUrl: fullUrl,
           },
         },

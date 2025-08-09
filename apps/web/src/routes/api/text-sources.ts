@@ -1,9 +1,9 @@
 import { db } from "@/db";
-import { organization, textSource } from "@/db/schema";
+import { textSource } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import z from "zod";
 
 const createTextSourceSchema = z.object({
@@ -33,20 +33,17 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
-    const organizationId = session?.session?.activeOrganizationId;
+    const chatbotId = session?.session?.activeChatbotId;
 
-    if (!organizationId) {
-      return json({ error: "No active organization" }, { status: 400 });
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
 
     const results = await db
       .select()
       .from(textSource)
       .where(
-        and(
-          eq(textSource.userId, userId),
-          eq(textSource.organizationId, organizationId),
-        ),
+        and(eq(textSource.userId, userId), eq(textSource.chatbotId, chatbotId)),
       );
 
     return json(results);
@@ -57,9 +54,9 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       headers: request.headers || new Headers(),
     });
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return json({ error: "No active organization" }, { status: 400 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
 
     const userId = session?.user?.id;
@@ -81,18 +78,9 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
         ...parsed.data,
         createdAt: new Date(),
         updatedAt: new Date(),
-        organizationId,
+        chatbotId,
       })
       .returning();
-
-    if (result) {
-      await db
-        .update(organization)
-        .set({
-          sourcesCount: sql`${organization.sourcesCount} + 1`,
-        })
-        .where(eq(organization.id, organizationId));
-    }
 
     return json({ message: "Text source created", result });
   },
@@ -107,6 +95,11 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
+    }
+
     const body = await request.json();
     const parsed = updateTextSourceSchema.safeParse(body);
 
@@ -119,7 +112,13 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
     const updated = await db
       .update(textSource)
       .set({ ...updates, updatedAt: new Date() })
-      .where(and(eq(textSource.id, id), eq(textSource.userId, userId)))
+      .where(
+        and(
+          eq(textSource.id, id),
+          eq(textSource.userId, userId),
+          eq(textSource.chatbotId, chatbotId),
+        ),
+      )
       .returning();
 
     if (!updated.length) {
@@ -137,9 +136,9 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       headers: request.headers || new Headers(),
     });
 
-    const organizationId = session?.session?.activeOrganizationId;
-    if (!organizationId) {
-      return json({ error: "No active organization" }, { status: 400 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
 
     const userId = session?.user?.id;
@@ -157,7 +156,11 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
     const deleted = await db
       .delete(textSource)
       .where(
-        and(eq(textSource.id, parsed.data.id), eq(textSource.userId, userId)),
+        and(
+          eq(textSource.id, parsed.data.id),
+          eq(textSource.userId, userId),
+          eq(textSource.chatbotId, chatbotId),
+        ),
       )
       .returning();
 
@@ -166,15 +169,6 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
         { error: "Text source not found or unauthorized" },
         { status: 404 },
       );
-    }
-
-    if (deleted) {
-      await db
-        .update(organization)
-        .set({
-          sourcesCount: sql`greatest(0, ${organization.sourcesCount} - 1)`,
-        })
-        .where(eq(organization.id, organizationId));
     }
 
     return json({ message: "Text source deleted", deleted });

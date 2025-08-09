@@ -3,7 +3,6 @@ import {
   chatbot,
   documentSource,
   knowledge,
-  member,
   organization,
   question,
   textSource,
@@ -41,8 +40,8 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
     // Verify the chatbot exists and get its organization
     const [chatbotData] = await db
       .select({
-        organizationId: chatbot.organizationId,
-        lastTrainedAt: organization.lastTrainedAt,
+        id: chatbot.id,
+        lastTrainedAt: chatbot.lastTrainedAt,
       })
       .from(chatbot)
       .innerJoin(organization, eq(chatbot.organizationId, organization.id))
@@ -51,30 +50,14 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
     if (!chatbotData) {
       return json({ error: "Chatbot not found." }, { status: 404 });
     }
-
-    // Verify user is a member of the chatbot's organization
-    const [membership] = await db
-      .select()
-      .from(member)
-      .where(
-        and(
-          eq(member.userId, userId),
-          eq(member.organizationId, chatbotData.organizationId),
-        ),
-      );
-
-    if (!membership) {
-      return json({ error: "Forbidden." }, { status: 403 });
-    }
-
     try {
       // Get the chatbot's last training timestamp from its organization
       const lastTrainedAt = chatbotData.lastTrainedAt;
 
       await db
-        .update(organization)
+        .update(chatbot)
         .set({ trainingStatus: "in-progress" })
-        .where(eq(organization.id, chatbotData.organizationId));
+        .where(eq(chatbot.id, chatbotData.id));
 
       // Only retrain documents that are new or updated since last training
       const documentFilter = lastTrainedAt
@@ -122,7 +105,7 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
             console.error("Data being inserted:", {
               source: "document",
               sourceId: doc.id,
-              organizationId,
+              chatbotId,
               userId,
               content: `${chunks[i].substring(0, 100)}...`,
               embedding: embedding ? `[${embedding.length} dimensions]` : null,
@@ -233,19 +216,19 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
       }
 
       await db
-        .update(organization)
+        .update(chatbot)
         .set({
           trainingStatus: "completed",
           lastTrainedAt: new Date(),
         })
-        .where(eq(organization.id, chatbotData.organizationId));
+        .where(eq(chatbot.id, chatbotData.id));
 
       return json({ message: "Agent training initiated successfully." });
     } catch (error) {
       await db
-        .update(organization)
+        .update(chatbot)
         .set({ trainingStatus: "failed" })
-        .where(eq(organization.id, chatbotData.organizationId));
+        .where(eq(chatbot.id, chatbotData.id));
       console.error("Agent training error:", error);
       return json({ error: "Agent training failed." }, { status: 500 });
     }

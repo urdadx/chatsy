@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chatbot, visitorAnalytics } from "@/db/schema";
+import { visitorAnalytics } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -70,16 +70,15 @@ export const ServerRoute = createServerFileRoute(
     const session = await auth.api.getSession({
       headers: request.headers || new Headers(),
     });
-    const chatbotId = request.headers.get("X-Chatbot-Id");
-
+    const chatbotId = session?.session?.activeChatbotId;
     if (!chatbotId) {
-      return json({ error: "chatbotId is required" }, { status: 400 });
+      return new Response("No active chatbot", { status: 400 });
     }
     try {
       const records = await db.query.visitorAnalytics.findMany({
         where: and(
           eq(visitorAnalytics.chatbotId, chatbotId),
-          eq(visitorAnalytics.event, "page_visit"), // Only return actual visits, not unload events
+          eq(visitorAnalytics.event, "page_visit"),
         ),
         orderBy: (
           fields: typeof visitorAnalytics._.columns,

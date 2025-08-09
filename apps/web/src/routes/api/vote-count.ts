@@ -9,11 +9,9 @@ export const ServerRoute = createServerFileRoute("/api/vote-count").methods({
       headers: request.headers || new Headers(),
     });
 
-    const userId = session?.user?.id;
-    const chatbotId = request.headers.get("X-Chatbot-Id");
-
-    if (!userId || !chatbotId) {
-      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    const chatbotId = session?.session?.activeChatbotId;
+    if (!chatbotId) {
+      return new Response("No active chatbot", { status: 400 });
     }
 
     try {

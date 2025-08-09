@@ -7,6 +7,7 @@ import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Textarea } from "../../ui/textarea";
+import { TextSourceList } from "./text-source-list";
 
 export const TextSource = () => {
   const [title, setTitle] = useState("");
@@ -86,6 +87,7 @@ export const TextSource = () => {
           </div>
         </form>
       </div>
+      <TextSourceList />
     </>
   );
 };

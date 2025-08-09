@@ -23,13 +23,13 @@ export const ServerRoute = createServerFileRoute("/api/leads").methods({
         return json({ error: parsed.error }, { status: 400 });
       }
 
-      let organizationId: string;
+      let chatbotId: string;
 
       if (parsed.data.embedToken) {
         // Embedded widget scenario - use embedToken to find organization
         const [chatbotData] = await db
           .select({
-            organizationId: chatbot.organizationId,
+            chatbotId: chatbot.id,
             isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
           })
           .from(chatbot)
@@ -45,7 +45,7 @@ export const ServerRoute = createServerFileRoute("/api/leads").methods({
             { status: 403 },
           );
         }
-        organizationId = chatbotData.organizationId;
+        chatbotId = chatbotData.chatbotId;
       } else {
         // Chat preview scenario - use session to get organization
         const session = await auth.api.getSession({ headers: request.headers });
@@ -53,15 +53,15 @@ export const ServerRoute = createServerFileRoute("/api/leads").methods({
           return json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const activeOrganizationId = session?.session?.activeOrganizationId;
-        if (!activeOrganizationId) {
+        const activeChatbotId = session?.session?.activeChatbotId;
+        if (!activeChatbotId) {
           return json({ error: "No active organization" }, { status: 400 });
         }
-        organizationId = activeOrganizationId;
+        chatbotId = activeChatbotId;
       }
 
       await db.insert(lead).values({
-        organizationId: organizationId,
+        chatbotId: chatbotId,
         name: parsed.data.name,
         contact: parsed.data.contact,
         message: parsed.data.message,

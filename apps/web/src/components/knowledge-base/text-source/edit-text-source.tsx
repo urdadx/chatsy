@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
-import { useSession } from "@/lib/auth-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -38,8 +37,6 @@ export const EditTextSource = ({
   const [content, setContent] = useState(textSource.content || "");
 
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
-  const organizationId = session?.session?.activeOrganizationId;
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -52,7 +49,7 @@ export const EditTextSource = ({
     onSuccess: () => {
       toast.success("Text source updated!");
       queryClient.invalidateQueries({
-        queryKey: ["text-sources", organizationId],
+        queryKey: ["text-sources"],
       });
       onOpenChange(false);
     },

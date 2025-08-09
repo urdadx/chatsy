@@ -87,10 +87,7 @@ export const organization = pgTable("organization", {
   slug: text("slug").unique(),
   logo: text("logo"),
   createdAt: timestamp("created_at").notNull(),
-  trainingStatus: text("training_status").default("idle"),
-  lastTrainedAt: timestamp("last_trained_at"),
   metadata: text("metadata"),
-  sourcesCount: integer("sources_count").default(0).notNull(),
   maxChatbots: integer("max_chatbots").default(1).notNull(),
 });
 
@@ -200,6 +197,11 @@ export const chatbot = pgTable("chatbot", {
     .notNull()
     .default("Hello there👋, how can i help you today?"),
   suggestedMessages: text("suggested_messages").array(),
+
+  // Training and sources fields moved from organization
+  trainingStatus: text("training_status").default("idle"),
+  lastTrainedAt: timestamp("last_trained_at"),
+  sourcesCount: integer("sources_count").default(0).notNull(),
 
   // Embedding configuration
   isEmbeddingEnabled: boolean("is_embedding_enabled").notNull().default(true),
@@ -323,9 +325,9 @@ export const knowledge = pgTable("knowledge", {
 
 export const feedback = pgTable("feedback", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
-  organizationId: text("organization_id")
+  chatbotId: uuid("chatbot_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   email: text("email").notNull(),
   subject: text("subject"),
   message: text("message").notNull(),
