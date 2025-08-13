@@ -16,6 +16,7 @@ import {
   generateAnswerEmbedding,
   generateQuestionEmbedding,
 } from "@/lib/ai/embeddings";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -26,11 +27,15 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods({
     const session = await auth.api.getSession({
       headers: request.headers || new Headers(),
     });
-
-    const chatbotId = session?.session?.activeChatbotId;
     const userId = session?.user?.id;
+    if (!userId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
 
-    if (!chatbotId || !userId) {
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+
+    if (!chatbotId) {
       return json(
         { error: "Authentication or active chatbot context is missing." },
         { status: 400 },

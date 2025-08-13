@@ -1,8 +1,8 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { chatbot, subscription, user } from "@/db/schema";
+import { chatbot, session, subscription, user } from "@/db/schema";
 import { sendOrganizationInvitation } from "@/lib/emails/email";
-import { getActiveChatbot } from "@/lib/hooks/get-active-chatbot";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getActiveOrganization } from "@/lib/hooks/get-active-organization";
 import {
   checkout,
@@ -26,9 +26,6 @@ if (!POLAR_ACCESS_TOKEN) {
 
 export const polarClient = new Polar({
   accessToken: POLAR_ACCESS_TOKEN!,
-  // Use 'sandbox' if you're using the Polar Sandbox environment
-  // Remember that access tokens, products, etc. are completely separated between environments.
-  // Access tokens obtained in Production are for instance not usable in the Sandbox environment.
   server: "sandbox",
 });
 
@@ -44,19 +41,27 @@ export const auth = betterAuth({
     schema,
   }),
 
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google", "github", "email-password"],
+      allowDifferentEmails: false,
+    },
+  },
+
   session: {
     additionalFields: {
       activeOrganizationId: {
         type: "string",
         required: false,
         defaultValue: null,
-        input: false, // don't allow user to set this directly
+        input: false,
       },
       activeChatbotId: {
         type: "string",
         required: false,
         defaultValue: null,
-        input: false, // don't allow user to set this directly
+        input: false,
       },
     },
   },
@@ -92,39 +97,17 @@ export const auth = betterAuth({
         before: async (session) => {
           try {
             const organization = await getActiveOrganization(session.userId);
+            const activeChatbot = await getActiveChatbotId(session.userId);
+            console.log("🏢 Found organization:", organization?.id);
+            console.log("🤖 Found chatbot:", activeChatbot);
 
-            if (organization?.id) {
-              // Get the active chatbot for this organization
-              try {
-                const activeChatbot = await getActiveChatbot(
-                  session.userId,
-                  organization.id,
-                );
-
-                return {
-                  data: {
-                    ...session,
-                    activeOrganizationId: organization.id,
-                    activeChatbotId: activeChatbot.id,
-                  },
-                };
-              } catch (chatbotError) {
-                console.log(
-                  "No active chatbot found for user:",
-                  session.userId,
-                  "in organization:",
-                  organization.id,
-                );
-
-                return {
-                  data: {
-                    ...session,
-                    activeOrganizationId: organization.id,
-                    activeChatbotId: null,
-                  },
-                };
-              }
-            }
+            return {
+              data: {
+                ...session,
+                activeOrganizationId: organization.id,
+                activeChatbotId: activeChatbot,
+              },
+            };
           } catch (error) {
             console.log(
               "No active organization found for user:",
@@ -155,26 +138,44 @@ export const auth = betterAuth({
             },
           };
         },
-        afterCreate: async ({ organization }) => {
+        afterCreate: async ({ organization, user }) => {
           try {
-            await db.insert(chatbot).values({
-              organizationId: organization.id,
-              name: organization.name,
+            const embedToken = `embed_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+
+            // Create the default chatbot and get its ID
+            const [createdChatbot] = await db
+              .insert(chatbot)
+              .values({
+                organizationId: organization.id,
+                name: organization.name,
+                embedToken: embedToken,
+              })
+              .returning();
+
+            // set id as activeChatbotId in session
+            const activeChatbotId = createdChatbot?.id || null;
+            await db.insert(session).values({
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+              token: uuidv4(),
+              userId: user.id || "",
+              activeChatbotId,
             });
 
             console.log(
-              `Created default branding for organization: ${organization.id}`,
+              `Created default chatbot for organization: ${organization.id}`,
             );
           } catch (error) {
             console.error(
-              `Failed to create default branding for organization ${organization.id}:`,
+              `Failed to create default chatbot for organization ${organization.id}:`,
               error,
             );
           }
         },
       },
       async sendInvitationEmail(data) {
-        const inviteLink = `https://example.com/accept-invitation/${data.id}`;
+        const inviteLink = `${process.env.VITE_SERVER_URL!}/api/accept-invitation/${data.id}`;
         await sendOrganizationInvitation({
           email: data.email,
           invitedByUsername: data.inviter.user.name,
@@ -265,7 +266,7 @@ export const auth = betterAuth({
               try {
                 // STEP 1: Extract user ID from customer data
                 const userId = data.customer?.externalId;
-                const organizationId = data.customer?.organizationId;
+                const organizationId = data.metadata?.referenceId as string;
 
                 console.log(organizationId, "Organization ID from webhook");
                 // STEP 1.5: Check if user exists to prevent foreign key violations

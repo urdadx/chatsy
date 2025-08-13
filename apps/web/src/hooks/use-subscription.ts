@@ -6,9 +6,7 @@ interface Subscription {
   [key: string]: any;
 }
 
-const organizationId = (await authClient.organization.list())?.data?.[0]?.id;
-
-export function useSubscription() {
+export function useSubscription(organizationId?: string) {
   return useQuery<Subscription | null>({
     queryKey: ["subscription", organizationId],
     queryFn: async () => {
@@ -21,6 +19,7 @@ export function useSubscription() {
           referenceId: organizationId,
         },
       });
+      console.log("Subscription Data:", data);
       return data?.result?.items?.[0] || null;
     },
     enabled: !!organizationId,

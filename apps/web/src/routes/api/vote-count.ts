@@ -1,4 +1,5 @@
 import { getTotalVotes } from "@/lib/ai/chat-functions";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -9,11 +10,20 @@ export const ServerRoute = createServerFileRoute("/api/vote-count").methods({
       headers: request.headers || new Headers(),
     });
 
-    const chatbotId = session?.session?.activeChatbotId;
-    if (!chatbotId) {
-      return new Response("No active chatbot", { status: 400 });
+    const userId = session?.user?.id;
+    if (!userId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+
+    if (!chatbotId) {
+      return json(
+        { error: "Unauthorized: Please log in or no active chatbot" },
+        { status: 401 },
+      );
+    }
     try {
       const { upvotes, downvotes } = await getTotalVotes({ chatbotId });
       return json({ upvotes, downvotes }, { status: 200 });

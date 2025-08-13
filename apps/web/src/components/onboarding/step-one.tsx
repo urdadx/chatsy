@@ -74,6 +74,8 @@ export const StepOne = () => {
         throw new Error(result.error.message || "Failed to create workspace");
       }
 
+      console.log("organization id created", result.data.id);
+
       await authClient.organization.setActive({
         organizationId: result.data.id,
       });

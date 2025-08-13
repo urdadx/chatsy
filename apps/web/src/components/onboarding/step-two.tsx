@@ -1,5 +1,7 @@
 import { useUpdatePrimaryColor } from "@/lib/hooks/use-primary-color";
+import { getChatbotDetails } from "@/lib/server-functions/onboarding-queries";
 import { cn, containerVariants } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -10,6 +12,13 @@ import { ColorPickerDialog } from "./pick-color-onboard";
 export const StepTwo = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>("#8b5cf6");
   const updatePrimaryColorMutation = useUpdatePrimaryColor();
+
+  const { data: chatbot } = useQuery({
+    queryKey: ["chatbot"],
+    queryFn: async () => getChatbotDetails(),
+  });
+
+  console.log("Chatbot Data:", chatbot);
 
   const colors = [
     "#8b5cf6",

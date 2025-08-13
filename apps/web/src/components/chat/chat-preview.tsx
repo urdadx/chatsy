@@ -131,17 +131,14 @@ export function ChatPreview() {
         </div>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={handleResetChat}
-              className="hover:bg-muted"
-            >
+            <Button size="icon" variant="ghost" onClick={handleResetChat}>
               <RefreshCcw className="h-4 w-4 text-white" />
               <span className="sr-only">Reset chat</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top">Reset chat</TooltipContent>
+          <TooltipContent className="bg-white shadow-sm" side="top">
+            <p className="text-black">Reset chat</p>
+          </TooltipContent>
         </Tooltip>
       </div>
       {/* Make message area grow and scrollable */}

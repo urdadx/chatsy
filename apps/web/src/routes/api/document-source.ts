@@ -1,5 +1,7 @@
 import { db } from "@/db";
-import { chatbot, documentSource, member, organization } from "@/db/schema";
+import { chatbot, documentSource, member } from "@/db/schema";
+import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -25,41 +27,30 @@ export const ServerRoute = createServerFileRoute(
       headers: request.headers || new Headers(),
     });
 
-    const chatbotId = session?.session?.activeChatbotId;
-    if (!chatbotId) {
-      return json({ error: "No active chatbot" }, { status: 400 });
-    }
-
     const userId = session?.user?.id;
-    if (!userId) {
+    const organizationId = session?.session?.activeOrganizationId;
+
+    if (!userId || !organizationId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
-    // Verify chatbot exists and user has access to its organization
-    const [chatbotData] = await db
-      .select({ organizationId: chatbot.organizationId })
-      .from(chatbot)
-      .where(eq(chatbot.id, chatbotId))
-      .limit(1);
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
 
-    if (!chatbotData) {
-      return json({ error: "Chatbot not found" }, { status: 404 });
+    if (!chatbotId) {
+      return json(
+        { error: "Unauthorized: No active chatbot" },
+        { status: 401 },
+      );
     }
 
-    // Verify user is a member of the chatbot's organization
-    const [membership] = await db
-      .select({ id: member.id })
-      .from(member)
-      .where(
-        and(
-          eq(member.organizationId, chatbotData.organizationId),
-          eq(member.userId, userId),
-        ),
-      )
-      .limit(1);
+    const isMember = await isUserMemberOfOrganization(
+      session.user.id,
+      organizationId,
+    );
 
-    if (!membership) {
-      return json({ error: "Unauthorized: Access denied" }, { status: 403 });
+    if (!isMember) {
+      return new Response("Forbidden", { status: 403 });
     }
 
     const results = await db
@@ -80,41 +71,19 @@ export const ServerRoute = createServerFileRoute(
       headers: request.headers || new Headers(),
     });
 
-    const chatbotId = session?.session?.activeChatbotId;
-    if (!chatbotId) {
-      return json({ error: "No active chatbot" }, { status: 400 });
-    }
-
     const userId = session?.user?.id;
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
-    // Verify chatbot exists and user has access to its organization
-    const [chatbotData] = await db
-      .select({ organizationId: chatbot.organizationId })
-      .from(chatbot)
-      .where(eq(chatbot.id, chatbotId))
-      .limit(1);
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
 
-    if (!chatbotData) {
-      return json({ error: "Chatbot not found" }, { status: 404 });
-    }
-
-    // Verify user is a member of the chatbot's organization
-    const [membership] = await db
-      .select({ id: member.id })
-      .from(member)
-      .where(
-        and(
-          eq(member.organizationId, chatbotData.organizationId),
-          eq(member.userId, userId),
-        ),
-      )
-      .limit(1);
-
-    if (!membership) {
-      return json({ error: "Unauthorized: Access denied" }, { status: 403 });
+    if (!chatbotId) {
+      return json(
+        { error: "Unauthorized: Please log in or no active chatbot" },
+        { status: 401 },
+      );
     }
 
     const body = await request.json();
@@ -135,11 +104,11 @@ export const ServerRoute = createServerFileRoute(
 
     if (newDocumentSource) {
       await db
-        .update(organization)
+        .update(chatbot)
         .set({
-          sourcesCount: sql`${organization.sourcesCount} + 1`,
+          sourcesCount: sql`${chatbot.sourcesCount} + 1`,
         })
-        .where(eq(organization.id, chatbotData.organizationId));
+        .where(eq(chatbot.id, chatbotId));
     }
 
     return json(newDocumentSource);
@@ -149,15 +118,17 @@ export const ServerRoute = createServerFileRoute(
     const session = await auth.api.getSession({
       headers: request.headers || new Headers(),
     });
-
-    const chatbotId = session?.session?.activeChatbotId;
-    if (!chatbotId) {
-      return json({ error: "No active chatbot" }, { status: 400 });
-    }
-
     const userId = session?.user?.id;
+
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
 
     // Verify chatbot exists and user has access to its organization
@@ -214,11 +185,11 @@ export const ServerRoute = createServerFileRoute(
 
     if (deleted) {
       await db
-        .update(organization)
+        .update(chatbot)
         .set({
-          sourcesCount: sql`greatest(0, ${organization.sourcesCount} - 1)`,
+          sourcesCount: sql`greatest(0, ${chatbot.sourcesCount} - 1)`,
         })
-        .where(eq(organization.id, chatbotData.organizationId));
+        .where(eq(chatbot.id, chatbotId));
     }
 
     return json({ message: "Document source deleted", deleted });

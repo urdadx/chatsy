@@ -21,7 +21,7 @@ import type * as React from "react";
 import { NavMain } from "./nav-main";
 import { Navbar } from "./navbar";
 import { UsageBanner } from "./usage-banner";
-import { WorkspaceSwitcher } from "./workspace/workspace-switcher";
+import { ChatbotSwitcher } from "./workspace/chatbot-switcher";
 
 const data = {
   navMain: [
@@ -78,7 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </h1>
             </div>
           </div> */}
-          <WorkspaceSwitcher />
+          <ChatbotSwitcher />
         </SidebarHeader>
         <SidebarContent>
           <NavMain items={data.navMain} />

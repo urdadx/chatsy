@@ -1,8 +1,12 @@
 import { Input } from "@/components/ui/input";
 import { useSubscription } from "@/hooks/use-subscription";
+import { useSession } from "@/lib/auth-client";
 
 export const BillingEmail = () => {
-  const { data: subscription } = useSubscription();
+  const { data: session } = useSession();
+  const organizationId = session?.session?.activeOrganizationId || "";
+
+  const { data: subscription } = useSubscription(organizationId);
 
   const billingEmail = subscription?.customer?.email || "Not available";
 

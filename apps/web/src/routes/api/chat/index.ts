@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chatbot, member, message } from "@/db/schema";
+import { chatbot, message } from "@/db/schema";
 import { deleteChatById, getChatById, saveChat } from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import {
@@ -17,7 +17,7 @@ import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { streamText } from "ai";
 import { auth } from "auth";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY!,
@@ -42,13 +42,11 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
       }
 
       const chatbotId = session?.session.activeChatbotId;
-      const activeOrganization = session?.session.activeOrganizationId;
 
       if (!chatbotId) {
         return new Response("No active chatbot", { status: 400 });
       }
 
-      // Verify the chatbot exists and user has access to its organization
       const [chatbotData] = await db
         .select({
           organizationId: chatbot.organizationId,
@@ -61,24 +59,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
         return new Response("Chatbot not found", { status: 404 });
       }
 
-      const externalCustomerId =
-        activeOrganization || chatbotData.organizationId;
-
-      // Verify user is a member of the chatbot's organization
-      const [membership] = await db
-        .select()
-        .from(member)
-        .where(
-          and(
-            eq(member.userId, session.user.id),
-            eq(member.organizationId, chatbotData.organizationId),
-          ),
-        );
-
-      if (!membership) {
-        return new Response("Forbidden", { status: 403 });
-      }
-
+      const externalCustomerId = session.user?.id;
       const chat = await getChatById(id);
       const userMessage = messages[messages.length - 1];
 
@@ -94,7 +75,6 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
           visibility: "private",
         });
       } else {
-        // Verify the chat belongs to the same chatbot
         if (chat.chatbotId !== chatbotId) {
           return new Response("Forbidden", { status: 403 });
         }
@@ -115,7 +95,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
           console.error("Error saving user message:", error);
         }
       }
-      // get the chatbot name
+
       const model = llmIngestion.client({
         externalCustomerId:
           request.headers.get("X-Polar-Customer-Id") ?? externalCustomerId,
@@ -182,33 +162,6 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods({
     const chatbotId = session?.session?.activeChatbotId;
     if (!chatbotId) {
       return new Response("No active chatbot", { status: 400 });
-    }
-
-    // Verify the chatbot exists and get its organization
-    const [chatbotData] = await db
-      .select({
-        organizationId: chatbot.organizationId,
-      })
-      .from(chatbot)
-      .where(eq(chatbot.id, chatbotId));
-
-    if (!chatbotData) {
-      return new Response("Chatbot not found", { status: 404 });
-    }
-
-    // Verify user is a member of the chatbot's organization
-    const [membership] = await db
-      .select()
-      .from(member)
-      .where(
-        and(
-          eq(member.userId, session.user.id),
-          eq(member.organizationId, chatbotData.organizationId),
-        ),
-      );
-
-    if (!membership) {
-      return new Response("Forbidden", { status: 403 });
     }
 
     try {

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chat, message, vote } from "@/db/schema";
+import { chat, member, message, vote } from "@/db/schema";
 import type { Chat, DBMessage } from "@/db/schema";
 import {
   type SQL,
@@ -15,6 +15,21 @@ import {
 } from "drizzle-orm";
 import { ChatSDKError } from "../errors";
 import type { VisibilityType } from "../types";
+
+// FUNCTION TO CHECK IF USER IS A MEMBER OF AN ORGANIZATION
+export async function isUserMemberOfOrganization(
+  userId: string,
+  organizationId: string,
+) {
+  const [membership] = await db
+    .select()
+    .from(member)
+    .where(
+      and(eq(member.userId, userId), eq(member.organizationId, organizationId)),
+    );
+
+  return !!membership;
+}
 
 // FUNCTION TO SAVE A CHAT
 export async function saveChat({

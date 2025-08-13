@@ -1,34 +1,28 @@
-import { authClient } from "@/lib/auth-client";
 import { generateUUID } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
+import { useChatbots } from "./use-chatbot-management";
 
 export const useChatWithReset = () => {
   const [chatId, setChatId] = useState<string>("");
-  const [previousOrgId, setPreviousOrgId] = useState<string>("");
+  const [previousChatbotId, setPreviousChatbotId] = useState<string>("");
 
-  const { data: activeOrganization, isLoading } = useQuery({
-    queryKey: ["activeOrganization"],
-    queryFn: async () => {
-      const result = await authClient.organization.getFullOrganization();
-      return result.data;
-    },
-  });
+  const { data: chatbotsData, isLoading } = useChatbots();
+  const activeChatbot = chatbotsData?.activeChatbotId;
 
-  const getChatStorageKey = useCallback((organizationId: string) => {
-    return `chatId_${organizationId}`;
+  const getChatStorageKey = useCallback((chatbotId: string) => {
+    return `chatId_${chatbotId}`;
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && activeOrganization?.id) {
-      const currentOrgId = activeOrganization.id;
+    if (typeof window !== "undefined" && activeChatbot) {
+      const currentChatbotId = activeChatbot;
 
-      // If organization changed, clear any temporary chat state
-      if (previousOrgId && previousOrgId !== currentOrgId) {
+      // If chatbot changed, clear any temporary chat state
+      if (previousChatbotId && previousChatbotId !== currentChatbotId) {
         setChatId("");
       }
 
-      const storageKey = getChatStorageKey(currentOrgId);
+      const storageKey = getChatStorageKey(currentChatbotId);
       const existingId = localStorage.getItem(storageKey);
 
       if (existingId) {
@@ -39,31 +33,32 @@ export const useChatWithReset = () => {
         setChatId(newId);
       }
 
-      setPreviousOrgId(currentOrgId);
+      setPreviousChatbotId(currentChatbotId);
     }
-  }, [activeOrganization?.id, getChatStorageKey, previousOrgId]);
+  }, [activeChatbot, getChatStorageKey, previousChatbotId]);
 
   const resetChat = useCallback(() => {
-    if (typeof window !== "undefined" && activeOrganization?.id) {
-      const storageKey = getChatStorageKey(activeOrganization.id);
+    if (typeof window !== "undefined" && activeChatbot) {
+      const storageKey = getChatStorageKey(activeChatbot);
       const newId = generateUUID();
       localStorage.setItem(storageKey, newId);
       setChatId(newId);
     }
-  }, [activeOrganization?.id, getChatStorageKey]);
+  }, [activeChatbot, getChatStorageKey]);
 
-  const clearOrganizationChats = useCallback(() => {
-    if (typeof window !== "undefined" && activeOrganization?.id) {
-      const storageKey = getChatStorageKey(activeOrganization.id);
+  const clearChatbotChats = useCallback(() => {
+    if (typeof window !== "undefined" && activeChatbot) {
+      const storageKey = getChatStorageKey(activeChatbot);
       localStorage.removeItem(storageKey);
     }
-  }, [activeOrganization?.id, getChatStorageKey]);
+  }, [activeChatbot, getChatStorageKey]);
 
   return {
     chatId,
     resetChat,
-    clearOrganizationChats,
+    clearChatbotChats,
     isLoading,
-    activeOrganization,
+    activeChatbot,
+    chatbots: chatbotsData?.chatbots,
   };
 };

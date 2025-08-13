@@ -1,144 +1,188 @@
 import { db } from "@/db";
-import { chatbot, member } from "@/db/schema";
+import { chatbot, session as sessionTable } from "@/db/schema";
+import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
+
+const createChatbotSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  image: z.string().url().optional(),
+  primaryColor: z.string().default("#9333ea"),
+  theme: z.enum(["light", "dark"]).default("light"),
+  hidePoweredBy: z.boolean().default(false),
+  initialMessage: z
+    .string()
+    .default("Hello there👋, how can i help you today?"),
+  suggestedMessages: z.array(z.string()).optional(),
+  isEmbeddingEnabled: z.boolean().default(true),
+  allowedDomains: z.array(z.string()).optional(),
+});
 
 export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
   GET: async ({ request }) => {
-    const url = new URL(request.url);
-    const organizationId = url.searchParams.get("organizationId");
+    const session = await auth.api.getSession({ headers: request.headers });
+    const userId = session?.user?.id;
 
-    if (!organizationId) {
-      return new Response("Organization ID is required", { status: 400 });
+    if (!userId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
-    const [userChatbot] = await db
-      .select({
-        id: chatbot.id,
-        organizationId: chatbot.organizationId,
-        name: chatbot.name,
-        image: chatbot.image,
-        primaryColor: chatbot.primaryColor,
-        theme: chatbot.theme,
-        hidePoweredBy: chatbot.hidePoweredBy,
-        initialMessage: chatbot.initialMessage,
-        suggestedMessages: chatbot.suggestedMessages,
-        isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
-        embedToken: chatbot.embedToken,
-        allowedDomains: chatbot.allowedDomains,
-        createdAt: chatbot.createdAt,
-        updatedAt: chatbot.updatedAt,
-      })
-      .from(chatbot)
-      .where(eq(chatbot.organizationId, organizationId));
+    const activeChatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+
+    if (!activeChatbotId) {
+      return new Response("No active chatbot found", { status: 404 });
+    }
+
+    const [userChatbot] = await db.query.chatbot.findMany({
+      where: (fields, { eq }) => eq(fields.id, activeChatbotId),
+    });
 
     if (!userChatbot) {
-      return new Response("Not found", { status: 404 });
+      return new Response("Could not retrieve active chatbot data", {
+        status: 404,
+      });
     }
 
     return json(userChatbot);
   },
   PATCH: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
+    const userId = session?.user?.id;
 
-    if (!session?.user?.id) {
-      return new Response("Unauthorized", { status: 401 });
+    if (!userId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
-    // Get user's active organization from session
-    const organizationId = session.session.activeOrganizationId;
-    if (!organizationId) {
-      return new Response("No active organization", { status: 400 });
+    const activeChatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+
+    if (!activeChatbotId) {
+      return new Response("No active chatbot found", { status: 404 });
     }
-
-    // Verify user is a member of the organization (optionally check for admin/owner role)
-    const [membership] = await db
-      .select()
-      .from(member)
-      .where(
-        and(
-          eq(member.userId, session.user.id),
-          eq(member.organizationId, organizationId),
-        ),
-      );
-
-    if (!membership) {
-      return new Response("Forbidden", { status: 403 });
-    }
-
-    // Optional: Check if user has admin/owner role for branding changes
-    // if (!['admin', 'owner'].includes(membership.role)) {
-    //   return new Response("Insufficient permissions", { status: 403 });
-    // }
-
-    const body = await request.json();
 
     try {
-      const chatbotUpdates = {
-        ...(body.name && { name: body.name }),
-        ...(body.image && { image: body.image }),
-        ...(body.primaryColor && { primaryColor: body.primaryColor }),
-        ...(body.theme && { theme: body.theme }),
-        ...(typeof body.hidePoweredBy === "boolean" && {
-          hidePoweredBy: body.hidePoweredBy,
-        }),
-        ...(body.initialMessage !== undefined && {
-          initialMessage: body.initialMessage,
-        }),
-        ...(body.suggestedMessages && {
-          suggestedMessages: body.suggestedMessages,
-        }),
-        ...(typeof body.isEmbeddingEnabled === "boolean" && {
-          isEmbeddingEnabled: body.isEmbeddingEnabled,
-        }),
-        ...(body.embedToken && { embedToken: body.embedToken }),
-        ...(body.allowedDomains && { allowedDomains: body.allowedDomains }),
-        updatedAt: new Date(),
-      };
+      const body = await request.json();
+      const updates = {} as Record<string, any>;
+      const allowedFields = [
+        "name",
+        "image",
+        "primaryColor",
+        "theme",
+        "embedToken",
+        "allowedDomains",
+        "suggestedMessages",
+        "initialMessage",
+      ];
 
-      const hasUpdates = Object.keys(chatbotUpdates).length > 1;
-      if (hasUpdates) {
+      allowedFields.forEach((field) => {
+        if (body[field] !== undefined) updates[field] = body[field];
+      });
+
+      if (typeof body.hidePoweredBy === "boolean") {
+        updates.hidePoweredBy = body.hidePoweredBy;
+      }
+      if (typeof body.isEmbeddingEnabled === "boolean") {
+        updates.isEmbeddingEnabled = body.isEmbeddingEnabled;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        updates.updatedAt = new Date();
+
         const [updated] = await db
           .update(chatbot)
-          .set(chatbotUpdates)
-          .where(eq(chatbot.organizationId, organizationId))
+          .set(updates)
+          .where(eq(chatbot.id, activeChatbotId))
           .returning();
 
         if (!updated) {
           return new Response("Chatbot not found", { status: 404 });
         }
+
+        return json(updated);
       }
 
-      const [chatbotData] = await db
-        .select({
-          id: chatbot.id,
-          organizationId: chatbot.organizationId,
-          name: chatbot.name,
-          image: chatbot.image,
-          primaryColor: chatbot.primaryColor,
-          theme: chatbot.theme,
-          hidePoweredBy: chatbot.hidePoweredBy,
-          initialMessage: chatbot.initialMessage,
-          suggestedMessages: chatbot.suggestedMessages,
-          isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
-          embedToken: chatbot.embedToken,
-          allowedDomains: chatbot.allowedDomains,
-          createdAt: chatbot.createdAt,
-          updatedAt: chatbot.updatedAt,
-        })
+      const [current] = await db
+        .select()
         .from(chatbot)
-        .where(eq(chatbot.organizationId, organizationId));
+        .where(eq(chatbot.id, activeChatbotId));
 
-      if (!chatbotData) {
-        return new Response("Chatbot not found", { status: 404 });
+      return current
+        ? json(current)
+        : new Response("Chatbot not found", { status: 404 });
+    } catch (err) {
+      console.error("PATCH /api/my-chatbot error:", err);
+      return new Response("Failed to update chatbot", { status: 500 });
+    }
+  },
+  POST: async ({ request }) => {
+    const session = await auth.api.getSession({ headers: request.headers });
+    const userId = session?.user?.id;
+    const organizationId = session?.session.activeOrganizationId;
+
+    if (!userId || !organizationId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+
+    const isMember = await isUserMemberOfOrganization(userId, organizationId);
+    if (!isMember) {
+      return new Response("Forbidden", { status: 403 });
+    }
+
+    try {
+      const body = await request.json();
+      const parsed = createChatbotSchema.safeParse(body);
+
+      if (!parsed.success) {
+        return json({ error: parsed.error.format() }, { status: 400 });
       }
 
-      return json(chatbotData);
+      // Generate a unique embed token
+      const embedToken = `embed_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+
+      const [newChatbot] = await db
+        .insert(chatbot)
+        .values({
+          organizationId,
+          name: parsed.data.name,
+          image: parsed.data.image,
+          primaryColor: parsed.data.primaryColor,
+          theme: parsed.data.theme,
+          hidePoweredBy: parsed.data.hidePoweredBy,
+          initialMessage: parsed.data.initialMessage,
+          suggestedMessages: parsed.data.suggestedMessages,
+          isEmbeddingEnabled: parsed.data.isEmbeddingEnabled,
+          allowedDomains: parsed.data.allowedDomains,
+          embedToken: embedToken,
+        })
+        .returning();
+
+      // Update the session to set this as the active chatbot
+      try {
+        await db.insert(sessionTable).values({
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+          token: uuidv4(),
+          userId: session.user.id || "",
+          activeChatbotId: newChatbot.id,
+        });
+      } catch (sessionError) {
+        console.warn(
+          "Failed to create new session with chatbot ID:",
+          sessionError,
+        );
+      }
+
+      return json(newChatbot, { status: 201 });
     } catch (err) {
-      console.error("PATCH /api/my-branding error:", err);
-      return new Response("Failed to update branding", { status: 500 });
+      console.error("POST /api/my-chatbot error:", err);
+      return new Response("Failed to create chatbot", { status: 500 });
     }
   },
 });

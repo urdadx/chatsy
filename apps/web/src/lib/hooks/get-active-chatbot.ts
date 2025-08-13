@@ -1,45 +1,43 @@
 import { db } from "@/db";
-import { chatbot, member } from "@/db/schema";
+import { chatbot, member, session } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 
-export async function getActiveChatbot(userId: string, organizationId: string) {
-  // Get the user's most recent chatbot for the specific organization
+export async function getActiveChatbotId(userId: string) {
+  const [lastSession] = await db
+    .select({ activeChatbotId: session.activeChatbotId })
+    .from(session)
+    .where(eq(session.userId, userId))
+    .orderBy(desc(session.updatedAt))
+    .limit(1);
+
+  if (lastSession?.activeChatbotId) {
+    const [chatbotData] = await db
+      .select({ id: chatbot.id })
+      .from(chatbot)
+      .innerJoin(member, eq(chatbot.organizationId, member.organizationId))
+      .where(
+        and(
+          eq(chatbot.id, lastSession.activeChatbotId),
+          eq(member.userId, userId),
+        ),
+      );
+
+    if (chatbotData) {
+      return chatbotData.id;
+    }
+  }
+
   const [chatbotData] = await db
-    .select({
-      id: chatbot.id,
-      name: chatbot.name,
-      organizationId: chatbot.organizationId,
-      image: chatbot.image,
-      primaryColor: chatbot.primaryColor,
-      theme: chatbot.theme,
-      hidePoweredBy: chatbot.hidePoweredBy,
-      initialMessage: chatbot.initialMessage,
-      suggestedMessages: chatbot.suggestedMessages,
-      isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
-      embedToken: chatbot.embedToken,
-      allowedDomains: chatbot.allowedDomains,
-      whatsappEnabled: chatbot.whatsappEnabled,
-      whatsappPhoneNumberId: chatbot.whatsappPhoneNumberId,
-      whatsappBusinessAccountId: chatbot.whatsappBusinessAccountId,
-      whatsappWelcomeMessage: chatbot.whatsappWelcomeMessage,
-      whatsappSettings: chatbot.whatsappSettings,
-      createdAt: chatbot.createdAt,
-      updatedAt: chatbot.updatedAt,
-    })
+    .select({ id: chatbot.id })
     .from(chatbot)
     .innerJoin(member, eq(chatbot.organizationId, member.organizationId))
-    .where(
-      and(
-        eq(member.userId, userId),
-        eq(chatbot.organizationId, organizationId),
-      ),
-    )
-    .orderBy(desc(chatbot.createdAt))
+    .where(eq(member.userId, userId))
+    .orderBy(desc(chatbot.updatedAt))
     .limit(1);
 
   if (!chatbotData) {
-    throw new Error("User has no chatbot access for this organization");
+    throw new Error("User has no chatbot access");
   }
 
-  return chatbotData;
+  return chatbotData.id;
 }

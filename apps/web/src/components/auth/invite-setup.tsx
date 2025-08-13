@@ -4,21 +4,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn, signUp } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 import { GoogleSVG } from "./google-svg";
 
-interface RegisterFormData {
+interface InviteSetupData {
   name: string;
   email: string;
   password: string;
 }
 
-export function RegisterForm({
+export function InviteSetup({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -26,14 +25,17 @@ export function RegisterForm({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterFormData>();
+  } = useForm<InviteSetupData>();
 
   const navigate = useNavigate();
+  const { email, invitationId } = useSearch({
+    from: "/(auth)/setup",
+  });
 
-  const handleRegister = async (data: RegisterFormData) => {
+  const handleRegister = async (data: InviteSetupData) => {
     await signUp.email(
       {
-        email: data.email,
+        email: email,
         name: data.name,
         password: data.password,
       },
@@ -42,7 +44,10 @@ export function RegisterForm({
           console.log("Registration successful", ctx);
           toast.success("Account created successfully");
           navigate({
-            to: "/onboarding",
+            to: "/accept-invitation",
+            search: {
+              invitationId: invitationId,
+            },
           });
         },
         onError: (ctx: any) => {
@@ -58,12 +63,15 @@ export function RegisterForm({
     await signIn.social(
       {
         provider: "google",
-        callbackURL: "/onboarding",
+        callbackURL: "/accept-invitation",
       },
       {
         onSuccess: () => {
           navigate({
-            to: "/onboarding",
+            to: "/accept-invitation",
+            search: {
+              invitationId: invitationId,
+            },
           });
         },
         onError: (ctx: any) => {
@@ -77,7 +85,7 @@ export function RegisterForm({
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-3xl instrument-serif-regular">
-            Create an account
+            Setup Your Account
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -121,27 +129,7 @@ export function RegisterForm({
                     </p>
                   )}
                 </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    className="sm:text-xs text-sm"
-                    placeholder="jane@example.com"
-                    {...register("email", {
-                      required: "Email is required",
-                      pattern: {
-                        value: /^\S+@\S+$/i,
-                        message: "Invalid email address",
-                      },
-                    })}
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-red-500">
-                      {errors.email.message}
-                    </p>
-                  )}
-                </div>
+
                 <div className="grid gap-3">
                   <Label htmlFor="password">Password</Label>
                   <Input
@@ -180,10 +168,7 @@ export function RegisterForm({
                     {isSubmitting ? (
                       <Spinner className="text-white" />
                     ) : (
-                      <>
-                        <Mail className="h-4 w-4" />
-                        Continue with email
-                      </>
+                      <>Complete Setup</>
                     )}
                   </Button>
                 </motion.div>

@@ -12,7 +12,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DeleteWorkspace } from "./delete-workspace";
 
-interface WorkspaceCardProps {
+interface ChatbotCardProps {
   workspaceId: string;
   name: string;
   logo: string | null | undefined;
@@ -30,18 +30,17 @@ const GRADIENT_PRESETS = [
   "bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500",
   "bg-gradient-to-br from-rose-500 via-pink-500 to-purple-500",
   "bg-gradient-to-br from-amber-500 via-yellow-500 to-orange-500",
-  "bg-gradient-to-br from-slate-600 via-gray-600 to-zinc-600",
-  "bg-gradient-to-br from-violet-600 via-indigo-500 to-blue-600",
+  "bg-gradient-to-br from-lime-400 via-green-400 to-emerald-500",
+  "bg-gradient-to-br from-fuchsia-500 via-pink-500 to-rose-500",
 ];
 
-export function WorkspaceCard({
+export function ChatbotCard({
   workspaceId,
   name,
   logo,
   createdAt,
-}: WorkspaceCardProps) {
+}: ChatbotCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  // Generate a consistent random gradient based on the workspace name
   const gradientClass = useMemo(() => {
     const hash = name.split("").reduce((acc, char) => {
       return char.charCodeAt(0) + ((acc << 5) - acc);
@@ -50,7 +49,7 @@ export function WorkspaceCard({
     return GRADIENT_PRESETS[index];
   }, [name]);
 
-  const handleSwitchWorkspace = async () => {
+  const handleSwitchBot = async () => {
     try {
       await authClient.organization.setActive({
         organizationId: workspaceId,
@@ -96,9 +95,9 @@ export function WorkspaceCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onSelect={handleSwitchWorkspace}>
+                  <DropdownMenuItem onSelect={handleSwitchBot}>
                     <ArrowRightLeft className="h-4 w-4 mr-2" />
-                    Switch to workspace
+                    Switch
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     variant="destructive"

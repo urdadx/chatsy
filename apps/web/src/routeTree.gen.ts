@@ -15,6 +15,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebsiteSourcesRouteImport } from './routes/website-sources'
 import { Route as SuccessRouteImport } from './routes/success'
 import { Route as ChoosePlanRouteImport } from './routes/choose-plan'
+import { Route as AcceptInvitationRouteImport } from './routes/accept-invitation'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
@@ -27,6 +28,7 @@ import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
 import { Route as AdminKnowledgeBaseRouteImport } from './routes/admin/knowledge-base'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as AdminActionsRouteImport } from './routes/admin/actions'
+import { Route as authSetupRouteImport } from './routes/(auth)/setup'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
@@ -57,6 +59,7 @@ import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/so
 import { ServerRoute as ApiEmbedGenerateTokenServerRouteImport } from './routes/api/embed/generate-token'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
+import { ServerRoute as ApiAcceptInvitationInvitationIdServerRouteImport } from './routes/api/accept-invitation/$invitationId'
 import { ServerRoute as ApiEmbedChatbotEmbedTokenServerRouteImport } from './routes/api/embed/chatbot/$embedToken'
 import { ServerRoute as ApiEmbedChatEmbedTokenServerRouteImport } from './routes/api/embed/chat/$embedToken'
 import { ServerRoute as ApiIntegrationsWhatsappWebhooksVerifyServerRouteImport } from './routes/api/integrations/whatsapp/webhooks/verify'
@@ -81,6 +84,11 @@ const SuccessRoute = SuccessRouteImport.update({
 const ChoosePlanRoute = ChoosePlanRouteImport.update({
   id: '/choose-plan',
   path: '/choose-plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcceptInvitationRoute = AcceptInvitationRouteImport.update({
+  id: '/accept-invitation',
+  path: '/accept-invitation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -147,6 +155,11 @@ const AdminActionsRoute = AdminActionsRouteImport.update({
   id: '/actions',
   path: '/actions',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const authSetupRoute = authSetupRouteImport.update({
+  id: '/(auth)/setup',
+  path: '/setup',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const authRegisterRoute = authRegisterRouteImport.update({
   id: '/(auth)/register',
@@ -305,6 +318,12 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiAcceptInvitationInvitationIdServerRoute =
+  ApiAcceptInvitationInvitationIdServerRouteImport.update({
+    id: '/api/accept-invitation/$invitationId',
+    path: '/api/accept-invitation/$invitationId',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiEmbedChatbotEmbedTokenServerRoute =
   ApiEmbedChatbotEmbedTokenServerRouteImport.update({
     id: '/api/embed/chatbot/$embedToken',
@@ -351,11 +370,13 @@ const ApiIntegrationsWhatsappAuthCallbackServerRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/accept-invitation': typeof AcceptInvitationRoute
   '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
   '/website-sources': typeof WebsiteSourcesRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/setup': typeof authSetupRoute
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
@@ -372,11 +393,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/accept-invitation': typeof AcceptInvitationRoute
   '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
   '/website-sources': typeof WebsiteSourcesRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/setup': typeof authSetupRoute
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
@@ -394,11 +417,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/accept-invitation': typeof AcceptInvitationRoute
   '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
   '/website-sources': typeof WebsiteSourcesRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
+  '/(auth)/setup': typeof authSetupRoute
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
@@ -417,11 +442,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/accept-invitation'
     | '/choose-plan'
     | '/success'
     | '/website-sources'
     | '/login'
     | '/register'
+    | '/setup'
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/knowledge-base'
@@ -438,11 +465,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/accept-invitation'
     | '/choose-plan'
     | '/success'
     | '/website-sources'
     | '/login'
     | '/register'
+    | '/setup'
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/knowledge-base'
@@ -459,11 +488,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/accept-invitation'
     | '/choose-plan'
     | '/success'
     | '/website-sources'
     | '/(auth)/login'
     | '/(auth)/register'
+    | '/(auth)/setup'
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/knowledge-base'
@@ -481,11 +512,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  AcceptInvitationRoute: typeof AcceptInvitationRoute
   ChoosePlanRoute: typeof ChoosePlanRoute
   SuccessRoute: typeof SuccessRoute
   WebsiteSourcesRoute: typeof WebsiteSourcesRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
+  authSetupRoute: typeof authSetupRoute
   BioPagePageIdRoute: typeof BioPagePageIdRoute
   BubbleWidgetIdRoute: typeof BubbleWidgetIdRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
@@ -513,6 +546,7 @@ export interface FileServerRoutesByFullPath {
   '/api/visitor-analytics': typeof ApiVisitorAnalyticsServerRoute
   '/api/vote': typeof ApiVoteServerRoute
   '/api/vote-count': typeof ApiVoteCountServerRoute
+  '/api/accept-invitation/$invitationId': typeof ApiAcceptInvitationInvitationIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
@@ -549,6 +583,7 @@ export interface FileServerRoutesByTo {
   '/api/visitor-analytics': typeof ApiVisitorAnalyticsServerRoute
   '/api/vote': typeof ApiVoteServerRoute
   '/api/vote-count': typeof ApiVoteCountServerRoute
+  '/api/accept-invitation/$invitationId': typeof ApiAcceptInvitationInvitationIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
@@ -586,6 +621,7 @@ export interface FileServerRoutesById {
   '/api/visitor-analytics': typeof ApiVisitorAnalyticsServerRoute
   '/api/vote': typeof ApiVoteServerRoute
   '/api/vote-count': typeof ApiVoteCountServerRoute
+  '/api/accept-invitation/$invitationId': typeof ApiAcceptInvitationInvitationIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
@@ -624,6 +660,7 @@ export interface FileServerRouteTypes {
     | '/api/visitor-analytics'
     | '/api/vote'
     | '/api/vote-count'
+    | '/api/accept-invitation/$invitationId'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/embed/generate-token'
@@ -660,6 +697,7 @@ export interface FileServerRouteTypes {
     | '/api/visitor-analytics'
     | '/api/vote'
     | '/api/vote-count'
+    | '/api/accept-invitation/$invitationId'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/embed/generate-token'
@@ -696,6 +734,7 @@ export interface FileServerRouteTypes {
     | '/api/visitor-analytics'
     | '/api/vote'
     | '/api/vote-count'
+    | '/api/accept-invitation/$invitationId'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/embed/generate-token'
@@ -733,6 +772,7 @@ export interface RootServerRouteChildren {
   ApiVisitorAnalyticsServerRoute: typeof ApiVisitorAnalyticsServerRoute
   ApiVoteServerRoute: typeof ApiVoteServerRoute
   ApiVoteCountServerRoute: typeof ApiVoteCountServerRoute
+  ApiAcceptInvitationInvitationIdServerRoute: typeof ApiAcceptInvitationInvitationIdServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
   ApiEmbedGenerateTokenServerRoute: typeof ApiEmbedGenerateTokenServerRoute
@@ -768,6 +808,13 @@ declare module '@tanstack/react-router' {
       path: '/choose-plan'
       fullPath: '/choose-plan'
       preLoaderRoute: typeof ChoosePlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accept-invitation': {
+      id: '/accept-invitation'
+      path: '/accept-invitation'
+      fullPath: '/accept-invitation'
+      preLoaderRoute: typeof AcceptInvitationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -860,6 +907,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/actions'
       preLoaderRoute: typeof AdminActionsRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/(auth)/setup': {
+      id: '/(auth)/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof authSetupRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(auth)/register': {
       id: '/(auth)/register'
@@ -1075,6 +1129,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiAuthSplatServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/accept-invitation/$invitationId': {
+      id: '/api/accept-invitation/$invitationId'
+      path: '/api/accept-invitation/$invitationId'
+      fullPath: '/api/accept-invitation/$invitationId'
+      preLoaderRoute: typeof ApiAcceptInvitationInvitationIdServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/embed/chatbot/$embedToken': {
       id: '/api/embed/chatbot/$embedToken'
       path: '/api/embed/chatbot/$embedToken'
@@ -1158,11 +1219,13 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  AcceptInvitationRoute: AcceptInvitationRoute,
   ChoosePlanRoute: ChoosePlanRoute,
   SuccessRoute: SuccessRoute,
   WebsiteSourcesRoute: WebsiteSourcesRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
+  authSetupRoute: authSetupRoute,
   BioPagePageIdRoute: BioPagePageIdRoute,
   BubbleWidgetIdRoute: BubbleWidgetIdRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
@@ -1193,6 +1256,8 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiVisitorAnalyticsServerRoute: ApiVisitorAnalyticsServerRoute,
   ApiVoteServerRoute: ApiVoteServerRoute,
   ApiVoteCountServerRoute: ApiVoteCountServerRoute,
+  ApiAcceptInvitationInvitationIdServerRoute:
+    ApiAcceptInvitationInvitationIdServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
   ApiEmbedGenerateTokenServerRoute: ApiEmbedGenerateTokenServerRoute,

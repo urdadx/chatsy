@@ -25,14 +25,12 @@ export function DocumentSource() {
         const { name, type, size } = file.file;
         const { url } = uploadResponse.data;
 
-        const documentSourceResponse = await api.post("/document-source", {
+        await api.post("/document-source", {
           name,
           type,
           size,
           url,
         });
-
-        const { id: documentSourceId } = documentSourceResponse.data;
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["document-sources"] });

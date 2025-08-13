@@ -14,51 +14,45 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
+import {
+  useChatbots,
+  useSetActiveChatbot,
+} from "@/hooks/use-chatbot-management";
 import { RiCheckboxCircleFill } from "@remixicon/react";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import Avatar from "boring-avatars";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import { InviteMembers } from "./invite-members";
-import { CreateWorkspace } from "./new-workspace";
+import { ChatbotManager } from "./new-chabot";
 
-export function WorkspaceSwitcher() {
-  const { data: activeOrganization, isLoading } = useSuspenseQuery({
-    queryKey: ["activeOrganization"],
-    queryFn: async () => {
-      const result = await authClient.organization.getFullOrganization();
+export function ChatbotSwitcher() {
+  const { data: chatbotsData, isLoading } = useChatbots();
+  const setActiveChatbotMutation = useSetActiveChatbot();
 
-      return result.data;
-    },
-  });
+  const activeChatbot = useMemo(() => {
+    if (!chatbotsData?.chatbots || !chatbotsData?.activeChatbotId) return null;
+    return chatbotsData.chatbots.find(
+      (chatbot) => chatbot.id === chatbotsData.activeChatbotId,
+    );
+  }, [chatbotsData]);
 
-  console.log("Active Organization ID: ", activeOrganization?.id);
-
-  const { data: organizations } = authClient.useListOrganizations();
   const currentLogo = useMemo(
-    () => activeOrganization?.logo,
-    [activeOrganization?.logo],
+    () => activeChatbot?.image,
+    [activeChatbot?.image],
   );
 
-  const handleSwitchOrganization = async (organizationId: string) => {
+  const handleSwitchChatbot = async (chatbotId: string) => {
     try {
-      await authClient.organization.setActive({
-        organizationId,
-      });
-      toast.success("Workspace switched successfully");
-      window.location.reload();
+      await setActiveChatbotMutation.mutateAsync({ chatbotId });
     } catch (error) {
-      toast.error("Failed to switch workspace");
+      // Error handling is done in the mutation
     }
   };
 
-  const [openCreateOrganization, setOpenCreateOrganization] = useState(false);
-
+  const [openCreateChatbot, setOpenCreateChatbot] = useState(false);
   const [inviteMembersOpen, setInviteMembersOpen] = useState(false);
 
-  const handleCreateOrganization = () => {
-    setOpenCreateOrganization(true);
+  const handleCreateChatbot = () => {
+    setOpenCreateChatbot(true);
   };
 
   const handleInviteMembers = () => {
@@ -82,10 +76,7 @@ export function WorkspaceSwitcher() {
 
   return (
     <>
-      <CreateWorkspace
-        open={openCreateOrganization}
-        setOpen={setOpenCreateOrganization}
-      />
+      <ChatbotManager open={openCreateChatbot} setOpen={setOpenCreateChatbot} />
       <InviteMembers open={inviteMembersOpen} setOpen={setInviteMembersOpen} />
       <SidebarMenu>
         <SidebarMenuItem className="bg-transparent border-2 rounded-lg p-1">
@@ -96,20 +87,20 @@ export function WorkspaceSwitcher() {
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
                 {currentLogo ? (
-                  <div className=" rounded-full w-8 h-8">
+                  <div className="rounded-full w-4 h-4">
                     <img
                       src={currentLogo}
-                      alt={activeOrganization?.name}
+                      alt={activeChatbot?.name}
                       className="h-full w-full rounded-full object-cover "
                     />
                   </div>
                 ) : (
-                  <Avatar name={activeOrganization?.name} size={200} />
+                  <Avatar name={activeChatbot?.name} size={200} />
                 )}
 
                 <div className="grid flex-1 text-left leading-tight">
                   <span className="truncate font-normal">
-                    {activeOrganization?.name || "No workspace selected"}
+                    {activeChatbot?.name || "No chatbot selected"}
                   </span>
                 </div>
                 <ChevronsUpDown className="ml-auto size-4" />
@@ -130,31 +121,39 @@ export function WorkspaceSwitcher() {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
 
-              {organizations && organizations.length > 0 && (
+              {chatbotsData?.chatbots && chatbotsData.chatbots.length > 0 && (
                 <>
                   <DropdownMenuLabel className="text-xs">
-                    Workspaces
+                    Chatbots
                   </DropdownMenuLabel>
                   <DropdownMenuGroup className="space-y-1">
-                    {organizations.map((org: any) => (
+                    {chatbotsData.chatbots.map((chatbot) => (
                       <DropdownMenuItem
-                        key={org.id}
-                        onClick={() => handleSwitchOrganization(org.id)}
+                        key={chatbot.id}
+                        onClick={() => handleSwitchChatbot(chatbot.id)}
                         className={
-                          org.id === activeOrganization?.id
+                          chatbot.id === activeChatbot?.id
                             ? "bg-accent text-accent-foreground"
                             : ""
                         }
                       >
-                        <Avatar
-                          name={org.name}
-                          className="h-8 w-8 rounded-full"
-                        />
+                        {chatbot.image ? (
+                          <img
+                            src={chatbot.image}
+                            alt={chatbot.name}
+                            className="h-5 w-5 rounded-full object-cover"
+                          />
+                        ) : (
+                          <Avatar
+                            name={chatbot.name}
+                            className="h-8 w-8 rounded-full"
+                          />
+                        )}
 
                         <span className="truncate max-w-[120px] block">
-                          {org.name}
+                          {chatbot.name}
                         </span>
-                        {org.id === activeOrganization?.id && (
+                        {chatbot.id === activeChatbot?.id && (
                           <RiCheckboxCircleFill className="ml-auto h-4 w-4 text-primary" />
                         )}
                       </DropdownMenuItem>
@@ -164,9 +163,9 @@ export function WorkspaceSwitcher() {
               )}
 
               <DropdownMenuGroup className="mt-2">
-                <DropdownMenuItem onClick={handleCreateOrganization}>
+                <DropdownMenuItem onClick={handleCreateChatbot}>
                   <PlusIcon />
-                  Create new workspace
+                  Create new chatbot
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>

@@ -1,5 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { useUsage } from "@/hooks/use-usage-meters";
+import { motion } from "motion/react";
+import { AddOnsDialog } from "../add-ons-dialog";
+import { Dialog, DialogTrigger } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
 
@@ -53,7 +56,17 @@ export const UsageTable = () => {
             )}
         </div>
         <div className="bg-gray-50 px-6 py-4 flex justify-end border-t">
-          <Button variant="default">Increase limits</Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button variant="default">Increase limits</Button>
+              </motion.div>
+            </DialogTrigger>
+            <AddOnsDialog defaultValue="messages" />
+          </Dialog>
         </div>
       </div>
     </div>

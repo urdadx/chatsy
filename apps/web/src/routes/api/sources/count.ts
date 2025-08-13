@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { documentSource, textSource, websiteSource } from "@/db/schema";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -12,9 +13,14 @@ export const ServerRoute = createServerFileRoute("/api/sources/count").methods({
     });
 
     const userId = session?.user?.id;
-    const chatbotId = session?.session?.activeChatbotId;
+    if (!userId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
 
-    if (!userId || !chatbotId) {
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+
+    if (!chatbotId) {
       return json(
         { error: "Unauthorized: Please log in or no active chatbot" },
         { status: 401 },

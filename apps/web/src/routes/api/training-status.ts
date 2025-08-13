@@ -1,5 +1,6 @@
 import { db } from "@/db";
-import { chatbot } from "@/db/schema"; // Update to import chatbot schema
+import { chatbot } from "@/db/schema";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -13,12 +14,18 @@ export const ServerRoute = createServerFileRoute(
       headers: request.headers || new Headers(),
     });
 
-    const chatbotId = session?.session?.activeChatbotId;
+    const userId = session?.user?.id;
+    if (!userId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
 
     if (!chatbotId) {
       return json(
-        { error: "Authentication or chatbot context is missing." },
-        { status: 400 },
+        { error: "Unauthorized: Please log in or no active chatbot" },
+        { status: 401 },
       );
     }
 

@@ -19,9 +19,9 @@ interface OrganizationInvitationEmailProps {
 }
 
 export const OrganizationInvitationEmail = ({
-  invitedByEmail = "john@example.com",
-  teamName = "Acme Corp",
-  inviteLink = "https://example.com/accept-invitation/123",
+  invitedByEmail,
+  teamName,
+  inviteLink,
 }: OrganizationInvitationEmailProps) => {
   return (
     <Html>

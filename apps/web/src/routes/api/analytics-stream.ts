@@ -1,5 +1,7 @@
 import { db } from "@/db";
 import { visitorAnalytics } from "@/db/schema";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { and, count, desc, eq, gte, isNotNull } from "drizzle-orm";
@@ -13,7 +15,6 @@ interface AnalyticsData {
   bioPageAverage: number;
   widgetAverage: number;
   totalSessions: number;
-  // Add chart data for recent activity
   recentActivity: {
     timestamp: string;
     visits: number;
@@ -163,7 +164,7 @@ async function getAnalyticsData(chatbotId: string): Promise<AnalyticsData> {
       recentActivity.push({
         timestamp: hourStart.toISOString(),
         visits: visitsInHour,
-        chats: 0, // This could be enhanced to track chats per hour
+        chats: 0,
       });
     }
 
@@ -192,14 +193,23 @@ export const ServerRoute = createServerFileRoute(
       headers: request.headers || new Headers(),
     });
 
-    const chatbotId = session?.session?.activeChatbotId;
+    const userId = session?.user?.id;
+    if (!userId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+
     if (!chatbotId) {
-      return new Response("Unauthorized", { status: 401 });
+      return json(
+        { error: "Unauthorized: Please log in or no active chatbot" },
+        { status: 401 },
+      );
     }
 
     let lastDataHash = "";
 
-    // Create a readable stream for SSE
     const stream = new ReadableStream({
       start(controller) {
         const sendData = async () => {

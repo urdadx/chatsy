@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chat, chatbot, message } from "@/db/schema";
+import { chat, chatbot, member, message } from "@/db/schema";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import {
   type Message,
@@ -15,7 +15,7 @@ import { LLMStrategy } from "@polar-sh/ingestion/strategies/LLM";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { streamText } from "ai";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY!,
@@ -63,6 +63,23 @@ export const ServerRoute = createServerFileRoute(
         });
       }
 
+      // Fetch the owner userId for the organization
+      const [owner] = await db
+        .select({ userId: member.userId })
+        .from(member)
+        .where(
+          and(
+            eq(member.organizationId, chatbotData.organizationId),
+            eq(member.role, "owner"),
+          ),
+        );
+
+      if (!owner) {
+        return new Response("No owner found for this organization", {
+          status: 500,
+        });
+      }
+
       // Check domain restrictions
       const referer = request.headers.get("referer");
       if (chatbotData.allowedDomains && chatbotData.allowedDomains.length > 0) {
@@ -91,8 +108,6 @@ export const ServerRoute = createServerFileRoute(
         const title = await generateTitleFromUserMessage({
           message: userMessage,
         });
-
-        // Create chat without userId (anonymous public chat)
         await db
           .insert(chat)
           .values({
@@ -124,7 +139,7 @@ export const ServerRoute = createServerFileRoute(
       }
 
       const model = llmIngestion.client({
-        externalCustomerId: chatbotData.organizationId,
+        externalCustomerId: owner.userId,
       });
 
       const resultStream = streamText({

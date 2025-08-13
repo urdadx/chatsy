@@ -1,3 +1,4 @@
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -17,7 +18,11 @@ export const ServerRoute = createServerFileRoute("/api/crawl").methods({
     });
 
     const userId = session?.user?.id;
-    const activeChatbotId = session?.session.activeChatbotId;
+    if (!userId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+    const activeChatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
 
     if (!activeChatbotId) {
       return json({ error: "No active chatbot" }, { status: 400 });

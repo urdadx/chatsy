@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { chat, chatbot, member } from "@/db/schema";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -16,13 +17,20 @@ const querySchema = z.object({
 export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
   GET: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
-    if (!session?.user?.id) {
-      return new Response("Unauthorized", { status: 401 });
+
+    const userId = session?.user?.id;
+    if (!userId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
-    const chatbotId = session?.session?.activeChatbotId;
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+
     if (!chatbotId) {
-      return new Response("No active chatbot", { status: 400 });
+      return json(
+        { error: "Unauthorized: Please log in or no active chatbot" },
+        { status: 401 },
+      );
     }
 
     // Verify the chatbot exists and get its organization

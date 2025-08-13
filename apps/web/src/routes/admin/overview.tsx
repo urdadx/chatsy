@@ -1,5 +1,5 @@
 import { DashboardMetrics } from "@/components/dashboard/dashboard-metrics";
-import { MyWorkspaces } from "@/components/dashboard/my-workspaces";
+import { MyChatbots } from "@/components/dashboard/my-chatbots";
 import { CompletedStatus } from "@/components/dashboard/training-status/completed-status";
 import { FailedStatus } from "@/components/dashboard/training-status/failed-status";
 import { InProgressStatus } from "@/components/dashboard/training-status/inprogress-status";
@@ -42,7 +42,7 @@ function RouteComponent() {
       <div className="relative p-6 w-full max-w-5xl mx-auto space-y-10">
         <DashboardMetrics />
         {renderStatus()}
-        <MyWorkspaces />
+        <MyChatbots />
       </div>
     </>
   );

@@ -1,14 +1,15 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUsage } from "@/hooks/use-usage-meters";
-import { authClient } from "@/lib/auth-client";
 import { getDaysUntilReset } from "@/lib/utils";
+import { motion } from "motion/react";
+import { AddOnsDialog } from "./add-ons-dialog";
+import { Button } from "./ui/button";
+import { Dialog, DialogTrigger } from "./ui/dialog";
 
 export function UsageBanner() {
   const { data, isLoading, isError } = useUsage("ai_usage_two");
-
   const meter = Array.isArray(data) ? data[0] : data;
 
   const creditedUnits = meter?.creditedUnits ?? 0;
@@ -17,15 +18,6 @@ export function UsageBanner() {
   const currentUsage = creditedUnits - balance;
   const usagePercentage =
     creditedUnits > 0 ? (balance / creditedUnits) * 100 : 0;
-
-  const handleCheckout = async () => {
-    const organizationId = (await authClient.organization.list())?.data?.[0]
-      ?.id;
-    await authClient.checkout({
-      slug: "starter",
-      referenceId: organizationId,
-    });
-  };
 
   if (isLoading) {
     return (
@@ -63,13 +55,19 @@ export function UsageBanner() {
           </div>
           <Progress value={usagePercentage} />
         </div>
-        <Button
-          onClick={handleCheckout}
-          className="w-full text-sidebar-primary-foreground shadow-none"
-          size="sm"
-        >
-          <p className="text-white">Buy more credits</p>
-        </Button>
+        <Dialog>
+          <DialogTrigger className="w-full mx-auto">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                className="w-full text-sidebar-primary-foreground shadow-none"
+                size="sm"
+              >
+                <p className="text-white">Buy more credits</p>
+              </Button>
+            </motion.div>
+          </DialogTrigger>
+          <AddOnsDialog defaultValue="messages" />
+        </Dialog>
       </div>
     </Card>
   );

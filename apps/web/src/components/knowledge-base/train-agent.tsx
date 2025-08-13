@@ -4,6 +4,7 @@ import { useSession } from "@/lib/auth-client";
 import { RiQuestionFill } from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileText, Globe, Hammer, InfoIcon, Paperclip } from "lucide-react";
+import { motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "../ui/alert";
@@ -181,20 +182,22 @@ export const TrainAgent = () => {
         label="Text"
         size={formatBytes(totalTextSize)}
       />
-      <Button
-        className="w-full font-semibold"
-        onClick={handleTrainAgent}
-        disabled={trainAgentMutation.isPending}
-      >
-        {trainAgentMutation.isPending ? (
-          "Training..."
-        ) : (
-          <>
-            <Hammer className="w-4 h-4 " />
-            Train agent
-          </>
-        )}
-      </Button>
+      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+        <Button
+          className="w-full font-semibold"
+          onClick={handleTrainAgent}
+          disabled={trainAgentMutation.isPending}
+        >
+          {trainAgentMutation.isPending ? (
+            "Training..."
+          ) : (
+            <>
+              <Hammer className="w-4 h-4 " />
+              Train agent
+            </>
+          )}
+        </Button>
+      </motion.div>
     </div>
   );
 };

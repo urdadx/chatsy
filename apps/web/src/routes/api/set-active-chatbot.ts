@@ -1,13 +1,14 @@
 import { db } from "@/db";
-import { chatbot, member } from "@/db/schema";
+import { chatbot, session as sessionTable } from "@/db/schema";
+import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { and, eq } from "drizzle-orm";
-import z from "zod";
+import { eq } from "drizzle-orm";
+import { z } from "zod";
 
 const setActiveChatbotSchema = z.object({
-  chatbotId: z.string().uuid(),
+  chatbotId: z.string().uuid("Invalid chatbot ID format"),
 });
 
 export const ServerRoute = createServerFileRoute(
@@ -17,59 +18,71 @@ export const ServerRoute = createServerFileRoute(
     const session = await auth.api.getSession({ headers: request.headers });
 
     if (!session?.user?.id) {
-      return new Response("Unauthorized", { status: 401 });
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const parsed = setActiveChatbotSchema.safeParse(body);
+    try {
+      const body = await request.json();
+      const parsed = setActiveChatbotSchema.safeParse(body);
 
-    if (!parsed.success) {
-      return json({ error: parsed.error.format() }, { status: 400 });
-    }
+      if (!parsed.success) {
+        return json({ error: parsed.error.format() }, { status: 400 });
+      }
 
-    const { chatbotId } = parsed.data;
+      const { chatbotId } = parsed.data;
+      const userId = session.user.id;
 
-    // Verify the chatbot exists and get its organization
-    const [chatbotData] = await db
-      .select({
-        organizationId: chatbot.organizationId,
-      })
-      .from(chatbot)
-      .where(eq(chatbot.id, chatbotId));
+      // Verify the chatbot exists and get its organization
+      const [chatbotData] = await db
+        .select({
+          id: chatbot.id,
+          name: chatbot.name,
+          organizationId: chatbot.organizationId,
+        })
+        .from(chatbot)
+        .where(eq(chatbot.id, chatbotId));
 
-    if (!chatbotData) {
-      return json({ error: "Chatbot not found" }, { status: 404 });
-    }
+      if (!chatbotData) {
+        return json({ error: "Chatbot not found" }, { status: 404 });
+      }
 
-    // Verify user is a member of the chatbot's organization
-    const [membership] = await db
-      .select()
-      .from(member)
-      .where(
-        and(
-          eq(member.userId, session.user.id),
-          eq(member.organizationId, chatbotData.organizationId),
-        ),
+      const isMember = await isUserMemberOfOrganization(
+        userId,
+        chatbotData.organizationId,
       );
 
-    if (!membership) {
-      return json({ error: "Forbidden" }, { status: 403 });
-    }
+      if (!isMember) {
+        return json(
+          { error: "Forbidden: You don't have access to this chatbot" },
+          { status: 403 },
+        );
+      }
 
-    // Update the session with the new active chatbot
-    try {
-      await auth.api.updateSession({
-        sessionId: session.session.id,
-        update: {
+      try {
+        await db
+          .update(sessionTable)
+          .set({
+            activeChatbotId: chatbotId,
+            updatedAt: new Date(),
+          })
+          .where(eq(sessionTable.userId, userId));
+
+        return json({
+          success: true,
+          message: "Active chatbot updated successfully",
           activeChatbotId: chatbotId,
-          activeOrganizationId: chatbotData.organizationId,
-        },
-      });
-
-      return json({ success: true, activeChatbotId: chatbotId });
-    } catch (error) {
-      console.error("Error updating session:", error);
-      return json({ error: "Failed to set active chatbot" }, { status: 500 });
+          chatbotName: chatbotData.name,
+        });
+      } catch (error) {
+        console.error("Error updating session with active chatbot:", error);
+        return json(
+          { error: "Failed to update active chatbot" },
+          { status: 500 },
+        );
+      }
+    } catch (err) {
+      console.error("POST /api/set-active-chatbot error:", err);
+      return json({ error: "Internal server error" }, { status: 500 });
     }
   },
 });

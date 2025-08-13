@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { textSource } from "@/db/schema";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -28,15 +29,18 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
     });
 
     const userId = session?.user?.id;
-
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
-    const chatbotId = session?.session?.activeChatbotId;
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
 
     if (!chatbotId) {
-      return json({ error: "No active chatbot" }, { status: 400 });
+      return json(
+        { error: "Unauthorized: Please log in or no active chatbot" },
+        { status: 401 },
+      );
     }
 
     const results = await db
@@ -54,14 +58,19 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       headers: request.headers || new Headers(),
     });
 
-    const chatbotId = session?.session?.activeChatbotId;
-    if (!chatbotId) {
-      return json({ error: "No active chatbot" }, { status: 400 });
-    }
-
     const userId = session?.user?.id;
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+
+    if (!chatbotId) {
+      return json(
+        { error: "Unauthorized: Please log in or no active chatbot" },
+        { status: 401 },
+      );
     }
 
     const body = await request.json();
@@ -95,7 +104,8 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
-    const chatbotId = session?.session?.activeChatbotId;
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
     if (!chatbotId) {
       return json({ error: "No active chatbot" }, { status: 400 });
     }
@@ -135,15 +145,15 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
     const session = await auth.api.getSession({
       headers: request.headers || new Headers(),
     });
-
-    const chatbotId = session?.session?.activeChatbotId;
-    if (!chatbotId) {
-      return json({ error: "No active chatbot" }, { status: 400 });
-    }
-
     const userId = session?.user?.id;
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
     }
 
     const body = await request.json();
