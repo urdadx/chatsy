@@ -23,7 +23,7 @@ export const ChatConversation = () => {
   const messages = messagesFromDb ? convertToUIMessages(messagesFromDb) : [];
 
   return (
-    <div className="relative flex-1 h-[320px]">
+    <div className="relative flex-1 h-full">
       <ChatContainerRoot className="h-full smooth-div">
         <ChatContainerContent className="p-4">
           <div className="w-full space-y-4">

@@ -65,9 +65,11 @@ export const TextSourceList = () => {
 
   return (
     <>
-      <div className="my-5 border rounded-md p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-lg">Text Sources</h3>
+      <div className="my-5 border rounded-md p-4 sm:p-6">
+        <div className="flex justify-between gap-2 items-center mb-4">
+          <h3 className="font-semibold text-lg hidden sm:block">
+            Text Sources
+          </h3>
           <SearchInput
             placeholder="Search text sources..."
             value={searchTerm}

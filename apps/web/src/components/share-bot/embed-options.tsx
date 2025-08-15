@@ -8,7 +8,7 @@ export function EmbedOptions({ embedToken }: { embedToken: string }) {
   const [option, setOption] = useState("1");
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       <RadioGroup
         className="w-full flex flex-row gap-4"
         defaultValue="1"

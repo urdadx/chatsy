@@ -9,8 +9,8 @@ export const AnalyticsCard = () => {
         <div className="absolute left-1/2 top-1/2 w-[90%] transform -translate-x-1/2 -translate-y-1/2 sm:left-[8%] sm:top-[38%] sm:w-auto sm:translate-x-0 sm:translate-y-0">
           <div className="pointer-events-auto">
             <NotificationBadge
-              flag="🇿🇦"
-              text="New visitor from Pretoria, South Africa"
+              flag="🇳🇬"
+              text="New visitor from Lagos, Nigeria"
             />
           </div>
         </div>

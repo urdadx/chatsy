@@ -14,7 +14,8 @@ import {
   useSetActiveChatbot,
 } from "@/hooks/use-chatbot-management";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Bot, Check, Plus } from "lucide-react";
+import { RiCheckboxCircleFill } from "@remixicon/react";
+import { ArrowRight, Bot, Plus } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Button } from "../ui/button";
@@ -165,7 +166,7 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
                             </div>
                           </div>
                           {activeChatbotId === chatbot.id && (
-                            <Check className="w-4 h-4 text-primary" />
+                            <RiCheckboxCircleFill className="w-5 h-5 text-primary" />
                           )}
                         </motion.div>
                       ))}

@@ -194,7 +194,7 @@ export function ChatsByCountry() {
           </TabsList>
           <div className="flex items-center gap-1">
             <div className="text-muted-foreground text-sm flex items-center gap-1">
-              <MousePointerClick className="h-4 w-4" /> Destination
+              <MousePointerClick className="h-4 w-4" /> Location
             </div>
           </div>
         </div>

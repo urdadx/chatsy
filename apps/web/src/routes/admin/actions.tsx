@@ -28,9 +28,9 @@ function RouteComponent() {
   };
 
   return (
-    <div className="max-w-4xl w-full max-h-screen mx-auto px-2 sm:px-0 py-4">
-      <div className="">
-        <h1 className="text-xl font-semibold mb-2">Agent Actions</h1>
+    <div className="max-w-4xl w-full max-h-screen mx-auto px-4 sm:px-0 py-4">
+      <div className="hidden sm:block">
+        <h1 className="text-xl font-semibold mb-2 ">Agent Actions</h1>
         <span className="text-md text-muted-foreground">
           Enhance your bot's capabilities with powerful AI actions and
           integrations

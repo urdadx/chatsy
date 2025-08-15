@@ -7,8 +7,10 @@ import { Logo } from "../logo-image";
 
 const menuItems = [
   { name: "Features", href: "#features" },
+  { name: "Integrations", href: "#integrations" },
+  // { name: "How to Use", href: "#howtouse" },
   { name: "Pricing", href: "#pricing" },
-  { name: "Customers", href: "#customers" },
+  { name: "FAQs", href: "#faqs" },
 ];
 
 export const HeroHeader = () => {

@@ -10,6 +10,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NumberFlow from "@number-flow/react";
 import { Check } from "lucide-react";
+import { motion } from "motion/react";
 import { useState } from "react";
 
 export function Pricing() {
@@ -124,7 +125,7 @@ export function Pricing() {
                 {plans.map((plan) => (
                   <Card
                     key={plan.id}
-                    className="relative bg-white w-full max-w-xl shadow-sm shadow-primary/60"
+                    className="relative bg-gray-50 w-full p-2 max-w-xl shadow-sm ring-muted"
                   >
                     {plan.isPopular && (
                       <span className="bg-primary text-white absolute inset-x-0 -top-3 mx-auto flex h-6 w-fit items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset ring-white/20 ring-offset-1 ring-offset-gray-950/5">
@@ -132,7 +133,7 @@ export function Pricing() {
                       </span>
                     )}
 
-                    <div className="flex flex-col h-full">
+                    <div className="flex flex-col h-full bg-white rounded-lg border ">
                       <CardHeader>
                         <CardTitle className="font-medium text-lg pt-4">
                           {plan.name}
@@ -165,16 +166,22 @@ export function Pricing() {
                         </ul>
                       </CardContent>
 
-                      <CardFooter>
-                        <Button
-                          variant={plan.isPopular ? "default" : "outline"}
-                          onClick={() => handleSelectPlan(plan)}
+                      <CardFooter className="p-3">
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           className="w-full"
                         >
-                          {plan.name === "Enterprise"
-                            ? "Contact Sales"
-                            : "Get Started"}
-                        </Button>
+                          <Button
+                            variant={plan.isPopular ? "default" : "outline"}
+                            onClick={() => handleSelectPlan(plan)}
+                            className="w-full"
+                          >
+                            {plan.name === "Enterprise"
+                              ? "Contact Sales"
+                              : "Get Started"}
+                          </Button>
+                        </motion.div>
                       </CardFooter>
                     </div>
                   </Card>
@@ -187,7 +194,7 @@ export function Pricing() {
                 {plans.map((plan) => (
                   <Card
                     key={plan.id}
-                    className="relative w-full max-w-xl shadow-sm shadow-primary/60"
+                    className="relative bg-gray-50 w-full p-2 max-w-xl shadow-sm ring-muted"
                   >
                     {plan.isPopular && (
                       <span className="bg-primary text-white absolute inset-x-0 -top-3 mx-auto flex h-6 w-fit items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset ring-white/20 ring-offset-1 ring-offset-gray-950/5">
@@ -195,7 +202,7 @@ export function Pricing() {
                       </span>
                     )}
 
-                    <div className="flex flex-col h-full">
+                    <div className="flex flex-col h-full bg-white rounded-lg border">
                       <CardHeader>
                         <CardTitle className="font-medium text-lg pt-4">
                           {plan.name}
@@ -252,7 +259,7 @@ export function Pricing() {
                         </ul>
                       </CardContent>
 
-                      <CardFooter className="">
+                      <CardFooter className="p-3">
                         <Button
                           variant={plan.isPopular ? "default" : "outline"}
                           onClick={() => handleSelectPlan(plan)}

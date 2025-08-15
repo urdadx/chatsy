@@ -1,6 +1,7 @@
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../../ui/button";
@@ -81,9 +82,11 @@ export const TextSource = () => {
             </div>
           </div>
           <div className="flex justify-end mt-4">
-            <Button className="w-fit" type="submit" disabled={isPending}>
-              {isPending ? "Adding..." : "Add text source"}
-            </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button className="w-fit" type="submit" disabled={isPending}>
+                {isPending ? "Adding..." : "Add text source"}
+              </Button>
+            </motion.div>
           </div>
         </form>
       </div>

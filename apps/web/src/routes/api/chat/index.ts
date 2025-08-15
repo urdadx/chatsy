@@ -11,7 +11,7 @@ import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { ChatSDKError } from "@/lib/errors";
-import { subscriptionMiddleware } from "@/middlewares";
+import { subscriptionMiddleware, tokenUsageMiddleware } from "@/middlewares";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Ingestion } from "@polar-sh/ingestion";
 import { LLMStrategy } from "@polar-sh/ingestion/strategies/LLM";
@@ -36,7 +36,7 @@ const llmIngestion = Ingestion({
 export const ServerRoute = createServerFileRoute("/api/chat/").methods(
   (api) => ({
     POST: api
-      .middleware([subscriptionMiddleware])
+      .middleware([subscriptionMiddleware, tokenUsageMiddleware])
       .handler(async ({ request, context }) => {
         try {
           const { id, messages } = await request.json();
@@ -45,9 +45,13 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             headers: request.headers,
           });
 
-          console.log(" active subscription:", context.hasActiveSubscription);
-          if (!context.hasActiveSubscription) {
+          if (context.hasActiveSubscription === false) {
             const error = new ChatSDKError("forbidden:subscription");
+            return error.toResponse();
+          }
+
+          if (context.tokensLeft === 0) {
+            const error = new ChatSDKError("forbidden:tokens");
             return error.toResponse();
           }
 

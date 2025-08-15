@@ -73,9 +73,9 @@ export const QuestionList = () => {
   );
 
   return (
-    <div className="my-5 border rounded-md p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-lg">Questions</h3>
+    <div className="my-5 border rounded-md p-4 sm:p-6">
+      <div className="flex justify-between gap-4 items-center mb-4">
+        <h3 className="font-semibold text-lg hidden sm:block">Questions</h3>
         <SearchInput
           placeholder="Search questions..."
           value={searchTerm}

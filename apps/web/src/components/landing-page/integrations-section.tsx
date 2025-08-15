@@ -3,7 +3,7 @@ import { UserImage } from "../logo-image";
 
 export default function IntegrationsSection() {
   return (
-    <section className="px-4 py-6 sm:py-12">
+    <section id="integrations" className="px-4 py-6 sm:py-14">
       <div className="bg-white dark:bg-background ">
         <div className="mx-auto flex flex-col md:flex-row px-4 md:px-6 md:grid md:max-w-6xl gap-6 md:gap-12">
           <div className="flex flex-col gap-4 w-full md:w-auto">
@@ -14,7 +14,7 @@ export default function IntegrationsSection() {
                   favorite platforms
                 </span>{" "}
               </h2>
-              <p className="text-muted-foreground text-base">
+              <p className="text-muted-foreground text-lg">
                 Connect seamlessly with popular platforms and services to
                 enhance your workflow.
               </p>
@@ -81,7 +81,7 @@ export default function IntegrationsSection() {
               </div>
               <div className="mt-2 flex flex-col md:flex-row gap-2 text-sm justify-center items-center">
                 <cite>Alfred Kissiedu,</cite>
-                <p className="text-muted-foreground">CEO, RedPear</p>
+                <p className="text-muted-foreground">RedPear Communications</p>
               </div>
             </div>
           </div>

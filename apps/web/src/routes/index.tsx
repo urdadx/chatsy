@@ -5,8 +5,8 @@ import Features from "@/components/landing-page/feature-section";
 import { FooterSection } from "@/components/landing-page/footer";
 import { HeroHeader } from "@/components/landing-page/hero-header";
 import IntegrationsSection from "@/components/landing-page/integrations-section";
+import { Setup } from "@/components/landing-page/landing-setup";
 import { Pricing } from "@/components/landing-page/pricing";
-import { Setup } from "@/components/landing-page/setup";
 import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -40,7 +40,7 @@ function HomeComponent() {
         <Setup />
         <IntegrationsSection />
 
-        <div className="pt-24">
+        <div className="pt-10">
           <Pricing />
         </div>
         <AddOns />

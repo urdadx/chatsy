@@ -35,7 +35,7 @@ export const GreetingMessage = ({ title }: any) => {
                 <ResponseStream
                   textStream={sanitizeText(title)}
                   mode="typewriter"
-                  speed={20}
+                  speed={25}
                   className="text-md"
                 />{" "}
               </div>

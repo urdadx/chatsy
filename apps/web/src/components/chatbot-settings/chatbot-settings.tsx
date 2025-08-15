@@ -136,7 +136,7 @@ export function ChatbotSettings() {
           <div className="relative">
             <Input
               id="name"
-              className="w-[300px]"
+              className="w-full sm:w-[300px]"
               value={name}
               onChange={(e) => setName(e.target.value)}
               onBlur={handleNameBlur}
@@ -165,7 +165,7 @@ export function ChatbotSettings() {
           </div>
           <div className="relative">
             <Textarea
-              className="w-[300px] min-h-[80px]"
+              className="w-full sm:w-[300px] min-h-[80px]"
               value={initialMessage}
               onChange={(e) => setInitialMessage(e.target.value)}
               onBlur={handleInitialMessageBlur}
@@ -224,7 +224,7 @@ export function ChatbotSettings() {
               <Button
                 variant="outline"
                 onClick={addSuggestedMessage}
-                className="w-fit"
+                className="w-full sm:w-fit"
               >
                 <Plus className="h-4 w-4" />
                 Add suggested message

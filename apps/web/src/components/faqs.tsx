@@ -4,50 +4,52 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Mail } from "lucide-react";
 
 export default function FAQs() {
   const faqItems = [
     {
       id: "item-1",
-      question: "How long does shipping take?",
+      question: "How does the AI customer support bot work?",
       answer:
-        "Standard shipping takes 3-5 business days, depending on your location. Express shipping options are available at checkout for 1-2 business day delivery.",
+        "Our bot is trained on your knowledge base and support documentation, allowing it to instantly answer customer questions 24/7 across all supported channels.",
     },
     {
       id: "item-2",
-      question: "What payment methods do you accept?",
+      question: "What integrations does the platform support?",
       answer:
-        "We accept all major credit cards (Visa, Mastercard, American Express), PayPal, Apple Pay, and Google Pay. For enterprise customers, we also offer invoicing options.",
+        "We integrate with major communication channels including WhatsApp, Facebook Messenger, Telegram, and live chat widgets. More integrations coming soon.",
     },
     {
       id: "item-3",
-      question: "Can I change or cancel my order?",
+      question: "Can I customize the responses of the AI?",
       answer:
-        "You can modify or cancel your order within 1 hour of placing it. After this window, please contact our customer support team who will assist you with any changes.",
+        "Yes. You can customize tone, language and messaging in the dashboard, and also provide custom rules and example answers for specific use cases.",
     },
     {
       id: "item-4",
-      question: "Do you ship internationally?",
+      question: "Do I need any technical experience to set up the bot?",
       answer:
-        "Yes, we ship to over 50 countries worldwide. International shipping typically takes 7-14 business days. Additional customs fees may apply depending on your country's import regulations.",
+        "No. You can easily set up and deploy the bot easily in just a few minutes",
     },
     {
       id: "item-5",
-      question: "What is your return policy?",
+      question: "Is there a free trial or demo available?",
       answer:
-        "We offer a 30-day return policy for most items. Products must be in original condition with tags attached. Some specialty items may have different return terms, which will be noted on the product page.",
+        "We offer a 3-day free trial with full access to all features. You can also request a live demo with our team (support@padyna.com) if you’d like to see it in action first.",
     },
   ];
 
   return (
-    <section className="py-10 md:pt-14 md:pb-2">
+    <section id="faqs" className="py-10 md:pt-14 md:pb-2">
       <div className="mx-auto max-w-5xl px-4 md:px-6">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="text-balance instrument-serif-regular-italic text-3xl font-bold md:text-3xl lg:text-4xl">
-            Frequently Asked Questions
+            Frequently Asked{" "}
+            <span className="text-purple-600 bg-purple-100 px-1 rounded relative inline-block z-1">
+              Questions
+            </span>{" "}
           </h2>
-          <p className="text-muted-foreground mt-4 text-balance">
+          <p className="text-muted-foreground text-lg mt-4 text-balance">
             Discover quick and comprehensive answers to common questions about
             our platform, services, and features.
           </p>
@@ -57,7 +59,7 @@ export default function FAQs() {
           <Accordion
             type="single"
             collapsible
-            className="bg-card ring-muted w-full rounded-2xl border px-8 py-3 shadow-sm ring-4 dark:ring-0"
+            className="bg-card ring-muted w-full rounded-2xl border px-8 py-3 shadow-sm ring-8 dark:ring-0"
           >
             {faqItems.map((item) => (
               <AccordionItem

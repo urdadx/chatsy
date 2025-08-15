@@ -4,15 +4,33 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { ArrowRight, Bot, MessageCircle, Zap } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { useMediaQuery } from "usehooks-ts";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { DialogContent } from "./ui/dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "./ui/drawer";
 
-export const AddOnsDialog = ({ defaultValue }: { defaultValue: string }) => {
+export const AddOnsDialog = ({
+  defaultValue,
+  open,
+  onOpenChange,
+}: {
+  defaultValue: string;
+  open: boolean;
+  onOpenChange: (value: boolean) => void;
+}) => {
   const { data: session } = useSession();
   const [selectedAddon, setSelectedAddon] = useState<string | null>(
     defaultValue,
   );
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const handleCheckout = async () => {
     const organizationId = session?.session?.activeOrganizationId;
@@ -26,6 +44,7 @@ export const AddOnsDialog = ({ defaultValue }: { defaultValue: string }) => {
       slug: "starter",
       referenceId: organizationId,
     });
+    onOpenChange(false);
   };
 
   const selectAddon = (addonId: string) => {
@@ -34,13 +53,8 @@ export const AddOnsDialog = ({ defaultValue }: { defaultValue: string }) => {
 
   const isSelected = (addonId: string) => selectedAddon === addonId;
 
-  return (
-    <DialogContent className=" w-full max-w-lg">
-      <div className="space-y-1">
-        <DialogTitle className="text-lg font-semibold">Add-ons</DialogTitle>
-        <p className="text-sm text-gray-600">Get more with add-ons</p>
-      </div>
-
+  const addonsContent = (
+    <>
       {/* Extra 5k Messages Addon */}
       <Card
         className={cn(
@@ -141,6 +155,33 @@ export const AddOnsDialog = ({ defaultValue }: { defaultValue: string }) => {
           <ArrowRight className="w-5 h-5" />
         </Button>
       </motion.div>
-    </DialogContent>
+    </>
+  );
+
+  if (isDesktop) {
+    return (
+      <DialogContent className="w-full max-w-lg">
+        <div className="space-y-1">
+          <DialogTitle className="text-lg font-semibold">Add-ons</DialogTitle>
+          <p className="text-sm text-gray-600">Get more with add-ons</p>
+        </div>
+        {addonsContent}
+      </DialogContent>
+    );
+  }
+
+  return (
+    <DrawerContent>
+      <DrawerHeader className="text-left">
+        <DrawerTitle className="text-lg font-semibold">Add-ons</DrawerTitle>
+        <p className="text-sm text-gray-600">Get more with add-ons</p>
+      </DrawerHeader>
+      <div className="px-4 space-y-4">{addonsContent}</div>
+      <DrawerFooter className="pt-2">
+        <DrawerClose asChild>
+          <Button variant="outline">Cancel</Button>
+        </DrawerClose>
+      </DrawerFooter>
+    </DrawerContent>
   );
 };

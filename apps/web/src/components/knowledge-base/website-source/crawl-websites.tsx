@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 import { PlayIcon } from "lucide-react";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import Spinner from "../../ui/spinner";
@@ -75,18 +76,20 @@ export const CrawlWebsites = () => {
               disabled={mutation.isPending}
             />
           </div>
-          <Button
-            className="w-fit"
-            onClick={handleCrawl}
-            disabled={mutation.isPending}
-          >
-            {mutation.isPending ? (
-              <Spinner className="text-white" />
-            ) : (
-              <PlayIcon />
-            )}
-            Crawl
-          </Button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              className="w-fit"
+              onClick={handleCrawl}
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? (
+                <Spinner className="text-white" />
+              ) : (
+                <PlayIcon />
+              )}
+              Crawl
+            </Button>
+          </motion.div>
         </div>
       </div>
     </>

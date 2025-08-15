@@ -10,6 +10,12 @@ import { RefreshCw } from "lucide-react";
 
 import { ChatConversation } from "@/components/chat-history/chat-conversation";
 import { ChatLogItem } from "@/components/chat-history/chat-log-item";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
@@ -18,7 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { RiSearch2Line } from "@remixicon/react";
+import { useState } from "react";
 import z from "zod";
 
 export const chatHistorySearchSchema = z.object({
@@ -34,6 +42,9 @@ export const Route = createFileRoute("/admin/chat-history/")({
 function RouteComponent() {
   const navigate = useNavigate({ from: "/admin/chat-history" });
   const { chatId, filter } = useSearch({ from: "/admin/chat-history/" });
+  const isMobile = useIsMobile();
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [selectedChatTitle, setSelectedChatTitle] = useState<string>("");
 
   const {
     data,
@@ -48,6 +59,13 @@ function RouteComponent() {
   const chats = data?.pages.flatMap((page) => page.chats) ?? [];
 
   const handleChatIdChange = (value: string) => {
+    if (isMobile) {
+      // On mobile, find the selected chat title and open drawer
+      const selectedChat = chats.find((chat) => chat.id === value);
+      setSelectedChatTitle(selectedChat?.title || "Untitled Chat");
+      setMobileDrawerOpen(true);
+    }
+
     navigate({
       search: { chatId: value, filter },
     });
@@ -64,10 +82,10 @@ function RouteComponent() {
 
   if (!isLoading && !isError && chats.length === 0) {
     return (
-      <div className="max-w-5xl my-4 w-full overflow-hidden max-h-screen mx-auto p-3 sm:p-6">
+      <div className="max-w-5xl my-4 w-full overflow-hidden max-h-screen mx-auto p-2 sm:p-6">
         <div className="bg-white border rounded-lg my-4 py-2">
           <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white">
-            <h1 className="text-md font-semibold">Chat Logs</h1>
+            <h1 className="text-md font-semibold hidden sm:flex">Chat Logs</h1>
             <div className="flex items-center space-x-3">
               <Select value={filter} onValueChange={handleFilterChange}>
                 <SelectTrigger className="w-[200px]">
@@ -105,14 +123,14 @@ function RouteComponent() {
 
   return (
     <>
-      <div className="max-w-5xl w-full overflow-hidden max-h-screen mx-auto p-6">
-        <span className="text-md text-muted-foreground">
+      <div className="max-w-5xl w-full overflow-hidden max-h-screen mx-auto p-2 sm:p-6">
+        <span className="text-md text-muted-foreground hidden sm:flex">
           View and manage your bot's chat history
         </span>
         <div className="bg-white border rounded-lg my-4 py-2">
           {/* Chat Header */}
           <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white">
-            <h1 className="text-md font-semibold">Chat Logs</h1>
+            <h1 className="text-md font-semibold hidden sm:flex">Chat Logs</h1>
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <Select value={filter} onValueChange={handleFilterChange}>
@@ -143,7 +161,7 @@ function RouteComponent() {
           </div>
           <div className="flex flex-row h-[calc(100vh-13rem)]">
             {/* Sidebar */}
-            <div className="w-96 border-r bg-white">
+            <div className={`${isMobile ? "w-full" : "w-96"} bg-white`}>
               <ScrollArea
                 className="h-full p-1"
                 onScroll={(e) => {
@@ -198,20 +216,37 @@ function RouteComponent() {
               </ScrollArea>
             </div>
 
-            {/* Main conversation area */}
-            <div className="w-full flex flex-col h-full relative overflow-hidden">
-              {chatId ? (
-                <ChatConversation />
-              ) : (
-                <div className="flex justify-center items-center h-full">
-                  <p className="text-gray-500">
-                    Select a chat to view the conversation
-                  </p>
-                </div>
-              )}
-            </div>
+            {/* Main conversation area - hidden on mobile */}
+            {!isMobile && (
+              <div className="flex w-full border-l flex-col h-full relative overflow-hidden">
+                {chatId ? (
+                  <ChatConversation />
+                ) : (
+                  <div className="flex justify-center items-center h-full">
+                    <p className="text-gray-500">
+                      Select a chat to view the conversation
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Mobile Drawer */}
+        <Drawer open={mobileDrawerOpen} onOpenChange={setMobileDrawerOpen}>
+          <DrawerContent className="h-[85vh]">
+            <DrawerHeader className="flex-row items-center justify-between">
+              <DrawerTitle className="text-left ">
+                {selectedChatTitle}
+              </DrawerTitle>
+            </DrawerHeader>
+            <div className="flex-1 overflow-hidden">
+              {chatId && <ChatConversation />}
+            </div>
+          </DrawerContent>
+        </Drawer>
+
         <div className="h-[14px]" />
       </div>
     </>

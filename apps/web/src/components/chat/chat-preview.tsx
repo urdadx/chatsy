@@ -107,7 +107,7 @@ export function ChatPreview() {
   });
 
   return (
-    <div className="flex flex-col w-full h-screen shadow-sm md:h-[550px] md:rounded-2xl overflow-hidden">
+    <div className="flex flex-col w-full h-full max-h-[80vh] md:h-[550px] shadow-sm md:rounded-2xl overflow-hidden">
       {" "}
       {/* Header */}
       <div

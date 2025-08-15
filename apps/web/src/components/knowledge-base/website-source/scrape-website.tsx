@@ -1,6 +1,7 @@
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PlayIcon } from "lucide-react";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../../ui/button";
@@ -64,14 +65,16 @@ export const ScrapeWebsite = () => {
               disabled={mutation.isPending}
             />
           </div>
-          <Button
-            className="w-fit"
-            onClick={handleScrape}
-            disabled={mutation.isPending}
-          >
-            {mutation.isPending ? <Spinner /> : <PlayIcon />}
-            Run
-          </Button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              className="w-fit"
+              onClick={handleScrape}
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? <Spinner /> : <PlayIcon />}
+              Run
+            </Button>
+          </motion.div>
         </div>
       </div>
     </>

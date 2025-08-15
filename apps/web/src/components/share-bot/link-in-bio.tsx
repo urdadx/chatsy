@@ -109,8 +109,8 @@ export const LinkInBio = ({ embedToken }: { embedToken: string }) => {
       <div className="flex justify-center items-center py-2 sm:py-3">
         <div className="relative rounded-full border-2 border-primary">
           <Avatar
-            className="inline-flex h-[60px] w-[60px] border-2 
-           items-center justify-center overflow-hidden rounded-full align-middle sm:w-[70px] sm:h-[70px] lg:w-[96px] lg:h-[96px]"
+            className="inline-flex border-2 
+           items-center justify-center overflow-hidden rounded-full align-middle w-[90px] h-[90px] sm:w-[96px] sm:h-[96px]"
           >
             <AvatarImage
               className="h-full w-full rounded-[inherit] object-cover"

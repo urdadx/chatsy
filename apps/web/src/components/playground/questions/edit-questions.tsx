@@ -5,6 +5,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +19,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useMediaQuery } from "usehooks-ts";
 
 interface Question {
   id: string;
@@ -35,6 +42,7 @@ export const EditQuestion = ({
 }) => {
   const [questionText, setQuestionText] = useState(question.question || "");
   const [answerText, setAnswerText] = useState(question.answer || "");
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const queryClient = useQueryClient();
 
@@ -61,52 +69,69 @@ export const EditQuestion = ({
     mutation.mutate();
   };
 
+  const formContent = (
+    <form onSubmit={handleSubmit} className="w-full space-y-4">
+      <div className="flex flex-col space-y-2">
+        <Label htmlFor="question" className="text-sm font-medium">
+          Question
+        </Label>
+        <Input
+          id="question"
+          autoFocus
+          name="question"
+          placeholder="Eg: When is the new product launching?"
+          value={questionText}
+          onChange={(e) => setQuestionText(e.target.value)}
+        />
+      </div>
+      <div className="flex flex-col space-y-2">
+        <Label htmlFor="answer" className="text-sm font-medium">
+          Answer
+        </Label>
+        <Textarea
+          id="answer"
+          name="answer"
+          placeholder="Enter the answer"
+          className="w-full min-h-32"
+          value={answerText}
+          onChange={(e) => setAnswerText(e.target.value)}
+        />
+      </div>
+      <div className="flex justify-end w-full">
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            type="submit"
+            className="bg-purple-600 text-white"
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? "Saving..." : "Save changes"}
+          </Button>
+        </motion.div>
+      </div>
+    </form>
+  );
+
+  if (isDesktop) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="w-full sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-md">Edit Q&A</DialogTitle>
+          </DialogHeader>
+          {formContent}
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="text-md">Edit Q&A</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="w-full space-y-4">
-          <div className="flex flex-col space-y-2">
-            <Label htmlFor="question" className="text-sm font-medium">
-              Question
-            </Label>
-            <Input
-              id="question"
-              autoFocus
-              name="question"
-              placeholder="Eg: When is the new product launching?"
-              value={questionText}
-              onChange={(e) => setQuestionText(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col space-y-2">
-            <Label htmlFor="answer" className="text-sm font-medium">
-              Answer
-            </Label>
-            <Textarea
-              id="answer"
-              name="answer"
-              placeholder="Enter the answer"
-              className="w-full min-h-32"
-              value={answerText}
-              onChange={(e) => setAnswerText(e.target.value)}
-            />
-          </div>
-          <div className="flex justify-end w-full">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                type="submit"
-                className="bg-purple-600 text-white"
-                disabled={mutation.isPending}
-              >
-                {mutation.isPending ? "Saving..." : "Save changes"}
-              </Button>
-            </motion.div>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="h-[50%]">
+        <DrawerHeader className="text-left">
+          <DrawerTitle className="text-md">Edit Q&A</DrawerTitle>
+        </DrawerHeader>
+        <div className="px-4">{formContent}</div>
+      </DrawerContent>
+    </Drawer>
   );
 };

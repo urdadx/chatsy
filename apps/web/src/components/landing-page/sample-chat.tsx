@@ -19,7 +19,7 @@ export const SampleChat = () => {
             },
             {
               sender: "ai",
-              message: "No problem. Let me assist you with that.",
+              message: "Please click on the 'Forgot Password' button",
             },
           ].map((chat, idx) =>
             chat.sender === "user" ? (

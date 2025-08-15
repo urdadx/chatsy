@@ -143,7 +143,7 @@ export function ChatAnalytics() {
   return (
     <div className="mt-4 flex flex-col space-y-4 w-full">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 mb-2">
+        <div className="sm:flex items-center gap-3 mb-2 hidden">
           <h1 className="text-xl font-semibold ">Analytics</h1>
           {/* Real-time connection status */}
           {realtimeError && (

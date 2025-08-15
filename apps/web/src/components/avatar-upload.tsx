@@ -242,10 +242,10 @@ export function AvatarUpload() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative inline-flex">
+      <div className="relative inline-flex w-fit">
         <button
           type="button"
-          className="border-primary h-14 w-14 bprd hover:bg-accent/50 data-[dragging=true]:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/50 relative flex size-16 items-center justify-center overflow-hidden rounded-full border border-dashed transition-colors outline-none focus-visible:ring-[3px] has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none"
+          className="border-primary h-14 w-14 hover:bg-accent/50 data-[dragging=true]:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/50 relative flex items-center justify-center overflow-hidden rounded-full border border-dashed transition-colors outline-none focus-visible:ring-[3px] has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none"
           onClick={openFileDialog}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
@@ -257,11 +257,11 @@ export function AvatarUpload() {
         >
           {finalImageUrl ? (
             <img
-              className="size-full object-cover"
+              className="h-14 w-14 object-cover rounded-full"
               src={finalImageUrl}
               alt="Chatbot"
-              width={64}
-              height={64}
+              width={56}
+              height={56}
               style={{ objectFit: "cover" }}
             />
           ) : (

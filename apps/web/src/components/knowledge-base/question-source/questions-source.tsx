@@ -1,5 +1,6 @@
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../../ui/button";
@@ -81,13 +82,15 @@ export const QuestionSource = () => {
             </div>
           </div>
           <div className="flex justify-end mt-4">
-            <Button
-              className="w-fit"
-              type="submit"
-              disabled={addQuestionMutation.isPending}
-            >
-              {addQuestionMutation.isPending ? "Adding..." : "Add Q&A source"}
-            </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                className="w-fit"
+                type="submit"
+                disabled={addQuestionMutation.isPending}
+              >
+                {addQuestionMutation.isPending ? "Adding..." : "Add Q&A source"}
+              </Button>
+            </motion.div>
           </div>
         </form>
       </div>

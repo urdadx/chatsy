@@ -3,12 +3,20 @@ import { QuestionSource } from "@/components/knowledge-base/question-source/ques
 import { TextSource } from "@/components/knowledge-base/text-source/text-source";
 import { TrainAgent } from "@/components/knowledge-base/train-agent";
 import { WebsiteSource } from "@/components/knowledge-base/website-source/website-source";
+import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   createFileRoute,
   useNavigate,
   useSearch,
 } from "@tanstack/react-router";
+import { Hammer } from "lucide-react";
 import z from "zod";
 
 const knowledgeSchema = z.object({
@@ -33,7 +41,9 @@ function RouteComponent() {
       {/* Main content scrollable */}
       <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:pr-[360px] bg-white">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-xl font-semibold mb-6">Knowledge Base</h1>
+          <h1 className="text-xl font-semibold mb-6 hidden sm:block">
+            Knowledge Base
+          </h1>
           <Tabs value={tab} onValueChange={handleTabChange}>
             <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0">
               <TabsTrigger
@@ -78,9 +88,23 @@ function RouteComponent() {
         </div>
       </div>
 
-      {/* Sidebar (fixed on right for lg screens and up) */}
+      {/* Desktop sidebar */}
       <div className="hidden lg:flex fixed top-0 right-0 h-screen w-[340px] border-l bg-gray-50 p-4 items-center justify-center">
         <TrainAgent />
+      </div>
+      {/* Mobile Drawer */}
+      <div className="lg:hidden fixed bottom-4 right-0 left-0 z-50 flex justify-center">
+        <Drawer>
+          <DrawerTrigger asChild>
+            <Button className="bg-primary text-white rounded-full shadow-lg">
+              <Hammer /> Click to train Agent
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent className="p-4">
+            <DrawerHeader></DrawerHeader>
+            <TrainAgent />
+          </DrawerContent>
+        </Drawer>
       </div>
     </div>
   );

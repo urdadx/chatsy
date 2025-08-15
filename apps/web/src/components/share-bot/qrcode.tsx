@@ -27,7 +27,7 @@ export const QRCodeExport = ({ embedToken }: { embedToken: string }) => {
           size={Math.min(window.innerWidth * 0.6, 200)}
           value={baseUrl}
         />
-        <div className="text-xs sm:text-sm text-center max-w-sm font-medium">
+        <div className="text-xs sm:text-sm text-center  font-medium">
           Share this QR code with your audience to provide access to this
           chatbot.
         </div>
