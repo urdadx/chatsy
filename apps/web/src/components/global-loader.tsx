@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { Spinner } from "./ui/spinner";
+import Spinner from "./ui/spinner";
 
 export function GlobalLoader() {
   return (

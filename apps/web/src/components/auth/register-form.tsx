@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 import { GoogleSVG } from "./google-svg";
 
 interface RegisterFormData {

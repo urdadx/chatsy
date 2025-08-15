@@ -1,5 +1,12 @@
+import FAQs from "@/components/faqs";
 import { AddOns } from "@/components/landing-page/add-ons";
+import { CTASession } from "@/components/landing-page/cta-session";
+import Features from "@/components/landing-page/feature-section";
+import { FooterSection } from "@/components/landing-page/footer";
+import { HeroHeader } from "@/components/landing-page/hero-header";
+import IntegrationsSection from "@/components/landing-page/integrations-section";
 import { Pricing } from "@/components/landing-page/pricing";
+import { Setup } from "@/components/landing-page/setup";
 import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -9,25 +16,37 @@ export const Route = createFileRoute("/")({
 
 function HomeComponent() {
   return (
-    <main className="bg-white space-y-14 py-12">
-      <div className="relative flex justify-center">
-        <HeroVideoDialog
-          className="block dark:hidden"
-          animationStyle="top-in-bottom-out"
-          videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
-          thumbnailSrc="https://startup-template-sage.vercel.app/hero-light.png"
-          thumbnailAlt="Hero Video"
-        />
-        <HeroVideoDialog
-          className="hidden dark:block"
-          animationStyle="top-in-bottom-out"
-          videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
-          thumbnailSrc="https://startup-template-sage.vercel.app/hero-dark.png"
-          thumbnailAlt="Hero Video"
-        />
+    <main className="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:4rem_4rem] ">
+      <HeroHeader />
+      <div className="relative z-10 space-y-12">
+        <CTASession />
+        <div className="max-w-6xl px-3 sm:px-0 mx-auto relative flex justify-center items-center sm:flex-col sm:items-center">
+          <HeroVideoDialog
+            className="block dark:hidden"
+            animationStyle="top-in-bottom-out"
+            videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
+            thumbnailSrc="https://startup-template-sage.vercel.app/hero-light.png"
+            thumbnailAlt="Hero Video"
+          />
+          <HeroVideoDialog
+            className="hidden dark:block"
+            animationStyle="top-in-bottom-out"
+            videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
+            thumbnailSrc="https://startup-template-sage.vercel.app/hero-dark.png"
+            thumbnailAlt="Hero Video"
+          />
+        </div>
+        <Features />
+        <Setup />
+        <IntegrationsSection />
+
+        <div className="pt-24">
+          <Pricing />
+        </div>
+        <AddOns />
+        <FAQs />
+        <FooterSection />
       </div>
-      <Pricing />
-      <AddOns />
     </main>
   );
 }

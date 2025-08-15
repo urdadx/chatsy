@@ -19,7 +19,7 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 
 export const ChatbotManager = ({ open, setOpen }: any) => {
   const [formData, setFormData] = useState({

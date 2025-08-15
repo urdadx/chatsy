@@ -42,7 +42,7 @@ export const Completed = () => {
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button
               onClick={async () => {
-                navigate({ to: "/admin/overview" });
+                navigate({ to: "/choose-plan" });
                 localStorage.removeItem("stepper-storage");
               }}
               className=""

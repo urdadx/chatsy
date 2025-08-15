@@ -14,7 +14,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 
 const uploadImage = async (file: File): Promise<{ url: string }> => {
   const formData = new FormData();

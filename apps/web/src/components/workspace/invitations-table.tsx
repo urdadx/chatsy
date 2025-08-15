@@ -12,7 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import Avatar from "boring-avatars";
 import { Mail } from "lucide-react";
 import { NoDataPlaceholder } from "../no-data-placeholder";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 import { InvitationActions } from "./invitation-actions";
 
 export function InvitationsTable() {

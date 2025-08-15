@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { NoProductPlaceholder } from "../no-product-placeholder";
 import { SearchQuestions } from "../playground/search-questions";
 import { Button } from "../ui/button";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 import { AddDigitalProduct } from "./add-digital-product";
 import { ProductCard } from "./product-card";
 

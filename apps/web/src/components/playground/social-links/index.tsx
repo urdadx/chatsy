@@ -1,6 +1,6 @@
 import { NoLinksPlaceholder } from "@/components/no-links-placeholder";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
+import Spinner from "@/components/ui/spinner";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { SearchQuestions } from "../search-questions";

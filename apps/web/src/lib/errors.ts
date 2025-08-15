@@ -14,6 +14,7 @@ export type Surface =
   | "history"
   | "vote"
   | "document"
+  | "subscription"
   | "suggestions";
 
 export type ErrorCode = `${ErrorType}:${Surface}`;
@@ -29,6 +30,7 @@ export const visibilityBySurface: Record<Surface, ErrorVisibility> = {
   vote: "response",
   document: "response",
   suggestions: "response",
+  subscription: "response",
 };
 
 export class ChatSDKError extends Error {
@@ -104,6 +106,15 @@ export function getMessageByErrorCode(errorCode: ErrorCode): string {
       return "You need to sign in to view this document. Please sign in and try again.";
     case "bad_request:document":
       return "The request to create or update the document was invalid. Please check your input and try again.";
+
+    case "forbidden:subscription":
+      return "You need an active subscription to use this feature. Please upgrade your plan and try again.";
+    case "unauthorized:subscription":
+      return "You need to sign in to access subscription features. Please sign in and try again.";
+    case "not_found:subscription":
+      return "No active subscription found. Please upgrade your plan to access this feature.";
+    case "bad_request:subscription":
+      return "There was an issue with your subscription request. Please check your plan details and try again.";
 
     default:
       return "Something went wrong. Please try again later.";

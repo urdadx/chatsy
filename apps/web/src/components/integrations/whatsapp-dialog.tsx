@@ -23,7 +23,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, ExternalLink, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 import { IntegrationIcon } from "./integration-icon";
 
 interface PhoneNumber {

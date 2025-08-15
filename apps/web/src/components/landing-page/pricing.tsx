@@ -27,7 +27,7 @@ export function Pricing() {
       yearlySavings: 84,
       description: "For solopreneurs and early-stage startups",
       features: [
-        "3000 message credits",
+        "2,500 message credits",
         "150 scraping credits",
         "1 chatbot",
         "1 team member",
@@ -86,11 +86,15 @@ export function Pricing() {
   };
 
   return (
-    <section id="pricing" className="py-4">
+    <section id="pricing" className="">
       <div className="mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-2xl space-y-2 text-center">
           <h1 className="text-center instrument-serif-regular-italic text-3xl font-semibold lg:text-4xl">
-            Pricing That Scales With You
+            Pricing That{" "}
+            <span className="text-purple-600 bg-purple-100 px-1 rounded relative inline-block z-1">
+              Scales
+            </span>{" "}
+            With You
           </h1>
         </div>
 

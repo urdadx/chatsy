@@ -16,7 +16,7 @@ import { useVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { useSearch } from "@tanstack/react-router";
 import { Maximize2, MousePointerClick } from "lucide-react";
 import { useState } from "react";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 import { ViewAllStats } from "./view-all-stats";
 
 export function ChatsByCountry() {

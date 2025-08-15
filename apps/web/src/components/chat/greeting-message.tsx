@@ -2,7 +2,7 @@ import { useChatbot } from "@/hooks/use-chatbot";
 import { sanitizeText } from "@/lib/utils";
 import { SparklesIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { Markdown } from "./markdown";
+import { ResponseStream } from "./response-stream";
 
 export const GreetingMessage = ({ title }: any) => {
   const { data: chatbot } = useChatbot();
@@ -32,7 +32,12 @@ export const GreetingMessage = ({ title }: any) => {
                 data-testid="message-content"
                 className="flex flex-col gap-4 text-foreground bg-gray-50 prose px-3 py-2 rounded-md break-words whitespace-normal"
               >
-                <Markdown>{sanitizeText(title)}</Markdown>
+                <ResponseStream
+                  textStream={sanitizeText(title)}
+                  mode="typewriter"
+                  speed={20}
+                  className="text-md"
+                />{" "}
               </div>
             </div>
           </div>

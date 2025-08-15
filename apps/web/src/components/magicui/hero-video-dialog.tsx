@@ -1,8 +1,6 @@
-"use client";
-
-import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { Play, XIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -90,13 +88,11 @@ export default function HeroVideoDialog({
           alt={thumbnailAlt}
           width={1920}
           height={1080}
-          className="w-full rounded-md border shadow-lg transition-all duration-200 ease-out group-hover:brightness-[0.8]"
+          className="w-full rounded-md border shadow-lg transition-all duration-200 ease-out group-hover:brightness-[0.97]"
         />
         <div className="absolute inset-0 flex scale-[0.9] items-center justify-center rounded-2xl transition-all duration-200 ease-out group-hover:scale-100">
           <div className="flex size-28 items-center justify-center rounded-full bg-primary/10 backdrop-blur-md">
-            <div
-              className={`relative flex size-20 scale-100 items-center justify-center rounded-full bg-gradient-to-b from-primary/30 to-primary shadow-md transition-all duration-200 ease-out group-hover:scale-[1.2]`}
-            >
+            <div className="relative flex size-20 scale-100 items-center justify-center rounded-full bg-gradient-to-b from-primary/30 to-primary shadow-md transition-all duration-200 ease-out group-hover:scale-[1.2]">
               <Play
                 className="size-8 scale-100 fill-white text-white transition-transform duration-200 ease-out group-hover:scale-105"
                 style={{
@@ -113,6 +109,7 @@ export default function HeroVideoDialog({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            // biome-ignore lint/a11y/useSemanticElements: <explanation>
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {

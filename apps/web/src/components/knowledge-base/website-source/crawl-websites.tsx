@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { PlayIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Spinner } from "../../ui/spinner";
+import Spinner from "../../ui/spinner";
 
 export const CrawlWebsites = () => {
   const [url, setUrl] = useState("");

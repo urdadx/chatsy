@@ -13,7 +13,7 @@ import { ImageIcon, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 
 interface Product {
   id: string;

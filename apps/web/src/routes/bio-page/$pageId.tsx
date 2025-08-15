@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/chat-container";
 import { Input } from "@/components/ui/input";
 import { ScrollButton } from "@/components/ui/scroll-button";
-import { Spinner } from "@/components/ui/spinner";
+import Spinner from "@/components/ui/spinner";
 import type { Vote } from "@/db/schema";
 import { useSendVisitorAnalytics } from "@/hooks/log-visitor-analytics";
 import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";

@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "../../ui/dropdown-menu";
 import { SearchInput } from "../../ui/search-input";
-import { Spinner } from "../../ui/spinner";
+import Spinner from "../../ui/spinner";
 
 interface Question {
   id: string;

@@ -6,7 +6,7 @@ import z from "zod";
 export const Route = createFileRoute("/(auth)/setup")({
   component: RouteComponent,
   validateSearch: z.object({
-    email: z.string().email(),
+    email: z.string().email().optional(),
     invitationId: z.string(),
   }),
 });

@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import Avatar from "boring-avatars";
 import { Users } from "lucide-react";
 import { NoDataPlaceholder } from "../no-data-placeholder";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 import { MemberActions } from "./member-actions";
 
 export function MembersTable() {

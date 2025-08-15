@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { AvatarUpload } from "../avatar-upload";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 
 import { PickColor } from "./pick-color";
 import { WidgetSettings } from "./widget-settings";

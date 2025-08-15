@@ -3,7 +3,7 @@ import { Bot, MessageCircle, Zap } from "lucide-react";
 
 export function AddOns() {
   return (
-    <div className="w-full max-w-xl mx-auto ">
+    <div className="w-full max-w-lg px-3 sm:max-w-xl  mx-auto ">
       <div className="mb-4">
         <h1 className="text-3xl lg:text-4xl instrument-serif-regular-italic font-bold text-center text-gray-900">
           Add-ons

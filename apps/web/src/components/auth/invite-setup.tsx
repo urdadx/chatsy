@@ -8,7 +8,7 @@ import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 import { GoogleSVG } from "./google-svg";
 
 interface InviteSetupData {
@@ -28,14 +28,14 @@ export function InviteSetup({
   } = useForm<InviteSetupData>();
 
   const navigate = useNavigate();
-  const { email, invitationId } = useSearch({
+  const { invitationId } = useSearch({
     from: "/(auth)/setup",
   });
 
   const handleRegister = async (data: InviteSetupData) => {
     await signUp.email(
       {
-        email: email,
+        email: data.email,
         name: data.name,
         password: data.password,
       },
@@ -129,7 +129,27 @@ export function InviteSetup({
                     </p>
                   )}
                 </div>
-
+                <div className="grid gap-3">
+                  <Label htmlFor="name">Email</Label>
+                  <Input
+                    id="email"
+                    type="text"
+                    className="sm:text-xs text-sm"
+                    placeholder="Enter your email"
+                    {...register("email", {
+                      required: "Your full email is required",
+                      minLength: {
+                        value: 2,
+                        message: "Email must be at least 2 characters",
+                      },
+                    })}
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-red-500">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
                 <div className="grid gap-3">
                   <Label htmlFor="password">Password</Label>
                   <Input

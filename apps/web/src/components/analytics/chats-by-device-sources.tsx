@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MobilePhone } from "../icons/mobile-phone";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 import BarList from "./bar-list";
 import { ViewAllStats } from "./view-all-stats";
 

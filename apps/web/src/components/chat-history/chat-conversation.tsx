@@ -9,7 +9,7 @@ import {
   ChatContainerScrollAnchor,
 } from "../ui/chat-container";
 import { ScrollButton } from "../ui/scroll-button";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 
 export const ChatConversation = () => {
   const { chatId } = useSearch({ from: "/admin/chat-history/" });

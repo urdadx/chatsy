@@ -19,7 +19,7 @@ import {
   ChatContainerScrollAnchor,
 } from "../ui/chat-container";
 import { ScrollButton } from "../ui/scroll-button";
-import { Spinner } from "../ui/spinner";
+import Spinner from "../ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { GreetingMessage } from "./greeting-message";
 import { PreviewMessage, ThinkingMessage } from "./message";
@@ -54,6 +54,11 @@ export function ChatPreview() {
       onError: (error) => {
         if (error instanceof ChatSDKError) {
           toast.error(error.message);
+        } else {
+          console.error("Chat error:", error);
+          toast.error(
+            error instanceof Error ? error.message : "An error occurred",
+          );
         }
       },
       onFinish: () => {

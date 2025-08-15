@@ -2,7 +2,7 @@ import type { WebsiteSource } from "@/db/schema";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Spinner } from "../../ui/spinner";
+import Spinner from "../../ui/spinner";
 import { EmptyState } from "./components/empty-state";
 import { SourcesHeader } from "./components/sources-header";
 import { SourcesList } from "./components/sources-list";

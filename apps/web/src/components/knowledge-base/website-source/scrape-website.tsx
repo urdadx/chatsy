@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
-import { Spinner } from "../../ui/spinner";
+import Spinner from "../../ui/spinner";
 
 export const ScrapeWebsite = () => {
   const [url, setUrl] = useState("");
