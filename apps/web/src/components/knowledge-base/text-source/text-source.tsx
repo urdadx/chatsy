@@ -1,5 +1,4 @@
 import { api } from "@/lib/api";
-import { useSession } from "@/lib/auth-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -14,8 +13,6 @@ export const TextSource = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
-  const organizationId = session?.session?.activeOrganizationId;
 
   const { mutateAsync: createTextSource, isPending } = useMutation({
     mutationFn: async (textSource: { title: string; content: string }) => {
@@ -24,7 +21,7 @@ export const TextSource = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["text-sources", organizationId],
+        queryKey: ["text-sources"],
       });
     },
   });

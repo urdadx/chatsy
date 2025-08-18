@@ -9,11 +9,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
+import { authClient, useSession } from "@/lib/auth-client";
 import { InfoIcon, Plus, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { AddOnsDialog } from "../add-ons-dialog";
 import { AvatarUpload } from "../avatar-upload";
 import { Button } from "../ui/button";
+import { Dialog } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import Spinner from "../ui/spinner";
 
@@ -23,6 +26,7 @@ import { WidgetSettings } from "./widget-settings";
 export function ChatbotSettings() {
   const { data: chatbot, error, refetch } = useChatbot();
   const updateChatbotMutation = useUpdateChatbot();
+  const { data: session } = useSession();
 
   const [name, setName] = useState("");
   const [hidePoweredBy, setHidePoweredBy] = useState(
@@ -31,6 +35,7 @@ export function ChatbotSettings() {
   const [initialMessage, setInitialMessage] = useState("");
   const [suggestedMessages, setSuggestedMessages] = useState<string[]>([]);
   const [showSuggestedInput, setShowSuggestedInput] = useState(false);
+  const [addonsDialogOpen, setAddonsDialogOpen] = useState(false);
 
   useEffect(() => {
     setName(chatbot?.name || "");
@@ -59,7 +64,47 @@ export function ChatbotSettings() {
     updateChatbot({ name });
   };
 
-  const handleHidePoweredByChange = (checked: boolean) => {
+  const handleHidePoweredByChange = async (checked: boolean) => {
+    if (checked) {
+      // Check if user has remove-branding subscription
+      const organizationId = session?.session?.activeOrganizationId;
+
+      if (!organizationId) {
+        toast.error("No active organization found");
+        return;
+      }
+
+      try {
+        const { data: subscriptions } =
+          await authClient.customer.subscriptions.list({
+            query: {
+              page: 1,
+              limit: 10,
+              active: true,
+              referenceId: organizationId,
+            },
+          });
+
+        // Check if user has remove-branding subscription
+        const hasRemoveBrandingSubscription =
+          subscriptions?.result?.items?.some((sub) => {
+            return (
+              sub.product?.name?.toLowerCase().includes("remove") &&
+              sub.product?.name?.toLowerCase().includes("branding")
+            );
+          });
+
+        if (!hasRemoveBrandingSubscription) {
+          setAddonsDialogOpen(true);
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+        toast.error("Unable to verify subscription status");
+        return;
+      }
+    }
+
     setHidePoweredBy(checked);
     updateChatbot({ hidePoweredBy: checked });
   };
@@ -130,7 +175,6 @@ export function ChatbotSettings() {
           </div>
         </div>
         <Separator className="my-3" />
-
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <Label htmlFor="name">Name</Label>
           <div className="relative">
@@ -150,7 +194,6 @@ export function ChatbotSettings() {
           </div>
         </div>
         <Separator className="my-3" />
-
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <Label htmlFor="primary-color">Primary Color</Label>
           <div className="flex items-center gap-2">
@@ -158,7 +201,6 @@ export function ChatbotSettings() {
           </div>
         </div>
         <Separator className="my-3" />
-
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <div className="flex items-center gap-2">
             <Label>Welcome Message</Label>
@@ -181,7 +223,6 @@ export function ChatbotSettings() {
           </div>
         </div>
         <Separator className="my-3" />
-
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <div className="flex items-center gap-2">
             <Label>Suggested Messages</Label>
@@ -232,11 +273,9 @@ export function ChatbotSettings() {
             )}
           </div>
         </div>
-
         <Separator className="my-6" />
         <WidgetSettings />
-        <Separator className="my-6" />
-
+        <Separator className="my-6" />{" "}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Label htmlFor="hide-powered-by">Hide "Powered by" text</Label>
@@ -268,6 +307,14 @@ export function ChatbotSettings() {
         </div>
       </div>
       <div className="h-[16px]" />
+
+      {/* Add-ons Dialog */}
+      <Dialog open={addonsDialogOpen} onOpenChange={setAddonsDialogOpen}>
+        <AddOnsDialog
+          defaultValue="branding"
+          onOpenChange={setAddonsDialogOpen}
+        />
+      </Dialog>
     </div>
   );
 }

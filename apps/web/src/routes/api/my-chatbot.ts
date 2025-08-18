@@ -1,11 +1,12 @@
 import { db } from "@/db";
-import { chatbot, session as sessionTable } from "@/db/schema";
+import { chatbot, organization, session as sessionTable } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { checkSubscriptionLimits } from "@/lib/subscription-utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { eq } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
@@ -134,6 +135,30 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       return new Response("Forbidden", { status: 403 });
     }
 
+    // Check subscription limits before creating chatbot
+    const [currentCount] = await db
+      .select({ count: count(chatbot.id) })
+      .from(chatbot)
+      .where(eq(chatbot.organizationId, organizationId));
+
+    const currentChatbotCount = currentCount?.count || 0;
+    const limitCheck = await checkSubscriptionLimits(
+      organizationId,
+      currentChatbotCount,
+    );
+
+    if (!limitCheck.canCreate) {
+      return json(
+        {
+          error: limitCheck.message || "Chatbot creation limit reached",
+          reason: limitCheck.reason,
+          currentCount: limitCheck.currentCount,
+          limit: limitCheck.limit,
+        },
+        { status: 403 },
+      );
+    }
+
     try {
       const body = await request.json();
       const parsed = createChatbotSchema.safeParse(body);
@@ -161,6 +186,14 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
           embedToken: embedToken,
         })
         .returning();
+
+      // Increment the organization's chatbot count
+      await db
+        .update(organization)
+        .set({
+          chatbotCount: sql`${organization.chatbotCount} + 1`,
+        })
+        .where(eq(organization.id, organizationId));
 
       // Update the session to set this as the active chatbot
       try {

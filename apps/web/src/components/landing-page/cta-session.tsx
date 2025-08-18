@@ -52,9 +52,11 @@ export const CTASession = () => {
               <Link to="/register">
                 <Button className="h-10 min-w-[120px]">Get started</Button>
               </Link>
-              <Button className="h-10 min-w-[120px]" variant="outline">
-                Book a demo
-              </Button>
+              <a target="_blank" href="https://cal.com/urdadx" rel="noreferrer">
+                <Button className="h-10 min-w-[120px]" variant="outline">
+                  Book a demo
+                </Button>
+              </a>
             </div>
           </motion.div>
         </div>

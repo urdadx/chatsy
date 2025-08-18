@@ -108,8 +108,6 @@ export function ChatPreview() {
 
   return (
     <div className="flex flex-col w-full h-full max-h-[80vh] md:h-[550px] shadow-sm md:rounded-2xl overflow-hidden">
-      {" "}
-      {/* Header */}
       <div
         className="flex items-center justify-between p-4 "
         style={{
@@ -151,12 +149,20 @@ export function ChatPreview() {
         <ChatContainerRoot className="h-full smooth-div ">
           <ChatContainerContent className="p-4">
             {isLoading ? (
-              <div className="flex items-center justify-center h-full">
+              <div className="flex items-center justify-center min-h-screen">
                 <Spinner className="text-primary" />
               </div>
             ) : error ? (
-              <div className="flex items-center justify-center h-full text-red-500">
+              <div className="flex flex-col items-center justify-center h-full text-red-500 gap-2">
                 <div>Error loading messages</div>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    queryClient.invalidateQueries({ queryKey: ["messages"] })
+                  }
+                >
+                  Try Again
+                </Button>
               </div>
             ) : (
               <div className="space-y-4">

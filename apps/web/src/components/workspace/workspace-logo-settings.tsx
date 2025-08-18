@@ -1,23 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { useFileUpload } from "@/hooks/use-file-upload";
-import { authClient, useSession } from "@/lib/auth-client";
-import { useQueryClient } from "@tanstack/react-query";
+import { authClient } from "@/lib/auth-client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { User } from "lucide-react";
+import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export const WorkspaceLogoSettings = () => {
-  const { data: session } = useSession();
-  const organizationId = session?.session?.activeOrganizationId ?? "";
   const { data: activeOrganization } = authClient.useActiveOrganization();
-
-  const organization = useMemo(
-    () =>
-      authClient.organization.getFullOrganization({
-        query: { organizationId: organizationId },
-      }),
-    [organizationId],
-  );
 
   const [isUploading, setIsUploading] = useState(false);
 
@@ -25,6 +17,16 @@ export const WorkspaceLogoSettings = () => {
     accept: "image/*",
     maxFiles: 1,
   });
+
+  const { data: member } = useQuery({
+    queryKey: ["activeMember"],
+    queryFn: async () => {
+      const { data } = await authClient.organization.getActiveMember();
+      return data;
+    },
+  });
+
+  const isAdmin = member?.role === "owner" || member?.role === "admin";
 
   const queryClient = useQueryClient();
 
@@ -54,9 +56,9 @@ export const WorkspaceLogoSettings = () => {
 
       const { url: uploadedImageUrl } = await uploadResponse.json();
 
-      const resolvedOrganization = await organization;
-      if (resolvedOrganization) {
+      if (activeOrganization?.id) {
         await authClient.organization.update({
+          organizationId: activeOrganization?.id,
           data: {
             logo: uploadedImageUrl,
           },
@@ -123,9 +125,29 @@ export const WorkspaceLogoSettings = () => {
         </div>
 
         <div className="bg-gray-50 px-6 py-4 flex justify-end border-t">
-          <Button onClick={handleSave} disabled={!previewUrl || isUploading}>
-            {isUploading ? "Saving..." : "Save changes"}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  onClick={handleSave}
+                  disabled={!previewUrl || isUploading || !isAdmin}
+                >
+                  {isUploading ? "Saving..." : "Save changes"}
+                </Button>
+              </motion.div>
+            </TooltipTrigger>
+            {!isAdmin && (
+              <TooltipContent className="bg-white shadow-sm p-3" sideOffset={8}>
+                <p className="text-black text-sm">
+                  Only admins can change workspace logo. Please contact your
+                  admin
+                </p>
+              </TooltipContent>
+            )}
+          </Tooltip>
         </div>
       </div>
     </div>

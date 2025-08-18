@@ -45,13 +45,13 @@ export function AddOns() {
                 </div>
                 <div>
                   <h3 className="text-base text-gray-900">
-                    Extra 1000 messages
+                    Extra 1000 credits
                   </h3>
                 </div>
               </div>
               <div className="">
                 <div className="text-xl font-bold text-gray-900">
-                  +$10
+                  +$12
                   <span className="text-base font-normal text-gray-500">
                     /mo
                   </span>

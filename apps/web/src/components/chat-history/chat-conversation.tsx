@@ -28,7 +28,7 @@ export const ChatConversation = () => {
         <ChatContainerContent className="p-4">
           <div className="w-full space-y-4">
             {isLoading ? (
-              <div className="flex items-center justify-center h-full">
+              <div className="flex items-center justify-center min-h-screen">
                 <Spinner className="text-primary" />
               </div>
             ) : error ? (

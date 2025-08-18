@@ -59,7 +59,16 @@ export function useCreateChatbot() {
       toast.success("Chatbot created successfully!");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.error || "Failed to create chatbot");
+      const errorData = error.response?.data;
+
+      if (errorData?.reason === "limit_reached") {
+        toast.error(
+          "You have reached your chatbot limit. Please upgrade your plan or purchase additional chatbot add-ons.",
+        );
+        throw error;
+      }
+
+      toast.error(errorData?.error || "Failed to create chatbot");
     },
   });
 }
@@ -79,8 +88,6 @@ export function useSetActiveChatbot() {
       toast.success(
         `Switched to ${response.chatbotName || "chatbot"} successfully!`,
       );
-
-      // Refresh the page to update session state
       window.location.reload();
     },
     onError: (error: any) => {

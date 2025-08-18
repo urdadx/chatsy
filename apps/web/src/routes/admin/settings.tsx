@@ -8,6 +8,8 @@ import { MembersTable } from "@/components/workspace/members-table";
 import { WorkspaceDelete } from "@/components/workspace/workspace-delete";
 import { WorkspaceLogoSettings } from "@/components/workspace/workspace-logo-settings";
 import { WorkspaceNameSettings } from "@/components/workspace/workspace-name-settings";
+import { authClient } from "@/lib/auth-client";
+import { useQuery } from "@tanstack/react-query";
 import {
   createFileRoute,
   useNavigate,
@@ -40,6 +42,16 @@ function RouteComponent() {
       },
     });
   };
+
+  const { data: member } = useQuery({
+    queryKey: ["activeMember"],
+    queryFn: async () => {
+      const { data } = await authClient.organization.getActiveMember();
+      return data;
+    },
+  });
+
+  const isAdmin = member?.role === "owner" || member?.role === "admin";
 
   return (
     <>
@@ -75,12 +87,14 @@ function RouteComponent() {
               >
                 Members
               </TabsTrigger>
-              <TabsTrigger
-                value="invitations"
-                className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-              >
-                Invitations
-              </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger
+                  value="invitations"
+                  className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                >
+                  Invitations
+                </TabsTrigger>
+              )}
             </TabsList>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
@@ -100,9 +114,11 @@ function RouteComponent() {
             <div className="flex justify-between items-center py-4">
               <h1 className="text-md font-semibold ">All Members</h1>
 
-              <Button onClick={() => setInviteMembersOpen(true)}>
-                Invite new member
-              </Button>
+              {isAdmin && (
+                <Button onClick={() => setInviteMembersOpen(true)}>
+                  Invite new member
+                </Button>
+              )}
             </div>
             <div className="w-full border rounded-lg p-4">
               <MembersTable />
@@ -112,9 +128,11 @@ function RouteComponent() {
             <div className="flex justify-between items-center py-4">
               <h1 className="text-md font-semibold ">All Invitations</h1>
 
-              <Button onClick={() => setInviteMembersOpen(true)}>
-                Invite new member
-              </Button>
+              {isAdmin && (
+                <Button onClick={() => setInviteMembersOpen(true)}>
+                  Invite new member
+                </Button>
+              )}
             </div>
             <div className="w-full border rounded-lg p-4">
               <InvitationsTable />

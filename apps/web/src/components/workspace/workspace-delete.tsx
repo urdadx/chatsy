@@ -12,11 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { authClient, signOut, useSession } from "@/lib/auth-client";
 import { sleep } from "@/lib/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { CircleAlert, Loader2 } from "lucide-react";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export const WorkspaceDelete = () => {
   const [open, setOpen] = useState(false);
@@ -53,6 +55,16 @@ export const WorkspaceDelete = () => {
       );
     },
   });
+
+  const { data: member } = useQuery({
+    queryKey: ["activeMember"],
+    queryFn: async () => {
+      const { data } = await authClient.organization.getActiveMember();
+      return data;
+    },
+  });
+
+  const isAdmin = member?.role === "owner" || member?.role === "admin";
 
   const handleLogout = async () => {
     await signOut({
@@ -91,12 +103,32 @@ export const WorkspaceDelete = () => {
         <div className="bg-red-50 px-6 py-4 flex justify-end border-t border-red-300">
           <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
-              <Button
-                className="bg-red-500 hover:bg-red-600 text-white"
-                disabled={!organizationId}
-              >
-                Delete workspace
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      className="bg-red-500 hover:bg-red-600 text-white"
+                      disabled={!organizationId || !isAdmin}
+                    >
+                      Delete workspace
+                    </Button>
+                  </motion.div>
+                </TooltipTrigger>
+                {!isAdmin && (
+                  <TooltipContent
+                    className="bg-white shadow-sm p-3"
+                    sideOffset={8}
+                  >
+                    <p className="text-black text-sm">
+                      Only admins can change workspace logo. Please contact your
+                      admin
+                    </p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">
@@ -121,20 +153,40 @@ export const WorkspaceDelete = () => {
                 >
                   Cancel
                 </AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-red-500 hover:bg-red-400"
-                  onClick={handleDelete}
-                  disabled={deleteWorkspace.isPending}
-                >
-                  {deleteWorkspace.isPending ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Deleting...
-                    </div>
-                  ) : (
-                    "Yes, delete"
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <AlertDialogAction
+                        className="bg-red-500 hover:bg-red-400"
+                        onClick={handleDelete}
+                        disabled={deleteWorkspace.isPending}
+                      >
+                        {deleteWorkspace.isPending ? (
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Deleting...
+                          </div>
+                        ) : (
+                          "Yes, delete"
+                        )}
+                      </AlertDialogAction>
+                    </motion.div>
+                  </TooltipTrigger>
+                  {!isAdmin && (
+                    <TooltipContent
+                      className="bg-white shadow-sm p-3"
+                      sideOffset={8}
+                    >
+                      <p className="text-black text-sm">
+                        Only admins can change workspace logo. Please contact
+                        your admin
+                      </p>
+                    </TooltipContent>
                   )}
-                </AlertDialogAction>
+                </Tooltip>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

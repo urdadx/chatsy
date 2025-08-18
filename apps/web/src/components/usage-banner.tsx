@@ -19,6 +19,8 @@ export function UsageBanner() {
   const usagePercentage =
     creditedUnits > 0 ? (balance / creditedUnits) * 100 : 0;
 
+  console.log("Meter data:", meter);
+
   if (isLoading) {
     return (
       <Card className="shadow-none h-fit">

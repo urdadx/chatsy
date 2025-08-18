@@ -8,15 +8,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { authClient, useSession } from "@/lib/auth-client";
 import NumberFlow from "@number-flow/react";
+import { useNavigate } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function Pricing() {
+  const { data: session } = useSession();
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
     "monthly",
   );
+
+  const navigate = useNavigate();
 
   const plans = [
     {
@@ -27,8 +33,10 @@ export function Pricing() {
       yearlyPrice: 32,
       yearlySavings: 84,
       description: "For solopreneurs and early-stage startups",
+      monthlySlug: "monthly-starter",
+      yearlySlug: "yearly-starter",
       features: [
-        "2,500 message credits",
+        "2,000 message credits",
         "150 scraping credits",
         "1 chatbot",
         "1 team member",
@@ -47,6 +55,8 @@ export function Pricing() {
       yearlyPrice: 109,
       yearlySavings: 240,
       description: "For growing teams that need scale and collaboration",
+      monthlySlug: "monthly-growth",
+      yearlySlug: "yearly-growth",
       features: [
         "10,000 message credits",
         "500 scraping credits",
@@ -67,6 +77,8 @@ export function Pricing() {
       yearlyPrice: 329,
       yearlySavings: 840,
       description: "For scaling businesses and agencies",
+      monthlySlug: "monthly-pro",
+      yearlySlug: "yearly-pro",
       features: [
         "30,000 message credits",
         "2,500 scraping credits",
@@ -81,9 +93,44 @@ export function Pricing() {
     },
   ];
 
-  const handleSelectPlan = (plan: (typeof plans)[0]) => {
-    // Handle plan selection logic here
-    console.log("Selected plan:", plan, "Billing period:", billingPeriod);
+  const handleSelectPlan = async (plan: (typeof plans)[0]) => {
+    // Use the appropriate slug based on billing period
+    const slug =
+      billingPeriod === "monthly" ? plan.monthlySlug : plan.yearlySlug;
+    console.log(
+      "Selected plan:",
+      plan.name,
+      "Slug:",
+      slug,
+      "Billing period:",
+      billingPeriod,
+    );
+
+    if (!session) {
+      navigate({
+        to: "/login",
+      });
+      return;
+    }
+
+    const organizationId = session?.session?.activeOrganizationId;
+
+    if (!organizationId) {
+      toast.error("No active organization found. Please sign in first");
+      navigate({
+        to: "/login",
+      });
+      return;
+    }
+
+    try {
+      await authClient.checkout({
+        slug,
+        referenceId: organizationId,
+      });
+    } catch (error) {
+      toast.error("An error occured during checkout. Please try again.");
+    }
   };
 
   return (

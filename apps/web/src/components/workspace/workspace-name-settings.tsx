@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { useSession } from "@/lib/auth-client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export const WorkspaceNameSettings = () => {
   const { data: session } = useSession();
@@ -23,6 +25,7 @@ export const WorkspaceNameSettings = () => {
   const handleSave = async () => {
     if (organizationId) {
       await authClient.organization.update({
+        organizationId: organizationId,
         data: {
           name: name,
         },
@@ -31,6 +34,16 @@ export const WorkspaceNameSettings = () => {
       await queryClient.invalidateQueries({ queryKey: ["activeOrganization"] });
     }
   };
+
+  const { data: member } = useQuery({
+    queryKey: ["activeMember"],
+    queryFn: async () => {
+      const { data } = await authClient.organization.getActiveMember();
+      return data;
+    },
+  });
+
+  const isAdmin = member?.role === "owner" || member?.role === "admin";
 
   return (
     <div className="mx-auto">
@@ -51,12 +64,28 @@ export const WorkspaceNameSettings = () => {
           </div>
         </div>
         <div className="bg-gray-50 px-6 py-4 flex justify-end border-t">
-          <Button
-            onClick={handleSave}
-            disabled={name === activeOrganization?.name}
-          >
-            Save changes
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  onClick={handleSave}
+                  disabled={name === activeOrganization?.name || !isAdmin}
+                >
+                  Save changes
+                </Button>
+              </motion.div>
+            </TooltipTrigger>
+            {!isAdmin && (
+              <TooltipContent className="bg-white shadow-sm p-3" sideOffset={8}>
+                <p className="text-black text-sm">
+                  Only admins can edit workspace name. Please contact your admin
+                </p>
+              </TooltipContent>
+            )}
+          </Tooltip>
         </div>
       </div>
     </div>

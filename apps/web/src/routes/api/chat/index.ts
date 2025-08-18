@@ -11,6 +11,7 @@ import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { ChatSDKError } from "@/lib/errors";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { subscriptionMiddleware, tokenUsageMiddleware } from "@/middlewares";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Ingestion } from "@polar-sh/ingestion";
@@ -45,6 +46,13 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             headers: request.headers,
           });
 
+          if (!session) {
+            const error = new ChatSDKError("unauthorized:chat");
+            return error.toResponse();
+          }
+
+          const userId = session?.user.id || "";
+
           if (context.hasActiveSubscription === false) {
             const error = new ChatSDKError("forbidden:subscription");
             return error.toResponse();
@@ -55,7 +63,9 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             return error.toResponse();
           }
 
-          const chatbotId = session?.session.activeChatbotId;
+          const chatbotId =
+            session?.session?.activeChatbotId ||
+            (await getActiveChatbotId(userId));
 
           if (!chatbotId) {
             const error = new ChatSDKError(
@@ -81,7 +91,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             return error.toResponse();
           }
 
-          const externalCustomerId = session.user?.id;
+          const externalCustomerId = session?.user.id;
           const chat = await getChatById(id);
           const userMessage = messages[messages.length - 1];
 
@@ -91,7 +101,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             });
             await saveChat({
               id,
-              userId: session.user.id,
+              userId: session?.user.id,
               chatbotId,
               title,
               visibility: "private",

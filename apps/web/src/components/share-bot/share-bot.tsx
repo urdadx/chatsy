@@ -32,6 +32,7 @@ export const ShareBot = () => {
 
   const [isEmbeddingEnabled, setIsEmbeddingEnabled] = useState(false);
   const [embedToken, setEmbedToken] = useState("");
+  const [activeTab, setActiveTab] = useState("widget");
 
   useEffect(() => {
     if (chatbot) {
@@ -49,6 +50,20 @@ export const ShareBot = () => {
     });
   };
 
+  // Dynamic width based on active tab
+  const getDialogWidth = () => {
+    switch (activeTab) {
+      case "widget":
+        return "max-w-3xl";
+      case "link":
+        return "max-w-md";
+      case "qr":
+        return "max-w-md";
+      default:
+        return "max-w-lg";
+    }
+  };
+
   const triggerButton = (
     <Button variant={"outline"} className="w-fit text-primary">
       <Users className="w-4 h-4" />
@@ -62,6 +77,8 @@ export const ShareBot = () => {
       {isEmbeddingEnabled ? (
         <Tabs
           defaultValue="widget"
+          value={activeTab}
+          onValueChange={setActiveTab}
           className="items-center justify-center mx-auto w-full"
         >
           <TabsList className="grid w-full grid-cols-3 bg-transparent text-foreground">
@@ -119,7 +136,7 @@ export const ShareBot = () => {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{triggerButton}</DialogTrigger>
-        <DialogContent className="w-full max-w-2xl ">
+        <DialogContent className={`w-full ${getDialogWidth()}`}>
           <DialogHeader>
             <DialogTitle className="text-left text-base">
               Share your bot

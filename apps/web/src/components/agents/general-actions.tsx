@@ -1,11 +1,10 @@
-import { Calendar, MessageCircle, Users } from "lucide-react";
+import { Calendar, Headset, MessageCircle, Users } from "lucide-react";
 import { useState } from "react";
 import { ActionIcon } from "./action-icon";
 import { ActionCard } from "./actions-card";
-import { SearchActions } from "./search-actions";
 
 export const Actions = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, _setSearchTerm] = useState("");
 
   const actionsData = [
     {
@@ -36,6 +35,15 @@ export const Actions = () => {
       name: "Schedule appointment",
       description: "Lets customers book appointments with you",
     },
+    {
+      icon: (
+        <ActionIcon>
+          <Headset className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
+        </ActionIcon>
+      ),
+      name: "Escalate to human",
+      description: "Escalates the conversation to a human agent",
+    },
   ];
 
   const filteredActions = actionsData.filter(
@@ -47,9 +55,9 @@ export const Actions = () => {
   return (
     <>
       <div className="pt-4 flex flex-col justify-between items-center w-full gap-3">
-        <div className="flex justify-between items-center w-full ">
+        {/* <div className="flex justify-center sm:justify-end items-center w-full ">
           <SearchActions value={searchTerm} onChange={setSearchTerm} />
-        </div>
+        </div> */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-3">
           {filteredActions.map((action) => (
             <ActionCard

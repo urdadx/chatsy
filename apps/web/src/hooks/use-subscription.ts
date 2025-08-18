@@ -14,7 +14,7 @@ export function useSubscription(organizationId?: string) {
       const { data } = await authClient.customer.subscriptions.list({
         query: {
           page: 1,
-          limit: 1,
+          limit: 10,
           active: true,
           referenceId: organizationId,
         },

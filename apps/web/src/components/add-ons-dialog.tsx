@@ -1,51 +1,100 @@
 import { authClient, useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Bot, MessageCircle, Zap } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { DialogContent } from "./ui/dialog";
 import {
-  Drawer,
   DrawerClose,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "./ui/drawer";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export const AddOnsDialog = ({
   defaultValue,
-  open,
   onOpenChange,
 }: {
   defaultValue: string;
-  open: boolean;
-  onOpenChange: (value: boolean) => void;
+  onOpenChange?: (value: boolean) => void;
 }) => {
   const { data: session } = useSession();
   const [selectedAddon, setSelectedAddon] = useState<string | null>(
     defaultValue,
   );
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const navigate = useNavigate();
 
   const handleCheckout = async () => {
     const organizationId = session?.session?.activeOrganizationId;
 
-    if (!organizationId) {
-      console.error("No active organization found. Nothing to reference");
+    if (!session) {
+      toast.error("Please sign in first");
+      navigate({
+        to: "/login",
+      });
       return;
     }
 
-    await authClient.checkout({
-      slug: "starter",
-      referenceId: organizationId,
-    });
-    onOpenChange(false);
+    if (!organizationId) {
+      toast.error("No active organization found. Please sign in first");
+      navigate({
+        to: "/login",
+      });
+      return;
+    }
+
+    if (!selectedAddon) {
+      toast.error("No addon selected");
+      return;
+    }
+
+    // Map addon selection to slug
+    const addonSlugMap = {
+      messages: "extra-message-credits",
+      branding: "remove-branding",
+      chatbot: "extra-chatbot",
+    };
+
+    const slug = addonSlugMap[selectedAddon as keyof typeof addonSlugMap];
+
+    if (!slug) {
+      console.error("Invalid addon selection");
+      return;
+    }
+
+    try {
+      await authClient.checkout({
+        slug,
+        referenceId: organizationId,
+      });
+    } catch (error) {
+      toast.error("An error occured during checkout. Please try again.");
+    }
+
+    if (onOpenChange) {
+      onOpenChange(false);
+    }
   };
+
+  const { data: member } = useQuery({
+    queryKey: ["activeMember"],
+    queryFn: async () => {
+      const { data } = await authClient.organization.getActiveMember();
+      return data;
+    },
+  });
+
+  const isAdmin = member?.role === "owner" || member?.role === "admin";
 
   const selectAddon = (addonId: string) => {
     setSelectedAddon((prev) => (prev === addonId ? null : addonId));
@@ -72,12 +121,12 @@ export const AddOnsDialog = ({
                 <MessageCircle className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <h3 className="text-base text-gray-900">Extra 1000 messages</h3>
+                <h3 className="text-base text-gray-900">Extra 1000 credits</h3>
               </div>
             </div>
             <div className="">
               <div className="text-xl font-bold text-gray-900">
-                +$10
+                +$12
                 <span className="text-base font-normal text-gray-500">/mo</span>
               </div>
             </div>
@@ -145,16 +194,27 @@ export const AddOnsDialog = ({
           </div>
         </CardContent>
       </Card>
-      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-        <Button
-          className="w-full"
-          onClick={handleCheckout}
-          disabled={!selectedAddon}
-        >
-          Proceed to checkout
-          <ArrowRight className="w-5 h-5" />
-        </Button>
-      </motion.div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              className="w-full"
+              onClick={handleCheckout}
+              disabled={!selectedAddon || !isAdmin}
+            >
+              Proceed to checkout
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+          </motion.div>
+        </TooltipTrigger>
+        {!isAdmin && (
+          <TooltipContent className="bg-white shadow-sm p-3" sideOffset={8}>
+            <p className="text-black text-sm">
+              Only admins can purchase add-ons. Please contact your admin
+            </p>
+          </TooltipContent>
+        )}
+      </Tooltip>
     </>
   );
 

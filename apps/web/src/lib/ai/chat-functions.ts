@@ -1,6 +1,8 @@
 import { db } from "@/db";
-import { chat, member, message, vote } from "@/db/schema";
+import { chat, chatbot, member, message, vote } from "@/db/schema";
 import type { Chat, DBMessage } from "@/db/schema";
+import type { CustomerSubscription } from "@polar-sh/sdk/models/components/customersubscription.js";
+import { auth } from "auth";
 import {
   type SQL,
   and,
@@ -29,6 +31,43 @@ export async function isUserMemberOfOrganization(
     );
 
   return !!membership;
+}
+
+// FUNCTION TO GET CHATBOT DATA BY EMBED TOKEN
+export async function getChatbotDataByEmbedToken(embedToken: string) {
+  const [chatbotData] = await db
+    .select({
+      id: chatbot.id,
+      organizationId: chatbot.organizationId,
+      name: chatbot.name,
+      isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
+      allowedDomains: chatbot.allowedDomains,
+    })
+    .from(chatbot)
+    .where(eq(chatbot.embedToken, embedToken));
+
+  return chatbotData;
+}
+
+export async function hasActiveOrganizationSubscription(
+  organizationId: string,
+  headers?: any,
+): Promise<boolean> {
+  const subscriptionResponse = await auth.api.subscriptions({
+    query: {
+      page: 1,
+      limit: 1,
+      active: true,
+      referenceId: organizationId,
+    },
+    headers,
+  });
+
+  const subscription = subscriptionResponse?.result?.items?.[0] as
+    | CustomerSubscription
+    | undefined;
+
+  return subscription?.status === "active";
 }
 
 // FUNCTION TO SAVE A CHAT

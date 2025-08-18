@@ -2,8 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSubscription } from "@/hooks/use-subscription";
 import { authClient } from "@/lib/auth-client";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { addMonths, format, parseISO } from "date-fns";
 import { Wallet } from "lucide-react";
+import { motion } from "motion/react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export const SubscriptionTable = () => {
   const { data: activeOrganization } = authClient.useActiveOrganization();
@@ -24,6 +28,16 @@ export const SubscriptionTable = () => {
   }
 
   const planName = subscription?.product?.name || "Unknown Plan";
+
+  const { data: member } = useQuery({
+    queryKey: ["activeMember"],
+    queryFn: async () => {
+      const { data } = await authClient.organization.getActiveMember();
+      return data;
+    },
+  });
+
+  const isAdmin = member?.role === "owner" || member?.role === "admin";
 
   return (
     <div className="mx-auto">
@@ -50,9 +64,28 @@ export const SubscriptionTable = () => {
           </div>
         </div>
         <div className="bg-gray-50 px-6 py-4 flex justify-end border-t">
-          <Button variant="default" disabled={isLoading}>
-            Upgrade
-          </Button>{" "}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Link to="/choose-plan">
+                  <Button variant="default" disabled={isLoading || !isAdmin}>
+                    Upgrade
+                  </Button>
+                </Link>
+              </motion.div>
+            </TooltipTrigger>
+            {!isAdmin && (
+              <TooltipContent className="bg-white shadow-sm p-3" sideOffset={8}>
+                <p className="text-black text-sm">
+                  Only admins can change workspace logo. Please contact your
+                  admin
+                </p>
+              </TooltipContent>
+            )}
+          </Tooltip>
         </div>
       </div>
     </div>

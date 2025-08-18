@@ -10,6 +10,7 @@ import { RefreshCw } from "lucide-react";
 
 import { ChatConversation } from "@/components/chat-history/chat-conversation";
 import { ChatLogItem } from "@/components/chat-history/chat-log-item";
+import { ChatLogItemSkeleton } from "@/components/chat-history/chat-log-item-skeleton";
 import {
   Drawer,
   DrawerContent,
@@ -174,11 +175,7 @@ function RouteComponent() {
                   }
                 }}
               >
-                {isLoading && chats.length === 0 && (
-                  <div className="flex justify-center items-center h-full">
-                    <Spinner className="text-primary" />
-                  </div>
-                )}
+                {isLoading && chats.length === 0 && <ChatLogItemSkeleton />}
 
                 {isError && (
                   <div className="flex flex-col justify-center items-center h-full space-y-2">

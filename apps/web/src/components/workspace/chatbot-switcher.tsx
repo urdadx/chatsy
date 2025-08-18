@@ -22,7 +22,9 @@ import {
   useChatbots,
   useSetActiveChatbot,
 } from "@/hooks/use-chatbot-management";
+import { authClient } from "@/lib/auth-client";
 import { RiCheckboxCircleFill } from "@remixicon/react";
+import { useQuery } from "@tanstack/react-query";
 import Avatar from "boring-avatars";
 import { ChevronsUpDown, PlusIcon, UserRoundPlus } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -47,6 +49,16 @@ export function ChatbotSwitcher() {
     () => activeChatbot?.image,
     [activeChatbot?.image],
   );
+
+  const { data: member } = useQuery({
+    queryKey: ["activeMember"],
+    queryFn: async () => {
+      const { data } = await authClient.organization.getActiveMember();
+      return data;
+    },
+  });
+
+  const isAdmin = member?.role === "owner" || member?.role === "admin";
 
   const handleSwitchChatbot = async (chatbotId: string) => {
     try {
@@ -99,14 +111,16 @@ export function ChatbotSwitcher() {
   const menuContent = (
     <>
       <div className="p-2">
-        <button
-          type="button"
-          onClick={handleInviteMembers}
-          className="flex items-center gap-2 w-full p-2 rounded hover:bg-gray-100 transition-colors"
-        >
-          <UserRoundPlus className="text-primary h-4 w-4" />
-          <span className="text-primary">Invite team members</span>
-        </button>
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={handleInviteMembers}
+            className="flex items-center gap-2 w-full p-2 rounded hover:bg-gray-100 transition-colors"
+          >
+            <UserRoundPlus className="text-primary h-4 w-4" />
+            <span className="text-primary">Invite team members</span>
+          </button>
+        )}
       </div>
 
       {chatbotsData?.chatbots && chatbotsData.chatbots.length > 0 && (
@@ -201,15 +215,19 @@ export function ChatbotSwitcher() {
                 side="bottom"
                 align="end"
               >
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={handleInviteMembers}>
-                    <UserRoundPlus className="text-primary" />
-                    <span className="text-primary hover:text-primary">
-                      Invite team members
-                    </span>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
+                {isAdmin && (
+                  <>
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem onClick={handleInviteMembers}>
+                        <UserRoundPlus className="text-primary" />
+                        <span className="text-primary hover:text-primary">
+                          Invite team members
+                        </span>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
 
                 {chatbotsData?.chatbots && chatbotsData.chatbots.length > 0 && (
                   <>

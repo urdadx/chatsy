@@ -53,6 +53,7 @@ import { ServerRoute as ApiFeedbackServerRouteImport } from './routes/api/feedba
 import { ServerRoute as ApiDocumentSourceServerRouteImport } from './routes/api/document-source'
 import { ServerRoute as ApiCrawlServerRouteImport } from './routes/api/crawl'
 import { ServerRoute as ApiChatbotsServerRouteImport } from './routes/api/chatbots'
+import { ServerRoute as ApiChatbotCountServerRouteImport } from './routes/api/chatbot-count'
 import { ServerRoute as ApiAnalyticsStreamServerRouteImport } from './routes/api/analytics-stream'
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
 import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/sources/count'
@@ -284,6 +285,11 @@ const ApiCrawlServerRoute = ApiCrawlServerRouteImport.update({
 const ApiChatbotsServerRoute = ApiChatbotsServerRouteImport.update({
   id: '/api/chatbots',
   path: '/api/chatbots',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiChatbotCountServerRoute = ApiChatbotCountServerRouteImport.update({
+  id: '/api/chatbot-count',
+  path: '/api/chatbot-count',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiAnalyticsStreamServerRoute =
@@ -525,6 +531,7 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
+  '/api/chatbot-count': typeof ApiChatbotCountServerRoute
   '/api/chatbots': typeof ApiChatbotsServerRoute
   '/api/crawl': typeof ApiCrawlServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
@@ -562,6 +569,7 @@ export interface FileServerRoutesByFullPath {
 }
 export interface FileServerRoutesByTo {
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
+  '/api/chatbot-count': typeof ApiChatbotCountServerRoute
   '/api/chatbots': typeof ApiChatbotsServerRoute
   '/api/crawl': typeof ApiCrawlServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
@@ -600,6 +608,7 @@ export interface FileServerRoutesByTo {
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
+  '/api/chatbot-count': typeof ApiChatbotCountServerRoute
   '/api/chatbots': typeof ApiChatbotsServerRoute
   '/api/crawl': typeof ApiCrawlServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
@@ -639,6 +648,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
   fullPaths:
     | '/api/analytics-stream'
+    | '/api/chatbot-count'
     | '/api/chatbots'
     | '/api/crawl'
     | '/api/document-source'
@@ -676,6 +686,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/analytics-stream'
+    | '/api/chatbot-count'
     | '/api/chatbots'
     | '/api/crawl'
     | '/api/document-source'
@@ -713,6 +724,7 @@ export interface FileServerRouteTypes {
   id:
     | '__root__'
     | '/api/analytics-stream'
+    | '/api/chatbot-count'
     | '/api/chatbots'
     | '/api/crawl'
     | '/api/document-source'
@@ -751,6 +763,7 @@ export interface FileServerRouteTypes {
 }
 export interface RootServerRouteChildren {
   ApiAnalyticsStreamServerRoute: typeof ApiAnalyticsStreamServerRoute
+  ApiChatbotCountServerRoute: typeof ApiChatbotCountServerRoute
   ApiChatbotsServerRoute: typeof ApiChatbotsServerRoute
   ApiCrawlServerRoute: typeof ApiCrawlServerRoute
   ApiDocumentSourceServerRoute: typeof ApiDocumentSourceServerRoute
@@ -1087,6 +1100,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiChatbotsServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/chatbot-count': {
+      id: '/api/chatbot-count'
+      path: '/api/chatbot-count'
+      fullPath: '/api/chatbot-count'
+      preLoaderRoute: typeof ApiChatbotCountServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/analytics-stream': {
       id: '/api/analytics-stream'
       path: '/api/analytics-stream'
@@ -1235,6 +1255,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAnalyticsStreamServerRoute: ApiAnalyticsStreamServerRoute,
+  ApiChatbotCountServerRoute: ApiChatbotCountServerRoute,
   ApiChatbotsServerRoute: ApiChatbotsServerRoute,
   ApiCrawlServerRoute: ApiCrawlServerRoute,
   ApiDocumentSourceServerRoute: ApiDocumentSourceServerRoute,

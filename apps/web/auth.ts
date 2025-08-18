@@ -233,9 +233,44 @@ export const auth = betterAuth({
       use: [
         checkout({
           products: [
+            // Monthly Plans
             {
-              productId: "60d0f6e4-f0f3-44a6-8683-38d57aa53077",
-              slug: "starter",
+              productId: process.env.MONTHLY_STARTER_PLAN!,
+              slug: "monthly-starter",
+            },
+            {
+              productId: process.env.MONTHLY_GROWTH_PLAN!,
+              slug: "monthly-growth",
+            },
+            {
+              productId: process.env.MONTHLY_PRO_PLAN!,
+              slug: "monthly-pro",
+            },
+            // Yearly Plans
+            {
+              productId: process.env.YEARLY_STARTER_PLAN!,
+              slug: "yearly-starter",
+            },
+            {
+              productId: process.env.YEARLY_GROWTH_PLAN!,
+              slug: "yearly-growth",
+            },
+            {
+              productId: process.env.YEARLY_PRO_PLAN!,
+              slug: "yearly-pro",
+            },
+            // Add-ons
+            {
+              productId: process.env.EXTRA_CHATBOT_ADDON!,
+              slug: "extra-chatbot",
+            },
+            {
+              productId: process.env.EXTRA_MESSAGE_CREDITS_ADDON!,
+              slug: "extra-message-credits",
+            },
+            {
+              productId: process.env.REMOVE_BRANDING_ADDON!,
+              slug: "remove-branding",
             },
           ],
           successUrl: "/success",

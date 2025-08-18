@@ -42,7 +42,7 @@ export const ChatLogItem = ({
       >
         <div className="flex-shrink-0 border-2 rounded-full border-primary">
           <img
-            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${id}`}
+            src={`https://api.dicebear.com/7.x/open-peeps/svg?seed=${id}`}
             alt="Avatar"
             className="w-8 h-8 rounded-full "
           />

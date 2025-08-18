@@ -1,5 +1,9 @@
 import { db } from "@/db";
-import { chat, chatbot, member, message } from "@/db/schema";
+import { chat, member, message } from "@/db/schema";
+import {
+  getChatbotDataByEmbedToken,
+  hasActiveOrganizationSubscription,
+} from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import {
   type Message,
@@ -9,6 +13,7 @@ import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
+import { ChatSDKError } from "@/lib/errors";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Ingestion } from "@polar-sh/ingestion";
 import { LLMStrategy } from "@polar-sh/ingestion/strategies/LLM";
@@ -30,8 +35,8 @@ const llmIngestion = Ingestion({
 
 export const ServerRoute = createServerFileRoute(
   "/api/embed/chat/$embedToken",
-).methods({
-  POST: async ({ params, request }) => {
+).methods((api) => ({
+  POST: api.handler(async ({ params, request }) => {
     const { embedToken } = params;
 
     if (!embedToken) {
@@ -41,24 +46,15 @@ export const ServerRoute = createServerFileRoute(
     try {
       const { id, messages } = await request.json();
 
-      // Verify the chatbot exists and embedding is enabled
-      const [chatbotData] = await db
-        .select({
-          id: chatbot.id,
-          organizationId: chatbot.organizationId,
-          name: chatbot.name,
-          isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
-          allowedDomains: chatbot.allowedDomains,
-        })
-        .from(chatbot)
-        .where(eq(chatbot.embedToken, embedToken));
+      // Verify the chatbot exists
+      const chatbotData = await getChatbotDataByEmbedToken(embedToken);
 
       if (!chatbotData) {
         return new Response("Chatbot not found", { status: 404 });
       }
 
       if (!chatbotData.isEmbeddingEnabled) {
-        return new Response("Embedding is not enabled for this chatbot", {
+        return new Response("This chatbot is offline", {
           status: 403,
         });
       }
@@ -195,9 +191,9 @@ export const ServerRoute = createServerFileRoute(
         { status: err?.code === "DAILY_LIMIT_REACHED" ? 403 : 500 },
       );
     }
-  },
+  }),
 
-  OPTIONS: async ({ request }) => {
+  OPTIONS: api.handler(async ({ request }) => {
     // Handle CORS preflight requests
     const referer = request.headers.get("referer");
     const headers = new Headers({
@@ -207,5 +203,5 @@ export const ServerRoute = createServerFileRoute(
     });
 
     return new Response(null, { status: 200, headers });
-  },
-});
+  }),
+}));

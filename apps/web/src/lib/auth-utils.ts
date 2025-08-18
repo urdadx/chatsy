@@ -29,17 +29,18 @@ export const getActiveSubscription = createServerFn().handler(async () => {
   const { result } = await auth.api.subscriptions({
     query: {
       page: 1,
-      limit: 1,
+      limit: 10,
       active: true,
       referenceId: activeOrganizationId,
     },
     headers: getHeaders() as unknown as Headers,
   });
 
-  const status = result?.items?.[0]?.status;
+  const subscription = result?.items?.[0];
+  const status = subscription?.status;
   if (status !== "active") {
     return null;
   }
 
-  return status;
+  return subscription;
 });

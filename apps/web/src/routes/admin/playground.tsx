@@ -20,12 +20,12 @@ function RouteComponent() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   return (
-    <div className="relative h-screen w-full overflow-hidden">
+    <div className="relative h-screen w-full overflow-auto hide-scrollbar">
       {/* Main content */}
-      <div className="h-full overflow-y-auto hide-scrollbar md:pr-[420px]">
+      <div className="md:pr-[420px] ">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
-          <div className="mb-6 hidden sm:flex">
-            <h1 className="text-xl font-semibold mb-2 ">Playground</h1>
+          <div className="mb-6 flex-col hidden sm:flex">
+            <h1 className="text-xl font-semibold mb-2">Playground</h1>
             <p className="text-muted-foreground hidden sm:block">
               Preview and configure your chatbot's behavior and styling
             </p>
@@ -37,7 +37,7 @@ function RouteComponent() {
 
       {/* Fixed Sidebar - Hidden on mobile */}
       <aside className="hidden sm:flex fixed top-7 right-0 w-[420px] h-full border-l px-4 py-6 z-0">
-        <div className="h-full flex items-center justify-center">
+        <div className="w-full h-full flex items-center justify-center">
           <ChatPreview />
         </div>
       </aside>

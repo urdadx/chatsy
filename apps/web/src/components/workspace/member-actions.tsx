@@ -53,7 +53,7 @@ export function MemberActions({ member }: { member: any }) {
         open={isModifyRoleDialogOpen}
         onOpenChange={setIsModifyRoleDialogOpen}
       >
-        <DialogContent className="">
+        <DialogContent className="w-full max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base">Modify Role</DialogTitle>
             <DialogDescription>

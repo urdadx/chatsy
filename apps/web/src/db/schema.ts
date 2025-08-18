@@ -88,7 +88,7 @@ export const organization = pgTable("organization", {
   logo: text("logo"),
   createdAt: timestamp("created_at").notNull(),
   metadata: text("metadata"),
-  maxChatbots: integer("max_chatbots").default(1).notNull(),
+  chatbotCount: integer("chatbot_count").default(1).notNull(),
 });
 
 export const member = pgTable("member", {

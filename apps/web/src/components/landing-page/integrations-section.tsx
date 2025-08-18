@@ -67,8 +67,12 @@ export default function IntegrationsSection() {
             <div className="grid grid-rows-[auto_1fr] gap-3 w-full max-w-lg justify-items-center text-center">
               <blockquote className="w-full">
                 <p>
-                  We use Padyna to power our customer support, and it has
-                  transformed how we interact with our clients.
+                  We use{" "}
+                  <span className="text-purple-600 bg-purple-100 px-1 rounded relative inline-block z-1">
+                    Padyna
+                  </span>{" "}
+                  to power our customer support, and it has transformed how we
+                  interact with our clients.
                 </p>
               </blockquote>
               <div className="bg-background flex w-[50px] h-[50px] items-center justify-center rounded-full overflow-hidden border border-primary">

@@ -1,3 +1,4 @@
+import LandingImage from "@/assets/landing-image.png";
 import { Play, XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
@@ -84,7 +85,7 @@ export default function HeroVideoDialog({
         onClick={() => setIsVideoOpen(true)}
       >
         <img
-          src={thumbnailSrc}
+          src={LandingImage}
           alt={thumbnailAlt}
           width={1920}
           height={1080}

@@ -13,11 +13,14 @@ import {
   useCreateChatbot,
   useSetActiveChatbot,
 } from "@/hooks/use-chatbot-management";
+import { useSubscriptionLimits } from "@/hooks/use-subscription-limits";
 import { cn } from "@/lib/utils";
 import { RiCheckboxCircleFill } from "@remixicon/react";
 import { ArrowRight, Bot, Plus } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { AddOnsDialog } from "../add-ons-dialog";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import Spinner from "../ui/spinner";
@@ -27,10 +30,12 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
     name: "",
   });
   const [view, setView] = useState<"list" | "create">("list");
+  const [addonsDialogOpen, setAddonsDialogOpen] = useState(false);
 
   const { data: chatbotsData } = useChatbots();
   const createChatbot = useCreateChatbot();
   const setActiveChatbot = useSetActiveChatbot();
+  const { data: subscriptionLimits } = useSubscriptionLimits();
 
   const chatbots = chatbotsData?.chatbots || [];
   const activeChatbotId = chatbotsData?.activeChatbotId;
@@ -61,14 +66,20 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
 
       setFormData({ name: "" });
       setView("list");
-    } catch (error) {
-      // Error is handled by the mutation
+    } catch (error: any) {
+      console.error("Error creating chatbot:", error);
+
+      const errorData = error.response?.data;
+      if (errorData?.reason === "limit_reached") {
+        toast.warning(errorData.error);
+        setAddonsDialogOpen(true);
+        setOpen(false);
+      }
     }
   };
 
   const handleSwitchChatbot = async (chatbotId: string) => {
     if (chatbotId === activeChatbotId) {
-      // Already active, just close the dialog
       setOpen(false);
       return;
     }
@@ -77,13 +88,26 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
       await setActiveChatbot.mutateAsync({ chatbotId });
       setOpen(false);
     } catch (error) {
-      // Error is handled by the mutation
+      console.log("Error switching chatbot:", error);
     }
   };
 
   const resetForm = () => {
     setFormData({ name: "" });
     setView("list");
+  };
+
+  const handleCreateNewClick = () => {
+    if (subscriptionLimits && !subscriptionLimits.canCreateChatbot) {
+      toast.warning(
+        `You've reached your chatbot limit . ${subscriptionLimits.hasExtraAddons ? "You can purchase additional chatbot add-ons." : "Upgrade your plan or purchase additional chatbot add-ons"}`,
+      );
+      setAddonsDialogOpen(true);
+      setOpen(false);
+      return;
+    }
+
+    setView("create");
   };
 
   const handleClose = (open: boolean) => {
@@ -96,7 +120,7 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
   return (
     <>
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="w-full sm:max-w-lg">
+        <DialogContent className="w-full sm:max-w-md">
           <div className="flex flex-col items-center gap-2">
             <div
               className="flex size-11 shrink-0 items-center justify-center rounded-full border"
@@ -182,9 +206,9 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
                 className="px-2"
               >
                 <Button
-                  onClick={() => setView("create")}
+                  onClick={handleCreateNewClick}
                   variant="outline"
-                  className="w-full flex items-center gap-2"
+                  className="w-full"
                 >
                   <Plus className="w-4 h-4" />
                   Create New Chatbot
@@ -225,14 +249,28 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
                     className="w-full"
                     disabled={createChatbot.isPending || !formData.name.trim()}
                   >
-                    {createChatbot.isPending ? <Spinner /> : "Create"}
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    {createChatbot.isPending ? (
+                      <Spinner className="text-white" />
+                    ) : (
+                      <>
+                        Create
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </>
+                    )}
                   </Button>
                 </motion.div>
               </div>
             </form>
           )}
         </DialogContent>
+      </Dialog>
+
+      {/* Add-ons Dialog for subscription upgrades */}
+      <Dialog open={addonsDialogOpen} onOpenChange={setAddonsDialogOpen}>
+        <AddOnsDialog
+          defaultValue="chatbot"
+          onOpenChange={setAddonsDialogOpen}
+        />
       </Dialog>
     </>
   );

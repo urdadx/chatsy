@@ -8,8 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
-import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -23,12 +22,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export const InviteMembers = ({ open, setOpen }: any) => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("member");
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
+
+  const { data: member } = useQuery({
+    queryKey: ["activeMember"],
+    queryFn: async () => {
+      const { data } = await authClient.organization.getActiveMember();
+      return data;
+    },
+  });
+
+  const isAdmin = member?.role === "owner" || member?.role === "admin";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,16 +132,39 @@ export const InviteMembers = ({ open, setOpen }: any) => {
               </div>
             </div>
             <div className="flex gap-2">
-              <motion.div
-                className="w-full"
-                whileHover={{ scale: isLoading ? 1 : 1.02 }}
-                whileTap={{ scale: isLoading ? 1 : 0.98 }}
-              >
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send Invite"}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </motion.div>
+              {isAdmin ? (
+                <motion.div
+                  className="w-full"
+                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                >
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Sending..." : "Send Invite"}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </motion.div>
+              ) : (
+                <>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <motion.div className="w-full">
+                        <Button type="button" className="w-full" disabled>
+                          Send Invite
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </motion.div>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      className="bg-white shadow-sm"
+                      sideOffset={8}
+                    >
+                      <span className="text-black">
+                        You must be an admin to invite members
+                      </span>
+                    </TooltipContent>
+                  </Tooltip>
+                </>
+              )}
             </div>
           </form>
         </DialogContent>

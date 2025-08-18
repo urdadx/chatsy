@@ -8,7 +8,7 @@ const Integrations = () => {
     <div className="max-w-5xl mx-auto ">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-6">
         <WhatsAppDialog>
-          <div className="bg-white rounded-md p-3 sm:p-4 border border-gray-200 shadow-sm w-full max-w-xs mx-auto h-full cursor-pointer ">
+          <div className="bg-white rounded-md p-3 sm:p-4 border border-gray-200 w-full max-w-xs mx-auto h-full cursor-pointer ">
             <div className="flex flex-col gap-3 sm:gap-4 h-full">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
