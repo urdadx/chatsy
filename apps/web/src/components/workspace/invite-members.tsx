@@ -7,13 +7,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { api } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useMediaQuery } from "usehooks-ts";
+import { AddOnsDialog } from "../add-ons-dialog";
 import { Button } from "../ui/button";
+import { Drawer, DrawerContent } from "../ui/drawer";
 import {
   Select,
   SelectContent,
@@ -22,13 +26,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import Spinner from "../ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export const InviteMembers = ({ open, setOpen }: any) => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("member");
-  const [isLoading, setIsLoading] = useState(false);
+  const [showAddOnsDialog, setShowAddOnsDialog] = useState(false);
+
   const queryClient = useQueryClient();
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const { data: member } = useQuery({
     queryKey: ["activeMember"],
@@ -40,6 +48,29 @@ export const InviteMembers = ({ open, setOpen }: any) => {
 
   const isAdmin = member?.role === "owner" || member?.role === "admin";
 
+  const inviteMemberMutation = useMutation({
+    mutationFn: async ({ email, role }: { email: string; role: string }) => {
+      const response = await api.post("/invite-member", { email, role });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || `Invitation sent to ${email}`);
+      queryClient.invalidateQueries({ queryKey: ["invitations"] });
+      setEmail("");
+      setRole("member");
+      setOpen(false);
+    },
+    onError: (error: any) => {
+      console.error("Error sending invitation:", error);
+      if (error.status === 402) {
+        setShowAddOnsDialog(true);
+      }
+      const errorMessage =
+        error.message || "Failed to send invitation. Please try again.";
+      toast.warning(errorMessage);
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -48,32 +79,10 @@ export const InviteMembers = ({ open, setOpen }: any) => {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const { error } = await authClient.organization.inviteMember({
-        email: email.trim(),
-        role: role as "member" | "owner",
-      });
-
-      if (error) {
-        toast.error(error.message || "Failed to send invitation");
-        return;
-      }
-
-      toast.success(`Invitation sent to ${email}`);
-      queryClient.invalidateQueries({ queryKey: ["invitations"] });
-
-      setEmail("");
-      setRole("member");
-
-      setOpen(false);
-    } catch (error) {
-      console.error("Error sending invitation:", error);
-      toast.error("Failed to send invitation. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    inviteMemberMutation.mutate({
+      email: email.trim(),
+      role,
+    });
   };
 
   return (
@@ -108,7 +117,7 @@ export const InviteMembers = ({ open, setOpen }: any) => {
                   placeholder="johndoe@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
+                  disabled={inviteMemberMutation.isPending}
                   required
                 />
               </div>
@@ -117,7 +126,7 @@ export const InviteMembers = ({ open, setOpen }: any) => {
                 <Select
                   value={role}
                   onValueChange={setRole}
-                  disabled={isLoading}
+                  disabled={inviteMemberMutation.isPending}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -135,12 +144,26 @@ export const InviteMembers = ({ open, setOpen }: any) => {
               {isAdmin ? (
                 <motion.div
                   className="w-full"
-                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
-                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                  whileHover={{
+                    scale: inviteMemberMutation.isPending ? 1 : 1.02,
+                  }}
+                  whileTap={{
+                    scale: inviteMemberMutation.isPending ? 1 : 0.98,
+                  }}
                 >
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Sending..." : "Send Invite"}
-                    <ArrowRight className="h-4 w-4" />
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={inviteMemberMutation.isPending}
+                  >
+                    {inviteMemberMutation.isPending ? (
+                      <Spinner className="text-white" />
+                    ) : (
+                      <>
+                        Send Invite
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
                   </Button>
                 </motion.div>
               ) : (
@@ -169,6 +192,25 @@ export const InviteMembers = ({ open, setOpen }: any) => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Add-ons Dialog for when member limit is reached */}
+      {isDesktop ? (
+        <Dialog open={showAddOnsDialog} onOpenChange={setShowAddOnsDialog}>
+          <AddOnsDialog
+            defaultValue="member"
+            onOpenChange={setShowAddOnsDialog}
+          />
+        </Dialog>
+      ) : (
+        <Drawer open={showAddOnsDialog} onOpenChange={setShowAddOnsDialog}>
+          <DrawerContent>
+            <AddOnsDialog
+              defaultValue="member"
+              onOpenChange={setShowAddOnsDialog}
+            />
+          </DrawerContent>
+        </Drawer>
+      )}
     </>
   );
 };

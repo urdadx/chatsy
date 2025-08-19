@@ -46,6 +46,7 @@ import { ServerRoute as ApiScrapeServerRouteImport } from './routes/api/scrape'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
 import { ServerRoute as ApiMyChatbotServerRouteImport } from './routes/api/my-chatbot'
 import { ServerRoute as ApiLeadsServerRouteImport } from './routes/api/leads'
+import { ServerRoute as ApiInviteMemberServerRouteImport } from './routes/api/invite-member'
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
 import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-og-info'
 import { ServerRoute as ApiFirecrawlWebhookServerRouteImport } from './routes/api/firecrawl-webhook'
@@ -249,6 +250,11 @@ const ApiMyChatbotServerRoute = ApiMyChatbotServerRouteImport.update({
 const ApiLeadsServerRoute = ApiLeadsServerRouteImport.update({
   id: '/api/leads',
   path: '/api/leads',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiInviteMemberServerRoute = ApiInviteMemberServerRouteImport.update({
+  id: '/api/invite-member',
+  path: '/api/invite-member',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiHelloServerRoute = ApiHelloServerRouteImport.update({
@@ -539,6 +545,7 @@ export interface FileServerRoutesByFullPath {
   '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
+  '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -577,6 +584,7 @@ export interface FileServerRoutesByTo {
   '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
+  '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -616,6 +624,7 @@ export interface FileServerRoutesById {
   '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
   '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
+  '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -656,6 +665,7 @@ export interface FileServerRouteTypes {
     | '/api/firecrawl-webhook'
     | '/api/get-og-info'
     | '/api/hello'
+    | '/api/invite-member'
     | '/api/leads'
     | '/api/my-chatbot'
     | '/api/questions'
@@ -694,6 +704,7 @@ export interface FileServerRouteTypes {
     | '/api/firecrawl-webhook'
     | '/api/get-og-info'
     | '/api/hello'
+    | '/api/invite-member'
     | '/api/leads'
     | '/api/my-chatbot'
     | '/api/questions'
@@ -732,6 +743,7 @@ export interface FileServerRouteTypes {
     | '/api/firecrawl-webhook'
     | '/api/get-og-info'
     | '/api/hello'
+    | '/api/invite-member'
     | '/api/leads'
     | '/api/my-chatbot'
     | '/api/questions'
@@ -771,6 +783,7 @@ export interface RootServerRouteChildren {
   ApiFirecrawlWebhookServerRoute: typeof ApiFirecrawlWebhookServerRoute
   ApiGetOgInfoServerRoute: typeof ApiGetOgInfoServerRoute
   ApiHelloServerRoute: typeof ApiHelloServerRoute
+  ApiInviteMemberServerRoute: typeof ApiInviteMemberServerRoute
   ApiLeadsServerRoute: typeof ApiLeadsServerRoute
   ApiMyChatbotServerRoute: typeof ApiMyChatbotServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
@@ -1051,6 +1064,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiLeadsServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/invite-member': {
+      id: '/api/invite-member'
+      path: '/api/invite-member'
+      fullPath: '/api/invite-member'
+      preLoaderRoute: typeof ApiInviteMemberServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/hello': {
       id: '/api/hello'
       path: '/api/hello'
@@ -1263,6 +1283,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiFirecrawlWebhookServerRoute: ApiFirecrawlWebhookServerRoute,
   ApiGetOgInfoServerRoute: ApiGetOgInfoServerRoute,
   ApiHelloServerRoute: ApiHelloServerRoute,
+  ApiInviteMemberServerRoute: ApiInviteMemberServerRoute,
   ApiLeadsServerRoute: ApiLeadsServerRoute,
   ApiMyChatbotServerRoute: ApiMyChatbotServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,

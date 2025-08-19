@@ -17,9 +17,14 @@ export const getApiError = (error: unknown) => {
   if (axios.isAxiosError(error)) {
     const { response } = error;
     if (response) {
-      return new Error(
+      const apiError = new Error(
         response.data.message || response.statusText || "An API error occurred",
-      );
+      ) as Error & { status?: number; data?: any };
+
+      apiError.status = response.status;
+      apiError.data = response.data;
+
+      return apiError;
     }
 
     return new Error(error.message || "Network error occurred");

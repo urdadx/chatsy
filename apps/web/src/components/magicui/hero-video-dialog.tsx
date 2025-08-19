@@ -18,7 +18,6 @@ type AnimationStyle =
 interface HeroVideoProps {
   animationStyle?: AnimationStyle;
   videoSrc: string;
-  thumbnailSrc: string;
   thumbnailAlt?: string;
   className?: string;
 }
@@ -69,7 +68,6 @@ const animationVariants = {
 export default function HeroVideoDialog({
   animationStyle = "from-center",
   videoSrc,
-  thumbnailSrc,
   thumbnailAlt = "Video thumbnail",
   className,
 }: HeroVideoProps) {
@@ -89,7 +87,7 @@ export default function HeroVideoDialog({
           alt={thumbnailAlt}
           width={1920}
           height={1080}
-          className="w-full rounded-md border shadow-lg transition-all duration-200 ease-out group-hover:brightness-[0.97]"
+          className="w-full rounded-md border shadow-lg transition-all duration-200 ease-out group-hover:brightness-[0.99]"
         />
         <div className="absolute inset-0 flex scale-[0.9] items-center justify-center rounded-2xl transition-all duration-200 ease-out group-hover:scale-100">
           <div className="flex size-28 items-center justify-center rounded-full bg-primary/10 backdrop-blur-md">

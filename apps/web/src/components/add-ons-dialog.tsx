@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Bot, MessageCircle, Zap } from "lucide-react";
+import { ArrowRight, Bot, MessageCircle, User, Zap } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -63,6 +63,7 @@ export const AddOnsDialog = ({
       messages: "extra-message-credits",
       branding: "remove-branding",
       chatbot: "extra-chatbot",
+      member: "extra-team-member",
     };
 
     const slug = addonSlugMap[selectedAddon as keyof typeof addonSlugMap];
@@ -133,6 +134,64 @@ export const AddOnsDialog = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Extra chabot */}
+      <Card
+        className={cn(
+          "shadow-xs cursor-pointer transition-colors",
+          isSelected("chatbot")
+            ? "ring-2 ring-purple-500 bg-purple-50"
+            : "hover:bg-gray-50",
+        )}
+        onClick={() => selectAddon("chatbot")}
+      >
+        <CardContent className="">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Bot className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-base text-gray-900">Extra AI chatbot</h3>
+              </div>
+            </div>
+            <div className="">
+              <div className="text-xl font-bold text-gray-900">
+                +$7
+                <span className="text-base font-normal text-gray-500">/mo</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <Card
+        className={cn(
+          "shadow-xs cursor-pointer transition-colors",
+          isSelected("member")
+            ? "ring-2 ring-purple-500 bg-purple-50"
+            : "hover:bg-gray-50",
+        )}
+        onClick={() => selectAddon("member")}
+      >
+        <CardContent className="">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <User className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-base text-gray-900">Extra team member</h3>
+              </div>
+            </div>
+            <div className="">
+              <div className="text-xl font-bold text-gray-900">
+                +$5
+                <span className="text-base font-normal text-gray-500">/mo</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       {/* Remove Padyna Branding Addon  */}
       <Card
         className={cn(
@@ -158,36 +217,6 @@ export const AddOnsDialog = ({
             <div className="">
               <div className="text-xl font-bold text-gray-900">
                 +$29
-                <span className="text-base font-normal text-gray-500">/mo</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Extra chabot */}
-      <Card
-        className={cn(
-          "shadow-xs cursor-pointer transition-colors",
-          isSelected("chatbot")
-            ? "ring-2 ring-purple-500 bg-purple-50"
-            : "hover:bg-gray-50",
-        )}
-        onClick={() => selectAddon("chatbot")}
-      >
-        <CardContent className="">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Bot className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <h3 className="text-base text-gray-900">Extra AI chatbot</h3>
-              </div>
-            </div>
-            <div className="">
-              <div className="text-xl font-bold text-gray-900">
-                +$7
                 <span className="text-base font-normal text-gray-500">/mo</span>
               </div>
             </div>

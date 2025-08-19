@@ -103,32 +103,17 @@ export const WorkspaceDelete = () => {
         <div className="bg-red-50 px-6 py-4 flex justify-end border-t border-red-300">
           <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button
-                      className="bg-red-500 hover:bg-red-600 text-white"
-                      disabled={!organizationId || !isAdmin}
-                    >
-                      Delete workspace
-                    </Button>
-                  </motion.div>
-                </TooltipTrigger>
-                {!isAdmin && (
-                  <TooltipContent
-                    className="bg-white shadow-sm p-3"
-                    sideOffset={8}
-                  >
-                    <p className="text-black text-sm">
-                      Only admins can change workspace logo. Please contact your
-                      admin
-                    </p>
-                  </TooltipContent>
-                )}
-              </Tooltip>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                  disabled={!organizationId || !isAdmin}
+                >
+                  Delete workspace
+                </Button>
+              </motion.div>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">

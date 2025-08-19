@@ -1,4 +1,5 @@
 import { RiCheckboxCircleFill } from "@remixicon/react";
+import { Link } from "@tanstack/react-router";
 import { Hammer } from "lucide-react";
 import { Button } from "../../ui/button";
 
@@ -19,13 +20,15 @@ export const CompletedStatus = () => {
               now ready to answer questions. You can test it in the playground
               or add more training data to improve performance.
             </p>
-            <Button
-              variant="outline"
-              className="mt-2 border-green-500 text-green-700 hover:text-green-800 hover:border-green-600"
-            >
-              <Hammer className="w-4 h-4 " />
-              Test in Playground
-            </Button>
+            <Link to="/admin/playground">
+              <Button
+                variant="outline"
+                className="mt-2 border-green-500 text-green-700 hover:text-green-800 hover:border-green-600"
+              >
+                <Hammer className="w-4 h-4 " />
+                Test in Playground
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

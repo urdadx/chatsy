@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const storage = new Storage({
   projectId: "nomad-23595",
-  keyFilename: path.join(__dirname, "../../../chatsy-service-keys.json"),
+  keyFilename: path.join(__dirname, "../../../padyna-service-keys.json"),
 });
 
 const bucket = storage.bucket("nomad-23595.appspot.com");

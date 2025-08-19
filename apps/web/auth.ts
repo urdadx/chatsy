@@ -272,6 +272,10 @@ export const auth = betterAuth({
               productId: process.env.REMOVE_BRANDING_ADDON!,
               slug: "remove-branding",
             },
+            {
+              productId: process.env.EXTRA_TEAM_MEMBER_ADDON!,
+              slug: "extra-team-member",
+            },
           ],
           successUrl: "/success",
           authenticatedUsersOnly: true,
