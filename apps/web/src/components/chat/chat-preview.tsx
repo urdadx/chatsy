@@ -5,12 +5,14 @@ import { useChatWithReset } from "@/hooks/use-chat-reset";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
+import type { ChatMessage, ChatTools, CustomUIDataTypes } from "@/lib/types";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { UIMessage } from "ai";
+import { DefaultChatTransport, type UIMessagePart } from "ai";
+import { formatISO } from "date-fns";
 import { ArrowUp, RefreshCcw, SparklesIcon } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AISuggestion, AISuggestions } from "../ui/ai-suggestions";
 import {
@@ -22,23 +24,24 @@ import { ScrollButton } from "../ui/scroll-button";
 import Spinner from "../ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { GreetingMessage } from "./greeting-message";
-import { PreviewMessage, ThinkingMessage } from "./message";
+import { Messages } from "./messages";
 
-export function convertToUIMessages(
-  messages: Array<DBMessage>,
-): Array<UIMessage> {
+export function convertToUIMessages(messages: DBMessage[]): ChatMessage[] {
   return messages.map((message) => ({
     id: message.id,
-    parts: message.parts as UIMessage["parts"],
-    role: message.role as UIMessage["role"],
-    content: "",
-    createdAt: message.createdAt,
+    role: message.role as "user" | "assistant" | "system",
+    // @ts-ignore
+    parts: message.parts as UIMessagePart<CustomUIDataTypes, ChatTools>[],
+    metadata: {
+      createdAt: formatISO(message.createdAt),
+    },
   }));
 }
 
 export function ChatPreview() {
   const { chatId, resetChat } = useChatWithReset();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
+  const [input, setInput] = useState("");
 
   const initialMessages = messagesFromDb
     ? convertToUIMessages(messagesFromDb)
@@ -46,44 +49,61 @@ export function ChatPreview() {
 
   const queryClient = useQueryClient();
 
-  const { messages, setMessages, status, handleSubmit, input, setInput } =
-    useChat({
-      id: chatId,
-      initialMessages,
+  const {
+    messages,
+    sendMessage,
+    status,
+    setMessages,
+    regenerate,
+    error: chatError,
+  } = useChat<ChatMessage>({
+    id: chatId,
+    transport: new DefaultChatTransport({
       fetch: fetchWithErrorHandlers,
-      onError: (error) => {
-        if (error instanceof ChatSDKError) {
-          toast.error(error.message);
-        } else {
-          console.error("Chat error:", error);
-          toast.error(
-            error instanceof Error ? error.message : "An error occurred",
-          );
-        }
-      },
-      onFinish: () => {
-        queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
-        queryClient.invalidateQueries({ queryKey: ["messages"] });
-        queryClient.invalidateQueries({
-          queryKey: ["customerMeters", "ai_usage_two"],
-        });
-      },
-    });
+    }),
+    messages: initialMessages,
+    experimental_throttle: 100,
+    onError: (error) => {
+      if (error instanceof ChatSDKError) {
+        toast.error(error.message);
+      } else {
+        console.error("Chat error:", error);
+        toast.error(
+          error instanceof Error ? error.message : "An error occurred",
+        );
+      }
+    },
+    onFinish: () => {
+      queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      queryClient.invalidateQueries({
+        queryKey: ["customerMeters", "ai_usage_two"],
+      });
+    },
+  });
 
-  const inputLength = input.trim().length;
+  useEffect(() => {
+    if (initialMessages.length > 0 && messages.length === 0) {
+      setMessages(initialMessages);
+    }
+  }, [initialMessages, messages.length, setMessages]);
+
+  const handleSubmit = (event?: React.FormEvent) => {
+    event?.preventDefault();
+
+    if (!input.trim()) return;
+
+    sendMessage({ text: input });
+    setInput("");
+  };
 
   const handleResetChat = useCallback(() => {
     resetChat();
-    setMessages([]);
     setInput("");
     toast.success("Chat reset successfully");
     queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
     queryClient.invalidateQueries({ queryKey: ["messages"] });
-  }, [resetChat, setMessages, setInput]);
-
-  const isLastMessageFromUser =
-    messages.length > 0 && messages[messages.length - 1].role === "user";
-  const isStreamingLastMessage = status === "streaming" && messages.length > 0;
+  }, [resetChat, setInput, queryClient]);
 
   const { data: chatbot } = useChatbot();
 
@@ -94,7 +114,6 @@ export function ChatPreview() {
   };
 
   const showPoweredBy = !chatbot?.hidePoweredBy;
-
   const greetingMessage = chatbot?.initialMessage || "";
 
   const { data: votes }: { data: Array<Vote> | undefined } = useQuery({
@@ -109,7 +128,7 @@ export function ChatPreview() {
   return (
     <div className="flex flex-col w-full h-full max-h-[80vh] md:h-[550px] shadow-sm md:rounded-2xl overflow-hidden">
       <div
-        className="flex items-center justify-between p-4 "
+        className="flex items-center justify-between p-4"
         style={{
           backgroundColor: chatbot?.primaryColor || "#4F46E5",
           borderTopLeftRadius: "1rem",
@@ -121,7 +140,7 @@ export function ChatPreview() {
             <img
               src={chatbot.image}
               alt="Assistant"
-              className="rounded-full w-9 h-9 "
+              className="rounded-full w-9 h-9"
             />
           ) : (
             <div className="rounded-full border border-white w-9 h-9 flex items-center justify-center">
@@ -144,9 +163,10 @@ export function ChatPreview() {
           </TooltipContent>
         </Tooltip>
       </div>
+
       {/* Make message area grow and scrollable */}
       <div className="relative flex-1 min-h-0 overflow-y-hidden">
-        <ChatContainerRoot className="h-full smooth-div ">
+        <ChatContainerRoot className="h-full smooth-div">
           <ChatContainerContent className="p-4">
             {isLoading ? (
               <div className="flex items-center justify-center min-h-screen">
@@ -166,32 +186,23 @@ export function ChatPreview() {
               </div>
             ) : (
               <div className="space-y-4">
-                {messages.length === 0 && (
+                {messages.length === 0 ? (
                   <GreetingMessage title={greetingMessage} />
+                ) : (
+                  <Messages
+                    chatId={chatId}
+                    status={status}
+                    votes={votes}
+                    messages={messages}
+                    setMessages={setMessages}
+                    reload={regenerate}
+                  />
                 )}
 
-                {/* Render messages */}
-
-                {messages.map((message, index) => (
-                  <div key={message.id} className="w-full overflow-hidden p-1">
-                    <PreviewMessage
-                      chatId={chatId}
-                      message={message}
-                      isLoading={
-                        isStreamingLastMessage && messages.length - 1 === index
-                      }
-                      vote={
-                        votes
-                          ? votes.find((vote) => vote.messageId === message.id)
-                          : undefined
-                      }
-                      setMessages={setMessages}
-                    />
+                {status === "error" && chatError && (
+                  <div className="text-red-500 p-4">
+                    Error: {chatError.message}
                   </div>
-                ))}
-
-                {status === "submitted" && isLastMessageFromUser && (
-                  <ThinkingMessage />
                 )}
 
                 <ChatContainerScrollAnchor />
@@ -203,6 +214,7 @@ export function ChatPreview() {
           </div>
         </ChatContainerRoot>
       </div>
+
       {/* Footer always at bottom */}
       <div className="border-t bg-gray-50/40 p-3 space-y-2">
         {SUGGESTIONS.length > 0 && (
@@ -239,7 +251,7 @@ export function ChatPreview() {
             className="rounded-full p-2"
             style={{ backgroundColor: chatbot?.primaryColor }}
             type="submit"
-            disabled={inputLength === 0}
+            disabled={status === "streaming" || status === "submitted"}
             aria-label="Send"
           >
             <ArrowUp className="h-4 w-4 text-white" />

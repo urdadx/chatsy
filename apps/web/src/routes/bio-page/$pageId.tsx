@@ -1,6 +1,6 @@
 import { convertToUIMessages } from "@/components/chat/chat-preview";
 import { GreetingMessage } from "@/components/chat/greeting-message";
-import { PreviewMessage, ThinkingMessage } from "@/components/chat/message";
+import { Messages } from "@/components/chat/messages";
 import { AISuggestion, AISuggestions } from "@/components/ui/ai-suggestions";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +21,9 @@ import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { DefaultChatTransport } from "ai";
 import { ArrowUp, RefreshCcw, SparklesIcon, X } from "lucide-react";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/bio-page/$pageId")({
@@ -33,6 +34,8 @@ function RouteComponent() {
   const { pageId } = Route.useParams();
   const { chatId } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
+  const [input, setInput] = useState("");
+  const [isDeactivated, setIsDeactivated] = useState(false);
 
   const initialMessages = messagesFromDb
     ? convertToUIMessages(messagesFromDb)
@@ -46,7 +49,6 @@ function RouteComponent() {
     error: chatbotError,
   } = useChatWidget(pageId);
 
-  // Set CSS custom property for real viewport height
   useEffect(() => {
     const setVh = () => {
       const vh = window.innerHeight * 0.01;
@@ -63,35 +65,84 @@ function RouteComponent() {
     };
   }, []);
 
-  const { messages, setMessages, status, handleSubmit, input, setInput } =
-    useChat({
-      id: chatId,
-      initialMessages,
-      fetch: fetchWithErrorHandlers,
-      onError: (error) => {
-        if (error instanceof ChatSDKError) {
-          toast.error(error.message);
+  const {
+    messages,
+    setMessages,
+    status,
+    sendMessage,
+    regenerate,
+    error: chatError,
+  } = useChat({
+    id: chatId,
+    transport: new DefaultChatTransport({
+      fetch: async (url, options) => {
+        const response = await fetchWithErrorHandlers(url, options);
+        // Check if the response indicates deactivation
+        if (response.ok) {
+          const data = await response.clone().json();
+          if (data.deactivated) {
+            setIsDeactivated(true);
+            return new Response(
+              JSON.stringify({ error: "Chatbot deactivated" }),
+              {
+                status: 503,
+                headers: { "Content-Type": "application/json" },
+              },
+            );
+          }
         }
+
+        return response;
       },
       api: `/api/embed/chat/${pageId}`,
-      onFinish: () => {
-        queryClient.invalidateQueries({ queryKey: ["messages"] });
-        if (messages.length === 0) {
-          logVisitorAnalytics({
-            event: "bio_first_message_sent",
-            page_engagement: "first_message",
-          });
+    }),
+    messages: initialMessages,
+    experimental_throttle: 100,
+    onError: (error) => {
+      // Only show error toasts for non-deactivation errors
+      if (!isDeactivated) {
+        if (error instanceof ChatSDKError) {
+          toast.error(error.message);
         } else {
-          logVisitorAnalytics({
-            event: "bio_message_sent",
-            page_engagement: "continued_chat",
-            message_count: messages.length + 1,
-          });
+          console.error("Chat error:", error);
+          toast.error(
+            error instanceof Error ? error.message : "An error occurred",
+          );
         }
-      },
-    });
+      }
+    },
+    onFinish: () => {
+      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      if (messages.length === 0) {
+        logVisitorAnalytics({
+          event: "bio_first_message_sent",
+          page_engagement: "first_message",
+        });
+      } else {
+        logVisitorAnalytics({
+          event: "bio_message_sent",
+          page_engagement: "continued_chat",
+          message_count: messages.length + 1,
+        });
+      }
+    },
+  });
 
-  const inputLength = input.trim().length;
+  useEffect(() => {
+    if (initialMessages.length > 0 && messages.length === 0) {
+      setMessages(initialMessages);
+    }
+  }, [initialMessages, messages.length, setMessages]);
+
+  const handleSubmit = (event?: React.FormEvent) => {
+    event?.preventDefault();
+
+    if (!input.trim()) return;
+
+    sendMessage({ text: input });
+    setInput("");
+  };
+
   const chatbotId = chatbot?.id;
 
   const { logVisitorAnalytics } = useSendVisitorAnalytics({
@@ -114,10 +165,6 @@ function RouteComponent() {
     }
     logVisitorAnalytics({ event: "bio_page_chat_closed" });
   }, [logVisitorAnalytics]);
-
-  const isLastMessageFromUser =
-    messages.length > 0 && messages[messages.length - 1].role === "user";
-  const isStreamingLastMessage = status === "streaming" && messages.length > 0;
 
   const SUGGESTIONS = chatbot?.suggestedMessages || [];
 
@@ -213,9 +260,26 @@ function RouteComponent() {
 
         {/* Chat area - Flexible height */}
         <div className="relative flex-1 min-h-0 overflow-hidden">
-          <ChatContainerRoot className="h-full">
+          <ChatContainerRoot className="h-full smooth-div">
             <ChatContainerContent className="p-4 h-full">
-              {isLoading ? (
+              {isDeactivated ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center p-6 max-w-sm">
+                    <div className="mb-4">
+                      <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <SparklesIcon className="w-8 h-8 text-gray-400" />
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      Chatbot Unavailable
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      This chatbot is currently deactivated. Please try again
+                      later or contact support.
+                    </p>
+                  </div>
+                </div>
+              ) : isLoading ? (
                 <div className="flex items-center justify-center h-full">
                   <Spinner className="text-primary" />
                 </div>
@@ -224,42 +288,26 @@ function RouteComponent() {
                   <div>Error loading messages</div>
                 </div>
               ) : (
-                <div className="space-y-4 h-full flex flex-col">
-                  <div className="flex-1 min-h-0 overflow-y-auto space-y-4">
-                    {messages.length === 0 && (
-                      <GreetingMessage title={greetingMessage} />
-                    )}
+                <div className="space-y-4">
+                  {messages.length === 0 ? (
+                    <GreetingMessage title={greetingMessage} />
+                  ) : (
+                    <Messages
+                      chatId={chatId}
+                      status={status}
+                      votes={votes}
+                      messages={messages}
+                      setMessages={setMessages}
+                      reload={regenerate}
+                    />
+                  )}
 
-                    {/* Render messages */}
-                    {messages.map((message, index) => (
-                      <div
-                        key={message.id}
-                        className="w-full overflow-hidden p-1"
-                      >
-                        <PreviewMessage
-                          chatId={chatId}
-                          message={message}
-                          isLoading={
-                            isStreamingLastMessage &&
-                            messages.length - 1 === index
-                          }
-                          vote={
-                            votes
-                              ? votes.find(
-                                  (vote) => vote.messageId === message.id,
-                                )
-                              : undefined
-                          }
-                          setMessages={setMessages}
-                          chatbot={chatbot}
-                        />
-                      </div>
-                    ))}
+                  {status === "error" && chatError && (
+                    <div className="text-red-500 p-4">
+                      Error: {chatError.message}
+                    </div>
+                  )}
 
-                    {status === "submitted" && isLastMessageFromUser && (
-                      <ThinkingMessage />
-                    )}
-                  </div>
                   <ChatContainerScrollAnchor />
                 </div>
               )}
@@ -271,65 +319,67 @@ function RouteComponent() {
         </div>
 
         {/* Footer - Fixed height */}
-        <div className="border-t bg-gray-50/50 p-3 space-y-2 flex-shrink-0">
-          {SUGGESTIONS.length > 0 && (
-            <AISuggestions>
-              {SUGGESTIONS.map((suggestion: string) => (
-                <AISuggestion
-                  onClick={handleSuggestionClick}
-                  key={suggestion}
-                  suggestion={suggestion}
-                />
-              ))}
-            </AISuggestions>
-          )}
+        {!isDeactivated && (
+          <div className="border-t bg-gray-50/50 p-3 space-y-2 flex-shrink-0">
+            {SUGGESTIONS.length > 0 && (
+              <AISuggestions>
+                {SUGGESTIONS.map((suggestion: string) => (
+                  <AISuggestion
+                    onClick={handleSuggestionClick}
+                    key={suggestion}
+                    suggestion={suggestion}
+                  />
+                ))}
+              </AISuggestions>
+            )}
 
-          <form
-            onSubmit={handleSubmit}
-            className="flex w-full items-center space-x-2"
-          >
-            <Input
-              id="message"
-              placeholder="Chat with me..."
-              className="flex-1 text-sm bg-white sm:text-base"
-              style={
-                {
-                  "--tw-ring-color": chatbot?.primaryColor,
-                } as React.CSSProperties
-              }
-              autoComplete="off"
-              autoFocus
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-            />
-            <button
-              className="rounded-full p-2 flex-shrink-0"
-              style={{ backgroundColor: chatbot?.primaryColor }}
-              type="submit"
-              disabled={inputLength === 0}
-              aria-label="Send"
+            <form
+              onSubmit={handleSubmit}
+              className="flex w-full items-center space-x-2"
             >
-              <ArrowUp className="h-4 w-4 text-white" />
-            </button>
-          </form>
-
-          {showPoweredBy ? (
-            <div className="flex items-center justify-center text-xs text-muted-foreground">
-              <span>Powered by </span>
-              <a
-                href="https://padyna.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: chatbot?.primaryColor }}
-                className="ml-1 hover:underline font-semibold"
+              <Input
+                id="message"
+                placeholder="Chat with me..."
+                className="flex-1 text-sm bg-white sm:text-base"
+                style={
+                  {
+                    "--tw-ring-color": chatbot?.primaryColor,
+                  } as React.CSSProperties
+                }
+                autoComplete="off"
+                autoFocus
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+              />
+              <button
+                className="rounded-full p-2"
+                style={{ backgroundColor: chatbot?.primaryColor }}
+                type="submit"
+                disabled={status === "streaming" || status === "submitted"}
+                aria-label="Send"
               >
-                Padyna
-              </a>
-            </div>
-          ) : (
-            <div className="h-0" />
-          )}
-        </div>
+                <ArrowUp className="h-4 w-4 text-white" />
+              </button>
+            </form>
+
+            {showPoweredBy ? (
+              <div className="flex items-center justify-center text-xs text-muted-foreground">
+                <span>Powered by </span>
+                <a
+                  href="https://padyna.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: chatbot?.primaryColor }}
+                  className="ml-1 hover:underline font-semibold"
+                >
+                  Padyna
+                </a>
+              </div>
+            ) : (
+              <div className="h-0" />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

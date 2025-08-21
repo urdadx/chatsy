@@ -1,14 +1,15 @@
 import { Input } from "@/components/ui/input";
-import { useSubscription } from "@/hooks/use-subscription";
-import { useSession } from "@/lib/auth-client";
+import { getActiveSubscription } from "@/lib/auth-utils";
+import { useQuery } from "@tanstack/react-query";
 
 export const BillingEmail = () => {
-  const { data: session } = useSession();
-  const organizationId = session?.session?.activeOrganizationId || "";
+  const { data: subscription, isLoading } = useQuery({
+    queryKey: ["activeSubscription"],
+    queryFn: () => getActiveSubscription(),
+  });
 
-  const { data: subscription } = useSubscription(organizationId);
-
-  const billingEmail = subscription?.customer?.email || "Not available";
+  // @ts-ignore
+  const billingEmail = isLoading ? "loading..." : subscription?.customer?.email;
 
   return (
     <div className="mx-auto">

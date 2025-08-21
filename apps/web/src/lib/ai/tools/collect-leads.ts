@@ -3,7 +3,7 @@ import z from "zod";
 
 export const collectLeadsTool = tool({
   description: "Capture leads from conversations with customers.",
-  parameters: z.object({
+  inputSchema: z.object({
     name: z.string().describe("The name of the lead"),
     contact: z
       .string()

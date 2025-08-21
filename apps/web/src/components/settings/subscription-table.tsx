@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSubscription } from "@/hooks/use-subscription";
 import { authClient } from "@/lib/auth-client";
+import { getActiveSubscription } from "@/lib/auth-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { addMonths, format, parseISO } from "date-fns";
@@ -10,11 +10,10 @@ import { motion } from "motion/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export const SubscriptionTable = () => {
-  const { data: activeOrganization } = authClient.useActiveOrganization();
-
-  const { data: subscription, isLoading } = useSubscription(
-    activeOrganization?.id,
-  );
+  const { data: subscription, isLoading } = useQuery({
+    queryKey: ["activeSubscription"],
+    queryFn: () => getActiveSubscription(),
+  });
 
   let nextBilling = "-";
   if (subscription?.currentPeriodEnd) {

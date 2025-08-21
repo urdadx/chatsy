@@ -4,7 +4,7 @@ import z from "zod";
 export const collectFeedbackTool = tool({
   description:
     "Collects feedback, reviews, complaints, or suggestions from users.",
-  parameters: z.object({
+  inputSchema: z.object({
     email: z
       .string()
       .nullable()

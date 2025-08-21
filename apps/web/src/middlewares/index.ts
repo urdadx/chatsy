@@ -33,7 +33,6 @@ export const subscriptionMiddleware = createMiddleware({
     const subscription = subscriptionResponse?.result?.items?.[0] as
       | CustomerSubscription
       | undefined;
-    console.log("Active subscription:", subscription?.product.benefits);
 
     const hasActiveSubscription = subscription?.status === "active";
 

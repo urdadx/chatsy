@@ -3,6 +3,8 @@ import type { Vote } from "@/db/schema";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { CollectFeedbackForm } from "@/lib/ai/tools-ui/collect-feedback-form";
 import { CollectLeadsForm } from "@/lib/ai/tools-ui/collect-leads-form";
+import { EscalateToHumanNotification } from "@/lib/ai/tools-ui/escalate-to-human-notification";
+import type { ChatMessage } from "@/lib/types";
 import { cn, sanitizeText } from "@/lib/utils";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
@@ -14,6 +16,7 @@ import { memo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Loader } from "../ui/loader";
 import { MessageActions } from "./message-actions";
+import { MessageReasoning } from "./message-reasoning";
 
 const PurePreviewMessage = ({
   chatId,
@@ -21,13 +24,15 @@ const PurePreviewMessage = ({
   isLoading,
   vote,
   chatbot,
+  requiresScrollPadding,
 }: {
   chatId: string;
   message: UIMessage;
   vote: Vote | undefined;
   isLoading: boolean;
-  setMessages: UseChatHelpers["setMessages"];
+  setMessages: UseChatHelpers<ChatMessage>["setMessages"];
   chatbot?: any;
+  requiresScrollPadding: boolean;
 }) => {
   const { data: fallbackChatbot } = useChatbot();
   const activeChatbot = chatbot || fallbackChatbot;
@@ -58,13 +63,33 @@ const PurePreviewMessage = ({
             </Avatar>
           )}
 
-          <div className="flex flex-col gap-4 w-full">
+          <div
+            className={cn("flex flex-col gap-4 w-full", {
+              "min-h-10": message.role === "assistant" && requiresScrollPadding,
+            })}
+          >
             {message.parts?.map((part, index) => {
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
 
+              if (type === "reasoning" && part.text?.trim().length > 0) {
+                return (
+                  <MessageReasoning
+                    key={key}
+                    isLoading={isLoading}
+                    reasoning={part.text}
+                  />
+                );
+              }
+
               if (type === "text") {
-                const sanitizedText = sanitizeText(part.text);
+                const hasToolCalls = message.parts?.some((part) =>
+                  part.type?.startsWith("tool-"),
+                );
+
+                if (hasToolCalls) {
+                  return null;
+                }
 
                 return (
                   <div key={key} className="flex flex-row gap-2 items-start">
@@ -83,49 +108,183 @@ const PurePreviewMessage = ({
                         },
                       )}
                     >
-                      <Markdown>{sanitizedText}</Markdown>
+                      <Markdown>{sanitizeText(part.text)}</Markdown>
                     </div>
                   </div>
                 );
               }
 
-              if (type === "tool-invocation") {
-                const { toolInvocation } = part;
-                const { toolName, toolCallId, state } = toolInvocation;
+              if (type === "tool-collect_feedback") {
+                const { toolCallId, state } = part;
 
-                if (state === "call") {
-                  switch (toolName) {
-                    case "collect_feedback":
-                      return (
-                        <div key={toolCallId}>
-                          <CollectFeedbackForm
-                            color={activeChatbot?.primaryColor}
-                          />
-                        </div>
-                      );
-                    case "collect_leads":
-                      return (
-                        <div key={toolCallId}>
-                          <CollectLeadsForm />
-                        </div>
-                      );
-                    case "knowledge_base":
-                      return (
-                        <div
-                          key={toolCallId}
-                          className="flex items-center gap-2 text-muted-foreground text-sm"
-                        >
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
-                          Searching knowledge base...
-                        </div>
-                      );
-                  }
+                if (state === "input-available") {
+                  return (
+                    <div key={toolCallId}>
+                      <CollectFeedbackForm
+                        color={activeChatbot?.primaryColor}
+                      />
+                    </div>
+                  );
                 }
 
-                if (state === "result" && toolName === "knowledge_base") {
+                if (state === "output-available") {
+                  const { output } = part;
+
+                  if (
+                    output &&
+                    typeof output === "object" &&
+                    "error" in output
+                  ) {
+                    return (
+                      <div
+                        key={toolCallId}
+                        className="text-red-500 p-2 border rounded"
+                      >
+                        Error: {String(output.error)}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={toolCallId}>
+                      <CollectFeedbackForm
+                        color={activeChatbot?.primaryColor}
+                      />
+                    </div>
+                  );
+                }
+              }
+
+              if (type === "tool-collect_leads") {
+                const { toolCallId, state } = part;
+
+                if (state === "input-available") {
+                  return (
+                    <div key={toolCallId}>
+                      <CollectLeadsForm />
+                    </div>
+                  );
+                }
+
+                if (state === "output-available") {
+                  const { output } = part;
+
+                  if (
+                    output &&
+                    typeof output === "object" &&
+                    "error" in output
+                  ) {
+                    return (
+                      <div
+                        key={toolCallId}
+                        className="text-red-500 p-2 border rounded"
+                      >
+                        Error: {String(output.error)}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={toolCallId}>
+                      <CollectLeadsForm />
+                    </div>
+                  );
+                }
+              }
+
+              if (type === "tool-knowledge_base") {
+                const { toolCallId, state } = part;
+
+                if (state === "input-available") {
+                  return (
+                    <div
+                      key={toolCallId}
+                      className="flex items-center gap-2 text-muted-foreground text-sm"
+                    >
+                      <Loader
+                        variant="dots"
+                        className="text-muted-foreground"
+                      />
+                    </div>
+                  );
+                }
+
+                if (state === "output-available") {
+                  const { output } = part;
+
+                  if (
+                    output &&
+                    typeof output === "object" &&
+                    "error" in output
+                  ) {
+                    return (
+                      <div
+                        key={toolCallId}
+                        className="text-red-500 p-2 border rounded"
+                      >
+                        Error searching knowledge base: {String(output.error)}
+                      </div>
+                    );
+                  }
                   return null;
                 }
               }
+
+              if (type === "tool-escalate_to_human") {
+                const { toolCallId, state } = part;
+
+                if (state === "output-available") {
+                  const { output } = part;
+
+                  if (
+                    output &&
+                    typeof output === "object" &&
+                    "error" in output
+                  ) {
+                    return (
+                      <div
+                        key={toolCallId}
+                        className="text-red-500 p-2 border rounded"
+                      >
+                        We encountered an issue connecting you to a human
+                      </div>
+                    );
+                  }
+
+                  const reason = (output as any)?.reason || "complex-issue";
+                  const message = (output as any)?.message || undefined;
+                  const success = (output as any)?.success !== false;
+                  const error = (output as any)?.error;
+
+                  return (
+                    <div key={toolCallId}>
+                      <EscalateToHumanNotification
+                        reason={reason}
+                        message={message}
+                        success={success}
+                        error={error}
+                      />
+                    </div>
+                  );
+                }
+
+                if (state === "input-available") {
+                  return (
+                    <div
+                      key={toolCallId}
+                      className="flex items-center gap-2 text-muted-foreground text-sm"
+                    >
+                      <Loader
+                        variant="dots"
+                        className="text-muted-foreground"
+                      />
+                      <span>Escalating to human agent...</span>
+                    </div>
+                  );
+                }
+              }
+
+              return null;
             })}
             <MessageActions
               key={`action-${message.id}`}
@@ -155,11 +314,13 @@ export const PreviewMessage = memo(
 
 export const ThinkingMessage = () => {
   const role = "assistant";
+  const { data: chatbot } = useChatbot();
+  const activeChatbot = chatbot;
 
   return (
     <motion.div
       data-testid="message-assistant-loading"
-      className="w-full mx-auto max-w-3xl px-2 group/message "
+      className="w-full mx-auto max-w-3xl px-1 group/message "
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1, transition: { delay: 1 } }}
       data-role={role}
@@ -172,9 +333,15 @@ export const ThinkingMessage = () => {
           },
         )}
       >
-        <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
-          <SparklesIcon className="text-muted-foreground" size={14} />
-        </div>
+        <Avatar className="size-8 shrink-0">
+          <AvatarImage
+            src={activeChatbot?.image || undefined}
+            alt="Assistant"
+          />
+          <AvatarFallback className="bg-background border">
+            <SparklesIcon size={14} />
+          </AvatarFallback>
+        </Avatar>
 
         <Loader variant="dots" className="text-muted-foreground" />
       </div>

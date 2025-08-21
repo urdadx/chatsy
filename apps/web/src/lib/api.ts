@@ -1,7 +1,19 @@
 import axios from "axios";
 
+// Helper function to get the base URL
+const getBaseURL = () => {
+  // In browser environment, use relative URL
+  if (typeof window !== "undefined") {
+    return "/api";
+  }
+
+  // In server environment, use absolute URL
+  const appUrl = process.env.APP_URL || "http://localhost:3001";
+  return `${appUrl}/api`;
+};
+
 export const api = axios.create({
-  baseURL: "/api",
+  baseURL: getBaseURL(),
   withCredentials: true,
 });
 

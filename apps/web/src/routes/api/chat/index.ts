@@ -1,38 +1,41 @@
+import { convertToUIMessages } from "@/components/chat/chat-preview";
 import { db } from "@/db";
 import { chatbot, message } from "@/db/schema";
-import { deleteChatById, getChatById, saveChat } from "@/lib/ai/chat-functions";
-import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import {
-  type Message,
-  saveFinalAssistantMessage,
-} from "@/lib/ai/save-assistant-message";
+  createStreamId,
+  deleteChatById,
+  getChatById,
+  getMessagesByChatId,
+  saveChat,
+  saveMessages,
+} from "@/lib/ai/chat-functions";
+import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
+import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { ChatSDKError } from "@/lib/errors";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { generateUUID } from "@/lib/utils";
 import { subscriptionMiddleware, tokenUsageMiddleware } from "@/middlewares";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { Ingestion } from "@polar-sh/ingestion";
-import { LLMStrategy } from "@polar-sh/ingestion/strategies/LLM";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { streamText } from "ai";
-import { auth } from "auth";
+import {
+  JsonToSseTransformStream,
+  convertToModelMessages,
+  createUIMessageStream,
+  smoothStream,
+  stepCountIs,
+  streamText,
+} from "ai";
+import { auth, polarClient } from "auth";
 import { eq } from "drizzle-orm";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY!,
 });
-
-// Setup the LLM Ingestion Strategy
-const llmIngestion = Ingestion({
-  accessToken: process.env.POLAR_ACCESS_TOKEN!,
-  server: "sandbox",
-})
-  .strategy(new LLMStrategy(google("gemini-2.0-flash")))
-  .ingest("ai_usage_two");
 
 export const ServerRoute = createServerFileRoute("/api/chat/").methods(
   (api) => ({
@@ -93,6 +96,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
 
           const externalCustomerId = session?.user.id;
           const chat = await getChatById(id);
+
           const userMessage = messages[messages.length - 1];
 
           if (!chat) {
@@ -116,6 +120,12 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             }
           }
 
+          const messagesFromDb = await getMessagesByChatId({ id });
+          const uiMessages = [
+            ...convertToUIMessages(messagesFromDb),
+            userMessage,
+          ];
+
           if (userMessage && userMessage?.role === "user") {
             try {
               await db
@@ -123,7 +133,6 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                 .values({
                   chatId: id,
                   role: "user",
-                  content: userMessage.content,
                   parts: userMessage.parts,
                 })
                 .onConflictDoNothing();
@@ -132,40 +141,75 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             }
           }
 
-          const model = llmIngestion.client({
-            externalCustomerId:
-              request.headers.get("X-Polar-Customer-Id") ?? externalCustomerId,
+          const streamId = generateUUID();
+          await createStreamId({ streamId, chatId: id });
+
+          const stream = createUIMessageStream({
+            execute: ({ writer: dataStream }) => {
+              const result = streamText({
+                model: google("gemini-2.0-flash"),
+                system: systemPrompt(chatbotData.name ?? "Assistant"),
+                messages: convertToModelMessages(uiMessages),
+                stopWhen: stepCountIs(5),
+                experimental_transform: smoothStream({ chunking: "word" }),
+                tools: {
+                  knowledge_base: knowledgeSearchTool(chatbotId),
+                  collect_feedback: collectFeedbackTool,
+                  collect_leads: collectLeadsTool,
+                  escalate_to_human: escalateToHumanTool({
+                    chatId: id,
+                    chatbotId,
+                  }),
+                },
+                onFinish: async ({ usage }) => {
+                  await polarClient.events.ingest({
+                    events: [
+                      {
+                        name: "ai_usage_two",
+                        externalCustomerId,
+                        metadata: {
+                          totalTokens: usage.totalTokens ?? 0,
+                          promptTokens: usage.inputTokens ?? 0,
+                          completionTokens: usage.outputTokens ?? 0,
+                        },
+                      },
+                    ],
+                  });
+                },
+                onError: (err) => {
+                  console.error("🛑 streamText error:", err);
+                },
+              });
+
+              result.consumeStream();
+
+              dataStream.merge(
+                result.toUIMessageStream({
+                  sendReasoning: false,
+                }),
+              );
+            },
+            generateId: generateUUID,
+            onFinish: async ({ messages }) => {
+              await saveMessages({
+                messages: messages.map((message) => ({
+                  id: message.id,
+                  chatId: id,
+                  role: message.role,
+                  parts: message.parts,
+                  createdAt: new Date(),
+                })),
+              });
+            },
+            onError: (error) => {
+              console.log("Error in createUIMessageStream:", error);
+              return "Oops, an error occurred!";
+            },
           });
 
-          const resultStream = streamText({
-            model,
-            system: systemPrompt(chatbotData.name ?? "Assistant"),
-            messages,
-            maxSteps: 5,
-            tools: {
-              knowledge_base: knowledgeSearchTool(chatbotId),
-              collect_feedback: collectFeedbackTool,
-              collect_leads: collectLeadsTool,
-            },
-            onError: (err) => {
-              console.error("🛑 streamText error:", err);
-            },
-            async onFinish({ response }) {
-              try {
-                await saveFinalAssistantMessage(
-                  id,
-                  response.messages as unknown as Message[],
-                );
-              } catch (err) {
-                console.error(
-                  "Error in onFinish while saving assistant messages:",
-                  err,
-                );
-              }
-            },
-          });
-
-          const response = resultStream.toDataStreamResponse();
+          const response = new Response(
+            stream.pipeThrough(new JsonToSseTransformStream()),
+          );
 
           // Add custom headers including chat ID
           const headers = new Headers(response.headers);

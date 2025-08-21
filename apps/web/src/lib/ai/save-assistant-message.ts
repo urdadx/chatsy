@@ -95,13 +95,10 @@ export async function saveFinalAssistantMessage(
   // Merge tool parts at the end
   parts.push(...toolMap.values());
 
-  const finalPlainText = textParts.join("\n\n");
-
   try {
     await db.insert(message).values({
       chatId,
       role: "assistant",
-      content: finalPlainText || "",
       parts,
     });
 

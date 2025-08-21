@@ -1,14 +1,13 @@
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { DeleteChat } from "./delete-chat";
 
 interface ChatLogItemProps {
   id: string;
-  type: string;
+  status: string;
   title: string;
   description: string;
   onClick?: () => void;
@@ -20,7 +19,7 @@ export const ChatLogItem = ({
   title,
   description,
   id,
-  type,
+  status,
   onClick,
   isSelected,
 }: ChatLogItemProps) => {
@@ -60,16 +59,35 @@ export const ChatLogItem = ({
         </div>
 
         <div className="flex items-center space-x-3">
-          {type === "private" && (
-            <Tooltip>
-              <TooltipTrigger>
-                <Badge className="capitalize" variant="secondary">
-                  Test
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>This is a chat you created</TooltipContent>
-            </Tooltip>
-          )}
+          <Tooltip>
+            <TooltipTrigger>
+              <span
+                className={cn(
+                  "px-2 py-1 rounded-xl text-xs capitalize",
+                  status === "resolved"
+                    ? "bg-green-100 text-green-800"
+                    : status === "unresolved"
+                      ? "bg-blue-100 text-blue-800"
+                      : status === "escalated"
+                        ? "bg-orange-100 text-orange-800"
+                        : "bg-gray-100 text-gray-800",
+                )}
+              >
+                {status}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent className="bg-white shadow-sm">
+              <p className="text-black">
+                {status === "resolved"
+                  ? "This chat has been resolved"
+                  : status === "unresolved"
+                    ? "This chat is unresolved"
+                    : status === "escalated"
+                      ? "This chat has been escalated to a human agent"
+                      : "Unknown status"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
 
           <Button
             size="icon"

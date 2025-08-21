@@ -1,6 +1,7 @@
 import type { InferSelectModel } from "drizzle-orm";
 import {
   boolean,
+  foreignKey,
   integer,
   json,
   jsonb,
@@ -128,11 +129,12 @@ export const chat = pgTable("Chat", {
   visibility: varchar("visibility", { enum: ["public", "private"] })
     .notNull()
     .default("private"),
-
-  // Multi-channel support
   channel: varchar("channel", { enum: ["web", "whatsapp", "telegram"] })
     .notNull()
     .default("web"),
+  status: varchar("status", { enum: ["unresolved", "resolved", "escalated"] })
+    .notNull()
+    .default("unresolved"),
   externalUserId: text("external_user_id"),
   externalUserName: text("external_user_name"),
 });
@@ -143,7 +145,6 @@ export const message = pgTable("Message", {
     .notNull()
     .references(() => chat.id),
   role: varchar("role").notNull(),
-  content: text("content").notNull(),
   parts: json("parts").notNull(),
   createdAt: timestamp("createdAt")
     .notNull()
@@ -431,6 +432,19 @@ export const whatsappIntegration = pgTable("whatsapp_integration", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const stream = pgTable(
+  "stream",
+  {
+    id: uuid("id").notNull().defaultRandom(),
+    chatId: uuid("chatId").notNull(),
+    createdAt: timestamp("createdAt").notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.id] }),
+    foreignKey({ columns: [t.chatId], foreignColumns: [chat.id] }),
+  ],
+);
+
 // TYPES
 export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;
 export type Feedback = InferSelectModel<typeof feedback>;
@@ -458,3 +472,4 @@ export type WhatsappMessageMetadata = InferSelectModel<
   typeof whatsappMessageMetadata
 >;
 export type WhatsappIntegration = InferSelectModel<typeof whatsappIntegration>;
+export type Stream = InferSelectModel<typeof stream>;

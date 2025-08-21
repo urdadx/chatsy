@@ -196,7 +196,7 @@ function RouteComponent() {
                   <ChatLogItem
                     key={chat.id}
                     id={chat.id}
-                    type={chat.visibility}
+                    status={chat.status}
                     userId={chat.userId}
                     onClick={() => handleChatIdChange(chat.id)}
                     title={chat.title || "Untitled Chat"}
