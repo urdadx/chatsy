@@ -1,8 +1,8 @@
+import { getCustomerExternalId } from "@/lib/subscription/subscription-functions";
 import type { CustomerSubscription } from "@polar-sh/sdk/models/components/customersubscription.js";
-import type { CustomerPortalCustomerMetersListResponse } from "@polar-sh/sdk/models/operations/customerportalcustomermeterslist.js";
 import { createMiddleware } from "@tanstack/react-start";
 import { getHeaders } from "@tanstack/react-start/server";
-import { auth } from "auth";
+import { auth, polarClient } from "auth";
 
 interface SubscriptionContext {
   subscription: CustomerSubscription | undefined;
@@ -58,22 +58,19 @@ export const subscriptionMiddleware = createMiddleware({
 
 export const tokenUsageMiddleware = createMiddleware({
   type: "request",
-}).server(async ({ request, next }) => {
+}).server(async ({ next }) => {
   try {
-    const metersResponse = (await auth.api.meters({
-      query: {
-        page: 1,
-        limit: 1,
-      },
-      headers: request.headers,
-    })) as CustomerPortalCustomerMetersListResponse;
+    const externalCustomerId = (await getCustomerExternalId()) || "";
 
-    // Find the meter with name "ai_usage_two"
-    const meterItem = metersResponse.result.items.find(
-      (item) => item.meter?.name === "ai_usage_two",
-    );
+    const result = await polarClient.customers.getStateExternal({
+      externalId: externalCustomerId,
+    });
 
-    const tokensLeft = meterItem?.balance ?? 0;
+    // Get the first item in active_meters and calculate tokensLeft
+    const meterItem = result?.activeMeters?.[0];
+    const tokensLeft = meterItem
+      ? meterItem.creditedUnits - meterItem.consumedUnits
+      : 0;
     console.log("Tokens left for ai_usage_two:", tokensLeft);
 
     return await next({

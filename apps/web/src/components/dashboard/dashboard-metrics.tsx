@@ -1,6 +1,6 @@
 import { getVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { useChatHistory } from "@/hooks/use-chat-history";
-import { useUsage } from "@/hooks/use-usage-meters";
+import { useActiveMeters, useUsage } from "@/hooks/use-usage-meters";
 import { api } from "@/lib/api";
 import NumberFlow from "@number-flow/react";
 import { useQuery } from "@tanstack/react-query";
@@ -36,9 +36,7 @@ export function DashboardMetrics() {
     },
   });
 
-  const { data } = useUsage();
-
-  const meter = Array.isArray(data) ? data[0] : data;
+  const { data: meter } = useActiveMeters();
 
   const balance = meter?.balance ?? 0;
 

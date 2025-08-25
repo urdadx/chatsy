@@ -8,6 +8,6 @@ export const collectLeadsTool = tool({
     contact: z
       .string()
       .describe("The contact information of the lead (email, phone, or other)"),
-    message: z.string().optional().describe("Any message from the lead"),
+    message: z.string().nullable().describe("Any message from the lead"),
   }),
 });

@@ -8,7 +8,6 @@ export const BillingEmail = () => {
     queryFn: () => getActiveSubscription(),
   });
 
-  // @ts-ignore
   const billingEmail = isLoading ? "loading..." : subscription?.customer?.email;
 
   return (

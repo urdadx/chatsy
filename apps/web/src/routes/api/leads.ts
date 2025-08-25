@@ -25,8 +25,7 @@ export const ServerRoute = createServerFileRoute("/api/leads").methods({
 
       let chatbotId: string;
 
-      if (parsed.data.embedToken) {
-        // Embedded widget scenario - use embedToken to find organization
+      if (parsed.data.embedToken && parsed.data.embedToken.trim().length > 0) {
         const [chatbotData] = await db
           .select({
             chatbotId: chatbot.id,

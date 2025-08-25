@@ -10,9 +10,9 @@ export default defineConfig({
     }),
 
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({}),
   ],
   server: {
-    allowedHosts: ["21d70f56f853.ngrok-free.app"],
+    allowedHosts: ["32407ebb7f65.ngrok-free.app"],
   },
 });

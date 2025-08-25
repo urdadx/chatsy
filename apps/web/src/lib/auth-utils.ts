@@ -1,6 +1,8 @@
+import type { Subscription } from "@polar-sh/sdk/models/components/subscription.js";
 import { createServerFn } from "@tanstack/react-start";
 import { getHeaders } from "@tanstack/react-start/server";
-import { auth } from "auth";
+import { auth, polarClient } from "auth";
+import { getCustomerExternalId } from "./subscription/subscription-functions";
 
 export const getSession = createServerFn().handler(async () => {
   return auth.api.getSession({
@@ -36,11 +38,23 @@ export const getActiveSubscription = createServerFn().handler(async () => {
     headers: getHeaders() as unknown as Headers,
   });
 
-  const subscription = result?.items?.[0];
+  const subscription = result?.items?.[0] as Subscription;
   const status = subscription?.status;
   if (status !== "active") {
     return null;
   }
 
   return subscription;
+});
+
+// get active meter for everyone in the organization
+// since polar does not return meter data in subscription for invited users
+export const getActiveMeter = createServerFn().handler(async () => {
+  const externalCustomerId = (await getCustomerExternalId()) || "";
+
+  const result = await polarClient.customers.getStateExternal({
+    externalId: externalCustomerId,
+  });
+
+  return result?.activeMeters[0] || [];
 });

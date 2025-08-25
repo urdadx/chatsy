@@ -16,6 +16,7 @@ interface MessagesProps {
   messages: Array<UIMessage>;
   setMessages: UseChatHelpers<ChatMessage>["setMessages"];
   reload: UseChatHelpers<ChatMessage>["regenerate"];
+  chatbot?: any;
 }
 
 export function useMessages({
@@ -58,6 +59,7 @@ function PureMessages({
   votes,
   messages,
   setMessages,
+  chatbot,
 }: MessagesProps) {
   const {
     containerRef: messagesContainerRef,
@@ -89,6 +91,7 @@ function PureMessages({
           requiresScrollPadding={
             hasSentMessage && index === messages.length - 1
           }
+          chatbot={chatbot}
         />
       ))}
 
@@ -112,6 +115,7 @@ export const Messages = memo(PureMessages, (prevProps, nextProps) => {
   if (prevProps.messages.length !== nextProps.messages.length) return false;
   if (!equal(prevProps.messages, nextProps.messages)) return false;
   if (!equal(prevProps.votes, nextProps.votes)) return false;
+  if (!equal(prevProps.chatbot, nextProps.chatbot)) return false;
 
   return true;
 });

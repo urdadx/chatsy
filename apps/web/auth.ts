@@ -305,9 +305,7 @@ export const auth = betterAuth({
               try {
                 // STEP 1: Extract user ID from customer data
                 const userId = data.customer?.externalId;
-                const organizationId = data.metadata?.referenceId as string;
 
-                console.log(organizationId, "Organization ID from webhook");
                 // STEP 1.5: Check if user exists to prevent foreign key violations
                 let validUserId = null;
                 if (userId) {
@@ -365,7 +363,6 @@ export const auth = betterAuth({
                     ? JSON.stringify(data.customFieldData)
                     : null,
                   userId: validUserId,
-                  organizationId: organizationId,
                 };
 
                 console.log("💾 Final subscription data:", {
@@ -405,7 +402,6 @@ export const auth = betterAuth({
                       metadata: subscriptionData.metadata,
                       customFieldData: subscriptionData.customFieldData,
                       userId: subscriptionData.userId,
-                      organizationId: subscriptionData.organizationId,
                     },
                   });
 

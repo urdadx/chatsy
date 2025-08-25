@@ -1,7 +1,7 @@
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
@@ -26,17 +26,34 @@ export const TextSource = () => {
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await createTextSource({ title, content });
-      toast.success("Text source added successfully!");
-      setTitle("");
-      setContent("");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to add text source.");
-    }
-  };
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      try {
+        await createTextSource({ title, content });
+        toast.success("Text source added successfully!");
+        setTitle("");
+        setContent("");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to add text source.");
+      }
+    },
+    [createTextSource, title, content],
+  );
+
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTitle(e.target.value);
+    },
+    [],
+  );
+
+  const handleContentChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setContent(e.target.value);
+    },
+    [],
+  );
 
   return (
     <>
@@ -61,7 +78,7 @@ export const TextSource = () => {
                 name="title"
                 required
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={handleTitleChange}
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -74,7 +91,7 @@ export const TextSource = () => {
                 required
                 placeholder="Enter your text content here"
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={handleContentChange}
               />
             </div>
           </div>

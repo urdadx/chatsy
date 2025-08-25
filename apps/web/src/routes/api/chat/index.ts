@@ -1,4 +1,4 @@
-import { convertToUIMessages } from "@/components/chat/chat-preview";
+import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { db } from "@/db";
 import { chatbot, message } from "@/db/schema";
 import {
@@ -17,6 +17,7 @@ import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { ChatSDKError } from "@/lib/errors";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { getCustomerExternalId } from "@/lib/subscription/subscription-functions";
 import { generateUUID } from "@/lib/utils";
 import { subscriptionMiddleware, tokenUsageMiddleware } from "@/middlewares";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
@@ -94,7 +95,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             return error.toResponse();
           }
 
-          const externalCustomerId = session?.user.id;
+          const externalCustomerId = (await getCustomerExternalId()) || "";
           const chat = await getChatById(id);
 
           const userMessage = messages[messages.length - 1];
@@ -149,7 +150,9 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
               const result = streamText({
                 model: google("gemini-2.0-flash"),
                 system: systemPrompt(chatbotData.name ?? "Assistant"),
-                messages: convertToModelMessages(uiMessages),
+                messages: convertToModelMessages(uiMessages, {
+                  ignoreIncompleteToolCalls: true,
+                }),
                 stopWhen: stepCountIs(5),
                 experimental_transform: smoothStream({ chunking: "word" }),
                 tools: {

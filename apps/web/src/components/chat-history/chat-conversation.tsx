@@ -1,6 +1,6 @@
 import { useMessages } from "@/hooks/use-db-messages";
 import { useSearch } from "@tanstack/react-router";
-import { convertToUIMessages } from "../chat/chat-preview";
+import { convertToUIMessages } from "../chat/convert-to-ui-message";
 import { PreviewMessage } from "../chat/message";
 import { Button } from "../ui/button";
 import {
@@ -49,7 +49,6 @@ export const ChatConversation = () => {
                       message={message}
                       isLoading={false}
                       vote={undefined}
-                      setMessages={() => {}}
                     />
                   </div>
                 ))}

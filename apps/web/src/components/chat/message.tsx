@@ -84,7 +84,7 @@ const PurePreviewMessage = ({
 
               if (type === "text") {
                 const hasToolCalls = message.parts?.some((part) =>
-                  part.type?.startsWith("tool-"),
+                  part.type?.startsWith("tool-escalate"),
                 );
 
                 if (hasToolCalls) {
@@ -161,7 +161,7 @@ const PurePreviewMessage = ({
                 if (state === "input-available") {
                   return (
                     <div key={toolCallId}>
-                      <CollectLeadsForm />
+                      <CollectLeadsForm color={activeChatbot?.primaryColor} />
                     </div>
                   );
                 }

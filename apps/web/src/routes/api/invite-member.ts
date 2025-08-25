@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { member } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
-import { checkMemberInvitationLimits } from "@/lib/subscription-utils";
+import { checkMemberInvitationLimits } from "@/lib/subscription/subscription-utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";

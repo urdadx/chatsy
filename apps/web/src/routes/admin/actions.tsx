@@ -1,11 +1,5 @@
 import { Actions } from "@/components/agents/general-actions";
-import Integrations from "@/components/integrations/integrations";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  createFileRoute,
-  useNavigate,
-  useSearch,
-} from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import z from "zod";
 
 const agentSearchSchema = z.object({
@@ -18,17 +12,17 @@ export const Route = createFileRoute("/admin/actions")({
 });
 
 function RouteComponent() {
-  const navigate = useNavigate({ from: "/admin/actions" });
-  const { tab } = useSearch({ from: "/admin/actions" });
+  // const navigate = useNavigate({ from: "/admin/actions" });
+  // const { tab } = useSearch({ from: "/admin/actions" });
 
-  const handleTabChange = (value: string) => {
-    navigate({
-      search: { tab: value as "general" | "integrations" },
-    });
-  };
+  // const handleTabChange = (value: string) => {
+  //   navigate({
+  //     search: { tab: value as "general" | "integrations" },
+  //   });
+  // };
 
   return (
-    <div className=" max-w-4xl w-full max-h-screen mx-auto px-4 py-4">
+    <div className=" max-w-4xl w-full max-h-screen mx-auto px-4 sm:px-0 py-6">
       <div className="hidden sm:block">
         <h1 className="text-xl font-semibold mb-2 ">Agent Actions</h1>
         <span className="text-md text-muted-foreground">
@@ -36,8 +30,9 @@ function RouteComponent() {
           integrations
         </span>
       </div>
+      <Actions />
 
-      <Tabs value={tab} onValueChange={handleTabChange} className="w-full mt-3">
+      {/* <Tabs value={tab} onValueChange={handleTabChange} className="w-full mt-3">
         <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0 ">
           <TabsTrigger
             value="general"
@@ -58,7 +53,7 @@ function RouteComponent() {
         <TabsContent value="integrations">
           <Integrations />
         </TabsContent>
-      </Tabs>
+      </Tabs> */}
     </div>
   );
 }

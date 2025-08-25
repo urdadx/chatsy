@@ -1,16 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { DBMessage, Vote } from "@/db/schema";
+import type { Vote } from "@/db/schema";
 import { useChatWithReset } from "@/hooks/use-chat-reset";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
-import type { ChatMessage, ChatTools, CustomUIDataTypes } from "@/lib/types";
+import type { ChatMessage } from "@/lib/types";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { DefaultChatTransport, type UIMessagePart } from "ai";
-import { formatISO } from "date-fns";
+import { DefaultChatTransport } from "ai";
 import { ArrowUp, RefreshCcw, SparklesIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -23,20 +22,9 @@ import {
 import { ScrollButton } from "../ui/scroll-button";
 import Spinner from "../ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { convertToUIMessages } from "./convert-to-ui-message";
 import { GreetingMessage } from "./greeting-message";
 import { Messages } from "./messages";
-
-export function convertToUIMessages(messages: DBMessage[]): ChatMessage[] {
-  return messages.map((message) => ({
-    id: message.id,
-    role: message.role as "user" | "assistant" | "system",
-    // @ts-ignore
-    parts: message.parts as UIMessagePart<CustomUIDataTypes, ChatTools>[],
-    metadata: {
-      createdAt: formatISO(message.createdAt),
-    },
-  }));
-}
 
 export function ChatPreview() {
   const { chatId, resetChat } = useChatWithReset();
@@ -77,7 +65,7 @@ export function ChatPreview() {
       queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
       queryClient.invalidateQueries({ queryKey: ["messages"] });
       queryClient.invalidateQueries({
-        queryKey: ["customerMeters", "ai_usage_two"],
+        queryKey: ["active-meters"],
       });
     },
   });
@@ -196,13 +184,12 @@ export function ChatPreview() {
                     messages={messages}
                     setMessages={setMessages}
                     reload={regenerate}
+                    chatbot={chatbot}
                   />
                 )}
 
                 {status === "error" && chatError && (
-                  <div className="text-red-500 p-4">
-                    Error: {chatError.message}
-                  </div>
+                  <div className="text-red-500 p-4">{chatError.message}</div>
                 )}
 
                 <ChatContainerScrollAnchor />

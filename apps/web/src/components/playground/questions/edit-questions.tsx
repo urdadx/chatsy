@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -64,10 +64,27 @@ export const EditQuestion = ({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    mutation.mutate();
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      mutation.mutate();
+    },
+    [mutation],
+  );
+
+  const handleQuestionChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setQuestionText(e.target.value);
+    },
+    [],
+  );
+
+  const handleAnswerChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setAnswerText(e.target.value);
+    },
+    [],
+  );
 
   const formContent = (
     <form onSubmit={handleSubmit} className="w-full space-y-4">
@@ -81,7 +98,7 @@ export const EditQuestion = ({
           name="question"
           placeholder="Eg: When is the new product launching?"
           value={questionText}
-          onChange={(e) => setQuestionText(e.target.value)}
+          onChange={handleQuestionChange}
         />
       </div>
       <div className="flex flex-col space-y-2">
@@ -94,7 +111,7 @@ export const EditQuestion = ({
           placeholder="Enter the answer"
           className="w-full min-h-32"
           value={answerText}
-          onChange={(e) => setAnswerText(e.target.value)}
+          onChange={handleAnswerChange}
         />
       </div>
       <div className="flex justify-end w-full">

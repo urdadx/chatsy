@@ -1,4 +1,4 @@
-import { convertToUIMessages } from "@/components/chat/chat-preview";
+import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { GreetingMessage } from "@/components/chat/greeting-message";
 import { Messages } from "@/components/chat/messages";
 import { AISuggestion, AISuggestions } from "@/components/ui/ai-suggestions";
@@ -23,7 +23,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
 import { ArrowUp, RotateCcw, SparklesIcon, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/bubble/$widgetId")({
@@ -36,6 +36,7 @@ function RouteComponent() {
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
   const [input, setInput] = useState("");
   const [isDeactivated, setIsDeactivated] = useState(false);
+  const [hasLoggedFirstMessage, setHasLoggedFirstMessage] = useState(false);
 
   const initialMessages = messagesFromDb
     ? convertToUIMessages(messagesFromDb)
@@ -61,18 +62,16 @@ function RouteComponent() {
     transport: new DefaultChatTransport({
       fetch: async (url, options) => {
         const response = await fetchWithErrorHandlers(url, options);
-        // Check if the response indicates deactivation
-        if (response.ok) {
-          const data = await response.clone().json();
-          if (data.deactivated) {
-            setIsDeactivated(true);
-            return new Response(
-              JSON.stringify({ error: "Chatbot deactivated" }),
-              {
-                status: 503,
-                headers: { "Content-Type": "application/json" },
-              },
-            );
+
+        // Check if the response indicates deactivation (status 403 with specific message)
+        if (!response.ok && response.status === 403) {
+          try {
+            const errorData = await response.clone().json();
+            if (errorData.error?.includes("offline")) {
+              setIsDeactivated(true);
+            }
+          } catch (e) {
+            // Ignore JSON parsing errors for error responses
           }
         }
 
@@ -97,19 +96,6 @@ function RouteComponent() {
     },
     onFinish: () => {
       queryClient.invalidateQueries({ queryKey: ["messages"] });
-      // Track analytics
-      if (messages.length === 0) {
-        logVisitorAnalytics({
-          event: "bubble_first_message_sent",
-          page_engagement: "first_message",
-        });
-      } else {
-        logVisitorAnalytics({
-          event: "bubble_message_sent",
-          page_engagement: "continued_chat",
-          message_count: messages.length + 1,
-        });
-      }
 
       // Notify parent window of new message
       notifyParent("chatsy-message-received", {
@@ -125,34 +111,59 @@ function RouteComponent() {
     }
   }, [initialMessages, messages.length, setMessages]);
 
-  const handleSubmit = (event?: React.FormEvent) => {
-    event?.preventDefault();
-
-    if (!input.trim()) return;
-
-    sendMessage({ text: input });
-    setInput("");
-  };
-
   const chatbotId = chatbot?.id;
 
-  // Track visitor analytics
+  const analyticsExtra = useMemo(
+    () => ({
+      page_type: "bubble_chat",
+      embed_token: widgetId,
+    }),
+    [widgetId],
+  );
+
   const { logVisitorAnalytics } = useSendVisitorAnalytics({
     chatbotId: chatbotId || "placeholder",
-    extra: { page_type: "bubble_chat", embed_token: widgetId },
+    extra: analyticsExtra,
+    triggerOnMount: false, // Don't log on mount, only when user sends first message
   });
 
-  const handleCloseWidget = () => {
+  const handleSubmit = useCallback(
+    (event?: React.FormEvent) => {
+      event?.preventDefault();
+
+      if (!input.trim()) return;
+
+      // Log analytics only on first message
+      if (!hasLoggedFirstMessage) {
+        logVisitorAnalytics({ event: "page_visit" });
+        setHasLoggedFirstMessage(true);
+      }
+
+      sendMessage({ text: input });
+      setInput("");
+    },
+    [input, sendMessage, hasLoggedFirstMessage, logVisitorAnalytics],
+  );
+
+  const handleCloseWidget = useCallback(() => {
     if (window.parent && window.parent !== window) {
       window.parent.postMessage({ type: "chatsy-widget-close" }, "*");
+      window.parent.postMessage({ type: "page_unload" }, "*");
     }
-  };
+  }, []);
 
   const SUGGESTIONS = chatbot?.suggestedMessages || [];
 
-  const handleSuggestionClick = (suggestion: string) => {
+  const handleSuggestionClick = useCallback((suggestion: string) => {
     setInput(suggestion);
-  };
+  }, []);
+
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput(event.target.value);
+    },
+    [],
+  );
 
   const showPoweredBy = !chatbot?.hidePoweredBy;
   const greetingMessage = chatbot?.initialMessage || "";
@@ -174,18 +185,13 @@ function RouteComponent() {
 
   useEffect(() => {
     notifyParent("chatsy-widget-opened");
-    logVisitorAnalytics({ event: "bubble_chat_opened" });
-
-    return () => {
-      logVisitorAnalytics({ event: "bubble_chat_session_ended" });
-    };
-  }, [notifyParent, logVisitorAnalytics]);
+  }, [notifyParent]);
 
   const handleResetChat = () => {
     resetChat();
     setMessages([]);
     setInput("");
-    logVisitorAnalytics({ event: "bubble_chat_reset" });
+    setHasLoggedFirstMessage(false); // Reset analytics tracking on chat reset
   };
 
   if (chatbotError) {
@@ -295,6 +301,7 @@ function RouteComponent() {
                     messages={messages}
                     setMessages={setMessages}
                     reload={regenerate}
+                    chatbot={chatbot}
                   />
                 )}
 
@@ -344,7 +351,7 @@ function RouteComponent() {
               }
               autoComplete="off"
               value={input}
-              onChange={(event) => setInput(event.target.value)}
+              onChange={handleInputChange}
             />
             <button
               className="rounded-full p-2"

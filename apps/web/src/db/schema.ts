@@ -89,6 +89,7 @@ export const organization = pgTable("organization", {
   logo: text("logo"),
   createdAt: timestamp("created_at").notNull(),
   metadata: text("metadata"),
+  externalCustomerId: uuid("external_customer_id").unique(),
   chatbotCount: integer("chatbot_count").default(1).notNull(),
 });
 
@@ -381,9 +382,6 @@ export const subscription = pgTable("subscription", {
   customerCancellationComment: text("customerCancellationComment"),
   metadata: text("metadata"),
   customFieldData: text("customFieldData"),
-  organizationId: text("organizationId").references(() => organization.id, {
-    onDelete: "cascade",
-  }),
   userId: uuid("userId").references(() => user.id, { onDelete: "cascade" }),
 });
 

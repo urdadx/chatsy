@@ -9,7 +9,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export function CollectFeedbackForm({ color }: { color?: string }) {
-  const embedToken = useEmbedToken();
+  const embedTokenFromContext = useEmbedToken();
   const [formData, setFormData] = useState({
     email: "",
     subject: "",
@@ -25,6 +25,17 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
       [name]: value,
     }));
   };
+
+  const embedToken =
+    embedTokenFromContext ||
+    (() => {
+      if (typeof window !== "undefined") {
+        const path = window.location.pathname;
+        const bubbleMatch = path.match(/\/bubble\/(.+)/);
+        return bubbleMatch ? bubbleMatch[1] : undefined;
+      }
+      return undefined;
+    })();
 
   const mutation = useMutation({
     mutationFn: async (data: typeof formData) => {

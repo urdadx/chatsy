@@ -32,6 +32,7 @@ import { Route as authSetupRouteImport } from './routes/(auth)/setup'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
+import { Route as ApiOrganizationCustomerStateRouteImport } from './routes/api/organization/customer-state'
 import { ServerRoute as ApiVoteCountServerRouteImport } from './routes/api/vote-count'
 import { ServerRoute as ApiVoteServerRouteImport } from './routes/api/vote'
 import { ServerRoute as ApiVisitorAnalyticsServerRouteImport } from './routes/api/visitor-analytics'
@@ -178,6 +179,12 @@ const AdminChatHistoryIndexRoute = AdminChatHistoryIndexRouteImport.update({
   path: '/chat-history/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const ApiOrganizationCustomerStateRoute =
+  ApiOrganizationCustomerStateRouteImport.update({
+    id: '/api/organization/customer-state',
+    path: '/api/organization/customer-state',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiVoteCountServerRoute = ApiVoteCountServerRouteImport.update({
   id: '/api/vote-count',
   path: '/api/vote-count',
@@ -400,6 +407,7 @@ export interface FileRoutesByFullPath {
   '/bubble/$widgetId': typeof BubbleWidgetIdRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/api/organization/customer-state': typeof ApiOrganizationCustomerStateRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
 export interface FileRoutesByTo {
@@ -423,6 +431,7 @@ export interface FileRoutesByTo {
   '/bubble/$widgetId': typeof BubbleWidgetIdRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/api/organization/customer-state': typeof ApiOrganizationCustomerStateRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
 export interface FileRoutesById {
@@ -447,6 +456,7 @@ export interface FileRoutesById {
   '/bubble/$widgetId': typeof BubbleWidgetIdRoute
   '/admin/test': typeof AdminTestLazyRoute
   '/onboarding/': typeof OnboardingIndexRoute
+  '/api/organization/customer-state': typeof ApiOrganizationCustomerStateRoute
   '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
 }
 export interface FileRouteTypes {
@@ -472,6 +482,7 @@ export interface FileRouteTypes {
     | '/bubble/$widgetId'
     | '/admin/test'
     | '/onboarding'
+    | '/api/organization/customer-state'
     | '/admin/chat-history'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/bubble/$widgetId'
     | '/admin/test'
     | '/onboarding'
+    | '/api/organization/customer-state'
     | '/admin/chat-history'
   id:
     | '__root__'
@@ -518,6 +530,7 @@ export interface FileRouteTypes {
     | '/bubble/$widgetId'
     | '/admin/test'
     | '/onboarding/'
+    | '/api/organization/customer-state'
     | '/admin/chat-history/'
   fileRoutesById: FileRoutesById
 }
@@ -534,6 +547,7 @@ export interface RootRouteChildren {
   BioPagePageIdRoute: typeof BioPagePageIdRoute
   BubbleWidgetIdRoute: typeof BubbleWidgetIdRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
+  ApiOrganizationCustomerStateRoute: typeof ApiOrganizationCustomerStateRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
@@ -962,6 +976,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminChatHistoryIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/api/organization/customer-state': {
+      id: '/api/organization/customer-state'
+      path: '/api/organization/customer-state'
+      fullPath: '/api/organization/customer-state'
+      preLoaderRoute: typeof ApiOrganizationCustomerStateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -1269,6 +1290,7 @@ const rootRouteChildren: RootRouteChildren = {
   BioPagePageIdRoute: BioPagePageIdRoute,
   BubbleWidgetIdRoute: BubbleWidgetIdRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
+  ApiOrganizationCustomerStateRoute: ApiOrganizationCustomerStateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

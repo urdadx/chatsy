@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 export interface SendVisitorAnalyticsOptions {
   chatbotId: string;
@@ -29,6 +29,13 @@ export function useSendVisitorAnalytics({
     if (!id) {
       id = Math.random().toString(36).substring(2) + Date.now();
       sessionStorage.setItem("chatsy_visitor_id", id);
+
+      // Also store in localStorage to prevent duplicate visits across sessions
+      localStorage.setItem("chatsy_visitor_permanent_id", id);
+      localStorage.setItem("chatsy_last_visit", Date.now().toString());
+    } else {
+      // Update last visit time
+      localStorage.setItem("chatsy_last_visit", Date.now().toString());
     }
     return { id, isFirstVisit };
   }
@@ -165,171 +172,192 @@ export function useSendVisitorAnalytics({
     tryLocationAPI();
   }
 
-  function logVisitorAnalytics(logExtra?: any) {
-    if (!chatbotId || chatbotId === "placeholder") {
-      console.debug(
-        "Visitor analytics not logged: invalid chatbotId",
-        chatbotId,
-      );
-      return;
-    }
+  // Memoize sendAnalyticsData function to prevent unnecessary recreations
+  const sendAnalyticsData = useCallback(
+    (data: any, retryCount = 0) => {
+      const maxRetries = 2;
+      const retryDelay = Math.min(1000 * 2 ** retryCount, 5000); // Exponential backoff, max 5s
 
-    // Prevent duplicate logs within a short time window (deduplication)
-    const now = Date.now();
-    const event = logExtra?.event || "unknown";
-    const requestKey = `${chatbotId}-${event}-${Math.floor(now / 1000)}`; // 1-second window
+      console.debug("Sending visitor analytics data:", data);
 
-    if (pendingRequestsRef.current.has(requestKey)) {
-      console.debug(`Skipping duplicate analytics log for ${event}`);
-      return;
-    }
+      if (onLog) onLog(data);
 
-    // Prevent rapid-fire logging of the same event type
-    if (
-      lastLogRef.current &&
-      lastLogRef.current.event === event &&
-      now - lastLogRef.current.timestamp < 500
-    ) {
-      // 500ms minimum between same events
-      console.debug(`Rate limiting analytics log for ${event}`);
-      return;
-    }
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
-    lastLogRef.current = { event, timestamp: now };
-    pendingRequestsRef.current.add(requestKey);
+      fetch("/api/visitor-analytics", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Chatsy Analytics Client",
+        },
+        body: JSON.stringify(data),
+        signal: controller.signal,
+        // Add request options for better reliability
+        keepalive: true, // Ensure request completes even if page unloads
+      })
+        .then((response) => {
+          clearTimeout(timeoutId);
 
-    // Clean up old pending requests (prevent memory leak)
-    setTimeout(() => {
-      pendingRequestsRef.current.delete(requestKey);
-    }, 5000);
+          if (!response.ok) {
+            // Log detailed error information
+            console.error(
+              "Failed to send visitor analytics:",
+              response.status,
+              response.statusText,
+            );
 
-    console.debug("Logging visitor analytics for organization:", chatbotId);
+            // Retry on server errors (5xx) but not client errors (4xx)
+            if (response.status >= 500 && retryCount < maxRetries) {
+              console.warn(
+                `Retrying analytics request in ${retryDelay}ms (attempt ${retryCount + 1}/${maxRetries})`,
+              );
+              setTimeout(() => {
+                sendAnalyticsData(data, retryCount + 1);
+              }, retryDelay);
+              return;
+            }
 
-    const { id: visitorId, isFirstVisit } = getVisitorId();
-    const userAgent = navigator.userAgent;
-    const deviceInfo = {
-      platform: navigator.platform,
-      deviceType: getDeviceType(),
-    };
-    const referer = document.referrer || null;
+            return response.text().then((text) => {
+              console.error("Response body:", text);
+            });
+          }
 
-    // Only fetch location for initial visits to minimize API calls
-    const shouldFetchLocation =
-      (logExtra?.event === "page_visit" ||
-        logExtra?.event === "widget_opened") &&
-      !locationFetchedRef.current;
+          console.debug("Visitor analytics sent successfully");
 
-    if (shouldFetchLocation) {
-      getLocationInfo((location) => {
+          // Since SSE handles real-time updates, we don't need manual invalidation
+          // The SSE stream will automatically detect changes and invalidate queries
+          // However, we can optionally invalidate immediately for instant feedback
+          // This ensures even if SSE is temporarily disconnected, data stays fresh
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+
+          // Retry on network errors if we haven't exceeded max retries
+          if (
+            retryCount < maxRetries &&
+            (error.name === "AbortError" ||
+              error.name === "TypeError" ||
+              error.name === "NetworkError")
+          ) {
+            console.warn(
+              `Network error, retrying analytics request in ${retryDelay}ms (attempt ${retryCount + 1}/${maxRetries}):`,
+              error.message,
+            );
+            setTimeout(() => {
+              sendAnalyticsData(data, retryCount + 1);
+            }, retryDelay);
+          } else {
+            console.error(
+              "Error sending visitor analytics (final attempt):",
+              error,
+            );
+          }
+        });
+    },
+    [onLog],
+  );
+
+  // Memoize logVisitorAnalytics function to prevent unnecessary re-renders
+  const logVisitorAnalytics = useCallback(
+    (logExtra?: any) => {
+      if (!chatbotId || chatbotId === "placeholder") {
+        console.debug(
+          "Visitor analytics not logged: invalid chatbotId",
+          chatbotId,
+        );
+        return;
+      }
+
+      // Prevent duplicate logs within a short time window (deduplication)
+      const now = Date.now();
+      const event = logExtra?.event || "unknown";
+      const requestKey = `${chatbotId}-${event}-${Math.floor(now / 5000)}`; // 5-second window
+
+      if (pendingRequestsRef.current.has(requestKey)) {
+        console.debug(`Skipping duplicate analytics log for ${event}`);
+        return;
+      }
+
+      // Prevent rapid-fire logging of the same event type
+      if (
+        lastLogRef.current &&
+        lastLogRef.current.event === event &&
+        now - lastLogRef.current.timestamp < 2000
+      ) {
+        // 2s minimum between same events
+        console.debug(`Rate limiting analytics log for ${event}`);
+        return;
+      }
+
+      // For chat opened events, check if we've already logged this session
+      if (event === "bubble_chat_opened") {
+        const lastChatOpen = localStorage.getItem("chatsy_last_chat_opened");
+        if (lastChatOpen && now - Number.parseInt(lastChatOpen) < 30000) {
+          // 30 seconds
+          console.debug(
+            "Skipping duplicate chat opened event within 30 seconds",
+          );
+          return;
+        }
+        localStorage.setItem("chatsy_last_chat_opened", now.toString());
+      }
+
+      lastLogRef.current = { event, timestamp: now };
+      pendingRequestsRef.current.add(requestKey);
+
+      // Clean up old pending requests (prevent memory leak)
+      setTimeout(() => {
+        pendingRequestsRef.current.delete(requestKey);
+      }, 5000);
+
+      console.debug("Logging visitor analytics for organization:", chatbotId);
+
+      const { id: visitorId, isFirstVisit } = getVisitorId();
+      const userAgent = navigator.userAgent;
+      const deviceInfo = {
+        platform: navigator.platform,
+        deviceType: getDeviceType(),
+      };
+      const referer = document.referrer || null;
+
+      // Only fetch location for initial visits to minimize API calls
+      const shouldFetchLocation =
+        (logExtra?.event === "page_visit" ||
+          logExtra?.event === "widget_opened") &&
+        !locationFetchedRef.current;
+
+      if (shouldFetchLocation) {
+        getLocationInfo((location) => {
+          sendAnalyticsData({
+            chatbotId,
+            visitorId,
+            userAgent,
+            deviceInfo,
+            location,
+            referer,
+            isFirstVisit,
+            ...extra,
+            ...logExtra,
+          });
+        });
+      } else {
+        // Use cached location data or send without location
         sendAnalyticsData({
           chatbotId,
           visitorId,
           userAgent,
           deviceInfo,
-          location,
+          location: locationDataRef.current,
           referer,
           isFirstVisit,
           ...extra,
           ...logExtra,
         });
-      });
-    } else {
-      // Use cached location data or send without location
-      sendAnalyticsData({
-        chatbotId,
-        visitorId,
-        userAgent,
-        deviceInfo,
-        location: locationDataRef.current,
-        referer,
-        isFirstVisit,
-        ...extra,
-        ...logExtra,
-      });
-    }
-  }
-
-  function sendAnalyticsData(data: any, retryCount = 0) {
-    const maxRetries = 2;
-    const retryDelay = Math.min(1000 * 2 ** retryCount, 5000); // Exponential backoff, max 5s
-
-    console.debug("Sending visitor analytics data:", data);
-
-    if (onLog) onLog(data);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-    fetch("/api/visitor-analytics", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "Chatsy Analytics Client",
-      },
-      body: JSON.stringify(data),
-      signal: controller.signal,
-      // Add request options for better reliability
-      keepalive: true, // Ensure request completes even if page unloads
-    })
-      .then((response) => {
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          // Log detailed error information
-          console.error(
-            "Failed to send visitor analytics:",
-            response.status,
-            response.statusText,
-          );
-
-          // Retry on server errors (5xx) but not client errors (4xx)
-          if (response.status >= 500 && retryCount < maxRetries) {
-            console.warn(
-              `Retrying analytics request in ${retryDelay}ms (attempt ${retryCount + 1}/${maxRetries})`,
-            );
-            setTimeout(() => {
-              sendAnalyticsData(data, retryCount + 1);
-            }, retryDelay);
-            return;
-          }
-
-          return response.text().then((text) => {
-            console.error("Response body:", text);
-          });
-        }
-
-        console.debug("Visitor analytics sent successfully");
-
-        // Since SSE handles real-time updates, we don't need manual invalidation
-        // The SSE stream will automatically detect changes and invalidate queries
-        // However, we can optionally invalidate immediately for instant feedback
-        // This ensures even if SSE is temporarily disconnected, data stays fresh
-      })
-      .catch((error) => {
-        clearTimeout(timeoutId);
-
-        // Retry on network errors if we haven't exceeded max retries
-        if (
-          retryCount < maxRetries &&
-          (error.name === "AbortError" ||
-            error.name === "TypeError" ||
-            error.name === "NetworkError")
-        ) {
-          console.warn(
-            `Network error, retrying analytics request in ${retryDelay}ms (attempt ${retryCount + 1}/${maxRetries}):`,
-            error.message,
-          );
-          setTimeout(() => {
-            sendAnalyticsData(data, retryCount + 1);
-          }, retryDelay);
-        } else {
-          console.error(
-            "Error sending visitor analytics (final attempt):",
-            error,
-          );
-        }
-      });
-  }
+      }
+    },
+    [chatbotId, extra, sendAnalyticsData],
+  );
 
   useEffect(() => {
     if (triggerOnMount && chatbotId && chatbotId !== "placeholder") {

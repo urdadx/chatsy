@@ -112,7 +112,7 @@ export function getMessageByErrorCode(errorCode: ErrorCode): string {
     case "forbidden:subscription":
       return "You need an active subscription to use this feature. Please upgrade your plan and try again.";
     case "forbidden:tokens":
-      return "You have exhausted your credit limit for this month. Please upgrade your plan to continue using this feature.";
+      return "You have exhausted your credit limit for this month. Buy more credits to continue using this feature.";
     case "unauthorized:subscription":
       return "You need to sign in to access subscription features. Please sign in and try again.";
     case "not_found:subscription":

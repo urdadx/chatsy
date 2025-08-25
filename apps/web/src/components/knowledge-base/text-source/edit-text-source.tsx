@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -66,10 +66,27 @@ export const EditTextSource = ({
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    mutation.mutate();
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      mutation.mutate();
+    },
+    [mutation],
+  );
+
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTitle(e.target.value);
+    },
+    [],
+  );
+
+  const handleContentChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setContent(e.target.value);
+    },
+    [],
+  );
 
   const formContent = (
     <form onSubmit={handleSubmit} className="w-full space-y-4">
@@ -83,7 +100,7 @@ export const EditTextSource = ({
           name="title"
           placeholder="Eg: Company History"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={handleTitleChange}
         />
       </div>
       <div className="flex flex-col space-y-2">
@@ -96,7 +113,7 @@ export const EditTextSource = ({
           placeholder="Enter the content"
           className="w-full min-h-32"
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={handleContentChange}
         />
       </div>
       <div className="flex justify-end w-full">

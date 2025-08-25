@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useUsage } from "@/hooks/use-usage-meters";
+import { useActiveMeters } from "@/hooks/use-usage-meters";
 import { getDaysUntilReset } from "@/lib/utils";
 import { motion } from "motion/react";
 import { AddOnsDialog } from "./add-ons-dialog";
@@ -9,17 +9,17 @@ import { Button } from "./ui/button";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 
 export function UsageBanner() {
-  const { data, isLoading, isError } = useUsage("ai_usage_two");
-  const meter = Array.isArray(data) ? data[0] : data;
+  const { data: activeMeters, isLoading, isError } = useActiveMeters();
 
-  const creditedUnits = meter?.creditedUnits ?? 0;
-  const balance = meter?.balance ?? 0;
+  console.log("Active meters data:", activeMeters);
+
+  const creditedUnits = activeMeters?.creditedUnits ?? 0;
+  const balance = activeMeters?.balance ?? 0;
   const totalUsage = creditedUnits;
   const currentUsage = creditedUnits - balance;
   const usagePercentage =
     creditedUnits > 0 ? (balance / creditedUnits) * 100 : 0;
-
-  console.log("Meter data:", meter);
+  const createdAt = activeMeters?.createdAt;
 
   if (isLoading) {
     return (
@@ -52,7 +52,7 @@ export function UsageBanner() {
         <div className="mb-2">
           <div className="flex justify-between text-xs">
             <span className="mb-2">
-              Resets in {getDaysUntilReset(meter?.createdAt)}
+              Resets in {getDaysUntilReset(createdAt)}
             </span>
           </div>
           <Progress value={usagePercentage} />

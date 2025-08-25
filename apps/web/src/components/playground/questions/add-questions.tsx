@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -52,10 +52,27 @@ export const AddQuestions = () => {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    mutation.mutate();
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      mutation.mutate();
+    },
+    [mutation],
+  );
+
+  const handleQuestionChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setQuestion(e.target.value);
+    },
+    [],
+  );
+
+  const handleAnswerChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setAnswer(e.target.value);
+    },
+    [],
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -80,7 +97,7 @@ export const AddQuestions = () => {
               name="question"
               placeholder="Eg: When is the new product launching?"
               value={question}
-              onChange={(e) => setQuestion(e.target.value)}
+              onChange={handleQuestionChange}
             />
           </div>
           <div className="flex flex-col space-y-2">
@@ -93,7 +110,7 @@ export const AddQuestions = () => {
               placeholder="Enter the answer"
               className="w-full min-h-32"
               value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
+              onChange={handleAnswerChange}
             />
           </div>
           <div className="flex items-center space-x-2">

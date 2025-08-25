@@ -1,4 +1,4 @@
-import { convertToUIMessages } from "@/components/chat/chat-preview";
+import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { GreetingMessage } from "@/components/chat/greeting-message";
 import { Messages } from "@/components/chat/messages";
 import { AISuggestion, AISuggestions } from "@/components/ui/ai-suggestions";
@@ -23,7 +23,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
 import { ArrowUp, RefreshCcw, SparklesIcon, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/bio-page/$pageId")({
@@ -77,18 +77,16 @@ function RouteComponent() {
     transport: new DefaultChatTransport({
       fetch: async (url, options) => {
         const response = await fetchWithErrorHandlers(url, options);
-        // Check if the response indicates deactivation
-        if (response.ok) {
-          const data = await response.clone().json();
-          if (data.deactivated) {
-            setIsDeactivated(true);
-            return new Response(
-              JSON.stringify({ error: "Chatbot deactivated" }),
-              {
-                status: 503,
-                headers: { "Content-Type": "application/json" },
-              },
-            );
+
+        // Check if the response indicates deactivation (status 403 with specific message)
+        if (!response.ok && response.status === 403) {
+          try {
+            const errorData = await response.clone().json();
+            if (errorData.error?.includes("offline")) {
+              setIsDeactivated(true);
+            }
+          } catch (e) {
+            // Ignore JSON parsing errors for error responses
           }
         }
 
@@ -113,18 +111,6 @@ function RouteComponent() {
     },
     onFinish: () => {
       queryClient.invalidateQueries({ queryKey: ["messages"] });
-      if (messages.length === 0) {
-        logVisitorAnalytics({
-          event: "bio_first_message_sent",
-          page_engagement: "first_message",
-        });
-      } else {
-        logVisitorAnalytics({
-          event: "bio_message_sent",
-          page_engagement: "continued_chat",
-          message_count: messages.length + 1,
-        });
-      }
     },
   });
 
@@ -134,21 +120,32 @@ function RouteComponent() {
     }
   }, [initialMessages, messages.length, setMessages]);
 
-  const handleSubmit = (event?: React.FormEvent) => {
-    event?.preventDefault();
-
-    if (!input.trim()) return;
-
-    sendMessage({ text: input });
-    setInput("");
-  };
-
   const chatbotId = chatbot?.id;
+
+  const analyticsExtra = useMemo(
+    () => ({
+      page_type: "bio_page",
+      page_id: pageId,
+    }),
+    [pageId],
+  );
 
   const { logVisitorAnalytics } = useSendVisitorAnalytics({
     chatbotId: chatbotId || "placeholder",
-    extra: { page_type: "bio_page", page_id: pageId },
+    extra: analyticsExtra,
   });
+
+  const handleSubmit = useCallback(
+    (event?: React.FormEvent) => {
+      event?.preventDefault();
+
+      if (!input.trim()) return;
+
+      sendMessage({ text: input });
+      setInput("");
+    },
+    [input, sendMessage, messages.length, logVisitorAnalytics],
+  );
 
   const handleResetChat = useCallback(() => {
     setMessages([]);
@@ -168,9 +165,16 @@ function RouteComponent() {
 
   const SUGGESTIONS = chatbot?.suggestedMessages || [];
 
-  const handleSuggestionClick = (suggestion: string) => {
+  const handleSuggestionClick = useCallback((suggestion: string) => {
     setInput(suggestion);
-  };
+  }, []);
+
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput(event.target.value);
+    },
+    [],
+  );
 
   const showPoweredBy = !chatbot?.hidePoweredBy;
   const greetingMessage = chatbot?.initialMessage || "";
@@ -299,6 +303,7 @@ function RouteComponent() {
                       messages={messages}
                       setMessages={setMessages}
                       reload={regenerate}
+                      chatbot={chatbot}
                     />
                   )}
 
@@ -349,7 +354,7 @@ function RouteComponent() {
                 autoComplete="off"
                 autoFocus
                 value={input}
-                onChange={(event) => setInput(event.target.value)}
+                onChange={handleInputChange}
               />
               <button
                 className="rounded-full p-2"

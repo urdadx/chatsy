@@ -1,4 +1,4 @@
-import { convertToUIMessages } from "@/components/chat/chat-preview";
+import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { db } from "@/db";
 import { chat, member, message } from "@/db/schema";
 import {
@@ -14,7 +14,6 @@ import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { ChatSDKError } from "@/lib/errors";
 import { generateUUID } from "@/lib/utils";
-import { subscriptionMiddleware, tokenUsageMiddleware } from "@/middlewares";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -36,228 +35,207 @@ const google = createGoogleGenerativeAI({
 export const ServerRoute = createServerFileRoute(
   "/api/embed/chat/$embedToken",
 ).methods((api) => ({
-  POST: api
-    .middleware([subscriptionMiddleware, tokenUsageMiddleware])
+  POST: api.handler(async ({ params, request }) => {
+    const { embedToken } = params;
 
-    .handler(async ({ params, request, context }) => {
-      const { embedToken } = params;
+    if (!embedToken) {
+      const error = new ChatSDKError(
+        "bad_request:api",
+        "Embed token is required",
+      );
+      return error.toResponse();
+    }
 
-      if (!embedToken) {
+    try {
+      const { id, messages } = await request.json();
+
+      const chatbotData = await getChatbotDataByEmbedToken(embedToken);
+
+      if (!chatbotData) {
+        const error = new ChatSDKError("not_found:api", "Chatbot not found");
+        return error.toResponse();
+      }
+
+      if (!chatbotData.isEmbeddingEnabled) {
         const error = new ChatSDKError(
-          "bad_request:api",
-          "Embed token is required",
+          "forbidden:api",
+          "This chatbot is offline",
         );
         return error.toResponse();
       }
 
-      if (context.hasActiveSubscription === false || context.tokensLeft === 0) {
-        return json(
-          {
-            deactivated: true,
-            message: "This chatbot is currently unavailable",
-          },
-          { status: 200 },
+      const [owner] = await db
+        .select({ userId: member.userId })
+        .from(member)
+        .where(
+          and(
+            eq(member.organizationId, chatbotData.organizationId),
+            eq(member.role, "owner"),
+          ),
         );
+
+      if (!owner) {
+        const error = new ChatSDKError(
+          "not_found:api",
+          "No owner found for this organization",
+        );
+        return error.toResponse();
       }
 
-      try {
-        const { id, messages } = await request.json();
+      const externalCustomerId = owner.userId;
 
-        const chatbotData = await getChatbotDataByEmbedToken(embedToken);
+      const referer = request.headers.get("referer");
+      if (chatbotData.allowedDomains && chatbotData.allowedDomains.length > 0) {
+        const requestDomain = referer ? new URL(referer).hostname : null;
 
-        if (!chatbotData) {
-          const error = new ChatSDKError("not_found:api", "Chatbot not found");
-          return error.toResponse();
-        }
-
-        if (!chatbotData.isEmbeddingEnabled) {
-          const error = new ChatSDKError(
-            "forbidden:api",
-            "This chatbot is offline",
-          );
-          return error.toResponse();
-        }
-
-        const [owner] = await db
-          .select({ userId: member.userId })
-          .from(member)
-          .where(
-            and(
-              eq(member.organizationId, chatbotData.organizationId),
-              eq(member.role, "owner"),
-            ),
-          );
-
-        if (!owner) {
-          const error = new ChatSDKError(
-            "not_found:api",
-            "No owner found for this organization",
-          );
-          return error.toResponse();
-        }
-
-        const externalCustomerId = owner.userId;
-
-        const referer = request.headers.get("referer");
         if (
-          chatbotData.allowedDomains &&
-          chatbotData.allowedDomains.length > 0
+          !requestDomain ||
+          !chatbotData.allowedDomains.some(
+            (domain) =>
+              requestDomain === domain || requestDomain.endsWith(`.${domain}`),
+          )
         ) {
-          const requestDomain = referer ? new URL(referer).hostname : null;
-
-          if (
-            !requestDomain ||
-            !chatbotData.allowedDomains.some(
-              (domain) =>
-                requestDomain === domain ||
-                requestDomain.endsWith(`.${domain}`),
-            )
-          ) {
-            const error = new ChatSDKError(
-              "forbidden:api",
-              "Domain not allowed",
-            );
-            return error.toResponse();
-          }
+          const error = new ChatSDKError("forbidden:api", "Domain not allowed");
+          return error.toResponse();
         }
+      }
 
-        const [existingChat] = await db
-          .select()
-          .from(chat)
-          .where(eq(chat.id, id));
+      const [existingChat] = await db
+        .select()
+        .from(chat)
+        .where(eq(chat.id, id));
 
-        const userMessage = messages[messages.length - 1];
+      const userMessage = messages[messages.length - 1];
 
-        if (!existingChat) {
-          const title = await generateTitleFromUserMessage({
-            message: userMessage,
-          });
+      if (!existingChat) {
+        const title = await generateTitleFromUserMessage({
+          message: userMessage,
+        });
+        await db
+          .insert(chat)
+          .values({
+            id,
+            createdAt: new Date(),
+            userId: null,
+            chatbotId: chatbotData.id,
+            title,
+            visibility: "public",
+          })
+          .onConflictDoNothing();
+      }
+
+      const messagesFromDb = await getMessagesByChatId({ id });
+      const uiMessages = [...convertToUIMessages(messagesFromDb), userMessage];
+
+      if (userMessage && userMessage?.role === "user") {
+        try {
           await db
-            .insert(chat)
+            .insert(message)
             .values({
-              id,
-              createdAt: new Date(),
-              userId: null,
-              chatbotId: chatbotData.id,
-              title,
-              visibility: "public",
+              chatId: id,
+              role: "user",
+              parts: userMessage.parts,
             })
             .onConflictDoNothing();
+        } catch (error) {
+          console.error("Error saving user message:", error);
         }
-
-        const messagesFromDb = await getMessagesByChatId({ id });
-        const uiMessages = [
-          ...convertToUIMessages(messagesFromDb),
-          userMessage,
-        ];
-
-        if (userMessage && userMessage?.role === "user") {
-          try {
-            await db
-              .insert(message)
-              .values({
-                chatId: id,
-                role: "user",
-                parts: userMessage.parts,
-              })
-              .onConflictDoNothing();
-          } catch (error) {
-            console.error("Error saving user message:", error);
-          }
-        }
-
-        const stream = createUIMessageStream({
-          execute: ({ writer: dataStream }) => {
-            const result = streamText({
-              model: google("gemini-2.0-flash"),
-              system: systemPrompt(chatbotData.name ?? "Assistant"),
-              messages: convertToModelMessages(uiMessages),
-              stopWhen: stepCountIs(5),
-              experimental_transform: smoothStream({ chunking: "word" }),
-              tools: {
-                knowledge_base: knowledgeSearchTool(chatbotData.id),
-                collect_feedback: collectFeedbackTool,
-                collect_leads: collectLeadsTool,
-                escalate_to_human: escalateToHumanTool({
-                  chatId: id,
-                  chatbotId: chatbotData.id,
-                  embedToken,
-                }),
-              },
-              onFinish: async ({ usage }) => {
-                await polarClient.events.ingest({
-                  events: [
-                    {
-                      name: "ai_usage_two",
-                      externalCustomerId,
-                      metadata: {
-                        totalTokens: usage.totalTokens ?? 0,
-                        promptTokens: usage.inputTokens ?? 0,
-                        completionTokens: usage.outputTokens ?? 0,
-                      },
-                    },
-                  ],
-                });
-              },
-              onError: (err) => {
-                console.error("🛑 streamText error:", err);
-              },
-            });
-
-            result.consumeStream();
-
-            dataStream.merge(
-              result.toUIMessageStream({
-                sendReasoning: false,
-              }),
-            );
-          },
-          generateId: generateUUID,
-          onFinish: async ({ messages }) => {
-            await saveMessages({
-              messages: messages.map((message) => ({
-                id: message.id,
-                chatId: id,
-                role: message.role,
-                parts: message.parts,
-                createdAt: new Date(),
-              })),
-            });
-          },
-          onError: (error) => {
-            console.log("Error in createUIMessageStream:", error);
-            return "Oops, an error occurred!";
-          },
-        });
-
-        const response = new Response(
-          stream.pipeThrough(new JsonToSseTransformStream()),
-        );
-
-        // Add CORS headers for embedded widgets
-        const headers = new Headers(response.headers);
-        headers.set("X-Chat-Id", id);
-        headers.set("Cache-Control", "no-cache");
-        headers.set("Connection", "keep-alive");
-        headers.set(
-          "Access-Control-Allow-Origin",
-          referer ? new URL(referer).origin : "*",
-        );
-        headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-        headers.set("Access-Control-Allow-Headers", "Content-Type");
-
-        return new Response(response.body, {
-          status: response.status,
-          headers,
-        });
-      } catch (err: any) {
-        console.error("Error in /api/embed/chat:", err);
-        return json(
-          { error: err?.message || "Internal server error" },
-          { status: err?.code === "DAILY_LIMIT_REACHED" ? 403 : 500 },
-        );
       }
-    }),
+
+      const stream = createUIMessageStream({
+        execute: ({ writer: dataStream }) => {
+          const result = streamText({
+            model: google("gemini-2.0-flash"),
+            system: systemPrompt(chatbotData.name ?? "Assistant"),
+            messages: convertToModelMessages(uiMessages, {
+              ignoreIncompleteToolCalls: true,
+            }),
+            stopWhen: stepCountIs(5),
+            experimental_transform: smoothStream({ chunking: "word" }),
+            tools: {
+              knowledge_base: knowledgeSearchTool(chatbotData.id),
+              collect_feedback: collectFeedbackTool,
+              collect_leads: collectLeadsTool,
+              escalate_to_human: escalateToHumanTool({
+                chatId: id,
+                chatbotId: chatbotData.id,
+                embedToken,
+              }),
+            },
+            onFinish: async ({ usage }) => {
+              await polarClient.events.ingest({
+                events: [
+                  {
+                    name: "ai_usage_two",
+                    externalCustomerId,
+                    metadata: {
+                      totalTokens: usage.totalTokens ?? 0,
+                      promptTokens: usage.inputTokens ?? 0,
+                      completionTokens: usage.outputTokens ?? 0,
+                    },
+                  },
+                ],
+              });
+            },
+            onError: (err) => {
+              console.error("🛑 streamText error:", err);
+            },
+          });
+
+          result.consumeStream();
+
+          dataStream.merge(
+            result.toUIMessageStream({
+              sendReasoning: false,
+            }),
+          );
+        },
+        generateId: generateUUID,
+        onFinish: async ({ messages }) => {
+          await saveMessages({
+            messages: messages.map((message) => ({
+              id: message.id,
+              chatId: id,
+              role: message.role,
+              parts: message.parts,
+              createdAt: new Date(),
+            })),
+          });
+        },
+        onError: (error) => {
+          console.log("Error in createUIMessageStream:", error);
+          return "Oops, an error occurred!";
+        },
+      });
+
+      const response = new Response(
+        stream.pipeThrough(new JsonToSseTransformStream()),
+      );
+
+      // Add CORS headers for embedded widgets
+      const headers = new Headers(response.headers);
+      headers.set("X-Chat-Id", id);
+      headers.set("Cache-Control", "no-cache");
+      headers.set("Connection", "keep-alive");
+      headers.set(
+        "Access-Control-Allow-Origin",
+        referer ? new URL(referer).origin : "*",
+      );
+      headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+      headers.set("Access-Control-Allow-Headers", "Content-Type");
+
+      return new Response(response.body, {
+        status: response.status,
+        headers,
+      });
+    } catch (err: any) {
+      console.error("Error in /api/embed/chat:", err);
+      return json(
+        { error: err?.message || "Internal server error" },
+        { status: err?.code === "DAILY_LIMIT_REACHED" ? 403 : 500 },
+      );
+    }
+  }),
 
   OPTIONS: api.handler(async ({ request }) => {
     // Handle CORS preflight requests

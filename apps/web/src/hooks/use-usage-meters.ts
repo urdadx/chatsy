@@ -1,4 +1,5 @@
 import { authClient } from "@/lib/auth-client";
+import { getActiveMeter } from "@/lib/auth-utils";
 import { useQuery } from "@tanstack/react-query";
 
 export function useUsage(meterName = "all") {
@@ -18,3 +19,10 @@ export function useUsage(meterName = "all") {
     },
   });
 }
+
+export const useActiveMeters = () => {
+  return useQuery({
+    queryKey: ["active-meters"],
+    queryFn: () => getActiveMeter(),
+  });
+};
