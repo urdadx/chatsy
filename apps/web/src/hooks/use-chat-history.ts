@@ -3,14 +3,18 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 const PAGE_SIZE = 10;
 
-export const useChatHistory = (filter = "24h") => {
+export const useChatHistory = (filter = "24h", status = "all") => {
   return useInfiniteQuery({
-    queryKey: ["chat-logs", filter],
+    queryKey: ["chat-logs", filter, status],
     queryFn: async ({ pageParam }) => {
       const params: any = { limit: PAGE_SIZE };
 
       if (filter && filter !== "all") {
         params.filter = filter;
+      }
+
+      if (status && status !== "all") {
+        params.status = status;
       }
 
       if (pageParam) {

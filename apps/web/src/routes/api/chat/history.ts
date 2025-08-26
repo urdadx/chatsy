@@ -12,6 +12,7 @@ const querySchema = z.object({
   cursor: z.string().uuid().optional().nullable(),
   direction: z.enum(["next", "prev"]).default("next"),
   filter: z.enum(["24h", "7d", "30d", "90d", "all"]).default("24h"),
+  status: z.enum(["all", "unresolved", "resolved", "escalated"]).default("all"),
 });
 
 export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
@@ -67,7 +68,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
       return new Response("Invalid query params", { status: 400 });
     }
 
-    const { limit, cursor, filter } = result.data;
+    const { limit, cursor, filter, status } = result.data;
 
     // Time filtering
     let timeFilter: SQL<any> | undefined;
@@ -82,12 +83,19 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
       timeFilter = gt(chat.createdAt, timeMap[filter]);
     }
 
+    // Status filtering
+    let statusFilter: SQL<any> | undefined;
+    if (status !== "all") {
+      statusFilter = eq(chat.status, status);
+    }
+
     try {
       // Modified where conditions to include chatbot scoping
       // Include both user's personal chats AND embedded chats (userId = null) for the chatbot
       const whereConditions = [eq(chat.chatbotId, chatbotId)];
 
       if (timeFilter) whereConditions.push(timeFilter);
+      if (statusFilter) whereConditions.push(statusFilter);
 
       if (cursor) {
         const [refChat] = await db

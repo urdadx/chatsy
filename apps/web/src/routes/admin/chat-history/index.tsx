@@ -33,6 +33,7 @@ import z from "zod";
 export const chatHistorySearchSchema = z.object({
   chatId: z.string().optional(),
   filter: z.enum(["24h", "7d", "30d", "90d", "all"]).default("24h"),
+  status: z.enum(["all", "unresolved", "resolved", "escalated"]).default("all"),
 });
 
 export const Route = createFileRoute("/admin/chat-history/")({
@@ -42,7 +43,9 @@ export const Route = createFileRoute("/admin/chat-history/")({
 
 function RouteComponent() {
   const navigate = useNavigate({ from: "/admin/chat-history" });
-  const { chatId, filter } = useSearch({ from: "/admin/chat-history/" });
+  const { chatId, filter, status } = useSearch({
+    from: "/admin/chat-history/",
+  });
   const isMobile = useIsMobile();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [selectedChatTitle, setSelectedChatTitle] = useState<string>("");
@@ -55,20 +58,19 @@ function RouteComponent() {
     refetch,
     isLoading,
     isError,
-  } = useChatHistory(filter);
+  } = useChatHistory(filter, status);
 
   const chats = data?.pages.flatMap((page) => page.chats) ?? [];
 
   const handleChatIdChange = (value: string) => {
     if (isMobile) {
-      // On mobile, find the selected chat title and open drawer
       const selectedChat = chats.find((chat) => chat.id === value);
       setSelectedChatTitle(selectedChat?.title || "Untitled Chat");
       setMobileDrawerOpen(true);
     }
 
     navigate({
-      search: { chatId: value, filter },
+      search: { chatId: value, filter, status },
     });
   };
 
@@ -76,6 +78,17 @@ function RouteComponent() {
     navigate({
       search: {
         filter: value as "24h" | "7d" | "30d" | "90d",
+        chatId: undefined,
+        status,
+      },
+    });
+  };
+
+  const handleStatusChange = (value: string) => {
+    navigate({
+      search: {
+        status: value as "all" | "unresolved" | "resolved" | "escalated",
+        filter,
         chatId: undefined,
       },
     });
@@ -97,6 +110,28 @@ function RouteComponent() {
                   <SelectItem value="7d">Last 7 days</SelectItem>
                   <SelectItem value="30d">Last month</SelectItem>
                   <SelectItem value="90d">Last 3 months</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={status} onValueChange={handleStatusChange}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="unresolved">Unresolved</SelectItem>
+                  <SelectItem value="resolved">Resolved</SelectItem>
+                  <SelectItem value="escalated">Escalated</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={status} onValueChange={handleStatusChange}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="unresolved">Unresolved</SelectItem>
+                  <SelectItem value="resolved">Resolved</SelectItem>
+                  <SelectItem value="escalated">Escalated</SelectItem>
                 </SelectContent>
               </Select>
               <Button
@@ -144,6 +179,19 @@ function RouteComponent() {
                     <SelectItem value="7d">Last 7 days</SelectItem>
                     <SelectItem value="30d">Last month</SelectItem>
                     <SelectItem value="90d">Last 3 months</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="relative">
+                <Select value={status} onValueChange={handleStatusChange}>
+                  <SelectTrigger className="w-[160px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="unresolved">Unresolved</SelectItem>
+                    <SelectItem value="resolved">Resolved</SelectItem>
+                    <SelectItem value="escalated">Escalated</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

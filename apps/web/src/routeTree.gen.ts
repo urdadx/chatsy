@@ -38,6 +38,7 @@ import { ServerRoute as ApiVoteServerRouteImport } from './routes/api/vote'
 import { ServerRoute as ApiVisitorAnalyticsServerRouteImport } from './routes/api/visitor-analytics'
 import { ServerRoute as ApiUploadImagesServerRouteImport } from './routes/api/upload-images'
 import { ServerRoute as ApiUploadDocumentsServerRouteImport } from './routes/api/upload-documents'
+import { ServerRoute as ApiUpdateChatStatusServerRouteImport } from './routes/api/update-chat-status'
 import { ServerRoute as ApiTrainingStatusServerRouteImport } from './routes/api/training-status'
 import { ServerRoute as ApiTrainAgentServerRouteImport } from './routes/api/train-agent'
 import { ServerRoute as ApiTextSourcesServerRouteImport } from './routes/api/text-sources'
@@ -210,6 +211,12 @@ const ApiUploadDocumentsServerRoute =
   ApiUploadDocumentsServerRouteImport.update({
     id: '/api/upload-documents',
     path: '/api/upload-documents',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiUpdateChatStatusServerRoute =
+  ApiUpdateChatStatusServerRouteImport.update({
+    id: '/api/update-chat-status',
+    path: '/api/update-chat-status',
     getParentRoute: () => rootServerRouteImport,
   } as any)
 const ApiTrainingStatusServerRoute = ApiTrainingStatusServerRouteImport.update({
@@ -569,6 +576,7 @@ export interface FileServerRoutesByFullPath {
   '/api/text-sources': typeof ApiTextSourcesServerRoute
   '/api/train-agent': typeof ApiTrainAgentServerRoute
   '/api/training-status': typeof ApiTrainingStatusServerRoute
+  '/api/update-chat-status': typeof ApiUpdateChatStatusServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/visitor-analytics': typeof ApiVisitorAnalyticsServerRoute
@@ -608,6 +616,7 @@ export interface FileServerRoutesByTo {
   '/api/text-sources': typeof ApiTextSourcesServerRoute
   '/api/train-agent': typeof ApiTrainAgentServerRoute
   '/api/training-status': typeof ApiTrainingStatusServerRoute
+  '/api/update-chat-status': typeof ApiUpdateChatStatusServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/visitor-analytics': typeof ApiVisitorAnalyticsServerRoute
@@ -648,6 +657,7 @@ export interface FileServerRoutesById {
   '/api/text-sources': typeof ApiTextSourcesServerRoute
   '/api/train-agent': typeof ApiTrainAgentServerRoute
   '/api/training-status': typeof ApiTrainingStatusServerRoute
+  '/api/update-chat-status': typeof ApiUpdateChatStatusServerRoute
   '/api/upload-documents': typeof ApiUploadDocumentsServerRoute
   '/api/upload-images': typeof ApiUploadImagesServerRoute
   '/api/visitor-analytics': typeof ApiVisitorAnalyticsServerRoute
@@ -689,6 +699,7 @@ export interface FileServerRouteTypes {
     | '/api/text-sources'
     | '/api/train-agent'
     | '/api/training-status'
+    | '/api/update-chat-status'
     | '/api/upload-documents'
     | '/api/upload-images'
     | '/api/visitor-analytics'
@@ -728,6 +739,7 @@ export interface FileServerRouteTypes {
     | '/api/text-sources'
     | '/api/train-agent'
     | '/api/training-status'
+    | '/api/update-chat-status'
     | '/api/upload-documents'
     | '/api/upload-images'
     | '/api/visitor-analytics'
@@ -767,6 +779,7 @@ export interface FileServerRouteTypes {
     | '/api/text-sources'
     | '/api/train-agent'
     | '/api/training-status'
+    | '/api/update-chat-status'
     | '/api/upload-documents'
     | '/api/upload-images'
     | '/api/visitor-analytics'
@@ -807,6 +820,7 @@ export interface RootServerRouteChildren {
   ApiTextSourcesServerRoute: typeof ApiTextSourcesServerRoute
   ApiTrainAgentServerRoute: typeof ApiTrainAgentServerRoute
   ApiTrainingStatusServerRoute: typeof ApiTrainingStatusServerRoute
+  ApiUpdateChatStatusServerRoute: typeof ApiUpdateChatStatusServerRoute
   ApiUploadDocumentsServerRoute: typeof ApiUploadDocumentsServerRoute
   ApiUploadImagesServerRoute: typeof ApiUploadImagesServerRoute
   ApiVisitorAnalyticsServerRoute: typeof ApiVisitorAnalyticsServerRoute
@@ -1020,6 +1034,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/upload-documents'
       fullPath: '/api/upload-documents'
       preLoaderRoute: typeof ApiUploadDocumentsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/update-chat-status': {
+      id: '/api/update-chat-status'
+      path: '/api/update-chat-status'
+      fullPath: '/api/update-chat-status'
+      preLoaderRoute: typeof ApiUpdateChatStatusServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/training-status': {
@@ -1315,6 +1336,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiTextSourcesServerRoute: ApiTextSourcesServerRoute,
   ApiTrainAgentServerRoute: ApiTrainAgentServerRoute,
   ApiTrainingStatusServerRoute: ApiTrainingStatusServerRoute,
+  ApiUpdateChatStatusServerRoute: ApiUpdateChatStatusServerRoute,
   ApiUploadDocumentsServerRoute: ApiUploadDocumentsServerRoute,
   ApiUploadImagesServerRoute: ApiUploadImagesServerRoute,
   ApiVisitorAnalyticsServerRoute: ApiVisitorAnalyticsServerRoute,

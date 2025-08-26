@@ -124,7 +124,7 @@ function RouteComponent() {
   const { logVisitorAnalytics } = useSendVisitorAnalytics({
     chatbotId: chatbotId || "placeholder",
     extra: analyticsExtra,
-    triggerOnMount: false, // Don't log on mount, only when user sends first message
+    triggerOnMount: false,
   });
 
   const handleSubmit = useCallback(
