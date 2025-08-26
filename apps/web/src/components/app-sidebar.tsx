@@ -14,6 +14,7 @@ import {
   Flame,
   Hammer,
   MessageCircle,
+  RotateCcwIcon,
   Settings,
   Zap,
 } from "lucide-react";
@@ -56,6 +57,11 @@ const data = {
       title: "Chat History",
       url: "/admin/chat-history",
       icon: MessageCircle,
+    },
+    {
+      title: "Activity",
+      url: "/admin/activity",
+      icon: RotateCcwIcon,
     },
     {
       title: "Settings",

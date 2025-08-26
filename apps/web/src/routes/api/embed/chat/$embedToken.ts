@@ -7,6 +7,7 @@ import {
   saveMessages,
 } from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
+import { getActiveTools } from "@/lib/ai/get-active-tools";
 import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
@@ -142,6 +143,8 @@ export const ServerRoute = createServerFileRoute(
         }
       }
 
+      const activeTools = await getActiveTools();
+
       const stream = createUIMessageStream({
         execute: ({ writer: dataStream }) => {
           const result = streamText({
@@ -151,6 +154,7 @@ export const ServerRoute = createServerFileRoute(
               ignoreIncompleteToolCalls: true,
             }),
             stopWhen: stepCountIs(5),
+            experimental_activeTools: activeTools,
             experimental_transform: smoothStream({ chunking: "word" }),
             tools: {
               knowledge_base: knowledgeSearchTool(chatbotData.id),

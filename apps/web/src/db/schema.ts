@@ -443,6 +443,16 @@ export const stream = pgTable(
   ],
 );
 
+export const Action = pgTable("action", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  name: text("name").notNull(),
+  toolName: text("tool_name").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  description: text("description"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // TYPES
 export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;
 export type Feedback = InferSelectModel<typeof feedback>;
@@ -471,3 +481,4 @@ export type WhatsappMessageMetadata = InferSelectModel<
 >;
 export type WhatsappIntegration = InferSelectModel<typeof whatsappIntegration>;
 export type Stream = InferSelectModel<typeof stream>;
+export type ActionType = InferSelectModel<typeof Action>;

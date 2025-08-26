@@ -27,6 +27,7 @@ export function createRouter() {
     defaultNotFoundComponent: DefaultNotFound,
     scrollRestoration: true,
     defaultStructuralSharing: true,
+    defaultPendingMinMs: 0,
   });
 
   setupRouterSsrQueryIntegration({

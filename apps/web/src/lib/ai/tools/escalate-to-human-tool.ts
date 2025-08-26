@@ -24,7 +24,7 @@ export const escalateToHumanTool = (context: EscalateToHumanContext) =>
           "other",
         ])
         .describe("Reason for escalating to a human agent")
-        .optional()
+        .nullable()
         .default("complex-issue"),
     }),
     execute: async ({ reason }) => {

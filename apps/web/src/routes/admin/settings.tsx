@@ -59,7 +59,7 @@ function RouteComponent() {
         open={isInviteMembersOpen}
         setOpen={setInviteMembersOpen}
       />
-      <div className="max-w-3xl w-full max-h-screen mx-auto px-4 sm:px-0 py-4">
+      <div className="max-w-4xl w-full max-h-screen mx-auto px-4 sm:px-0 py-4">
         <h1 className="text-xl font-semibold my-2 hidden sm:flex">Settings</h1>
         <Tabs
           value={tab}

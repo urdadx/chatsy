@@ -1,55 +1,79 @@
-import { Calendar, Headset, MessageCircle, Users } from "lucide-react";
+import type { ActionType } from "@/db/schema";
+import { api } from "@/lib/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ActionIcon } from "./action-icon";
+import { toast } from "sonner";
 import { ActionCard } from "./actions-card";
 
 export const Actions = () => {
   const [searchTerm, _setSearchTerm] = useState("");
+  const queryClient = useQueryClient();
 
-  const actionsData = [
-    {
-      icon: (
-        <ActionIcon>
-          <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
-        </ActionIcon>
-      ),
-      name: "Feedback form",
-      description: "Collects feedback from users using a form",
+  const {
+    data: actionsResponse,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["actions"],
+    queryFn: async () => {
+      const response = await api.get("/agent-actions");
+      return response.data;
     },
-    {
-      icon: (
-        <ActionIcon>
-          <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
-        </ActionIcon>
-      ),
-      name: "Collect leads",
-      description: "Captures leads from conversations with customers",
-    },
+  });
 
-    {
-      icon: (
-        <ActionIcon>
-          <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
-        </ActionIcon>
-      ),
-      name: "Schedule appointment",
-      description: "Lets customers book appointments with you",
+  const toggleMutation = useMutation({
+    mutationFn: async ({
+      actionId,
+      isActive,
+    }: {
+      actionId: string;
+      isActive: boolean;
+    }) => {
+      const response = await api.patch("/agent-actions", {
+        actionId,
+        isActive,
+      });
+      return response.data;
     },
-    {
-      icon: (
-        <ActionIcon>
-          <Headset className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
-        </ActionIcon>
-      ),
-      name: "Escalate to human",
-      description: "Escalates the conversation to a human agent",
+    onSuccess: (_, variables) => {
+      toast.success(
+        `Action ${variables.isActive ? "enabled" : "disabled"} successfully`,
+      );
+      queryClient.invalidateQueries({ queryKey: ["actions"] });
     },
-  ];
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.message || "Failed to update action status",
+      );
+    },
+  });
 
-  const filteredActions = actionsData.filter(
+  const handleToggleAction = (actionId: string, isActive: boolean) => {
+    toggleMutation.mutate({ actionId, isActive });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="pt-4 flex justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="pt-4 flex justify-center">
+        <p className="text-red-600">Failed to load actions</p>
+      </div>
+    );
+  }
+
+  const actions: ActionType[] = actionsResponse?.actions || [];
+
+  const filteredActions = actions.filter(
     (action) =>
       action.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      action.description.toLowerCase().includes(searchTerm.toLowerCase()),
+      action.description?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -61,10 +85,10 @@ export const Actions = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-3">
           {filteredActions.map((action) => (
             <ActionCard
-              key={action.name}
-              icon={action.icon}
-              name={action.name}
-              description={action.description}
+              key={action.id}
+              action={action}
+              onToggle={handleToggleAction}
+              isLoading={toggleMutation.isPending}
             />
           ))}
         </div>

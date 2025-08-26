@@ -10,6 +10,7 @@ import {
   saveMessages,
 } from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
+import { getActiveTools } from "@/lib/ai/get-active-tools";
 import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
@@ -145,6 +146,9 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
           const streamId = generateUUID();
           await createStreamId({ streamId, chatId: id });
 
+          // Get active tools from database
+          const activeTools = await getActiveTools();
+
           const stream = createUIMessageStream({
             execute: ({ writer: dataStream }) => {
               const result = streamText({
@@ -153,6 +157,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                 messages: convertToModelMessages(uiMessages, {
                   ignoreIncompleteToolCalls: true,
                 }),
+                experimental_activeTools: activeTools,
                 stopWhen: stepCountIs(5),
                 experimental_transform: smoothStream({ chunking: "word" }),
                 tools: {

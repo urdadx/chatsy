@@ -5,7 +5,7 @@ import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { checkSubscriptionLimits } from "@/lib/subscription/subscription-utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth, polarClient } from "auth";
+import { auth } from "auth";
 import { count, eq, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -43,12 +43,6 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
     const [userChatbot] = await db.query.chatbot.findMany({
       where: (fields, { eq }) => eq(fields.id, activeChatbotId),
     });
-
-    const result = await polarClient.customers.getStateExternal({
-      externalId: userId,
-    });
-
-    console.log("customer state: ", result);
 
     if (!userChatbot) {
       return new Response("Could not retrieve active chatbot data", {
