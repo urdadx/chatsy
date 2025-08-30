@@ -11,8 +11,6 @@ import { Dialog, DialogTrigger } from "./ui/dialog";
 export function UsageBanner() {
   const { data: activeMeters, isLoading, isError } = useActiveMeters();
 
-  console.log("Active meters data:", activeMeters);
-
   const creditedUnits = activeMeters?.creditedUnits ?? 0;
   const balance = activeMeters?.balance ?? 0;
   const totalUsage = creditedUnits;
@@ -46,9 +44,15 @@ export function UsageBanner() {
   return (
     <Card className="shadow-none h-fit">
       <div className="px-4 grid gap-4">
-        <h3 className="text-sm font-medium text-gray-600">
-          Usage: {currentUsage} / {totalUsage}
-        </h3>
+        {activeMeters ? (
+          <h3 className="text-sm font-medium text-gray-600">
+            Usage: {currentUsage} / {totalUsage}
+          </h3>
+        ) : (
+          <h3 className="text-sm font-medium text-gray-600">
+            No subscription found
+          </h3>
+        )}
         <div className="mb-2">
           <div className="flex justify-between text-xs">
             <span className="mb-2">

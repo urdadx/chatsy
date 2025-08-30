@@ -7,6 +7,7 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
+import { useEffect } from "react";
 
 import { ChatConversation } from "@/components/chat-history/chat-conversation";
 import { ChatLogItem } from "@/components/chat-history/chat-log-item";
@@ -62,6 +63,14 @@ function RouteComponent() {
 
   const chats = data?.pages.flatMap((page) => page.chats) ?? [];
 
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   const handleChatIdChange = (value: string) => {
     if (isMobile) {
       const selectedChat = chats.find((chat) => chat.id === value);
@@ -96,7 +105,7 @@ function RouteComponent() {
 
   if (!isLoading && !isError && chats.length === 0) {
     return (
-      <div className="max-w-5xl my-4 w-full overflow-hidden max-h-screen mx-auto p-2 sm:p-6">
+      <div className="max-w-5xl lg:max-w-6xl my-4 w-full overflow-hidden max-h-screen mx-auto p-2 sm:p-6">
         <div className="bg-white border rounded-lg my-4 py-2">
           <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white">
             <h1 className="text-md font-semibold hidden sm:flex">Chat Logs</h1>
@@ -112,17 +121,7 @@ function RouteComponent() {
                   <SelectItem value="90d">Last 3 months</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={status} onValueChange={handleStatusChange}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="unresolved">Unresolved</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                  <SelectItem value="escalated">Escalated</SelectItem>
-                </SelectContent>
-              </Select>
+
               <Select value={status} onValueChange={handleStatusChange}>
                 <SelectTrigger className="w-[160px]">
                   <SelectValue placeholder="Status" />
@@ -159,14 +158,27 @@ function RouteComponent() {
 
   return (
     <>
-      <div className="max-w-5xl w-full overflow-hidden max-h-screen mx-auto p-2 sm:p-6">
-        <span className="text-md text-muted-foreground hidden sm:flex">
+      <div className="max-w-5xl lg:max-w-6xl w-full overflow-hidden max-h-screen mx-auto p-2 sm:p-6">
+        {/* <span className="text-md text-muted-foreground hidden sm:flex">
           View and manage your bot's chat history
-        </span>
+        </span> */}
+        <h1 className="text-lg font-semibold">Chat History</h1>
         <div className="bg-white border rounded-lg my-4 py-2">
           {/* Chat Header */}
           <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white">
-            <h1 className="text-md font-semibold hidden sm:flex">Chat Logs</h1>
+            <div className="relative">
+              <Select value={status} onValueChange={handleStatusChange}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="unresolved">Unresolved</SelectItem>
+                  <SelectItem value="resolved">Resolved</SelectItem>
+                  <SelectItem value="escalated">Escalated</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>{" "}
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <Select value={filter} onValueChange={handleFilterChange}>
@@ -182,19 +194,7 @@ function RouteComponent() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="relative">
-                <Select value={status} onValueChange={handleStatusChange}>
-                  <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="unresolved">Unresolved</SelectItem>
-                    <SelectItem value="resolved">Resolved</SelectItem>
-                    <SelectItem value="escalated">Escalated</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+
               <Button
                 variant="outline"
                 className="text-gray-600"

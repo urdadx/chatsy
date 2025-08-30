@@ -10,6 +10,7 @@ const leadSchema = z.object({
   name: z.string().min(1),
   contact: z.string().min(1),
   message: z.string().optional(),
+  location: z.string().optional(),
   embedToken: z.string().min(1).optional(),
 });
 
@@ -64,6 +65,7 @@ export const ServerRoute = createServerFileRoute("/api/leads").methods({
         name: parsed.data.name,
         contact: parsed.data.contact,
         message: parsed.data.message,
+        location: parsed.data.location,
       });
       return json({ success: true, message: "Lead collected successfully" });
     } catch (error) {

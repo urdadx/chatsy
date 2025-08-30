@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -20,26 +21,13 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronUpIcon,
-  CircleAlertIcon,
   CircleXIcon,
+  FileDown,
   FilterIcon,
   ListFilterIcon,
-  PlusIcon,
-  TrashIcon,
 } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -70,7 +58,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { TableSkeleton } from "../table-skeleton";
+import Spinner from "../ui/spinner";
 import { RowActions } from "./activity-actions";
 
 type Item = {
@@ -78,13 +69,12 @@ type Item = {
   name: string;
   email: string;
   location: string;
-  flag: string;
-  status: "Active" | "Inactive" | "Pending";
-  balance: number;
+  type: string;
+  date: string;
 };
 
 // Custom filter function for multi-column searching
-const multiColumnFilterFn: FilterFn<Item> = (row, columnId, filterValue) => {
+const multiColumnFilterFn: FilterFn<Item> = (row, filterValue) => {
   const searchableRowContent =
     `${row.original.name} ${row.original.email}`.toLowerCase();
   const searchTerm = (filterValue ?? "").toLowerCase();
@@ -103,67 +93,65 @@ const statusFilterFn: FilterFn<Item> = (
 
 const columns: ColumnDef<Item>[] = [
   {
+    header: "Date",
+    accessorKey: "date",
+    cell: ({ row }) => {
+      const value = row.getValue("date");
+      let formatted = "";
+      if (value) {
+        const date = new Date(value as string);
+        formatted = date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      }
+      return <div className="font-medium">{formatted}</div>;
+    },
+    filterFn: multiColumnFilterFn,
+  },
+  {
     header: "Name",
     accessorKey: "name",
     cell: ({ row }) => (
       <div className="font-medium">{row.getValue("name")}</div>
     ),
     size: 180,
-    filterFn: multiColumnFilterFn,
     enableHiding: false,
   },
   {
     header: "Email",
     accessorKey: "email",
-    size: 220,
+    size: 200,
   },
   {
     header: "Location",
     accessorKey: "location",
-    cell: ({ row }) => (
-      <div>
-        <span className="text-lg leading-none">{row.original.flag}</span>{" "}
-        {row.getValue("location")}
-      </div>
-    ),
-    size: 180,
+    cell: ({ row }) => <div>{row.getValue("location")}</div>,
   },
   {
-    header: "Status",
-    accessorKey: "status",
+    header: "Type",
+    accessorKey: "type",
     cell: ({ row }) => (
       <Badge
         className={cn(
-          row.getValue("status") === "Inactive" &&
-            "bg-muted-foreground/60 text-primary-foreground",
+          row.getValue("type") === "feedback"
+            ? "bg-orange-100 text-orange-800"
+            : row.getValue("type") === "lead"
+              ? "bg-green-100 text-green-800"
+              : "bg-muted-foreground/60 text-primary-foreground",
         )}
       >
-        {row.getValue("status")}
+        {row.getValue("type")}
       </Badge>
     ),
-    size: 100,
     filterFn: statusFilterFn,
   },
 
   {
-    header: "Balance",
-    accessorKey: "balance",
-    cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue("balance"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-      return formatted;
-    },
-    size: 120,
-  },
-  {
     id: "actions",
-    header: () => <span className="sr-only">Actions</span>,
+    header: "Actions",
     cell: ({ row }) => <RowActions row={row} />,
-    size: 60,
-    enableHiding: false,
   },
 ];
 
@@ -184,26 +172,33 @@ export default function Component() {
     },
   ]);
 
+  const {
+    data: activityData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["activity"],
+    queryFn: async () => {
+      const res = await api.get("/activity");
+      return (
+        res.data.items?.map((item: any) => ({
+          date: item.date,
+          id: item.id,
+          name: item.name ?? "Anonymous",
+          email: item.contact ?? "",
+          location: item.location ?? "",
+          type: item.type ?? "",
+        })) ?? []
+      );
+    },
+  });
+
   const [data, setData] = useState<Item[]>([]);
   useEffect(() => {
-    async function fetchPosts() {
-      const res = await fetch(
-        "https://raw.githubusercontent.com/origin-space/origin-images/refs/heads/main/users-01_fertyx.json",
-      );
-      const data = await res.json();
-      setData(data);
-    }
-    fetchPosts();
-  }, []);
-
-  const handleDeleteRows = () => {
-    const selectedRows = table.getSelectedRowModel().rows;
-    const updatedData = data.filter(
-      (item) => !selectedRows.some((row) => row.original.id === item.id),
-    );
-    setData(updatedData);
-    table.resetRowSelection();
-  };
+    if (activityData) setData(activityData);
+  }, [activityData]);
 
   const table = useReactTable({
     data,
@@ -226,31 +221,26 @@ export default function Component() {
     },
   });
 
-  // Get unique status values
-  const uniqueStatusValues = useMemo(() => {
-    const statusColumn = table.getColumn("status");
-
-    if (!statusColumn) return [];
-
-    const values = Array.from(statusColumn.getFacetedUniqueValues().keys());
-
+  const uniqueTypeValues = useMemo(() => {
+    const typeColumn = table.getColumn("type");
+    if (!typeColumn) return [];
+    const values = Array.from(typeColumn.getFacetedUniqueValues().keys());
     return values.sort();
-  }, [table.getColumn("status")?.getFacetedUniqueValues()]);
+  }, [table.getColumn("type")?.getFacetedUniqueValues()]);
 
-  // Get counts for each status
-  const statusCounts = useMemo(() => {
-    const statusColumn = table.getColumn("status");
-    if (!statusColumn) return new Map();
-    return statusColumn.getFacetedUniqueValues();
-  }, [table.getColumn("status")?.getFacetedUniqueValues()]);
+  const typeCounts = useMemo(() => {
+    const typeColumn = table.getColumn("type");
+    if (!typeColumn) return new Map();
+    return typeColumn.getFacetedUniqueValues();
+  }, [table.getColumn("type")?.getFacetedUniqueValues()]);
 
-  const selectedStatuses = useMemo(() => {
-    const filterValue = table.getColumn("status")?.getFilterValue() as string[];
+  const selectedTypes = useMemo(() => {
+    const filterValue = table.getColumn("type")?.getFilterValue() as string[];
     return filterValue ?? [];
-  }, [table.getColumn("status")?.getFilterValue()]);
+  }, [table.getColumn("type")?.getFilterValue()]);
 
-  const handleStatusChange = (checked: boolean, value: string) => {
-    const filterValue = table.getColumn("status")?.getFilterValue() as string[];
+  const handleTypeChange = (checked: boolean, value: string) => {
+    const filterValue = table.getColumn("type")?.getFilterValue() as string[];
     const newFilterValue = filterValue ? [...filterValue] : [];
 
     if (checked) {
@@ -263,9 +253,30 @@ export default function Component() {
     }
 
     table
-      .getColumn("status")
+      .getColumn("type")
       ?.setFilterValue(newFilterValue.length ? newFilterValue : undefined);
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center flex justify-center">
+        <TableSkeleton />
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="p-8 text-center text-destructive flex flex-col items-center gap-4">
+        <div>
+          Error loading data:{" "}
+          {error instanceof Error ? error.message : "Unknown error"}
+        </div>
+        <Button variant="outline" onClick={() => refetch()}>
+          Retry
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -310,7 +321,7 @@ export default function Component() {
               </button>
             )}
           </div>
-          {/* Filter by status */}
+          {/* Filter by type */}
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline">
@@ -319,10 +330,10 @@ export default function Component() {
                   size={16}
                   aria-hidden="true"
                 />
-                Status
-                {selectedStatuses.length > 0 && (
+                Type
+                {selectedTypes.length > 0 && (
                   <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                    {selectedStatuses.length}
+                    {selectedTypes.length}
                   </span>
                 )}
               </Button>
@@ -330,16 +341,16 @@ export default function Component() {
             <PopoverContent className="w-auto min-w-36 p-3" align="start">
               <div className="space-y-3">
                 <div className="text-muted-foreground text-xs font-medium">
-                  Filters
+                  Filter by type
                 </div>
                 <div className="space-y-3">
-                  {uniqueStatusValues.map((value, i) => (
+                  {uniqueTypeValues.map((value, i) => (
                     <div key={value} className="flex items-center gap-2">
                       <Checkbox
                         id={`${id}-${i}`}
-                        checked={selectedStatuses.includes(value)}
+                        checked={selectedTypes.includes(value)}
                         onCheckedChange={(checked: boolean) =>
-                          handleStatusChange(checked, value)
+                          handleTypeChange(checked, value)
                         }
                       />
                       <Label
@@ -348,7 +359,7 @@ export default function Component() {
                       >
                         {value}{" "}
                         <span className="text-muted-foreground ms-2 text-xs">
-                          {statusCounts.get(value)}
+                          {typeCounts.get(value)}
                         </span>
                       </Label>
                     </div>
@@ -359,61 +370,14 @@ export default function Component() {
           </Popover>
         </div>
         <div className="flex items-center gap-3">
-          {/* Delete button */}
-          {table.getSelectedRowModel().rows.length > 0 && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button className="ml-auto" variant="outline">
-                  <TrashIcon
-                    className="-ms-1 opacity-60"
-                    size={16}
-                    aria-hidden="true"
-                  />
-                  Delete
-                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                    {table.getSelectedRowModel().rows.length}
-                  </span>
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">
-                  <div
-                    className="flex size-9 shrink-0 items-center justify-center rounded-full border"
-                    aria-hidden="true"
-                  >
-                    <CircleAlertIcon className="opacity-80" size={16} />
-                  </div>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete{" "}
-                      {table.getSelectedRowModel().rows.length} selected{" "}
-                      {table.getSelectedRowModel().rows.length === 1
-                        ? "row"
-                        : "rows"}
-                      .
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                </div>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteRows}>
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
           {/* Add user button */}
           <Button className="ml-auto" variant="outline">
-            <PlusIcon
+            <FileDown
               className="-ms-1 opacity-60"
               size={16}
               aria-hidden="true"
             />
-            Add user
+            Export
           </Button>
         </div>
       </div>
@@ -421,7 +385,7 @@ export default function Component() {
       {/* Table */}
       <div className="bg-background overflow-hidden rounded-md border">
         <Table className="table-fixed">
-          <TableHeader>
+          <TableHeader className="bg-purple-50 ">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
@@ -429,7 +393,7 @@ export default function Component() {
                     <TableHead
                       key={header.id}
                       style={{ width: `${header.getSize()}px` }}
-                      className="h-11"
+                      className="h-14 text-primary"
                     >
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <div
@@ -489,6 +453,7 @@ export default function Component() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="h-14"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="last:py-0">

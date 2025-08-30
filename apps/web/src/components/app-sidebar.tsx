@@ -74,7 +74,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <SidebarProvider>
-      <Sidebar collapsible="offcanvas" {...props}>
+      <Sidebar className="z-0" collapsible="offcanvas" {...props}>
         <SidebarHeader className="pb-2">
           {/* <div className="flex gap-2 items-center pb-2">
             <Logo />

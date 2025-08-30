@@ -15,7 +15,7 @@ export const SubscriptionTable = () => {
     queryFn: () => getActiveSubscription(),
   });
 
-  let nextBilling = "-";
+  let nextBilling = "-- -- ----";
   if (subscription?.currentPeriodEnd) {
     nextBilling = format(new Date(subscription.currentPeriodEnd), "yyyy-MM-dd");
   } else if (subscription?.createdAt) {
@@ -26,7 +26,7 @@ export const SubscriptionTable = () => {
     nextBilling = format(addMonths(created, 1), "yyyy-MM-dd");
   }
 
-  const planName = subscription?.product?.name || "Unknown Plan";
+  const planName = subscription?.product?.name || "No active plan";
 
   const { data: member } = useQuery({
     queryKey: ["activeMember"],
@@ -46,7 +46,7 @@ export const SubscriptionTable = () => {
             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
               <Wallet className="w-5 h-5 text-green-600" />
             </div>
-            <h2 className="text-base font-semibold">Subscription</h2>
+            <h2 className="text-base font-semibold">Recent Subscription</h2>
           </div>
           <div className="flex items-center gap-2 min-h-[24px]">
             {isLoading ? (

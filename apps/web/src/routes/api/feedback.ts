@@ -10,6 +10,7 @@ const feedbackSchema = z.object({
   email: z.string().email(),
   subject: z.string().optional(),
   message: z.string().min(1),
+  location: z.string().optional(),
   embedToken: z.string().min(1).optional(),
 });
 
@@ -67,6 +68,7 @@ export const ServerRoute = createServerFileRoute("/api/feedback").methods({
         email: parsed.data.email,
         subject: parsed.data.subject,
         message: parsed.data.message,
+        location: parsed.data.location,
       });
       return json({ success: true, message: "Feedback received" });
     } catch (error) {

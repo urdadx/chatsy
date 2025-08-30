@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
+import { getClientLocation } from "@/lib/utils/client-location";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { PlusIcon } from "lucide-react";
@@ -30,7 +31,18 @@ export function AddLeadForm() {
 
   const mutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await api.post("/leads", data);
+      // Get user location before sending
+      const location = await getClientLocation();
+
+      // Map form fields to API expected format
+      const apiData = {
+        name: data.name,
+        contact: data.email || data.phone, // Use email as primary contact, fallback to phone
+        message: data.message,
+        location,
+      };
+
+      const response = await api.post("/leads", apiData);
       return response.data;
     },
     onSuccess: () => {

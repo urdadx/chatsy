@@ -1,4 +1,5 @@
 import { Pricing } from "@/components/landing-page/pricing";
+import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/auth-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
@@ -13,7 +14,7 @@ function RouteComponent() {
   console.log("Session:", session);
 
   return (
-    <main className="w-full bg-white min-h-screen flex items-center justify-center">
+    <main className="w-full bg-white min-h-screen flex flex-col items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
@@ -22,6 +23,7 @@ function RouteComponent() {
       >
         <Pricing />
       </motion.div>
+      <Button variant="link">Skip for now👉</Button>
     </main>
   );
 }

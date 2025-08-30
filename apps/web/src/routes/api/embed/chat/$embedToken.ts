@@ -8,6 +8,7 @@ import {
 } from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import { getActiveTools } from "@/lib/ai/get-active-tools";
+import { google } from "@/lib/ai/providers";
 import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
@@ -15,7 +16,6 @@ import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { ChatSDKError } from "@/lib/errors";
 import { generateUUID } from "@/lib/utils";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import {
@@ -28,10 +28,6 @@ import {
 } from "ai";
 import { polarClient } from "auth";
 import { and, eq } from "drizzle-orm";
-
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-});
 
 export const ServerRoute = createServerFileRoute(
   "/api/embed/chat/$embedToken",

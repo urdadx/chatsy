@@ -16,10 +16,10 @@ export const Route = createFileRoute("/admin")({
     }
 
     // Check if user has an active subscription
-    const activeSubscription = await getActiveSubscription();
-    if (!activeSubscription) {
-      throw redirect({ to: "/choose-plan", search: location.search });
-    }
+    // const activeSubscription = await getActiveSubscription();
+    // if (!activeSubscription) {
+    //   throw redirect({ to: "/choose-plan", search: location.search });
+    // }
   },
 });
 

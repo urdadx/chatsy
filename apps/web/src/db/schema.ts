@@ -233,6 +233,7 @@ export const lead = pgTable("lead", {
   name: text("name").notNull(),
   contact: text("contact").notNull(),
   message: text("message"),
+  location: text("location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -333,6 +334,7 @@ export const feedback = pgTable("feedback", {
   email: text("email").notNull(),
   subject: text("subject"),
   message: text("message").notNull(),
+  location: text("location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

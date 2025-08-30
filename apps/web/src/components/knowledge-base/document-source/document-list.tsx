@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { formatBytes } from "@/hooks/use-file-upload";
 import { api } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Trash2Icon } from "lucide-react";
+import { Loader2, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 const getFileIcon = (file: { type: string; name: string }) => {
@@ -62,7 +62,14 @@ export function DocumentList() {
   });
 
   if (isLoadingDocuments) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center gap-2 py-8">
+        <Loader2 className="size-4 animate-spin" />
+        <span className="text-sm text-muted-foreground">
+          Loading documents...
+        </span>
+      </div>
+    );
   }
 
   return (

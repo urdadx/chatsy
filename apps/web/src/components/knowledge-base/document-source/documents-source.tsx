@@ -1,8 +1,8 @@
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { api } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertCircleIcon, FileUpIcon } from "lucide-react";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { DocumentList } from "./document-list";
 
@@ -38,14 +38,13 @@ export function DocumentSource() {
     });
 
   const [
-    { files, isDragging, errors },
+    { isDragging, errors },
     {
       handleDragEnter,
       handleDragLeave,
       handleDragOver,
-      handleDrop,
+      handleDrop: originalHandleDrop,
       openFileDialog,
-      removeFile,
       getInputProps,
     },
   ] = useFileUpload({
@@ -55,21 +54,31 @@ export function DocumentSource() {
     accept: ".pdf,.docx,.doc,.txt",
   });
 
-  useEffect(() => {
-    if (files.length > 0) {
-      const lastFile = files[files.length - 1];
-      if (lastFile.file instanceof File) {
-        toast.promise(uploadAndCreateDocument(lastFile), {
+  const handleDrop = (e: React.DragEvent) => {
+    originalHandleDrop(e as React.DragEvent<HTMLElement>);
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    droppedFiles.forEach((file) => {
+      const fileObj = { id: Date.now().toString(), file };
+      toast.promise(uploadAndCreateDocument(fileObj), {
+        loading: "Uploading document...",
+        success: "Document uploaded and is now processing!",
+        error: "Failed to upload document.",
+      });
+    });
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      Array.from(e.target.files).forEach((file) => {
+        const fileObj = { id: Date.now().toString(), file };
+        toast.promise(uploadAndCreateDocument(fileObj), {
           loading: "Uploading document...",
-          success: () => {
-            removeFile(lastFile.id);
-            return "Document uploaded and is now processing!";
-          },
+          success: "Document uploaded and is now processing!",
           error: "Failed to upload document.",
         });
-      }
+      });
     }
-  }, [files, uploadAndCreateDocument, removeFile]);
+  };
 
   return (
     <>
@@ -94,10 +103,14 @@ export function DocumentSource() {
             onDragOver={handleDragOver}
             onDrop={handleDrop}
             data-dragging={isDragging || undefined}
-            className="border-input border-2 bg-accent/50 data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 flex min-h-52 flex-col items-center justify-center rounded-xl  border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px] hover:border-primary"
+            className={cn(
+              "border-input border-2 bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 flex min-h-52 flex-col items-center justify-center rounded-xl border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px] hover:border-primary",
+              isDragging && "border-primary",
+            )}
           >
             <input
               {...getInputProps()}
+              onChange={handleFileSelect}
               className="sr-only"
               aria-label="Upload files"
               disabled={isUploading}

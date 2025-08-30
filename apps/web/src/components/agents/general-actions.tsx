@@ -1,3 +1,4 @@
+import { CardSkeleton } from "@/components/ui/card-skeleton";
 import type { ActionType } from "@/db/schema";
 import { api } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -52,22 +53,6 @@ export const Actions = () => {
     toggleMutation.mutate({ actionId, isActive });
   };
 
-  if (isLoading) {
-    return (
-      <div className="pt-4 flex justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="pt-4 flex justify-center">
-        <p className="text-red-600">Failed to load actions</p>
-      </div>
-    );
-  }
-
   const actions: ActionType[] = actionsResponse?.actions || [];
 
   const filteredActions = actions.filter(
@@ -78,20 +63,32 @@ export const Actions = () => {
 
   return (
     <>
-      <div className="pt-4 flex flex-col justify-between items-center w-full gap-3">
+      <div className="pt-4 flex flex-col justify-between items-center max-w-6xl w-full gap-3">
         {/* <div className="flex justify-center sm:justify-end items-center w-full ">
           <SearchActions value={searchTerm} onChange={setSearchTerm} />
         </div> */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-3">
-          {filteredActions.map((action) => (
-            <ActionCard
-              key={action.id}
-              action={action}
-              onToggle={handleToggleAction}
-              isLoading={toggleMutation.isPending}
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-3">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <CardSkeleton key={idx} />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="w-full flex justify-center py-3">
+            <p className="text-red-600">Failed to load actions</p>
+          </div>
+        ) : (
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-3">
+            {filteredActions.map((action) => (
+              <ActionCard
+                key={action.id}
+                action={action}
+                onToggle={handleToggleAction}
+                isLoading={toggleMutation.isPending}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

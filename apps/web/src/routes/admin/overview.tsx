@@ -39,7 +39,7 @@ function RouteComponent() {
 
   return (
     <>
-      <div className="relative  p-6 w-full max-w-5xl mx-auto space-y-10">
+      <div className="relative p-6 w-full md:max-w-5xl xl:max-w-6xl mx-auto space-y-10">
         <DashboardMetrics />
         {renderStatus()}
         <MyChatbots />

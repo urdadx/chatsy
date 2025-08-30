@@ -1,6 +1,6 @@
 import { getVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { useChatHistory } from "@/hooks/use-chat-history";
-import { useActiveMeters, useUsage } from "@/hooks/use-usage-meters";
+import { useActiveMeters } from "@/hooks/use-usage-meters";
 import { api } from "@/lib/api";
 import NumberFlow from "@number-flow/react";
 import { useQuery } from "@tanstack/react-query";

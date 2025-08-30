@@ -1,8 +1,5 @@
-import { google } from "@ai-sdk/google";
-import { customProvider } from "ai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
-export const scira = customProvider({
-  languageModels: {
-    "padyna-google-pro": google("gemini-2.0-pro"),
-  },
+export const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY!,
 });

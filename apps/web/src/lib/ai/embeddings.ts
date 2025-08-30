@@ -1,7 +1,7 @@
-import { google } from "@ai-sdk/google";
 import { embed } from "ai";
+import { google } from "./providers";
 
-const model = google.textEmbedding('gemini-embedding-001');
+const model = google.textEmbedding("gemini-embedding-001");
 
 export async function generateQuestionEmbedding(text: string) {
   const { embedding } = await embed({
@@ -10,7 +10,7 @@ export async function generateQuestionEmbedding(text: string) {
     providerOptions: {
       google: {
         outputDimensionality: 768,
-        taskType: 'RETRIEVAL_QUERY',
+        taskType: "RETRIEVAL_QUERY",
       },
     },
   });
@@ -24,7 +24,7 @@ export async function generateAnswerEmbedding(text: string) {
     providerOptions: {
       google: {
         outputDimensionality: 768,
-        taskType: 'RETRIEVAL_DOCUMENT',
+        taskType: "RETRIEVAL_DOCUMENT",
       },
     },
   });
