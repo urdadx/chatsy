@@ -28,7 +28,7 @@ export const MyChatbots = () => {
           {chatbotsData?.chatbots?.map((chatbot) => (
             <ChatbotCard
               key={chatbot.id}
-              workspaceId={chatbot.id}
+              chatbotId={chatbot.id}
               name={chatbot.name}
               logo={chatbot.image}
               createdAt={chatbot.createdAt}

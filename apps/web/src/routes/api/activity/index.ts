@@ -1,9 +1,10 @@
 import { db } from "@/db";
 import { feedback, lead } from "@/db/schema";
+import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { desc, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { unionAll } from "drizzle-orm/pg-core"; // adjust for your database
 
 export const ServerRoute = createServerFileRoute("/api/activity/").methods({
@@ -12,6 +13,10 @@ export const ServerRoute = createServerFileRoute("/api/activity/").methods({
     if (!session?.user?.id) {
       return json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const activeChatbotId =
+      session?.session?.activeChatbotId ||
+      (await getActiveChatbotId(session.user.id));
 
     // Create the union as a subquery with proper aliases
     const unionQuery = unionAll(
@@ -26,7 +31,8 @@ export const ServerRoute = createServerFileRoute("/api/activity/").methods({
           location: lead.location,
           type: sql<string>`'lead'`.as("type"),
         })
-        .from(lead),
+        .from(lead)
+        .where(eq(lead.chatbotId, activeChatbotId)),
 
       db
         .select({
@@ -39,7 +45,8 @@ export const ServerRoute = createServerFileRoute("/api/activity/").methods({
           location: feedback.location,
           type: sql<string>`'feedback'`.as("type"),
         })
-        .from(feedback),
+        .from(feedback)
+        .where(eq(feedback.chatbotId, activeChatbotId)),
     ).as("combined");
 
     // Now select from the union with proper ordering

@@ -5,15 +5,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
+import { useSetActiveChatbot } from "@/hooks/use-chatbot-management";
 import { timeAgo } from "@/lib/utils";
 import { ArrowRightLeft, MoreHorizontal, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import { DeleteWorkspace } from "./delete-workspace";
 
 interface ChatbotCardProps {
-  workspaceId: string;
+  chatbotId: string;
   name: string;
   logo: string | null | undefined;
   createdAt: Date;
@@ -35,7 +34,7 @@ const GRADIENT_PRESETS = [
 ];
 
 export function ChatbotCard({
-  workspaceId,
+  chatbotId,
   name,
   logo,
   createdAt,
@@ -49,15 +48,13 @@ export function ChatbotCard({
     return GRADIENT_PRESETS[index];
   }, [name]);
 
-  const handleSwitchBot = async () => {
+  const setActiveChatbotMutation = useSetActiveChatbot();
+
+  const handleSwitchChatbot = async () => {
     try {
-      await authClient.organization.setActive({
-        organizationId: workspaceId,
-      });
-      toast.success("Workspace switched successfully");
-      window.location.reload();
+      await setActiveChatbotMutation.mutateAsync({ chatbotId });
     } catch (error) {
-      toast.error("Failed to switch workspace");
+      // Error handling is done in the mutation
     }
   };
 
@@ -95,7 +92,7 @@ export function ChatbotCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onSelect={handleSwitchBot}>
+                  <DropdownMenuItem onSelect={handleSwitchChatbot}>
                     <ArrowRightLeft className="h-4 w-4 mr-2" />
                     Switch
                   </DropdownMenuItem>
@@ -114,7 +111,7 @@ export function ChatbotCard({
       </div>
       {isDeleting && (
         <DeleteWorkspace
-          workspaceId={workspaceId}
+          workspaceId={chatbotId}
           onClose={() => setIsDeleting(false)}
         />
       )}

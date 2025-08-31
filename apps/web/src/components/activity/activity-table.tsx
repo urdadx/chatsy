@@ -61,7 +61,6 @@ import {
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { TableSkeleton } from "../table-skeleton";
-import Spinner from "../ui/spinner";
 import { RowActions } from "./activity-actions";
 
 type Item = {
@@ -259,7 +258,7 @@ export default function Component() {
 
   if (isLoading) {
     return (
-      <div className="p-8 text-center flex justify-center">
+      <div className="flex justify-center">
         <TableSkeleton />
       </div>
     );

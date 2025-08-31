@@ -66,7 +66,7 @@ export function RowActions({ row }: any) {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center justify-between w-full">
               <h2 className="text-lg capitalize font-medium text-gray-900">
-                {type} Information
+                {type} details
               </h2>
               <Button
                 variant="ghost"
@@ -197,7 +197,7 @@ export function RowActions({ row }: any) {
                           : "border-orange-300 bg-orange-100",
                       )}
                     >
-                      <span className="font-semibold">{data.subject}</span>
+                      {data.subject && <span>{data.subject}</span>}
                       <span>{data.message || "No message provided"}</span>
                     </div>
                   )}

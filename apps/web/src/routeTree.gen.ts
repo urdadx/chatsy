@@ -18,6 +18,8 @@ import { Route as AcceptInvitationRouteImport } from './routes/accept-invitation
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
+import { Route as LegalTermsRouteImport } from './routes/legal/terms'
+import { Route as LegalPrivacyRouteImport } from './routes/legal/privacy'
 import { Route as BubbleWidgetIdRouteImport } from './routes/bubble/$widgetId'
 import { Route as BioPagePageIdRouteImport } from './routes/bio-page/$pageId'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
@@ -110,6 +112,16 @@ const IndexRoute = IndexRouteImport.update({
 const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
   id: '/onboarding/',
   path: '/onboarding/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/legal/terms',
+  path: '/legal/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/legal/privacy',
+  path: '/legal/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BubbleWidgetIdRoute = BubbleWidgetIdRouteImport.update({
@@ -431,6 +443,8 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/bio-page/$pageId': typeof BioPagePageIdRoute
   '/bubble/$widgetId': typeof BubbleWidgetIdRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/api/organization/customer-state': typeof ApiOrganizationCustomerStateRoute
   '/admin/activity': typeof AdminActivityIndexRoute
@@ -455,6 +469,8 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/bio-page/$pageId': typeof BioPagePageIdRoute
   '/bubble/$widgetId': typeof BubbleWidgetIdRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/api/organization/customer-state': typeof ApiOrganizationCustomerStateRoute
   '/admin/activity': typeof AdminActivityIndexRoute
@@ -480,6 +496,8 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/bio-page/$pageId': typeof BioPagePageIdRoute
   '/bubble/$widgetId': typeof BubbleWidgetIdRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/api/organization/customer-state': typeof ApiOrganizationCustomerStateRoute
   '/admin/activity/': typeof AdminActivityIndexRoute
@@ -506,6 +524,8 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/bio-page/$pageId'
     | '/bubble/$widgetId'
+    | '/legal/privacy'
+    | '/legal/terms'
     | '/onboarding'
     | '/api/organization/customer-state'
     | '/admin/activity'
@@ -530,6 +550,8 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/bio-page/$pageId'
     | '/bubble/$widgetId'
+    | '/legal/privacy'
+    | '/legal/terms'
     | '/onboarding'
     | '/api/organization/customer-state'
     | '/admin/activity'
@@ -554,6 +576,8 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/bio-page/$pageId'
     | '/bubble/$widgetId'
+    | '/legal/privacy'
+    | '/legal/terms'
     | '/onboarding/'
     | '/api/organization/customer-state'
     | '/admin/activity/'
@@ -572,6 +596,8 @@ export interface RootRouteChildren {
   authSetupRoute: typeof authSetupRoute
   BioPagePageIdRoute: typeof BioPagePageIdRoute
   BubbleWidgetIdRoute: typeof BubbleWidgetIdRoute
+  LegalPrivacyRoute: typeof LegalPrivacyRoute
+  LegalTermsRoute: typeof LegalTermsRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
   ApiOrganizationCustomerStateRoute: typeof ApiOrganizationCustomerStateRoute
 }
@@ -930,6 +956,20 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/legal/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacy': {
+      id: '/legal/privacy'
+      path: '/legal/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bubble/$widgetId': {
@@ -1371,6 +1411,8 @@ const rootRouteChildren: RootRouteChildren = {
   authSetupRoute: authSetupRoute,
   BioPagePageIdRoute: BioPagePageIdRoute,
   BubbleWidgetIdRoute: BubbleWidgetIdRoute,
+  LegalPrivacyRoute: LegalPrivacyRoute,
+  LegalTermsRoute: LegalTermsRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
   ApiOrganizationCustomerStateRoute: ApiOrganizationCustomerStateRoute,
 }

@@ -10,8 +10,8 @@ import {
 
 export function TableSkeleton() {
   return (
-    <div className="w-full overflow-hidden max-w-6xl border rounded-lg">
-      <Table className="w-full overflow-hidden">
+    <div className="w-full overflow-hidden border rounded-lg">
+      <Table className="w-full table-fixed">
         <TableHeader>
           <TableRow>
             <TableHead className="w-[80px] md:w-[100px]">
@@ -21,6 +21,9 @@ export function TableSkeleton() {
               <Skeleton className="h-4 w-[60px] sm:w-[80px]" />
             </TableHead>
             <TableHead className="hidden sm:table-cell">
+              <Skeleton className="h-4 w-[80px]" />
+            </TableHead>
+            <TableHead className="hidden md:table-cell">
               <Skeleton className="h-4 w-[80px]" />
             </TableHead>
             <TableHead className="hidden md:table-cell">

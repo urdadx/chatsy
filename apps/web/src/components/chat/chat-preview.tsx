@@ -8,9 +8,10 @@ import { ChatSDKError } from "@/lib/errors";
 import type { ChatMessage } from "@/lib/types";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
+import { RiBardFill } from "@remixicon/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DefaultChatTransport } from "ai";
-import { ArrowUp, RefreshCcw, SparklesIcon } from "lucide-react";
+import { ArrowUp, RefreshCcw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AISuggestion, AISuggestions } from "../ui/ai-suggestions";
@@ -131,8 +132,8 @@ export function ChatPreview() {
               className="rounded-full w-9 h-9"
             />
           ) : (
-            <div className="rounded-full border border-white w-9 h-9 flex items-center justify-center">
-              <SparklesIcon size={20} className="text-white rounded-full" />
+            <div className="rounded-full  w-9 h-9 flex items-center justify-center">
+              <RiBardFill size={20} className="text-white rounded-full" />
             </div>
           )}
           <span className="font-normal text-base text-white">

@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import {
+  Area,
+  Bar,
+  CartesianGrid,
+  ComposedChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import {
   CardContent,
@@ -260,12 +267,12 @@ export function ChatAnalytics() {
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+        <CardContent className=" pt-4  sm:pt-6">
           <ChartContainer
             config={chartConfig}
             className="aspect-auto h-[300px] w-full"
           >
-            <AreaChart data={mergedChartData}>
+            <ComposedChart data={mergedChartData}>
               <defs>
                 <linearGradient id="fillChats" x1="0" y1="0" x2="0" y2="1">
                   <stop
@@ -307,6 +314,7 @@ export function ChatAnalytics() {
                   });
                 }}
               />
+              <YAxis tickLine={false} axisLine={false} />
               <ChartTooltip
                 cursor={false}
                 content={
@@ -321,26 +329,27 @@ export function ChatAnalytics() {
                   />
                 }
               />
-              {showChats && (
-                <Area
-                  dataKey="chats"
-                  type="natural"
-                  fill="url(#fillChats)"
-                  stroke="var(--color-chats)"
-                  stackId="a"
-                />
-              )}
+              {/* Render Area first (behind) */}
               {showVisitors && (
                 <Area
                   dataKey="visitors"
                   type="natural"
                   fill="url(#fillVisitors)"
                   stroke="var(--chart-4)"
-                  stackId="a"
+                  fillOpacity={0.3}
                 />
               )}
-              {/* <ChartLegend content={<ChartLegendContent />} /> */}
-            </AreaChart>
+              {/* Render Bar second (in front) */}
+              {showChats && (
+                <Bar
+                  dataKey="chats"
+                  fill="var(--color-chats)"
+                  radius={[8, 8, 0, 0]}
+                  barSize={24}
+                  fillOpacity={0.8}
+                />
+              )}
+            </ComposedChart>
           </ChartContainer>
         </CardContent>
       </div>

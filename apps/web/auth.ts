@@ -76,7 +76,7 @@ export const auth = betterAuth({
     "http://localhost:3001",
     "http://192.168.181.95:3001/",
   ],
-  appName: "chatsy",
+  appName: "padyna",
   emailAndPassword: {
     enabled: true,
   },

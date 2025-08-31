@@ -392,7 +392,7 @@ export function getVisitorHistory(filter: "24h" | "7d" | "30d" | "90d") {
     queryKey: ["visitor-analytics", filter],
     refetchOnMount: true,
     refetchOnWindowFocus: true,
-    staleTime: 1000 * 60 * 5, // Consider data stale after 5 minutes instead of infinity
+    staleTime: 1000 * 60 * 2,
     queryFn: async () => {
       const { data } = await api.get("/visitor-analytics");
       if (!Array.isArray(data)) return [];
