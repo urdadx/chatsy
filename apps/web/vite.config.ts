@@ -11,11 +11,11 @@ export default defineConfig({
 
     tailwindcss(),
     tanstackStart({
-      customViteReactPlugin: false,
+      customViteReactPlugin: true,
       target: "node-server",
     }),
   ],
   server: {
-    allowedHosts: ["32407ebb7f65.ngrok-free.app"],
+    allowedHosts: ["chatsy.railway.internal"],
   },
 });
