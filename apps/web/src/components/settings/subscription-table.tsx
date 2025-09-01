@@ -51,6 +51,8 @@ export const SubscriptionTable = () => {
           <div className="flex items-center gap-2 min-h-[24px]">
             {isLoading ? (
               <Skeleton className="h-5 w-3/4" />
+            ) : !subscription ? (
+              <p className="text-gray-600 text-sm">You have no active plan.</p>
             ) : (
               <p className="text-gray-600 text-sm">
                 You are currently on the{" "}

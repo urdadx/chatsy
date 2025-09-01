@@ -7,6 +7,7 @@ import { motion } from "motion/react";
 import { AddOnsDialog } from "./add-ons-dialog";
 import { Button } from "./ui/button";
 import { Dialog, DialogTrigger } from "./ui/dialog";
+import { UpgradeBanner } from "./upgrade-banner";
 
 export function UsageBanner() {
   const { data: activeMeters, isLoading, isError } = useActiveMeters();
@@ -32,13 +33,7 @@ export function UsageBanner() {
   }
 
   if (isError) {
-    return (
-      <Card className="shadow-none h-fit">
-        <div className="px-4 grid gap-4 text-red-500">
-          Failed to load usage.
-        </div>
-      </Card>
-    );
+    return <UpgradeBanner />;
   }
 
   return (

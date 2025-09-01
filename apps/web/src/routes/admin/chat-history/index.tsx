@@ -165,10 +165,10 @@ function RouteComponent() {
         <h1 className="text-lg font-semibold">Chat History</h1>
         <div className="bg-white border rounded-lg my-4 py-2">
           {/* Chat Header */}
-          <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white">
+          <div className="w-full flex items-center gap-2 justify-between px-4 pt-1 pb-2 border-b bg-white">
             <div className="relative">
               <Select value={status} onValueChange={handleStatusChange}>
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger className="w-full sm:w-[160px]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -182,7 +182,7 @@ function RouteComponent() {
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <Select value={filter} onValueChange={handleFilterChange}>
-                  <SelectTrigger className="w-[200px]">
+                  <SelectTrigger className="w-full sm:w-[200px]">
                     <SelectValue placeholder="Filter" />
                   </SelectTrigger>
 
@@ -197,7 +197,7 @@ function RouteComponent() {
 
               <Button
                 variant="outline"
-                className="text-gray-600"
+                className="text-gray-600 hidden sm:flex"
                 onClick={() => refetch()}
                 disabled={isLoading}
               >

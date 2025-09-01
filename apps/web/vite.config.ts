@@ -11,7 +11,6 @@ export default defineConfig({
 
     tailwindcss(),
     tanstackStart({
-      customViteReactPlugin: true,
       target: "node-server",
     }),
   ],

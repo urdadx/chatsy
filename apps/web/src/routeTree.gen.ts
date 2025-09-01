@@ -51,7 +51,6 @@ import { ServerRoute as ApiMyChatbotServerRouteImport } from './routes/api/my-ch
 import { ServerRoute as ApiLeadsServerRouteImport } from './routes/api/leads'
 import { ServerRoute as ApiInviteMemberServerRouteImport } from './routes/api/invite-member'
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
-import { ServerRoute as ApiGetOgInfoServerRouteImport } from './routes/api/get-og-info'
 import { ServerRoute as ApiFirecrawlWebhookServerRouteImport } from './routes/api/firecrawl-webhook'
 import { ServerRoute as ApiFeedbackServerRouteImport } from './routes/api/feedback'
 import { ServerRoute as ApiDocumentSourceServerRouteImport } from './routes/api/document-source'
@@ -281,11 +280,6 @@ const ApiInviteMemberServerRoute = ApiInviteMemberServerRouteImport.update({
 const ApiHelloServerRoute = ApiHelloServerRouteImport.update({
   id: '/api/hello',
   path: '/api/hello',
-  getParentRoute: () => rootServerRouteImport,
-} as any)
-const ApiGetOgInfoServerRoute = ApiGetOgInfoServerRouteImport.update({
-  id: '/api/get-og-info',
-  path: '/api/get-og-info',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiFirecrawlWebhookServerRoute =
@@ -595,7 +589,6 @@ export interface FileServerRoutesByFullPath {
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
   '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
-  '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
   '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
@@ -638,7 +631,6 @@ export interface FileServerRoutesByTo {
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
   '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
-  '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
   '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
@@ -682,7 +674,6 @@ export interface FileServerRoutesById {
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
   '/api/firecrawl-webhook': typeof ApiFirecrawlWebhookServerRoute
-  '/api/get-og-info': typeof ApiGetOgInfoServerRoute
   '/api/hello': typeof ApiHelloServerRoute
   '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
@@ -727,7 +718,6 @@ export interface FileServerRouteTypes {
     | '/api/document-source'
     | '/api/feedback'
     | '/api/firecrawl-webhook'
-    | '/api/get-og-info'
     | '/api/hello'
     | '/api/invite-member'
     | '/api/leads'
@@ -770,7 +760,6 @@ export interface FileServerRouteTypes {
     | '/api/document-source'
     | '/api/feedback'
     | '/api/firecrawl-webhook'
-    | '/api/get-og-info'
     | '/api/hello'
     | '/api/invite-member'
     | '/api/leads'
@@ -813,7 +802,6 @@ export interface FileServerRouteTypes {
     | '/api/document-source'
     | '/api/feedback'
     | '/api/firecrawl-webhook'
-    | '/api/get-og-info'
     | '/api/hello'
     | '/api/invite-member'
     | '/api/leads'
@@ -857,7 +845,6 @@ export interface RootServerRouteChildren {
   ApiDocumentSourceServerRoute: typeof ApiDocumentSourceServerRoute
   ApiFeedbackServerRoute: typeof ApiFeedbackServerRoute
   ApiFirecrawlWebhookServerRoute: typeof ApiFirecrawlWebhookServerRoute
-  ApiGetOgInfoServerRoute: typeof ApiGetOgInfoServerRoute
   ApiHelloServerRoute: typeof ApiHelloServerRoute
   ApiInviteMemberServerRoute: typeof ApiInviteMemberServerRoute
   ApiLeadsServerRoute: typeof ApiLeadsServerRoute
@@ -1179,13 +1166,6 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiHelloServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/api/get-og-info': {
-      id: '/api/get-og-info'
-      path: '/api/get-og-info'
-      fullPath: '/api/get-og-info'
-      preLoaderRoute: typeof ApiGetOgInfoServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
     '/api/firecrawl-webhook': {
       id: '/api/firecrawl-webhook'
       path: '/api/firecrawl-webhook'
@@ -1405,7 +1385,6 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiDocumentSourceServerRoute: ApiDocumentSourceServerRoute,
   ApiFeedbackServerRoute: ApiFeedbackServerRoute,
   ApiFirecrawlWebhookServerRoute: ApiFirecrawlWebhookServerRoute,
-  ApiGetOgInfoServerRoute: ApiGetOgInfoServerRoute,
   ApiHelloServerRoute: ApiHelloServerRoute,
   ApiInviteMemberServerRoute: ApiInviteMemberServerRoute,
   ApiLeadsServerRoute: ApiLeadsServerRoute,
