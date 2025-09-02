@@ -202,8 +202,9 @@ export function RegisterForm({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By continuing, you agree to our <Link to="/">Terms of Service</Link> and{" "}
-        <Link to="/">Privacy Policy</Link>.
+        By continuing, you agree to our{" "}
+        <Link to="/legal/terms">Terms of Service</Link> and{" "}
+        <Link to="/legal/privacy">Privacy Policy</Link>.
       </div>
     </div>
   );
