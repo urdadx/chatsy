@@ -8,14 +8,16 @@ export default defineConfig({
     viteTsConfigPaths({
       projects: ["./tsconfig.json"],
     }),
-    
 
     tailwindcss(),
     tanstackStart({
-      target: "node-server",
+      target: "vercel",
     }),
   ],
   server: {
-    allowedHosts: ["chatsy.railway.internal", "adjusted-strictly-newt.ngrok-free.app"],
+    allowedHosts: [
+      "chatsy.railway.internal",
+      "adjusted-strictly-newt.ngrok-free.app",
+    ],
   },
 });
