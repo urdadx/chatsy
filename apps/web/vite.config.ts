@@ -8,6 +8,7 @@ export default defineConfig({
     viteTsConfigPaths({
       projects: ["./tsconfig.json"],
     }),
+    
 
     tailwindcss(),
     tanstackStart({
@@ -15,6 +16,6 @@ export default defineConfig({
     }),
   ],
   server: {
-    allowedHosts: ["chatsy.railway.internal"],
+    allowedHosts: ["chatsy.railway.internal", "adjusted-strictly-newt.ngrok-free.app"],
   },
 });

@@ -17,7 +17,7 @@ export function createRouter() {
     defaultNotFoundComponent: DefaultNotFound,
     scrollRestoration: true,
     defaultStructuralSharing: true,
-    defaultComponent: GlobalLoader,
+    defaultPendingComponent: () => <GlobalLoader />,
   });
 
   setupRouterSsrQueryIntegration({

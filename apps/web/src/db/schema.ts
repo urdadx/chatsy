@@ -21,7 +21,7 @@ export const user = pgTable("user", {
   bio: text("bio"),
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified")
-    .$defaultFn(() => false)
+  .$defaultFn(() => false)
     .notNull(),
   image: text("image"),
   createdAt: timestamp("created_at")
@@ -447,6 +447,9 @@ export const stream = pgTable(
 
 export const Action = pgTable("action", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
+  chatbotId: uuid("chatbot_id")
+    .notNull()
+    .references(() => chatbot.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   toolName: text("tool_name").notNull(),
   isActive: boolean("is_active").notNull().default(true),

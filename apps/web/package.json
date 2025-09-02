@@ -126,13 +126,12 @@
     "@types/pg": "^8.15.4",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
-
     "@vitejs/plugin-react": "^4.3.4",
     "drizzle-kit": "^0.31.1",
     "jsdom": "^26.0.0",
     "tsx": "^4.19.4",
     "typescript": "^5.7.2",
-    "vite": "^6.3.5",
+    "vite": "^7.0.6",
     "vite-tsconfig-paths": "^5.1.4",
     "web-vitals": "^4.2.4"
   }

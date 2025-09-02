@@ -67,9 +67,7 @@ function RouteComponent() {
   const actions: ActionType[] = actionsResponse?.actions || [];
 
   const filteredActions = actions.filter(
-    (action) =>
-      action.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      action.description?.toLowerCase().includes(searchTerm.toLowerCase()),
+    (action) => action.toolName !== "knowledge_base",
   );
 
   if (isLoading) {

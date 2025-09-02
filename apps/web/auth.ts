@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { chatbot, session, subscription, user } from "@/db/schema";
+import { Action, chatbot, session, subscription, user } from "@/db/schema";
 import { sendOrganizationInvitation } from "@/lib/emails/email";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getActiveOrganization } from "@/lib/hooks/get-active-organization";
@@ -33,6 +33,52 @@ function safeParseDate(value: string | Date | null | undefined): Date | null {
   if (!value) return null;
   if (value instanceof Date) return value;
   return new Date(value);
+}
+
+async function createDefaultActions(chatbotId: string) {
+  const defaultActions = [
+    {
+      chatbotId,
+      name: "Knowledge base",
+      toolName: "knowledge_base",
+      description: "Search the knowledge base for relevant information.",
+      isActive: true,
+    },
+    {
+      chatbotId,
+      name: "Feedback form",
+      toolName: "collect_feedback",
+      description:
+        "Collects feedback, reviews, complaints, or suggestions from users.",
+      isActive: true,
+    },
+    {
+      chatbotId,
+      name: "Collect leads",
+      toolName: "collect_leads",
+      description: "Capture leads from conversations with customers.",
+      isActive: true,
+    },
+    {
+      chatbotId,
+      name: "Escalate to human",
+      toolName: "escalate_to_human",
+      description: "Escalates the conversation to a human agent.",
+      isActive: true,
+    },
+  ];
+
+  try {
+    await db.insert(Action).values(defaultActions);
+    console.log(
+      `Created ${defaultActions.length} default actions for chatbot: ${chatbotId}`,
+    );
+  } catch (error) {
+    console.error(
+      `Failed to create default actions for chatbot ${chatbotId}:`,
+      error,
+    );
+  }
 }
 
 export const auth = betterAuth({
@@ -166,6 +212,11 @@ export const auth = betterAuth({
             console.log(
               `Created default chatbot for organization: ${organization.id}`,
             );
+
+            // Create default actions for the chatbot
+            if (createdChatbot?.id) {
+              await createDefaultActions(createdChatbot.id);
+            }
           } catch (error) {
             console.error(
               `Failed to create default chatbot for organization ${organization.id}:`,

@@ -26,7 +26,6 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
     if (!userId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
-
     const chatbotId =
       session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
 
