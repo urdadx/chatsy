@@ -37,7 +37,7 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
           }
 
           // Get all actions
-          const actions = await db.select().from(Action);
+          const actions = await db.select().from(Action).where(eq(Action.chatbotId, chatbotId));
 
           return json({ actions }, { status: 200 });
         } catch (error) {
