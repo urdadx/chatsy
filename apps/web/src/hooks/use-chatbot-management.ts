@@ -2,6 +2,7 @@ import { api } from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { create } from "zustand";
 
 export interface ChatbotListItem {
   id: string;

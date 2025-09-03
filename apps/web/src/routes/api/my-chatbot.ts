@@ -5,7 +5,7 @@ import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { checkSubscriptionLimits } from "@/lib/subscription/subscription-utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
+import { auth, createDefaultActions } from "auth";
 import { count, eq, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -22,6 +22,10 @@ const createChatbotSchema = z.object({
   suggestedMessages: z.array(z.string()).optional(),
   isEmbeddingEnabled: z.boolean().default(true),
   allowedDomains: z.array(z.string()).optional(),
+});
+
+const deleteChatbotSchema = z.object({
+  chatbotId: z.string().uuid("Invalid chatbot ID format"),
 });
 
 export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
@@ -212,10 +216,106 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         );
       }
 
+      await createDefaultActions(newChatbot.id);
+
       return json(newChatbot, { status: 201 });
     } catch (err) {
       console.error("POST /api/my-chatbot error:", err);
       return new Response("Failed to create chatbot", { status: 500 });
+    }
+  },
+  DELETE: async ({ request }) => {
+    const session = await auth.api.getSession({ headers: request.headers });
+    const userId = session?.user?.id;
+    const organizationId = session?.session?.activeOrganizationId;
+
+    if (!userId || !organizationId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+
+    const isMember = await isUserMemberOfOrganization(userId, organizationId);
+    if (!isMember) {
+      return new Response("Forbidden", { status: 403 });
+    }
+
+    try {
+      const body = await request.json();
+      const parsed = deleteChatbotSchema.safeParse(body);
+
+      if (!parsed.success) {
+        return json({ error: parsed.error.format() }, { status: 400 });
+      }
+
+      const { chatbotId } = parsed.data;
+
+      // Verify the chatbot exists and belongs to the user's organization
+      const [existingChatbot] = await db
+        .select()
+        .from(chatbot)
+        .where(eq(chatbot.id, chatbotId));
+
+      if (!existingChatbot) {
+        return json({ error: "Chatbot not found" }, { status: 404 });
+      }
+
+      if (existingChatbot.organizationId !== organizationId) {
+        return json({ error: "Forbidden: You don't own this chatbot" }, { status: 403 });
+      }
+
+      // Check if this is the last chatbot in the organization
+      const [chatbotCount] = await db
+        .select({ count: count(chatbot.id) })
+        .from(chatbot)
+        .where(eq(chatbot.organizationId, organizationId));
+
+      if (chatbotCount?.count <= 1) {
+        return json({ 
+          error: "Cannot delete the last chatbot in an organization" 
+        }, { status: 400 });
+      }
+
+      // Delete the chatbot (cascade deletes will handle related records)
+      await db.delete(chatbot).where(eq(chatbot.id, chatbotId));
+
+      // Decrement the organization's chatbot count
+      await db
+        .update(organization)
+        .set({
+          chatbotCount: sql`${organization.chatbotCount} - 1`,
+        })
+        .where(eq(organization.id, organizationId));
+
+      // If this was the active chatbot, update sessions to use another chatbot
+      const isActiveChatbot = session?.session?.activeChatbotId === chatbotId;
+      if (isActiveChatbot) {
+        // Find another chatbot in the organization to set as active
+        const [newActiveChatbot] = await db
+          .select({ id: chatbot.id })
+          .from(chatbot)
+          .where(eq(chatbot.organizationId, organizationId))
+          .limit(1);
+
+        if (newActiveChatbot) {
+          // Update all sessions for this user to use the new active chatbot
+          await db
+            .update(sessionTable)
+            .set({ 
+              activeChatbotId: newActiveChatbot.id,
+              updatedAt: new Date()
+            })
+            .where(eq(sessionTable.userId, userId));
+        }
+      }
+
+      return json({ 
+        message: "Chatbot deleted successfully",
+        deletedChatbotId: chatbotId,
+        wasActive: isActiveChatbot
+      }, { status: 200 });
+
+    } catch (err) {
+      console.error("DELETE /api/my-chatbot error:", err);
+      return new Response("Failed to delete chatbot", { status: 500 });
     }
   },
 });

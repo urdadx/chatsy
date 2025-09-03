@@ -35,7 +35,7 @@ function safeParseDate(value: string | Date | null | undefined): Date | null {
   return new Date(value);
 }
 
-async function createDefaultActions(chatbotId: string) {
+export const createDefaultActions = async (chatbotId: string) => {
   const defaultActions = [
     {
       chatbotId,

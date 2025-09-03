@@ -10,6 +10,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  unique,
   uuid,
   varchar,
   vector,
@@ -456,7 +457,9 @@ export const Action = pgTable("action", {
   description: text("description"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => [
+  unique().on(table.chatbotId, table.toolName),
+]);
 
 // TYPES
 export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;

@@ -36,3 +36,36 @@ export function useUpdateChatbot() {
     },
   });
 }
+
+export function useDeleteChatbot() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (chatbotId: string) => {
+      const response = await api.delete("/my-chatbot", {
+        data: { chatbotId },
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["chatbot"] });
+      queryClient.invalidateQueries({ queryKey: ["chatbots"] });
+      
+      toast.success("Chatbot deleted successfully!");
+      
+      // If the deleted chatbot was active, refresh the page to update the UI
+      if (data.wasActive) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || "Failed to delete chatbot";
+      toast.error(errorMessage);
+    },
+  });
+}
+
+
+

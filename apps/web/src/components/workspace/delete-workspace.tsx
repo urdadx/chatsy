@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useDeleteChatbot } from "@/hooks/use-chatbot";
 import { authClient } from "@/lib/auth-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -21,36 +22,17 @@ export function DeleteWorkspace({
   workspaceId,
   onClose,
 }: DeleteWorkspaceProps) {
-  const queryClient = useQueryClient();
 
-  const deleteWorkspace = useMutation({
-    mutationFn: async () => {
-      if (!workspaceId) {
-        throw new Error("No workspace selected");
-      }
-      await authClient.organization.delete({
-        organizationId: workspaceId,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["organizations"] });
-      queryClient.invalidateQueries({ queryKey: ["activeOrganization"] });
-      toast.success("Workspace deleted successfully");
-      onClose();
-    },
-    onError: (error: any) => {
-      console.error("Failed to delete workspace:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to delete workspace. Please try again.",
-      );
-    },
-  });
+  const deleteChatbotMutation = useDeleteChatbot();
 
-  const handleDelete = async () => {
-    deleteWorkspace.mutate();
+  const handleDeleteChatbot = async () => {
+    try {
+      await deleteChatbotMutation.mutateAsync(workspaceId);
+    } catch (error) {
+      // Error handling is done in the mutation
+    }
   };
+
   return (
     <AlertDialog open onOpenChange={onClose}>
       <AlertDialogContent>
@@ -65,7 +47,7 @@ export function DeleteWorkspace({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             className="bg-red-500 text-white"
-            onClick={handleDelete}
+            onClick={handleDeleteChatbot}
           >
             Continue
           </AlertDialogAction>

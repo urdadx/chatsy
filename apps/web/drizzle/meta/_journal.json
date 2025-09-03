@@ -71,6 +71,13 @@
       "when": 1756244478231,
       "tag": "0009_seed_actions",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1756936670680,
+      "tag": "0010_clean_nighthawk",
+      "breakpoints": true
     }
   ]
 }

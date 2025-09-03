@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useDeleteChatbot } from "@/hooks/use-chatbot";
 import { useSetActiveChatbot } from "@/hooks/use-chatbot-management";
 import { timeAgo } from "@/lib/utils";
 import { ArrowRightLeft, MoreHorizontal, Trash2 } from "lucide-react";
@@ -49,6 +50,7 @@ export function ChatbotCard({
   }, [name]);
 
   const setActiveChatbotMutation = useSetActiveChatbot();
+  const deleteChatbotMutation = useDeleteChatbot();
 
   const handleSwitchChatbot = async () => {
     try {
@@ -57,6 +59,7 @@ export function ChatbotCard({
       // Error handling is done in the mutation
     }
   };
+
 
   return (
     <>
