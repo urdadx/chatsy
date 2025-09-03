@@ -11,7 +11,7 @@ export default defineConfig({
 
     tailwindcss(),
     tanstackStart({
-      target: "vercel",
+      target: "node-server",
     }),
   ],
   server: {
