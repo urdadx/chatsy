@@ -9,12 +9,12 @@ export default defineConfig({
     viteTsConfigPaths({
       projects: ["./tsconfig.json"],
     }),
-    react(),
     tailwindcss(),
     tanstackStart({
       target: "node-server",
       customViteReactPlugin: true,
     }),
+    react(),
   ],
   ssr: {
     noExternal: ["@polar-sh/sdk", "@polar-sh/better-auth"],
