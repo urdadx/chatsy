@@ -1,0 +1,1 @@
+function c(t){const e=Object.prototype.toString.call(t);return t instanceof Date||typeof t=="object"&&e==="[object Date]"?new t.constructor(+t):typeof t=="number"||e==="[object Number]"||typeof t=="string"||e==="[object String]"?new Date(t):new Date(NaN)}function r(t,e){const o=t<0?"-":"",n=Math.abs(t).toString().padStart(e,"0");return o+n}export{r as a,c as t};
