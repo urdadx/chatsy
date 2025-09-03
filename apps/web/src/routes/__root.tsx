@@ -37,6 +37,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
     ],
     links: [
       {
+        rel: "preload",
+        href: appCss,
+        as: "style",
+      },
+      {
         rel: "stylesheet",
         href: appCss,
       },
@@ -52,7 +57,7 @@ function RootDocument() {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <div className="">
           <TooltipProvider>
             <Outlet />

@@ -9,7 +9,9 @@ export default defineConfig({
       projects: ["./tsconfig.json"],
     }),
 
-    tailwindcss(),
+    tailwindcss({
+      cssInlineLimit: 0, // Force critical CSS inlining
+    }),
     tanstackStart({
       target: "node-server",
     }),
