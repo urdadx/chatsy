@@ -10,9 +10,7 @@ export default defineConfig({
       projects: ["./tsconfig.json"],
     }),
     react(),
-    tailwindcss({
-      cssInlineLimit: 0, // Force critical CSS inlining
-    }),
+    tailwindcss(),
     tanstackStart({
       target: "node-server",
       customViteReactPlugin: true,
@@ -28,6 +26,7 @@ export default defineConfig({
     allowedHosts: [
       "chatsy.railway.internal",
       "adjusted-strictly-newt.ngrok-free.app",
+      "padyna.com",
     ],
   },
 });
