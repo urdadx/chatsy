@@ -64,7 +64,7 @@
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "date-fns": "^4.1.0",
+    "date-fns": "^3.6.0",
     "dotenv": "^16.5.0",
     "dotted-map": "^2.2.3",
     "drizzle-orm": "^0.44.2",
