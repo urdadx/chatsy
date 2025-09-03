@@ -14,6 +14,12 @@ export default defineConfig({
       target: "node-server",
     }),
   ],
+  ssr: {
+    noExternal: ["@polar-sh/sdk", "@polar-sh/better-auth"],
+  },
+  optimizeDeps: {
+    exclude: ["@polar-sh/sdk/webhooks.ts"],
+  },
   server: {
     allowedHosts: [
       "chatsy.railway.internal",
