@@ -24,18 +24,18 @@ export function useSendVisitorAnalytics({
   const lastLogRef = useRef<{ event: string; timestamp: number } | null>(null);
 
   function getVisitorId() {
-    let id = sessionStorage.getItem("chatsy_visitor_id");
+    let id = sessionStorage.getItem("padyna_visitor_id");
     const isFirstVisit = !id;
     if (!id) {
       id = Math.random().toString(36).substring(2) + Date.now();
-      sessionStorage.setItem("chatsy_visitor_id", id);
+      sessionStorage.setItem("padyna_visitor_id", id);
 
       // Also store in localStorage to prevent duplicate visits across sessions
-      localStorage.setItem("chatsy_visitor_permanent_id", id);
-      localStorage.setItem("chatsy_last_visit", Date.now().toString());
+      localStorage.setItem("padyna_visitor_permanent_id", id);
+      localStorage.setItem("padyna_last_visit", Date.now().toString());
     } else {
       // Update last visit time
-      localStorage.setItem("chatsy_last_visit", Date.now().toString());
+      localStorage.setItem("padyna_last_visit", Date.now().toString());
     }
     return { id, isFirstVisit };
   }
@@ -123,7 +123,7 @@ export function useSendVisitorAnalytics({
           signal: controller.signal,
           headers: {
             Accept: "application/json",
-            "User-Agent": "Mozilla/5.0 (compatible; Chatsy Analytics)",
+            "User-Agent": "Mozilla/5.0 (compatible; padyna Analytics)",
           },
         });
 
@@ -189,7 +189,7 @@ export function useSendVisitorAnalytics({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": "Chatsy Analytics Client",
+          "User-Agent": "padyna Analytics Client",
         },
         body: JSON.stringify(data),
         signal: controller.signal,
@@ -292,7 +292,7 @@ export function useSendVisitorAnalytics({
 
       // For chat opened events, check if we've already logged this session
       if (event === "bubble_chat_opened") {
-        const lastChatOpen = localStorage.getItem("chatsy_last_chat_opened");
+        const lastChatOpen = localStorage.getItem("padyna_last_chat_opened");
         if (lastChatOpen && now - Number.parseInt(lastChatOpen) < 30000) {
           // 30 seconds
           console.debug(
@@ -300,7 +300,7 @@ export function useSendVisitorAnalytics({
           );
           return;
         }
-        localStorage.setItem("chatsy_last_chat_opened", now.toString());
+        localStorage.setItem("padyna_last_chat_opened", now.toString());
       }
 
       lastLogRef.current = { event, timestamp: now };

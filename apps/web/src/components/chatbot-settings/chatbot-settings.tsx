@@ -169,7 +169,7 @@ export function ChatbotSettings() {
     <div className="w-full mx-auto px-2 sm:px-0">
       <div className="space-y-8 mt-3">
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
-          <Label htmlFor="logo">Chat Logo</Label>
+          <Label htmlFor="logo">Chatbot Logo</Label>
           <div className="h-10">
             <AvatarUpload />
           </div>

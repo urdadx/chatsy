@@ -7,6 +7,7 @@ import { useStepperStore } from "../store/stepper-store";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import Spinner from "../ui/spinner";
 
 export const StepOne = () => {
   const { nextStep } = useStepperStore();
@@ -71,7 +72,9 @@ export const StepOne = () => {
       });
 
       if (result.error) {
-        throw new Error(result.error.message || "Failed to create workspace");
+        throw new Error(
+          result.error.message || "Failed to create organization",
+        );
       }
 
       console.log("organization id created", result.data.id);
@@ -80,16 +83,16 @@ export const StepOne = () => {
         organizationId: result.data.id,
       });
 
-      toast.success("Workspace created successfully!");
+      toast.success("Organization created successfully!");
 
       setFormData({ name: "", slug: "" });
       setSlugManuallyChanged(false);
       setError("");
       nextStep();
     } catch (error: any) {
-      toast.error("Error creating workspace");
+      toast.error("Error creating organization");
       setError(
-        error.message || "Failed to create workspace. Please try again.",
+        error.message || "Failed to create organization. Please try again.",
       );
     } finally {
       setIsLoading(false);
@@ -101,10 +104,10 @@ export const StepOne = () => {
         <div className="flex flex-col gap-6">
           <div className="flex flex-col">
             <h1 className="text-2xl text-start font-semibold">
-              Create your workspace
+              Create your organization
             </h1>
             <p className="text-start text-muted-foreground">
-              Set up your workspace to get started
+              Set up your organization to get started
             </p>
           </div>
 
@@ -133,7 +136,7 @@ export const StepOne = () => {
               <Label>Slug</Label>
               <div className="flex rounded-md shadow-xs">
                 <span className="border-input bg-gray-50 text-gray-500 inline-flex items-center rounded-s-md border px-3 text-sm">
-                  app.padyna.com/
+                  padyna.com/
                 </span>
                 <Input
                   className="-ms-px rounded-s-none shadow-none"
@@ -161,7 +164,16 @@ export const StepOne = () => {
                   isLoading || !formData.name.trim() || !formData.slug.trim()
                 }
               >
-                {isLoading ? "Creating..." : "Continue"}
+                {isLoading ? (
+                  <>
+                    <span className="flex items-center gap-2">
+                      <Spinner className="text-white h-4 w-4" />
+                      Creating...
+                    </span>
+                  </>
+                ) : (
+                  "Continue"
+                )}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </motion.div>

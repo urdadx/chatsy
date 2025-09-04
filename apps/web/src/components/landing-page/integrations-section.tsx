@@ -84,8 +84,8 @@ export default function IntegrationsSection() {
                 />
               </div>
               <div className="mt-2 flex flex-col md:flex-row gap-2 text-sm justify-center items-center">
-                <cite>Alfred Kissiedu,</cite>
-                <p className="text-muted-foreground">RedPear Communications</p>
+                <cite>Sheriff Adedokun</cite>
+                <p className="text-muted-foreground">Founder, PushBio </p>
               </div>
             </div>
           </div>

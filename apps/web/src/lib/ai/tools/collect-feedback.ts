@@ -3,7 +3,7 @@ import z from "zod";
 
 export const collectFeedbackTool = tool({
   description:
-    "Collects feedback, reviews, complaints, or suggestions from users.",
+    "Collect user feedback when they express satisfaction/dissatisfaction, want to leave a review, or report an experience",
   inputSchema: z.object({
     email: z
       .string()

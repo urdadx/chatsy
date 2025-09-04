@@ -49,9 +49,9 @@ export function ChatPreview() {
     id: chatId,
     transport: new DefaultChatTransport({
       fetch: fetchWithErrorHandlers,
+      api: "/api/chat/",
     }),
     messages: initialMessages,
-    experimental_throttle: 100,
     onError: (error) => {
       if (error instanceof ChatSDKError) {
         toast.error(error.message);

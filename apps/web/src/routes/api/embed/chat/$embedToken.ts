@@ -145,7 +145,7 @@ export const ServerRoute = createServerFileRoute(
         execute: ({ writer: dataStream }) => {
           const result = streamText({
             model: google("gemini-2.0-flash"),
-            system: systemPrompt(chatbotData.name ?? "Assistant"),
+            system: systemPrompt(chatbotData.name ?? "Assistant", activeTools),
             messages: convertToModelMessages(uiMessages, {
               ignoreIncompleteToolCalls: true,
             }),
@@ -201,10 +201,6 @@ export const ServerRoute = createServerFileRoute(
               createdAt: new Date(),
             })),
           });
-        },
-        onError: (error) => {
-          console.log("Error in createUIMessageStream:", error);
-          return "Oops, an error occurred!";
         },
       });
 

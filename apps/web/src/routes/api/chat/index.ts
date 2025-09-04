@@ -149,7 +149,10 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             execute: ({ writer: dataStream }) => {
               const result = streamText({
                 model: google("gemini-2.0-flash"),
-                system: systemPrompt(chatbotData.name ?? "Assistant"),
+                system: systemPrompt(
+                  chatbotData.name ?? "Assistant",
+                  activeTools,
+                ),
                 messages: convertToModelMessages(uiMessages, {
                   ignoreIncompleteToolCalls: true,
                 }),
@@ -205,10 +208,6 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                 })),
               });
             },
-            onError: (error) => {
-              console.log("Error in createUIMessageStream:", error);
-              return "Oops, an error occurred!";
-            },
           });
 
           const response = new Response(
@@ -220,6 +219,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
           headers.set("X-Chat-Id", id);
           headers.set("Cache-Control", "no-cache");
           headers.set("Connection", "keep-alive");
+          headers.set("Content-Type", "text/event-stream");
 
           return new Response(response.body, {
             status: response.status,
@@ -253,8 +253,11 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
           const error = new ChatSDKError("unauthorized:chat");
           return error.toResponse();
         }
+        const userId = session?.user.id || "";
 
-        const chatbotId = session?.session?.activeChatbotId;
+        const chatbotId =
+          session?.session?.activeChatbotId ||
+          (await getActiveChatbotId(userId));
         if (!chatbotId) {
           const error = new ChatSDKError(
             "bad_request:api",

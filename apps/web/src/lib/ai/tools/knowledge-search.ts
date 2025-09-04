@@ -4,7 +4,8 @@ import z from "zod";
 
 export const knowledgeSearchTool = (chatbotId: string) =>
   tool({
-    description: "Search the knowledge base for relevant information.",
+    description:
+      "Search company knowledge base for policies, procedures, technical issues, and factual information when the user asks questions you cannot answer confidently",
     inputSchema: z.object({
       query: z
         .string()

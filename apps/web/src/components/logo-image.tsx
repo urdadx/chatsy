@@ -1,5 +1,5 @@
 import LOGO from "@/assets/logo.svg";
-import Alfred from "@/assets/snr-man-alfred.webp";
+import Alfred from "@/assets/sheriff.jpg";
 import { cn } from "@/lib/utils";
 
 type ImageProps = {

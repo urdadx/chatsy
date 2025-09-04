@@ -4,7 +4,7 @@ import { Globe, Link as LinkIcon, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 export function DomainSettings() {
-  const [domain, _setDomain] = useState("urdadx.chatsy.me");
+  const [domain, _setDomain] = useState("urdadx.padyna.me");
 
   return (
     <div className="w-full mx-auto px-2 sm:px-0">

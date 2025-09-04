@@ -15,12 +15,14 @@ import { Check } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
+import Spinner from "../ui/spinner";
 
 export function Pricing() {
   const { data: session } = useSession();
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
     "monthly",
   );
+  const [loadingPlanId, setLoadingPlanId] = useState<number | null>(null);
 
   const navigate = useNavigate();
 
@@ -123,6 +125,8 @@ export function Pricing() {
       return;
     }
 
+    setLoadingPlanId(plan.id); // Start loading for this specific plan
+
     try {
       await authClient.checkout({
         slug,
@@ -130,8 +134,12 @@ export function Pricing() {
       });
     } catch (error) {
       toast.error("An error occured during checkout. Please try again.");
+    } finally {
+      setLoadingPlanId(null); // Stop loading
     }
   };
+
+  const isLoading = (planId: number) => loadingPlanId === planId;
 
   return (
     <section id="pricing" className="">
@@ -223,10 +231,18 @@ export function Pricing() {
                             variant={plan.isPopular ? "default" : "outline"}
                             onClick={() => handleSelectPlan(plan)}
                             className="w-full"
+                            disabled={isLoading(plan.id)}
                           >
-                            {plan.name === "Enterprise"
-                              ? "Contact Sales"
-                              : "Get Started"}
+                            {isLoading(plan.id) ? (
+                              <>
+                                <Spinner className="w-4 h-4 text-white" />
+                                Processing...
+                              </>
+                            ) : plan.name === "Enterprise" ? (
+                              "Contact Sales"
+                            ) : (
+                              "Get Started"
+                            )}
                           </Button>
                         </motion.div>
                       </CardFooter>
@@ -289,9 +305,6 @@ export function Pricing() {
                             </span>
                           )}
                         </div>
-                        {/* <CardDescription className="text-sm">
-                          {plan.tagline}
-                        </CardDescription> */}
                       </CardHeader>
 
                       <CardContent className="space-y-4 flex-grow p-4">
@@ -311,10 +324,18 @@ export function Pricing() {
                           variant={plan.isPopular ? "default" : "outline"}
                           onClick={() => handleSelectPlan(plan)}
                           className="w-full"
+                          disabled={isLoading(plan.id)}
                         >
-                          {plan.name === "Enterprise"
-                            ? "Contact Sales"
-                            : "Get Started"}
+                          {isLoading(plan.id) ? (
+                            <>
+                              <Spinner className="w-4 h-4 text-white" />
+                              Processing...
+                            </>
+                          ) : plan.name === "Enterprise" ? (
+                            "Contact Sales"
+                          ) : (
+                            "Get Started"
+                          )}
                         </Button>
                       </CardFooter>
                     </div>

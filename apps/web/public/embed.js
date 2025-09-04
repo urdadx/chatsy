@@ -1,13 +1,13 @@
-// Chatsy Widget SDK
+// Padyna Widget SDK
 (function () {
   "use strict";
 
-  class ChatsyWidget {
+  class PadynaWidget {
     constructor(config) {
       this.config = {
         embedToken: config.embedToken,
-        baseUrl: config.baseUrl || window.location.origin,
-        containerId: config.containerId || "chatsy-widget",
+        baseUrl: config.baseUrl || "https://padyna.com",
+        containerId: config.containerId || "padyna-widget",
         mode: config.mode || "bubble", // 'bubble' or 'iframe'
         theme: config.theme || "light",
         position: config.position || "bottom-right",
@@ -30,7 +30,7 @@
 
     init() {
       if (this.isLoaded) {
-        console.warn("Chatsy Widget already initialized");
+        console.warn("Padyna Widget already initialized");
         return;
       }
 
@@ -45,10 +45,10 @@
           this.setupEventListeners();
           this.handleAutoOpen();
           this.isLoaded = true;
-          this.dispatchEvent("chatsy-widget-ready", { widget: this });
+          this.dispatchEvent("padyna-widget-ready", { widget: this });
         })
         .catch((error) => {
-          console.error("Failed to initialize Chatsy Widget:", error);
+          console.error("Failed to initialize Padyna Widget:", error);
           this.handleError({ message: error.message });
         });
     }
@@ -100,7 +100,7 @@
     createBubble() {
       // Create bubble trigger
       this.bubble = document.createElement("div");
-      this.bubble.className = "chatsy-bubble";
+      this.bubble.className = "padyna-bubble";
       this.setupBubbleStyles();
       this.setupBubbleContent();
 
@@ -174,7 +174,7 @@
 
     createNotificationBadge(parent) {
       const badge = document.createElement("div");
-      badge.className = "chatsy-notification-badge";
+      badge.className = "padyna-notification-badge";
       badge.textContent =
         this.unreadCount > 99 ? "99+" : this.unreadCount.toString();
 
@@ -207,7 +207,7 @@
           : `${this.config.baseUrl}/embed/${this.config.embedToken}`;
 
       this.iframe.src = src;
-      this.iframe.title = this.chatData?.name || "Chatsy Widget";
+      this.iframe.title = this.chatData?.name || "Padyna Widget";
       this.iframe.allow = "clipboard-read; clipboard-write";
 
       if (this.config.mode === "bubble") {
@@ -330,7 +330,7 @@
       // Clear unread count when opened
       this.clearUnreadCount();
 
-      this.dispatchEvent("chatsy-bubble-opened", { isOpen: true });
+      this.dispatchEvent("padyna-bubble-opened", { isOpen: true });
     }
 
     closeChat() {
@@ -354,7 +354,7 @@
         // }
       }, 300);
 
-      this.dispatchEvent("chatsy-bubble-closed", { isOpen: false });
+      this.dispatchEvent("padyna-bubble-closed", { isOpen: false });
     }
     handleAutoOpen() {
       if (this.config.autoOpen && this.config.openDelay > 0) {
@@ -374,19 +374,19 @@
         const { type, data } = event.data;
 
         switch (type) {
-          case "chatsy-widget-resize":
+          case "padyna-widget-resize":
             this.handleResize(data);
             break;
-          case "chatsy-widget-toggle":
+          case "padyna-widget-toggle":
             this.handleToggle(data);
             break;
-          case "chatsy-widget-error":
+          case "padyna-widget-error":
             this.handleError(data);
             break;
-          case "chatsy-widget-close":
+          case "padyna-widget-close":
             this.closeChat();
             break;
-          case "chatsy-message-received":
+          case "padyna-message-received":
             this.handleNewMessage(data);
             break;
         }
@@ -461,11 +461,11 @@
         this.updateNotificationBadge();
       }
 
-      this.dispatchEvent("chatsy-message-received", data);
+      this.dispatchEvent("padyna-message-received", data);
     }
 
     updateNotificationBadge() {
-      const badge = this.bubble?.querySelector(".chatsy-notification-badge");
+      const badge = this.bubble?.querySelector(".padyna-notification-badge");
       if (badge) {
         badge.textContent =
           this.unreadCount > 99 ? "99+" : this.unreadCount.toString();
@@ -480,8 +480,8 @@
     }
 
     handleError(data) {
-      console.error("Chatsy Widget Error:", data.message);
-      this.dispatchEvent("chatsy-widget-error", { error: data.message });
+      console.error("Padyna Widget Error:", data.message);
+      this.dispatchEvent("padyna-widget-error", { error: data.message });
     }
 
     dispatchEvent(eventName, detail = {}) {
@@ -530,7 +530,7 @@
   }
 
   // Global API
-  window.ChatsyWidget = {
+  window.PadynaWidget = {
     instances: new Map(),
 
     init: function (config) {
@@ -541,11 +541,11 @@
       const instanceId = config.containerId || "default";
 
       if (this.instances.has(instanceId)) {
-        console.warn(`Chatsy Widget instance '${instanceId}' already exists`);
+        console.warn(`Padyna Widget instance '${instanceId}' already exists`);
         return this.instances.get(instanceId);
       }
 
-      const widget = new ChatsyWidget(config);
+      const widget = new PadynaWidget(config);
       widget.init();
 
       this.instances.set(instanceId, widget);
@@ -573,23 +573,23 @@
   // Auto-initialize if config is provided via data attributes
   document.addEventListener("DOMContentLoaded", function () {
     const autoInitElements = document.querySelectorAll(
-      "[data-chatsy-embed-token]",
+      "[data-padyna-embed-token]",
     );
 
     autoInitElements.forEach(function (element) {
       const config = {
-        embedToken: element.getAttribute("data-chatsy-embed-token"),
+        embedToken: element.getAttribute("data-padyna-embed-token"),
         containerId: element.id || undefined,
-        baseUrl: element.getAttribute("data-chatsy-base-url") || undefined,
-        position: element.getAttribute("data-chatsy-position") || undefined,
-        mode: element.getAttribute("data-chatsy-mode") || "bubble",
-        bubbleSize: element.getAttribute("data-chatsy-bubble-size") || "medium",
-        autoOpen: element.getAttribute("data-chatsy-auto-open") === "true",
+        baseUrl: element.getAttribute("data-padyna-base-url") || undefined,
+        position: element.getAttribute("data-padyna-position") || undefined,
+        mode: element.getAttribute("data-padyna-mode") || "bubble",
+        bubbleSize: element.getAttribute("data-padyna-bubble-size") || "medium",
+        autoOpen: element.getAttribute("data-padyna-auto-open") === "true",
         openDelay:
-          Number.parseInt(element.getAttribute("data-chatsy-open-delay")) || 0,
+          Number.parseInt(element.getAttribute("data-padyna-open-delay")) || 0,
       };
 
-      window.ChatsyWidget.init(config);
+      window.PadynaWidget.init(config);
     });
   });
 })();

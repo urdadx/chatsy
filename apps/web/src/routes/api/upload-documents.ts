@@ -47,7 +47,7 @@ export const ServerRoute = createServerFileRoute(
           originalname: file.name,
           mimetype: file.type,
         },
-        "chatsy/rag-documents/",
+        "padyna/rag-documents/",
       );
 
       return json({ url: uploadedUrl });

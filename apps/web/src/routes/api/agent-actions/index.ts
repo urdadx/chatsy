@@ -19,7 +19,9 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
           });
 
           if (!session) {
-            return new Response("No active chatbot found", { status: 404 });
+            return new Response("Unauthorized: No session found", {
+              status: 401,
+            });
           }
 
           const userId = session?.user.id || "";
@@ -37,11 +39,15 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
           }
 
           // Get all actions
-          const actions = await db.select().from(Action).where(eq(Action.chatbotId, chatbotId));
+          const actions = await db
+            .select()
+            .from(Action)
+            .where(eq(Action.chatbotId, chatbotId));
 
           return json({ actions }, { status: 200 });
         } catch (error) {
-          return new Response("Error fetching actions", { status: 404 });
+          console.error("Error fetching actions:", error);
+          return new Response("Internal Server Error", { status: 500 });
         }
       }),
 
@@ -54,7 +60,9 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
           });
 
           if (!session) {
-            return new Response("No active chatbot found", { status: 404 });
+            return new Response("Unauthorized: No session found", {
+              status: 401,
+            });
           }
 
           const userId = session?.user.id || "";
@@ -68,7 +76,7 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
               "bad_request:api",
               "No active chatbot selected",
             );
-            return error.toResponse();
+            return error.toResponse(); // ChatSDKError returns 400
           }
 
           const { actionId, isActive } = await request.json();
@@ -78,7 +86,7 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
               "bad_request:api",
               "Missing required fields: actionId, isActive",
             );
-            return error.toResponse();
+            return error.toResponse(); // ChatSDKError returns 400
           }
 
           const [updatedAction] = await db
@@ -92,7 +100,7 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
 
           if (!updatedAction) {
             const error = new ChatSDKError("not_found:api", "Action not found");
-            return error.toResponse();
+            return error.toResponse(); // ChatSDKError returns 404
           }
 
           return json(
@@ -101,7 +109,7 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
           );
         } catch (error) {
           console.error("Error updating action:", error);
-          return new Response("Error fetching actions", { status: 404 });
+          return new Response("Internal Server Error", { status: 500 });
         }
       }),
   }),

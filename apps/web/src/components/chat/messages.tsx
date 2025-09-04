@@ -6,7 +6,6 @@ import type { UIMessage } from "ai";
 import equal from "fast-deep-equal";
 import { motion } from "framer-motion";
 import { memo } from "react";
-import { useEffect, useState } from "react";
 import { PreviewMessage, ThinkingMessage } from "./message";
 
 interface MessagesProps {
@@ -19,40 +18,6 @@ interface MessagesProps {
   chatbot?: any;
 }
 
-export function useMessages({
-  status,
-}: {
-  chatId: string;
-  status: UseChatHelpers<ChatMessage>["status"];
-}) {
-  const {
-    containerRef,
-    endRef,
-    isAtBottom,
-    scrollToBottom,
-    onViewportEnter,
-    onViewportLeave,
-  } = useScrollToBottom();
-
-  const [hasSentMessage, setHasSentMessage] = useState(false);
-
-  useEffect(() => {
-    if (status === "submitted") {
-      setHasSentMessage(true);
-    }
-  }, [status]);
-
-  return {
-    containerRef,
-    endRef,
-    isAtBottom,
-    scrollToBottom,
-    onViewportEnter,
-    onViewportLeave,
-    hasSentMessage,
-  };
-}
-
 function PureMessages({
   chatId,
   status,
@@ -61,16 +26,9 @@ function PureMessages({
   setMessages,
   chatbot,
 }: MessagesProps) {
-  const {
-    containerRef: messagesContainerRef,
-    endRef: messagesEndRef,
-    onViewportEnter,
-    onViewportLeave,
-    hasSentMessage,
-  } = useMessages({
-    chatId,
-    status,
-  });
+  const [messagesContainerRef, messagesEndRef] =
+    useScrollToBottom<HTMLDivElement>();
+
   return (
     <div
       ref={messagesContainerRef}
@@ -88,9 +46,6 @@ function PureMessages({
               : undefined
           }
           setMessages={setMessages}
-          requiresScrollPadding={
-            hasSentMessage && index === messages.length - 1
-          }
           chatbot={chatbot}
         />
       ))}
@@ -102,8 +57,6 @@ function PureMessages({
       <motion.div
         ref={messagesEndRef}
         className="shrink-0 min-w-[24px] min-h-[24px]"
-        onViewportLeave={onViewportLeave}
-        onViewportEnter={onViewportEnter}
       />
     </div>
   );

@@ -2,8 +2,8 @@ import type { Chatbot } from "@/db/schema";
 import { useQuery } from "@tanstack/react-query";
 
 // Custom chatbot fetcher for embedded widgets
-const fetchEmbeddedChatbot = async (embedToken: string): Promise<Chatbot> => {
-  const response = await fetch(`/api/embed/chatbot/${embedToken}`, {
+const fetchChatbot = async (identifier: string): Promise<Chatbot> => {
+  const response = await fetch(`/api/embed/chatbot/${identifier}`, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -16,11 +16,11 @@ const fetchEmbeddedChatbot = async (embedToken: string): Promise<Chatbot> => {
   return response.json();
 };
 
-export function useChatWidget(embedToken: string) {
+export function useChatWidget(identifier: string) {
   return useQuery<Chatbot>({
-    queryKey: ["embedded-chatbot", embedToken],
-    queryFn: () => fetchEmbeddedChatbot(embedToken),
+    queryKey: ["embedded-chatbot", identifier],
+    queryFn: () => fetchChatbot(identifier),
     retry: 1,
-    enabled: !!embedToken,
+    enabled: !!identifier,
   });
 }

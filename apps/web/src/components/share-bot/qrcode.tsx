@@ -1,8 +1,8 @@
 import { QRCodeCanvas } from "qrcode.react";
 import { Button } from "../ui/button";
 
-export const QRCodeExport = ({ embedToken }: { embedToken: string }) => {
-  const baseUrl = `${window.location.origin}/bio-page/${embedToken}`;
+export const QRCodeExport = ({ chatbotName }: { chatbotName: string }) => {
+  const baseUrl = `${window.location.origin}/bio-page/${chatbotName}`;
   const downloadQRCode = () => {
     const canvas = document.getElementById("qr-code") as HTMLCanvasElement;
     if (!canvas) return;

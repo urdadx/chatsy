@@ -55,8 +55,8 @@ export const ServerRoute = createServerFileRoute("/api/crawl").methods({
       // Get the webhook URL - use WEBHOOK_BASE_URL if set (for ngrok), otherwise construct from request
       const requestUrl = new URL(request.url);
       const baseUrl =
-        process.env.WEBHOOK_BASE_URL! ||
-        `${requestUrl.protocol}//${requestUrl.host}`;
+        `${requestUrl.protocol}//${requestUrl.host}` ||
+        process.env.WEBHOOK_BASE_URL!;
       const webhookUrl = `${baseUrl}/api/firecrawl-webhook`;
 
       console.log("Using webhook URL:", webhookUrl);

@@ -24,7 +24,7 @@ export default defineConfig({
   },
   server: {
     allowedHosts: [
-      "chatsy.railway.internal",
+      "padyna.railway.internal",
       "adjusted-strictly-newt.ngrok-free.app",
       "padyna.com",
     ],

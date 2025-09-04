@@ -50,9 +50,9 @@ export function useDeleteChatbot() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["chatbot"] });
       queryClient.invalidateQueries({ queryKey: ["chatbots"] });
-      
+
       toast.success("Chatbot deleted successfully!");
-      
+
       // If the deleted chatbot was active, refresh the page to update the UI
       if (data.wasActive) {
         setTimeout(() => {
@@ -61,11 +61,9 @@ export function useDeleteChatbot() {
       }
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.error || "Failed to delete chatbot";
+      const errorMessage =
+        error.response?.data?.error || "Failed to delete chatbot";
       toast.error(errorMessage);
     },
   });
 }
-
-
-

@@ -32,12 +32,14 @@ export const ShareBot = () => {
 
   const [isEmbeddingEnabled, setIsEmbeddingEnabled] = useState(false);
   const [embedToken, setEmbedToken] = useState("");
+  const [chatbotName, setChatbotName] = useState("");
   const [activeTab, setActiveTab] = useState("widget");
 
   useEffect(() => {
     if (chatbot) {
       setIsEmbeddingEnabled(chatbot.isEmbeddingEnabled || false);
       setEmbedToken(chatbot.embedToken || "");
+      setChatbotName(chatbot.name || "");
     }
   }, [chatbot]);
 
@@ -50,7 +52,6 @@ export const ShareBot = () => {
     });
   };
 
-  // Dynamic width based on active tab
   const getDialogWidth = () => {
     switch (activeTab) {
       case "widget":
@@ -107,20 +108,20 @@ export const ShareBot = () => {
           </TabsContent>
 
           <TabsContent value="link" className="space-y-6">
-            <LinkInBio embedToken={embedToken} />
+            <LinkInBio chatbotName={chatbotName} />
           </TabsContent>
           <TabsContent value="qr" className="space-y-6">
-            <QRCodeExport embedToken={embedToken} />
+            <QRCodeExport chatbotName={chatbotName} />
           </TabsContent>
         </Tabs>
       ) : (
         <div className="flex flex-col items-center justify-center gap-3">
           <Globe className="w-8 h-8 text-primary" />
           <div className="text-base font-semibold text-muted-foreground">
-            Widget not activated
+            Chatbot is not activated
           </div>
           <div className="text-sm text-muted-foreground text-center">
-            To share your bot with customers, please activate the widget in
+            To share your bot with customers, please activate the chatbot in
             playground
           </div>
           <Button onClick={goToPlayground} className="mt-2">

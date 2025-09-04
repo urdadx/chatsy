@@ -38,7 +38,7 @@ export const ServerRoute = createServerFileRoute("/api/upload-images").methods({
           originalname: file.name,
           mimetype: file.type,
         },
-        "chatsy/images/",
+        "padyna/images/",
       );
 
       return json({ url: uploadedUrl });

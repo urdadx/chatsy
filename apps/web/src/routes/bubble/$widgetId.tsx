@@ -19,10 +19,11 @@ import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
+import { RiBardFill } from "@remixicon/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
-import { ArrowUp, RotateCcw, SparklesIcon, X } from "lucide-react";
+import { ArrowUp, RotateCcw, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -98,7 +99,7 @@ function RouteComponent() {
       queryClient.invalidateQueries({ queryKey: ["messages"] });
 
       // Notify parent window of new message
-      notifyParent("chatsy-message-received", {
+      notifyParent("padyna-message-received", {
         messageCount: messages.length + 1,
         isFromBot: false,
       });
@@ -147,7 +148,7 @@ function RouteComponent() {
 
   const handleCloseWidget = useCallback(() => {
     if (window.parent && window.parent !== window) {
-      window.parent.postMessage({ type: "chatsy-widget-close" }, "*");
+      window.parent.postMessage({ type: "padyna-widget-close" }, "*");
       window.parent.postMessage({ type: "page_unload" }, "*");
     }
   }, []);
@@ -184,7 +185,7 @@ function RouteComponent() {
   }, []);
 
   useEffect(() => {
-    notifyParent("chatsy-widget-opened");
+    notifyParent("padyna-widget-opened");
   }, [notifyParent]);
 
   const handleResetChat = () => {
@@ -226,8 +227,8 @@ function RouteComponent() {
               className="rounded-full w-8 h-8 flex-shrink-0"
             />
           ) : (
-            <div className="rounded-full w-8 h-8 bg-white/20 flex items-center justify-center flex-shrink-0">
-              <SparklesIcon size={16} />
+            <div className="rounded-full  w-9 h-9 flex items-center justify-center">
+              <RiBardFill size={20} className="text-white rounded-full" />
             </div>
           )}
           <p className="font-normal text-base">
@@ -266,8 +267,11 @@ function RouteComponent() {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center p-6 max-w-sm">
                   <div className="mb-4">
-                    <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                      <SparklesIcon className="w-8 h-8 text-gray-400" />
+                    <div className="rounded-full  w-9 h-9 flex items-center justify-center">
+                      <RiBardFill
+                        size={20}
+                        className="text-white rounded-full"
+                      />
                     </div>
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">

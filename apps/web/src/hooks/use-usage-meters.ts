@@ -17,6 +17,7 @@ export function useUsage(meterName = "all") {
       }
       return items;
     },
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -24,5 +25,6 @@ export const useActiveMeters = () => {
   return useQuery({
     queryKey: ["active-meters"],
     queryFn: () => getActiveMeter(),
+    refetchOnWindowFocus: false,
   });
 };

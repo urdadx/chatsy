@@ -18,10 +18,10 @@ import { Route as AcceptInvitationRouteImport } from './routes/accept-invitation
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
+import { Route as TalkPageIdRouteImport } from './routes/talk/$pageId'
 import { Route as LegalTermsRouteImport } from './routes/legal/terms'
 import { Route as LegalPrivacyRouteImport } from './routes/legal/privacy'
 import { Route as BubbleWidgetIdRouteImport } from './routes/bubble/$widgetId'
-import { Route as BioPagePageIdRouteImport } from './routes/bio-page/$pageId'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminPlaygroundRouteImport } from './routes/admin/playground'
 import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
@@ -67,7 +67,7 @@ import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/cha
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 import { ServerRoute as ApiActivityActivityIdServerRouteImport } from './routes/api/activity/$activityId'
 import { ServerRoute as ApiAcceptInvitationInvitationIdServerRouteImport } from './routes/api/accept-invitation/$invitationId'
-import { ServerRoute as ApiEmbedChatbotEmbedTokenServerRouteImport } from './routes/api/embed/chatbot/$embedToken'
+import { ServerRoute as ApiEmbedChatbotIdentifierServerRouteImport } from './routes/api/embed/chatbot/$identifier'
 import { ServerRoute as ApiEmbedChatEmbedTokenServerRouteImport } from './routes/api/embed/chat/$embedToken'
 import { ServerRoute as ApiIntegrationsWhatsappWebhooksVerifyServerRouteImport } from './routes/api/integrations/whatsapp/webhooks/verify'
 import { ServerRoute as ApiIntegrationsWhatsappWebhooksReceiveServerRouteImport } from './routes/api/integrations/whatsapp/webhooks/receive'
@@ -112,6 +112,11 @@ const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
   path: '/onboarding/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TalkPageIdRoute = TalkPageIdRouteImport.update({
+  id: '/talk/$pageId',
+  path: '/talk/$pageId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LegalTermsRoute = LegalTermsRouteImport.update({
   id: '/legal/terms',
   path: '/legal/terms',
@@ -125,11 +130,6 @@ const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
 const BubbleWidgetIdRoute = BubbleWidgetIdRouteImport.update({
   id: '/bubble/$widgetId',
   path: '/bubble/$widgetId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BioPagePageIdRoute = BioPagePageIdRouteImport.update({
-  id: '/bio-page/$pageId',
-  path: '/bio-page/$pageId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -368,10 +368,10 @@ const ApiAcceptInvitationInvitationIdServerRoute =
     path: '/api/accept-invitation/$invitationId',
     getParentRoute: () => rootServerRouteImport,
   } as any)
-const ApiEmbedChatbotEmbedTokenServerRoute =
-  ApiEmbedChatbotEmbedTokenServerRouteImport.update({
-    id: '/api/embed/chatbot/$embedToken',
-    path: '/api/embed/chatbot/$embedToken',
+const ApiEmbedChatbotIdentifierServerRoute =
+  ApiEmbedChatbotIdentifierServerRouteImport.update({
+    id: '/api/embed/chatbot/$identifier',
+    path: '/api/embed/chatbot/$identifier',
     getParentRoute: () => rootServerRouteImport,
   } as any)
 const ApiEmbedChatEmbedTokenServerRoute =
@@ -428,10 +428,10 @@ export interface FileRoutesByFullPath {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/bio-page/$pageId': typeof BioPagePageIdRoute
   '/bubble/$widgetId': typeof BubbleWidgetIdRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
+  '/talk/$pageId': typeof TalkPageIdRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/activity': typeof AdminActivityIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
@@ -453,10 +453,10 @@ export interface FileRoutesByTo {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/bio-page/$pageId': typeof BioPagePageIdRoute
   '/bubble/$widgetId': typeof BubbleWidgetIdRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
+  '/talk/$pageId': typeof TalkPageIdRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/admin/activity': typeof AdminActivityIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
@@ -479,10 +479,10 @@ export interface FileRoutesById {
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/bio-page/$pageId': typeof BioPagePageIdRoute
   '/bubble/$widgetId': typeof BubbleWidgetIdRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
+  '/talk/$pageId': typeof TalkPageIdRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/admin/activity/': typeof AdminActivityIndexRoute
   '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
@@ -506,10 +506,10 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
-    | '/bio-page/$pageId'
     | '/bubble/$widgetId'
     | '/legal/privacy'
     | '/legal/terms'
+    | '/talk/$pageId'
     | '/onboarding'
     | '/admin/activity'
     | '/admin/chat-history'
@@ -531,10 +531,10 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
-    | '/bio-page/$pageId'
     | '/bubble/$widgetId'
     | '/legal/privacy'
     | '/legal/terms'
+    | '/talk/$pageId'
     | '/onboarding'
     | '/admin/activity'
     | '/admin/chat-history'
@@ -556,10 +556,10 @@ export interface FileRouteTypes {
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
-    | '/bio-page/$pageId'
     | '/bubble/$widgetId'
     | '/legal/privacy'
     | '/legal/terms'
+    | '/talk/$pageId'
     | '/onboarding/'
     | '/admin/activity/'
     | '/admin/chat-history/'
@@ -575,10 +575,10 @@ export interface RootRouteChildren {
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
   authSetupRoute: typeof authSetupRoute
-  BioPagePageIdRoute: typeof BioPagePageIdRoute
   BubbleWidgetIdRoute: typeof BubbleWidgetIdRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalTermsRoute: typeof LegalTermsRoute
+  TalkPageIdRoute: typeof TalkPageIdRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -616,7 +616,7 @@ export interface FileServerRoutesByFullPath {
   '/api/agent-actions': typeof ApiAgentActionsIndexServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
   '/api/embed/chat/$embedToken': typeof ApiEmbedChatEmbedTokenServerRoute
-  '/api/embed/chatbot/$embedToken': typeof ApiEmbedChatbotEmbedTokenServerRoute
+  '/api/embed/chatbot/$identifier': typeof ApiEmbedChatbotIdentifierServerRoute
   '/api/integrations/whatsapp/auth/callback': typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
   '/api/integrations/whatsapp/auth/connect': typeof ApiIntegrationsWhatsappAuthConnectServerRoute
   '/api/integrations/whatsapp/settings/$chatbotId': typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
@@ -658,7 +658,7 @@ export interface FileServerRoutesByTo {
   '/api/agent-actions': typeof ApiAgentActionsIndexServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
   '/api/embed/chat/$embedToken': typeof ApiEmbedChatEmbedTokenServerRoute
-  '/api/embed/chatbot/$embedToken': typeof ApiEmbedChatbotEmbedTokenServerRoute
+  '/api/embed/chatbot/$identifier': typeof ApiEmbedChatbotIdentifierServerRoute
   '/api/integrations/whatsapp/auth/callback': typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
   '/api/integrations/whatsapp/auth/connect': typeof ApiIntegrationsWhatsappAuthConnectServerRoute
   '/api/integrations/whatsapp/settings/$chatbotId': typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
@@ -701,7 +701,7 @@ export interface FileServerRoutesById {
   '/api/agent-actions/': typeof ApiAgentActionsIndexServerRoute
   '/api/chat/': typeof ApiChatIndexServerRoute
   '/api/embed/chat/$embedToken': typeof ApiEmbedChatEmbedTokenServerRoute
-  '/api/embed/chatbot/$embedToken': typeof ApiEmbedChatbotEmbedTokenServerRoute
+  '/api/embed/chatbot/$identifier': typeof ApiEmbedChatbotIdentifierServerRoute
   '/api/integrations/whatsapp/auth/callback': typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
   '/api/integrations/whatsapp/auth/connect': typeof ApiIntegrationsWhatsappAuthConnectServerRoute
   '/api/integrations/whatsapp/settings/$chatbotId': typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
@@ -745,7 +745,7 @@ export interface FileServerRouteTypes {
     | '/api/agent-actions'
     | '/api/chat'
     | '/api/embed/chat/$embedToken'
-    | '/api/embed/chatbot/$embedToken'
+    | '/api/embed/chatbot/$identifier'
     | '/api/integrations/whatsapp/auth/callback'
     | '/api/integrations/whatsapp/auth/connect'
     | '/api/integrations/whatsapp/settings/$chatbotId'
@@ -787,7 +787,7 @@ export interface FileServerRouteTypes {
     | '/api/agent-actions'
     | '/api/chat'
     | '/api/embed/chat/$embedToken'
-    | '/api/embed/chatbot/$embedToken'
+    | '/api/embed/chatbot/$identifier'
     | '/api/integrations/whatsapp/auth/callback'
     | '/api/integrations/whatsapp/auth/connect'
     | '/api/integrations/whatsapp/settings/$chatbotId'
@@ -829,7 +829,7 @@ export interface FileServerRouteTypes {
     | '/api/agent-actions/'
     | '/api/chat/'
     | '/api/embed/chat/$embedToken'
-    | '/api/embed/chatbot/$embedToken'
+    | '/api/embed/chatbot/$identifier'
     | '/api/integrations/whatsapp/auth/callback'
     | '/api/integrations/whatsapp/auth/connect'
     | '/api/integrations/whatsapp/settings/$chatbotId'
@@ -872,7 +872,7 @@ export interface RootServerRouteChildren {
   ApiAgentActionsIndexServerRoute: typeof ApiAgentActionsIndexServerRoute
   ApiChatIndexServerRoute: typeof ApiChatIndexServerRoute
   ApiEmbedChatEmbedTokenServerRoute: typeof ApiEmbedChatEmbedTokenServerRoute
-  ApiEmbedChatbotEmbedTokenServerRoute: typeof ApiEmbedChatbotEmbedTokenServerRoute
+  ApiEmbedChatbotIdentifierServerRoute: typeof ApiEmbedChatbotIdentifierServerRoute
   ApiIntegrationsWhatsappAuthCallbackServerRoute: typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
   ApiIntegrationsWhatsappAuthConnectServerRoute: typeof ApiIntegrationsWhatsappAuthConnectServerRoute
   ApiIntegrationsWhatsappSettingsChatbotIdServerRoute: typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
@@ -931,6 +931,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/talk/$pageId': {
+      id: '/talk/$pageId'
+      path: '/talk/$pageId'
+      fullPath: '/talk/$pageId'
+      preLoaderRoute: typeof TalkPageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/legal/terms': {
       id: '/legal/terms'
       path: '/legal/terms'
@@ -950,13 +957,6 @@ declare module '@tanstack/react-router' {
       path: '/bubble/$widgetId'
       fullPath: '/bubble/$widgetId'
       preLoaderRoute: typeof BubbleWidgetIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bio-page/$pageId': {
-      id: '/bio-page/$pageId'
-      path: '/bio-page/$pageId'
-      fullPath: '/bio-page/$pageId'
-      preLoaderRoute: typeof BioPagePageIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/settings': {
@@ -1278,11 +1278,11 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiAcceptInvitationInvitationIdServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/api/embed/chatbot/$embedToken': {
-      id: '/api/embed/chatbot/$embedToken'
-      path: '/api/embed/chatbot/$embedToken'
-      fullPath: '/api/embed/chatbot/$embedToken'
-      preLoaderRoute: typeof ApiEmbedChatbotEmbedTokenServerRouteImport
+    '/api/embed/chatbot/$identifier': {
+      id: '/api/embed/chatbot/$identifier'
+      path: '/api/embed/chatbot/$identifier'
+      fullPath: '/api/embed/chatbot/$identifier'
+      preLoaderRoute: typeof ApiEmbedChatbotIdentifierServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/embed/chat/$embedToken': {
@@ -1368,10 +1368,10 @@ const rootRouteChildren: RootRouteChildren = {
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
   authSetupRoute: authSetupRoute,
-  BioPagePageIdRoute: BioPagePageIdRoute,
   BubbleWidgetIdRoute: BubbleWidgetIdRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalTermsRoute: LegalTermsRoute,
+  TalkPageIdRoute: TalkPageIdRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
 }
 export const routeTree = rootRouteImport
@@ -1413,7 +1413,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAgentActionsIndexServerRoute: ApiAgentActionsIndexServerRoute,
   ApiChatIndexServerRoute: ApiChatIndexServerRoute,
   ApiEmbedChatEmbedTokenServerRoute: ApiEmbedChatEmbedTokenServerRoute,
-  ApiEmbedChatbotEmbedTokenServerRoute: ApiEmbedChatbotEmbedTokenServerRoute,
+  ApiEmbedChatbotIdentifierServerRoute: ApiEmbedChatbotIdentifierServerRoute,
   ApiIntegrationsWhatsappAuthCallbackServerRoute:
     ApiIntegrationsWhatsappAuthCallbackServerRoute,
   ApiIntegrationsWhatsappAuthConnectServerRoute:

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Chatsy Bubble Widget</title>
+    <title>Test Padyna Bubble Widget</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -39,7 +39,7 @@
 <body>
     <div class="content">
         <h1>Test Page for Padyna Bubble Widget</h1>
-        <p>This is a test page to verify that the Chatsy bubble widget works correctly when embedded on external websites.</p>
+        <p>This is a test page to verify that the padyna bubble widget works correctly when embedded on external websites.</p>
         
         <p>The chat bubble should appear in the bottom-right corner of the page. Click on it to open the chat interface.</p>
         
@@ -54,17 +54,18 @@
     </div>
 
 <!-- Padyna Chat Bubble Widget -->
+<!-- Padyna Chat Bubble Widget -->
 <script>
   (function() {
     const script = document.createElement('script');
     script.src = 'http://localhost:3001/embed.js';
     script.async = true;
     script.onload = function() {
-      ChatsyWidget.init({
-        baseUrl: "http://localhost:3001",
-        embedToken: 'embed_5xgts837ok5ys0yn604kd',
+      PadynaWidget.init({
+        embedToken: 'embed_xxyzr17e0496lsbglc7k5v',
         mode: 'bubble',
         position: 'bottom-right',
+        baseUrl: 'http://localhost:3001',
         bubbleSize: 'medium',
         showBadge: true,
         autoOpen: false

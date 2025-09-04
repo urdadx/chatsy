@@ -18,6 +18,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "./ui/drawer";
+import Spinner from "./ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export const AddOnsDialog = ({
@@ -31,9 +32,10 @@ export const AddOnsDialog = ({
   const [selectedAddon, setSelectedAddon] = useState<string | null>(
     defaultValue,
   );
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const navigate = useNavigate();
-
   const handleCheckout = async () => {
     const organizationId = session?.session?.activeOrganizationId;
 
@@ -73,6 +75,8 @@ export const AddOnsDialog = ({
       return;
     }
 
+    setIsCheckingOut(true); // Start loading
+
     try {
       await authClient.checkout({
         slug,
@@ -80,6 +84,8 @@ export const AddOnsDialog = ({
       });
     } catch (error) {
       toast.error("An error occured during checkout. Please try again.");
+    } finally {
+      setIsCheckingOut(false); // Stop loading
     }
 
     if (onOpenChange) {
@@ -229,10 +235,19 @@ export const AddOnsDialog = ({
             <Button
               className="w-full"
               onClick={handleCheckout}
-              disabled={!selectedAddon || !isAdmin}
+              disabled={!selectedAddon || !isAdmin || isCheckingOut}
             >
-              Proceed to checkout
-              <ArrowRight className="w-5 h-5" />
+              {isCheckingOut ? (
+                <>
+                  <Spinner className="w-4 h-4 text-white" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  Proceed to checkout
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
             </Button>
           </motion.div>
         </TooltipTrigger>

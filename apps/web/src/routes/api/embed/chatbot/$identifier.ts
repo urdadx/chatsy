@@ -5,16 +5,18 @@ import { createServerFileRoute } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
 
 export const ServerRoute = createServerFileRoute(
-  "/api/embed/chatbot/$embedToken",
+  "/api/embed/chatbot/$identifier",
 ).methods({
   GET: async ({ params, request }) => {
-    const { embedToken } = params;
+    const { identifier } = params;
 
-    if (!embedToken) {
-      return new Response("Embed token is required", { status: 400 });
+    if (!identifier) {
+      return new Response("Chatbot identifier is required", { status: 400 });
     }
 
     try {
+      const isEmbedToken = identifier.startsWith("embed_");
+
       const [publicChatbot] = await db
         .select({
           id: chatbot.id,
@@ -30,7 +32,11 @@ export const ServerRoute = createServerFileRoute(
           allowedDomains: chatbot.allowedDomains,
         })
         .from(chatbot)
-        .where(eq(chatbot.embedToken, embedToken));
+        .where(
+          isEmbedToken
+            ? eq(chatbot.embedToken, identifier)
+            : eq(chatbot.name, identifier),
+        );
 
       if (!publicChatbot) {
         return new Response("Chatbot not found", { status: 404 });

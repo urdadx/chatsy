@@ -29,7 +29,7 @@ export const EmbedCodeBlock = ({
   src="${window.location.origin}/bio-page/${embedToken}"
   width="400"
   height="700"
-  title="Chatsy Chatbot"
+  title="Padyna Chatbot"
   style="border:none; background-color: none;"
   allow="clipboard-read; clipboard-write">
 </iframe>
@@ -47,7 +47,7 @@ export const EmbedCodeBlock = ({
     script.src = '${window.location.origin}/embed.js';
     script.async = true;
     script.onload = function() {
-      ChatsyWidget.init({
+      PadynaWidget.init({
         embedToken: '${embedToken}',
         mode: 'bubble',
         position: 'bottom-right',

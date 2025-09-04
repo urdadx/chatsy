@@ -1,5 +1,4 @@
 node_modules
 .turbo
-apps/web/padyna-service-keys.json
 .tanstack
 .vscode

@@ -32,7 +32,7 @@ const PurePreviewMessage = ({
   isLoading: boolean;
   setMessages: UseChatHelpers<ChatMessage>["setMessages"];
   chatbot?: any;
-  requiresScrollPadding: boolean;
+  requiresScrollPadding?: boolean;
 }) => {
   const { data: fallbackChatbot } = useChatbot();
   const activeChatbot = chatbot || fallbackChatbot;
