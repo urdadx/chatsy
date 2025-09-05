@@ -79,7 +79,7 @@ export const createDefaultActions = async (chatbotId: string) => {
       error,
     );
   }
-}
+};
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -171,7 +171,6 @@ export const auth = betterAuth({
       },
     },
   },
-
   plugins: [
     reactStartCookies(),
     organization({
@@ -328,7 +327,10 @@ export const auth = betterAuth({
               slug: "extra-team-member",
             },
           ],
-          successUrl: "/success",
+          successUrl:
+            process.env.NODE_ENV === "development"
+              ? "http://localhost:3001/success"
+              : "https://padyna/success",
           authenticatedUsersOnly: true,
         }),
         portal(),
