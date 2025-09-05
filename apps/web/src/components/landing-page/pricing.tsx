@@ -125,7 +125,7 @@ export function Pricing() {
       return;
     }
 
-    setLoadingPlanId(plan.id); // Start loading for this specific plan
+    setLoadingPlanId(plan.id);
 
     try {
       await authClient.checkout({
@@ -135,7 +135,7 @@ export function Pricing() {
     } catch (error) {
       toast.error("An error occured during checkout. Please try again.");
     } finally {
-      setLoadingPlanId(null); // Stop loading
+      setLoadingPlanId(null);
     }
   };
 

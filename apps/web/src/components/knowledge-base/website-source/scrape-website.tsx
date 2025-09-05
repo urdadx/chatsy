@@ -71,7 +71,11 @@ export const ScrapeWebsite = () => {
               onClick={handleScrape}
               disabled={mutation.isPending}
             >
-              {mutation.isPending ? <Spinner /> : <PlayIcon />}
+              {mutation.isPending ? (
+                <Spinner className="text-white" />
+              ) : (
+                <PlayIcon />
+              )}
               Run
             </Button>
           </motion.div>

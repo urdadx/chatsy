@@ -29,9 +29,10 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         title: "Padyna",
       },
       ...seo({
-        title: "Padyna - An customer support agent",
+        title: "Padyna - Automate your customer support",
         description: "Create a custom AI agent for your data",
-        keywords: "AI, bot, link in bio, custom bot, padyna",
+        keywords:
+          "AI, bot, link in bio, custom bot, padyna, customer support, chatbot",
         image: "https://padyna.app/og-image.png",
       }),
     ],

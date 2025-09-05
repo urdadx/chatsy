@@ -225,11 +225,15 @@ function RouteComponent() {
               </p>
               <br />
               <p className="text-gray-700 leading-relaxed">
-                By uploading content to Padyna, you give us permission to
-                display it publicly, and you confirm you have all necessary
-                rights from third parties to share this content. You maintain
-                ownership of all your rights to the content you share through
-                Padyna, and it's your responsibility to protect these rights.
+                By uploading content to Padyna, you give us permission to use it
+                solely for the purpose of operating, improving, and providing
+                the chatbot service to your authorized users and customers. You
+                confirm you have all necessary rights from third parties to
+                share this content. You maintain ownership of all your rights to
+                the content you share through Padyna, and it is your
+                responsibility to protect and manage these rights. We will not
+                display your content publicly, except to the extent you make it
+                accessible to your end-users/customers through the chatbot.
               </p>
             </section>
             <section className="mb-8">
