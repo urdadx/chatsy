@@ -2,7 +2,7 @@ import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { db } from "@/db";
 import { chat, member, message } from "@/db/schema";
 import {
-  getChatbotDataByEmbedToken,
+  getChatbotDataByPlatformIdentifier,
   getMessagesByChatId,
   saveMessages,
 } from "@/lib/ai/chat-functions";
@@ -30,12 +30,12 @@ import { polarClient } from "auth";
 import { and, eq } from "drizzle-orm";
 
 export const ServerRoute = createServerFileRoute(
-  "/api/embed/chat/$embedToken",
+  "/api/embed/chat/$platformIdentifier",
 ).methods((api) => ({
   POST: api.handler(async ({ params, request }) => {
-    const { embedToken } = params;
+    const { platformIdentifier } = params;
 
-    if (!embedToken) {
+    if (!platformIdentifier) {
       const error = new ChatSDKError(
         "bad_request:api",
         "Embed token is required",
@@ -46,7 +46,8 @@ export const ServerRoute = createServerFileRoute(
     try {
       const { id, messages } = await request.json();
 
-      const chatbotData = await getChatbotDataByEmbedToken(embedToken);
+      const chatbotData =
+        await getChatbotDataByPlatformIdentifier(platformIdentifier);
 
       if (!chatbotData) {
         const error = new ChatSDKError("not_found:api", "Chatbot not found");
@@ -159,7 +160,7 @@ export const ServerRoute = createServerFileRoute(
               escalate_to_human: escalateToHumanTool({
                 chatId: id,
                 chatbotId: chatbotData.id,
-                embedToken,
+                organizationId: chatbotData.organizationId,
               }),
             },
             onFinish: async ({ usage }) => {
@@ -213,6 +214,8 @@ export const ServerRoute = createServerFileRoute(
       headers.set("X-Chat-Id", id);
       headers.set("Cache-Control", "no-cache");
       headers.set("Connection", "keep-alive");
+      headers.set("Content-Type", "text/event-stream");
+
       headers.set(
         "Access-Control-Allow-Origin",
         referer ? new URL(referer).origin : "*",

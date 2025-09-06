@@ -80,6 +80,9 @@ export const AddOnsDialog = ({
       params.append("products", productId);
       params.append("metadata", metadata);
       params.append("customerExternalId", session.user.id);
+      params.append("customerEmail", session.user.email);
+      params.append("customerName", session.user.name);
+
       const checkoutUrl = `/api/checkout?${params.toString()}`;
 
       await new Promise((resolve) => setTimeout(resolve, 500));

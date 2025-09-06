@@ -4,13 +4,7 @@ import { Action, chatbot, session, subscription, user } from "@/db/schema";
 import { sendOrganizationInvitation } from "@/lib/emails/email";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getActiveOrganization } from "@/lib/hooks/get-active-organization";
-import {
-  checkout,
-  polar,
-  portal,
-  usage,
-  webhooks,
-} from "@polar-sh/better-auth";
+import { polar, portal, usage, webhooks } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -225,7 +219,11 @@ export const auth = betterAuth({
         },
       },
       async sendInvitationEmail(data) {
-        const inviteLink = `${process.env.VITE_SERVER_URL!}/api/accept-invitation/${data.id}`;
+        const serverUrl =
+          process.env.NODE_ENV === "production"
+            ? "https://padyna.com"
+            : "http://localhost:3001";
+        const inviteLink = `${serverUrl}/api/accept-invitation/${data.id}`;
         await sendOrganizationInvitation({
           email: data.email,
           invitedByUsername: data.inviter.user.name,
@@ -281,58 +279,6 @@ export const auth = betterAuth({
         }
       },
       use: [
-        checkout({
-          products: [
-            // Monthly Plans
-            {
-              productId: process.env.MONTHLY_STARTER_PLAN!,
-              slug: "monthly-starter",
-            },
-            {
-              productId: process.env.MONTHLY_GROWTH_PLAN!,
-              slug: "monthly-growth",
-            },
-            {
-              productId: process.env.MONTHLY_PRO_PLAN!,
-              slug: "monthly-pro",
-            },
-            // Yearly Plans
-            {
-              productId: process.env.YEARLY_STARTER_PLAN!,
-              slug: "yearly-starter",
-            },
-            {
-              productId: process.env.YEARLY_GROWTH_PLAN!,
-              slug: "yearly-growth",
-            },
-            {
-              productId: process.env.YEARLY_PRO_PLAN!,
-              slug: "yearly-pro",
-            },
-            // Add-ons
-            {
-              productId: process.env.EXTRA_CHATBOT_ADDON!,
-              slug: "extra-chatbot",
-            },
-            {
-              productId: process.env.EXTRA_MESSAGE_CREDITS_ADDON!,
-              slug: "extra-message-credits",
-            },
-            {
-              productId: process.env.REMOVE_BRANDING_ADDON!,
-              slug: "remove-branding",
-            },
-            {
-              productId: process.env.EXTRA_TEAM_MEMBER_ADDON!,
-              slug: "extra-team-member",
-            },
-          ],
-          successUrl:
-            process.env.NODE_ENV === "development"
-              ? "http://localhost:3001/success"
-              : "https://padyna.com/success",
-          authenticatedUsersOnly: true,
-        }),
         portal(),
         usage(),
         webhooks({

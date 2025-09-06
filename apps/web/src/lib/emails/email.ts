@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import OrganizationInvitationEmail from "./invitation-template";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const resendClient = new Resend(process.env.RESEND_API_KEY!);
 
 interface OrganizationInvitationData {
   email: string;
@@ -16,7 +16,7 @@ export async function sendOrganizationInvitations(
 ) {
   try {
     const emailBatch = invitations.map((data) => ({
-      from: "Acme <onboarding@resend.dev>",
+      from: "Padyna <onboarding@padyna.com>",
       to: [data.email],
       subject: `You've been invited to join ${data.teamName}`,
       react: OrganizationInvitationEmail({
@@ -27,7 +27,7 @@ export async function sendOrganizationInvitations(
       }),
     }));
 
-    const { data: result, error } = await resend.batch.send(emailBatch);
+    const { data: result, error } = await resendClient.batch.send(emailBatch);
 
     if (error) {
       console.error("Error sending organization invitations:", error);

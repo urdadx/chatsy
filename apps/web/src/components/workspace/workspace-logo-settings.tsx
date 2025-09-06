@@ -84,9 +84,9 @@ export const WorkspaceLogoSettings = () => {
       <div className="bg-white rounded-xl shadow-xs border overflow-hidden">
         <div className="flex justify-between items-center p-6">
           <div className="space-y-2">
-            <h2 className="text-base font-semibold mb-2">Workspace Logo</h2>
+            <h2 className="text-base font-semibold mb-2">Organization Logo</h2>
             <p className="text-gray-600 text-sm">
-              Update your workspace's photo.
+              Update your organization's photo.
             </p>
           </div>
           <div>
@@ -142,7 +142,7 @@ export const WorkspaceLogoSettings = () => {
             {!isAdmin && (
               <TooltipContent className="bg-white shadow-sm p-3" sideOffset={8}>
                 <p className="text-black text-sm">
-                  Only admins can change workspace logo. Please contact your
+                  Only admins can change organization logo. Please contact your
                   admin
                 </p>
               </TooltipContent>

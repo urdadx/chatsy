@@ -1,13 +1,15 @@
 import { db } from "@/db";
-import { chat } from "@/db/schema";
+import { chat, chatbot, member, user } from "@/db/schema";
+import { resendClient } from "@/lib/emails/email";
 import { tool } from "ai";
 import { eq } from "drizzle-orm";
 import z from "zod";
+import EscalationEmail from "../tools-ui/escalation-email";
 
 interface EscalateToHumanContext {
   chatId: string;
   chatbotId: string;
-  embedToken?: string;
+  organizationId: string;
 }
 
 export const escalateToHumanTool = (context: EscalateToHumanContext) =>
@@ -29,6 +31,51 @@ export const escalateToHumanTool = (context: EscalateToHumanContext) =>
     }),
     execute: async ({ reason }) => {
       try {
+        const organizationId = context.organizationId;
+
+        // Fetch all members of organization from the db
+        const membersWithEmails = await db
+          .select({ email: user.email })
+          .from(member)
+          .innerJoin(user, eq(member.userId, user.id))
+          .where(eq(member.organizationId, organizationId));
+
+        const emails = membersWithEmails.map((m) => m.email);
+
+        if (emails.length === 0) {
+          throw new Error("No members found for this organization");
+        }
+
+        if (emails.length > 50) {
+          console.warn(
+            `Organization has ${emails.length} members, exceeding Resend's limit of 50`,
+          );
+        }
+
+        const [chatbotName] = await db
+          .select({ name: chatbot.name })
+          .from(chatbot)
+          .where(eq(chatbot.id, context.chatbotId))
+          .limit(1);
+
+        const emailHtml = EscalationEmail({
+          chatId: context.chatId,
+          createdAt: new Date().toLocaleString(),
+          reason: reason || "complex-issue",
+          chatbotName: chatbotName?.name || "Chatbot",
+        });
+
+        const { error } = await resendClient.emails.send({
+          from: "Padyna <escalation@padyna.com>",
+          to: emails,
+          subject: "🚨 Chat Escalation - Customer needs help",
+          react: emailHtml,
+        });
+
+        if (error) {
+          throw new Error(`Failed to send email: ${error.message}`);
+        }
+
         const [updatedChat] = await db
           .update(chat)
           .set({
@@ -41,20 +88,11 @@ export const escalateToHumanTool = (context: EscalateToHumanContext) =>
           throw new Error("Failed to update chat status");
         }
 
-        // Here you could add additional logic like:
-        // - Creating a support ticket
-        // - Sending notifications to human agents
-        // - Logging the escalation details
-        console.log("Chat escalated to human:", {
-          chatId: context.chatId,
-          chatbotId: context.chatbotId,
-          reason,
-          timestamp: new Date().toISOString(),
-        });
-
         return {
           success: true,
           reason,
+          emails: emails,
+          emailsSent: emails.length,
           message:
             "I've escalated your conversation to a human agent. They will be with you shortly to assist with your request.",
           chatStatus: updatedChat.status,

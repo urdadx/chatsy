@@ -166,6 +166,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                   escalate_to_human: escalateToHumanTool({
                     chatId: id,
                     chatbotId,
+                    organizationId: chatbotData.organizationId,
                   }),
                 },
                 onFinish: async ({ usage }) => {

@@ -49,13 +49,15 @@ export const WorkspaceNameSettings = () => {
     <div className="mx-auto">
       <div className="bg-white rounded-xl shadow-xs border overflow-hidden">
         <div className="p-6 pb-0">
-          <h2 className="text-base font-semibold mb-2">Workspace Name</h2>
-          <p className="text-gray-600 text-sm">Update your workspace's name.</p>
+          <h2 className="text-base font-semibold mb-2">Organization Name</h2>
+          <p className="text-gray-600 text-sm">
+            Update your organization's name.
+          </p>
         </div>
         <div className="p-6 pt-3">
           <div className="flex flex-col gap-4">
             <Input
-              id="workspace-name"
+              id="organization-name"
               type="text"
               className="mt-1 block w-full"
               value={name}
@@ -81,7 +83,8 @@ export const WorkspaceNameSettings = () => {
             {!isAdmin && (
               <TooltipContent className="bg-white shadow-sm p-3" sideOffset={8}>
                 <p className="text-black text-sm">
-                  Only admins can edit workspace name. Please contact your admin
+                  Only admins can edit the organization's name. Please contact
+                  your admin
                 </p>
               </TooltipContent>
             )}

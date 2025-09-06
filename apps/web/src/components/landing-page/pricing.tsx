@@ -126,6 +126,8 @@ export function Pricing() {
       params.append("products", productId);
       params.append("metadata", metadata);
       params.append("customerExternalId", session.user.id);
+      params.append("customerEmail", session.user.email);
+      params.append("customerName", session.user.name);
 
       const checkoutUrl = `/api/checkout?${params.toString()}`;
 

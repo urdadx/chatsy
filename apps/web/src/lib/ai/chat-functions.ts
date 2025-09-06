@@ -34,7 +34,11 @@ export async function isUserMemberOfOrganization(
 }
 
 // FUNCTION TO GET CHATBOT DATA BY EMBED TOKEN
-export async function getChatbotDataByEmbedToken(embedToken: string) {
+export async function getChatbotDataByPlatformIdentifier(
+  platformIdentifier: string,
+) {
+  const isEmbedToken = platformIdentifier.startsWith("embed_");
+
   const [chatbotData] = await db
     .select({
       id: chatbot.id,
@@ -44,8 +48,11 @@ export async function getChatbotDataByEmbedToken(embedToken: string) {
       allowedDomains: chatbot.allowedDomains,
     })
     .from(chatbot)
-    .where(eq(chatbot.embedToken, embedToken));
-
+    .where(
+      isEmbedToken
+        ? eq(chatbot.embedToken, platformIdentifier)
+        : eq(chatbot.name, platformIdentifier),
+    );
   return chatbotData;
 }
 

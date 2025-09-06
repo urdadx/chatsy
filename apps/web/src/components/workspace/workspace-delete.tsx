@@ -93,10 +93,10 @@ export const WorkspaceDelete = () => {
     <div className="mx-auto">
       <div className="bg-white rounded-xl shadow-xs border border-red-300 overflow-hidden">
         <div className="p-6">
-          <h2 className="text-base font-semibold mb-2">Delete workspace</h2>
+          <h2 className="text-base font-semibold mb-2">Delete organization</h2>
           <p className="text-gray-600 text-sm">
-            Permanently remove your workspace "{workspaceName}" and all of its
-            contents. This action is not reversible, so please continue with
+            Permanently remove your organization "{workspaceName}" and all of
+            its contents. This action is not reversible, so please continue with
             caution.
           </p>
         </div>
@@ -111,7 +111,7 @@ export const WorkspaceDelete = () => {
                   className="bg-red-500 hover:bg-red-600 text-white"
                   disabled={!organizationId || !isAdmin}
                 >
-                  Delete workspace
+                  Delete organization
                 </Button>
               </motion.div>
             </AlertDialogTrigger>
@@ -127,7 +127,7 @@ export const WorkspaceDelete = () => {
                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                   <AlertDialogDescription className="text-md">
                     This will permanently delete the "{workspaceName}"
-                    workspace.
+                    organization.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
               </div>
@@ -166,7 +166,7 @@ export const WorkspaceDelete = () => {
                       sideOffset={8}
                     >
                       <p className="text-black text-sm">
-                        Only admins can change workspace logo. Please contact
+                        Only admins can delete an organization. Please contact
                         your admin
                       </p>
                     </TooltipContent>
