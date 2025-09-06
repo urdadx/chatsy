@@ -330,7 +330,7 @@ export const auth = betterAuth({
           successUrl:
             process.env.NODE_ENV === "development"
               ? "http://localhost:3001/success"
-              : "https://padyna/success",
+              : "https://padyna.com/success",
           authenticatedUsersOnly: true,
         }),
         portal(),

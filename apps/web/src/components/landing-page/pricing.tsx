@@ -8,7 +8,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { authClient, useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth-client";
+import { PLAN_PRODUCT_IDS } from "@/lib/plan-slugs";
 import NumberFlow from "@number-flow/react";
 import { useNavigate } from "@tanstack/react-router";
 import { Check } from "lucide-react";
@@ -35,8 +36,8 @@ export function Pricing() {
       yearlyPrice: 32,
       yearlySavings: 84,
       description: "For solopreneurs and early-stage startups",
-      monthlySlug: "monthly-starter",
-      yearlySlug: "yearly-starter",
+      monthlyProductId: PLAN_PRODUCT_IDS.starter.monthly,
+      yearlyProductId: PLAN_PRODUCT_IDS.starter.yearly,
       features: [
         "2,000 message credits",
         "150 scraping credits",
@@ -57,8 +58,8 @@ export function Pricing() {
       yearlyPrice: 109,
       yearlySavings: 240,
       description: "For growing teams that need scale and collaboration",
-      monthlySlug: "monthly-growth",
-      yearlySlug: "yearly-growth",
+      monthlyProductId: PLAN_PRODUCT_IDS.growth.monthly,
+      yearlyProductId: PLAN_PRODUCT_IDS.growth.yearly,
       features: [
         "10,000 message credits",
         "500 scraping credits",
@@ -79,8 +80,8 @@ export function Pricing() {
       yearlyPrice: 329,
       yearlySavings: 840,
       description: "For scaling businesses and agencies",
-      monthlySlug: "monthly-pro",
-      yearlySlug: "yearly-pro",
+      monthlyProductId: PLAN_PRODUCT_IDS.professional.monthly,
+      yearlyProductId: PLAN_PRODUCT_IDS.professional.yearly,
       features: [
         "30,000 message credits",
         "2,500 scraping credits",
@@ -96,22 +97,13 @@ export function Pricing() {
   ];
 
   const handleSelectPlan = async (plan: (typeof plans)[0]) => {
-    // Use the appropriate slug based on billing period
-    const slug =
-      billingPeriod === "monthly" ? plan.monthlySlug : plan.yearlySlug;
-    console.log(
-      "Selected plan:",
-      plan.name,
-      "Slug:",
-      slug,
-      "Billing period:",
-      billingPeriod,
-    );
+    const productId =
+      billingPeriod === "monthly"
+        ? plan.monthlyProductId
+        : plan.yearlyProductId;
 
     if (!session) {
-      navigate({
-        to: "/login",
-      });
+      navigate({ to: "/login" });
       return;
     }
 
@@ -119,22 +111,30 @@ export function Pricing() {
 
     if (!organizationId) {
       toast.error("No active organization found. Please sign in first");
-      navigate({
-        to: "/login",
-      });
+      navigate({ to: "/login" });
       return;
     }
 
     setLoadingPlanId(plan.id);
 
     try {
-      await authClient.checkout({
-        slug,
+      const metadata = JSON.stringify({
         referenceId: organizationId,
       });
+
+      const params = new URLSearchParams();
+      params.append("products", productId);
+      params.append("metadata", metadata);
+      params.append("customerExternalId", session.user.id);
+
+      const checkoutUrl = `/api/checkout?${params.toString()}`;
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      window.location.href = checkoutUrl;
     } catch (error) {
-      toast.error("An error occured during checkout. Please try again.");
-    } finally {
+      console.error("Checkout error:", error);
+      toast.error("An error occurred during checkout. Please try again.");
       setLoadingPlanId(null);
     }
   };

@@ -55,6 +55,7 @@ import { ServerRoute as ApiFirecrawlWebhookServerRouteImport } from './routes/ap
 import { ServerRoute as ApiFeedbackServerRouteImport } from './routes/api/feedback'
 import { ServerRoute as ApiDocumentSourceServerRouteImport } from './routes/api/document-source'
 import { ServerRoute as ApiCrawlServerRouteImport } from './routes/api/crawl'
+import { ServerRoute as ApiCheckoutServerRouteImport } from './routes/api/checkout'
 import { ServerRoute as ApiChatbotsServerRouteImport } from './routes/api/chatbots'
 import { ServerRoute as ApiChatbotCountServerRouteImport } from './routes/api/chatbot-count'
 import { ServerRoute as ApiAnalyticsStreamServerRouteImport } from './routes/api/analytics-stream'
@@ -301,6 +302,11 @@ const ApiDocumentSourceServerRoute = ApiDocumentSourceServerRouteImport.update({
 const ApiCrawlServerRoute = ApiCrawlServerRouteImport.update({
   id: '/api/crawl',
   path: '/api/crawl',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiCheckoutServerRoute = ApiCheckoutServerRouteImport.update({
+  id: '/api/checkout',
+  path: '/api/checkout',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiChatbotsServerRoute = ApiChatbotsServerRouteImport.update({
@@ -585,6 +591,7 @@ export interface FileServerRoutesByFullPath {
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
   '/api/chatbot-count': typeof ApiChatbotCountServerRoute
   '/api/chatbots': typeof ApiChatbotsServerRoute
+  '/api/checkout': typeof ApiCheckoutServerRoute
   '/api/crawl': typeof ApiCrawlServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
@@ -627,6 +634,7 @@ export interface FileServerRoutesByTo {
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
   '/api/chatbot-count': typeof ApiChatbotCountServerRoute
   '/api/chatbots': typeof ApiChatbotsServerRoute
+  '/api/checkout': typeof ApiCheckoutServerRoute
   '/api/crawl': typeof ApiCrawlServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
@@ -670,6 +678,7 @@ export interface FileServerRoutesById {
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
   '/api/chatbot-count': typeof ApiChatbotCountServerRoute
   '/api/chatbots': typeof ApiChatbotsServerRoute
+  '/api/checkout': typeof ApiCheckoutServerRoute
   '/api/crawl': typeof ApiCrawlServerRoute
   '/api/document-source': typeof ApiDocumentSourceServerRoute
   '/api/feedback': typeof ApiFeedbackServerRoute
@@ -714,6 +723,7 @@ export interface FileServerRouteTypes {
     | '/api/analytics-stream'
     | '/api/chatbot-count'
     | '/api/chatbots'
+    | '/api/checkout'
     | '/api/crawl'
     | '/api/document-source'
     | '/api/feedback'
@@ -756,6 +766,7 @@ export interface FileServerRouteTypes {
     | '/api/analytics-stream'
     | '/api/chatbot-count'
     | '/api/chatbots'
+    | '/api/checkout'
     | '/api/crawl'
     | '/api/document-source'
     | '/api/feedback'
@@ -798,6 +809,7 @@ export interface FileServerRouteTypes {
     | '/api/analytics-stream'
     | '/api/chatbot-count'
     | '/api/chatbots'
+    | '/api/checkout'
     | '/api/crawl'
     | '/api/document-source'
     | '/api/feedback'
@@ -841,6 +853,7 @@ export interface RootServerRouteChildren {
   ApiAnalyticsStreamServerRoute: typeof ApiAnalyticsStreamServerRoute
   ApiChatbotCountServerRoute: typeof ApiChatbotCountServerRoute
   ApiChatbotsServerRoute: typeof ApiChatbotsServerRoute
+  ApiCheckoutServerRoute: typeof ApiCheckoutServerRoute
   ApiCrawlServerRoute: typeof ApiCrawlServerRoute
   ApiDocumentSourceServerRoute: typeof ApiDocumentSourceServerRoute
   ApiFeedbackServerRoute: typeof ApiFeedbackServerRoute
@@ -1194,6 +1207,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiCrawlServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/checkout': {
+      id: '/api/checkout'
+      path: '/api/checkout'
+      fullPath: '/api/checkout'
+      preLoaderRoute: typeof ApiCheckoutServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/chatbots': {
       id: '/api/chatbots'
       path: '/api/chatbots'
@@ -1381,6 +1401,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAnalyticsStreamServerRoute: ApiAnalyticsStreamServerRoute,
   ApiChatbotCountServerRoute: ApiChatbotCountServerRoute,
   ApiChatbotsServerRoute: ApiChatbotsServerRoute,
+  ApiCheckoutServerRoute: ApiCheckoutServerRoute,
   ApiCrawlServerRoute: ApiCrawlServerRoute,
   ApiDocumentSourceServerRoute: ApiDocumentSourceServerRoute,
   ApiFeedbackServerRoute: ApiFeedbackServerRoute,

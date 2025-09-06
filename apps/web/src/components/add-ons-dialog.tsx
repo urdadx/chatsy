@@ -1,4 +1,5 @@
 import { authClient, useSession } from "@/lib/auth-client";
+import { ADDON_PRODUCT_IDS } from "@/lib/plan-slugs";
 import { cn } from "@/lib/utils";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
@@ -36,6 +37,7 @@ export const AddOnsDialog = ({
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const navigate = useNavigate();
+
   const handleCheckout = async () => {
     const organizationId = session?.session?.activeOrganizationId;
 
@@ -60,32 +62,33 @@ export const AddOnsDialog = ({
       return;
     }
 
-    // Map addon selection to slug
-    const addonSlugMap = {
-      messages: "extra-message-credits",
-      branding: "remove-branding",
-      chatbot: "extra-chatbot",
-      member: "extra-team-member",
-    };
+    const addonProductIdMap = ADDON_PRODUCT_IDS;
+    const productId =
+      addonProductIdMap[selectedAddon as keyof typeof addonProductIdMap];
 
-    const slug = addonSlugMap[selectedAddon as keyof typeof addonSlugMap];
-
-    if (!slug) {
+    if (!productId) {
       console.error("Invalid addon selection");
       return;
     }
 
-    setIsCheckingOut(true); // Start loading
+    setIsCheckingOut(true);
 
     try {
-      await authClient.checkout({
-        slug,
-        referenceId: organizationId,
-      });
+      // Build metadata JSON
+      const metadata = JSON.stringify({ referenceId: organizationId });
+      const params = new URLSearchParams();
+      params.append("products", productId);
+      params.append("metadata", metadata);
+      params.append("customerExternalId", session.user.id);
+      const checkoutUrl = `/api/checkout?${params.toString()}`;
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      window.location.href = checkoutUrl;
     } catch (error) {
-      toast.error("An error occured during checkout. Please try again.");
-    } finally {
-      setIsCheckingOut(false); // Stop loading
+      console.error("Checkout error:", error);
+      toast.error("An error occurred during checkout. Please try again.");
+      setIsCheckingOut(false); // Only reset loading on error
     }
 
     if (onOpenChange) {
