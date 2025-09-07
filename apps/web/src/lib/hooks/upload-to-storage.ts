@@ -1,13 +1,16 @@
-import path from "node:path";
-import { dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import { Storage } from "@google-cloud/storage";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const storage = new Storage({
   projectId: "nomad-23595",
-  keyFilename: path.join(__dirname, "../../../padyna-service-keys.json"),
+  credentials: {
+    type: "service_account",
+    project_id: process.env.GOOGLE_PROJECT_ID!,
+    private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID!,
+    private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    client_email: process.env.GOOGLE_CLIENT_EMAIL!,
+    client_id: process.env.GOOGLE_CLIENT_ID!,
+    universe_domain: "googleapis.com",
+  },
 });
 
 const bucket = storage.bucket("nomad-23595.appspot.com");

@@ -16,7 +16,6 @@ export default defineConfig({
     }),
     react(),
   ],
-
   optimizeDeps: {
     exclude: ["@polar-sh/sdk/webhooks.ts"],
   },
