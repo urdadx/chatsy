@@ -15,8 +15,6 @@ export type RouterAppContext = {
   queryClient: QueryClient;
 };
 
-const ogURL = `${window.location.origin}/api/og`;
-
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
@@ -35,7 +33,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         description: "Create a custom AI agent for your data",
         keywords:
           "AI, bot, link in bio, custom bot, padyna, customer support, chatbot",
-        image: ogURL,
+        image: "https://padyna.com/og.png",
       }),
     ],
     links: [
