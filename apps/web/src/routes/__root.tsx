@@ -53,6 +53,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 function RootDocument() {
+  const isDevelopment = import.meta.env.VITE_NODE_ENV === "development";
   return (
     <html lang="en">
       <head>
@@ -67,11 +68,7 @@ function RootDocument() {
         <Toaster richColors theme="light" />
 
         <Scripts />
-        <ReactQueryDevtools
-          buttonPosition="bottom-left"
-          position="left"
-          initialIsOpen={false}
-        />
+        {isDevelopment && <ReactQueryDevtools initialIsOpen={false} />}
       </body>
     </html>
   );
