@@ -16,9 +16,7 @@ export default defineConfig({
     }),
     react(),
   ],
-  ssr: {
-    noExternal: ["@polar-sh/sdk", "@polar-sh/better-auth"],
-  },
+
   optimizeDeps: {
     exclude: ["@polar-sh/sdk/webhooks.ts"],
   },
