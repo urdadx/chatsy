@@ -3,7 +3,6 @@ import {
   Drawer,
   DrawerContent,
   DrawerHeader,
-  DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import {
@@ -37,6 +36,7 @@ export function UserDropdown({ user }: any) {
     await signOut({
       fetchOptions: {
         onSuccess: () => {
+          localStorage.removeItem("lastTrainedAt");
           navigate({
             to: "/login",
           });

@@ -47,6 +47,7 @@ import { ServerRoute as ApiSimilaritySearchServerRouteImport } from './routes/ap
 import { ServerRoute as ApiSetActiveChatbotServerRouteImport } from './routes/api/set-active-chatbot'
 import { ServerRoute as ApiScrapeServerRouteImport } from './routes/api/scrape'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
+import { ServerRoute as ApiOgServerRouteImport } from './routes/api/og'
 import { ServerRoute as ApiMyChatbotServerRouteImport } from './routes/api/my-chatbot'
 import { ServerRoute as ApiLeadsServerRouteImport } from './routes/api/leads'
 import { ServerRoute as ApiInviteMemberServerRouteImport } from './routes/api/invite-member'
@@ -261,6 +262,11 @@ const ApiScrapeServerRoute = ApiScrapeServerRouteImport.update({
 const ApiQuestionsServerRoute = ApiQuestionsServerRouteImport.update({
   id: '/api/questions',
   path: '/api/questions',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiOgServerRoute = ApiOgServerRouteImport.update({
+  id: '/api/og',
+  path: '/api/og',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiMyChatbotServerRoute = ApiMyChatbotServerRouteImport.update({
@@ -600,6 +606,7 @@ export interface FileServerRoutesByFullPath {
   '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
+  '/api/og': typeof ApiOgServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/set-active-chatbot': typeof ApiSetActiveChatbotServerRoute
@@ -643,6 +650,7 @@ export interface FileServerRoutesByTo {
   '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
+  '/api/og': typeof ApiOgServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/set-active-chatbot': typeof ApiSetActiveChatbotServerRoute
@@ -687,6 +695,7 @@ export interface FileServerRoutesById {
   '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
+  '/api/og': typeof ApiOgServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/set-active-chatbot': typeof ApiSetActiveChatbotServerRoute
@@ -732,6 +741,7 @@ export interface FileServerRouteTypes {
     | '/api/invite-member'
     | '/api/leads'
     | '/api/my-chatbot'
+    | '/api/og'
     | '/api/questions'
     | '/api/scrape'
     | '/api/set-active-chatbot'
@@ -775,6 +785,7 @@ export interface FileServerRouteTypes {
     | '/api/invite-member'
     | '/api/leads'
     | '/api/my-chatbot'
+    | '/api/og'
     | '/api/questions'
     | '/api/scrape'
     | '/api/set-active-chatbot'
@@ -818,6 +829,7 @@ export interface FileServerRouteTypes {
     | '/api/invite-member'
     | '/api/leads'
     | '/api/my-chatbot'
+    | '/api/og'
     | '/api/questions'
     | '/api/scrape'
     | '/api/set-active-chatbot'
@@ -862,6 +874,7 @@ export interface RootServerRouteChildren {
   ApiInviteMemberServerRoute: typeof ApiInviteMemberServerRoute
   ApiLeadsServerRoute: typeof ApiLeadsServerRoute
   ApiMyChatbotServerRoute: typeof ApiMyChatbotServerRoute
+  ApiOgServerRoute: typeof ApiOgServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
   ApiScrapeServerRoute: typeof ApiScrapeServerRoute
   ApiSetActiveChatbotServerRoute: typeof ApiSetActiveChatbotServerRoute
@@ -1151,6 +1164,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiQuestionsServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/og': {
+      id: '/api/og'
+      path: '/api/og'
+      fullPath: '/api/og'
+      preLoaderRoute: typeof ApiOgServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/my-chatbot': {
       id: '/api/my-chatbot'
       path: '/api/my-chatbot'
@@ -1410,6 +1430,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiInviteMemberServerRoute: ApiInviteMemberServerRoute,
   ApiLeadsServerRoute: ApiLeadsServerRoute,
   ApiMyChatbotServerRoute: ApiMyChatbotServerRoute,
+  ApiOgServerRoute: ApiOgServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,
   ApiScrapeServerRoute: ApiScrapeServerRoute,
   ApiSetActiveChatbotServerRoute: ApiSetActiveChatbotServerRoute,

@@ -98,7 +98,7 @@ export const TrainAgent = () => {
       const now = new Date();
       setLastTrainedAt(now);
       localStorage.setItem("lastTrainedAt", now.toISOString());
-      queryClient.invalidateQueries();
+      queryClient.invalidateQueries({ queryKey: ["training-status"] });
     },
     onError: (error) => {
       toast.error(`Failed to train agent: ${error.message}`);
@@ -112,7 +112,7 @@ export const TrainAgent = () => {
         const now = new Date();
         setLastTrainedAt(now);
         localStorage.setItem("lastTrainedAt", now.toISOString());
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: ["training-status"] });
         return "Agent training completed successfully!";
       },
       error: (error) => `Failed to train agent: ${error.message}`,

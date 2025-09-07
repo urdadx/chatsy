@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
+import { AnalyticsCard } from "./analytics-card";
 // import { AnalyticsCard } from "./analytics-card";
 import { FeatureCard } from "./feature-card";
 import { LandingShare } from "./landing-share";
 import { LandingThemes } from "./landing-themes";
 import { SampleChat } from "./sample-chat";
-import { AnalyticsCard } from "./analytics-card";
 
 export default function Features() {
   return (
