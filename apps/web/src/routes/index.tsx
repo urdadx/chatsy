@@ -1,5 +1,5 @@
 import FAQs from "@/components/faqs";
-import { AddOns } from "@/components/landing-page/add-ons";
+// import { AddOns } from "@/components/landing-page/add-ons";
 import { CTASession } from "@/components/landing-page/cta-session";
 import Features from "@/components/landing-page/feature-section";
 import { FooterSection } from "@/components/landing-page/footer";
@@ -24,13 +24,13 @@ function HomeComponent() {
           <HeroVideoDialog
             className="block dark:hidden"
             animationStyle="top-in-bottom-out"
-            videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
+            videoSrc="https://www.youtube.com/embed/xP-7DPrct7I?si=qbAARKAjkXh017A6"
             thumbnailAlt="Hero Video"
           />
           <HeroVideoDialog
             className="hidden dark:block"
             animationStyle="top-in-bottom-out"
-            videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
+            videoSrc="https://www.youtube.com/embed/xP-7DPrct7I?si=qbAARKAjkXh017A6"
             thumbnailAlt="Hero Video"
           />
         </div>

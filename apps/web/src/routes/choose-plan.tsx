@@ -1,7 +1,6 @@
 import { Pricing } from "@/components/landing-page/pricing";
-import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/auth-client";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
 
 export const Route = createFileRoute("/choose-plan")({
@@ -23,9 +22,9 @@ function RouteComponent() {
       >
         <Pricing />
       </motion.div>
-      <Link to="/admin/overview">
+      {/* <Link to="/admin/overview">
         <Button variant="link">Skip for now👉</Button>
-      </Link>
+      </Link> */}
     </main>
   );
 }
