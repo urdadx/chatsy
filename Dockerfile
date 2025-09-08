@@ -7,8 +7,11 @@ RUN npm install -g pnpm@10.10.0
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy workspace config first
+COPY pnpm-workspace.yaml ./
 COPY package.json pnpm-lock.yaml* ./
+
+# Copy all package.json files
 COPY apps/web/package.json ./apps/web/
 
 # Install dependencies
