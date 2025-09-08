@@ -37,9 +37,10 @@ COPY --from=base /app/apps/web/.output ./apps/web/.output
 COPY --from=base /app/apps/web/package.json ./apps/web/
 COPY --from=base /app/package.json ./
 COPY --from=base /app/pnpm-lock.yaml* ./
+COPY --from=base /app/pnpm-workspace.yaml ./
 
 # Install only production dependencies
-RUN cd apps/web && pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
