@@ -35,6 +35,7 @@ WORKDIR /app
 # Copy built TanStack Start application
 COPY --from=base /app/apps/web/.output ./apps/web/.output
 COPY --from=base /app/apps/web/package.json ./apps/web/
+COPY --from=base /app/apps/web/test ./apps/web/test
 COPY --from=base /app/package.json ./
 COPY --from=base /app/pnpm-lock.yaml* ./
 COPY --from=base /app/pnpm-workspace.yaml ./
