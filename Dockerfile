@@ -59,5 +59,8 @@ EXPOSE 3000
 # Set environment to production
 ENV NODE_ENV=production
 
+# Set working directory to the web app for relative paths to work
+WORKDIR /app/apps/web
+
 # Start the TanStack Start application
-CMD ["node", "apps/web/.output/server/index.mjs"]
+CMD ["node", ".output/server/index.mjs"]
