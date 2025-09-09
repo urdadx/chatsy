@@ -1,7 +1,10 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { Action, chatbot, session, subscription, user } from "@/db/schema";
-import { sendOrganizationInvitation } from "@/lib/emails/email";
+import {
+  sendOrganizationInvitation,
+  sendVerificationEmail,
+} from "@/lib/emails/email";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getActiveOrganization } from "@/lib/hooks/get-active-organization";
 import { polar, portal, usage, webhooks } from "@polar-sh/better-auth";
@@ -80,6 +83,19 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
+
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      console.log("Sending verification email to:", user.email, url);
+      await sendVerificationEmail({
+        email: user.email,
+        username: user.name,
+        verificationLink: url,
+      });
+    },
+  },
 
   account: {
     accountLinking: {

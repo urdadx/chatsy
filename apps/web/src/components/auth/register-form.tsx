@@ -36,13 +36,14 @@ export function RegisterForm({
         email: data.email,
         name: data.name,
         password: data.password,
+        callbackURL: "/onboarding",
       },
       {
         onSuccess: (ctx: any) => {
           console.log("Registration successful", ctx);
           toast.success("Account created successfully");
           navigate({
-            to: "/onboarding",
+            to: "/verify-email",
           });
         },
         onError: (ctx: any) => {

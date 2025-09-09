@@ -29,6 +29,7 @@ import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
 import { Route as AdminKnowledgeBaseRouteImport } from './routes/admin/knowledge-base'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as AdminActionsRouteImport } from './routes/admin/actions'
+import { Route as authVerifyEmailRouteImport } from './routes/(auth)/verify-email'
 import { Route as authSetupRouteImport } from './routes/(auth)/setup'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
@@ -168,6 +169,11 @@ const AdminActionsRoute = AdminActionsRouteImport.update({
   id: '/actions',
   path: '/actions',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const authVerifyEmailRoute = authVerifyEmailRouteImport.update({
+  id: '/(auth)/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const authSetupRoute = authSetupRouteImport.update({
   id: '/(auth)/setup',
@@ -433,6 +439,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/setup': typeof authSetupRoute
+  '/verify-email': typeof authVerifyEmailRoute
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
@@ -458,6 +465,7 @@ export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/setup': typeof authSetupRoute
+  '/verify-email': typeof authVerifyEmailRoute
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
@@ -484,6 +492,7 @@ export interface FileRoutesById {
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/(auth)/setup': typeof authSetupRoute
+  '/(auth)/verify-email': typeof authVerifyEmailRoute
   '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
@@ -511,6 +520,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/setup'
+    | '/verify-email'
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/knowledge-base'
@@ -536,6 +546,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/setup'
+    | '/verify-email'
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/knowledge-base'
@@ -561,6 +572,7 @@ export interface FileRouteTypes {
     | '/(auth)/login'
     | '/(auth)/register'
     | '/(auth)/setup'
+    | '/(auth)/verify-email'
     | '/admin/actions'
     | '/admin/analytics'
     | '/admin/knowledge-base'
@@ -587,6 +599,7 @@ export interface RootRouteChildren {
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
   authSetupRoute: typeof authSetupRoute
+  authVerifyEmailRoute: typeof authVerifyEmailRoute
   BubbleWidgetIdRoute: typeof BubbleWidgetIdRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalTermsRoute: typeof LegalTermsRoute
@@ -1034,6 +1047,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminActionsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/(auth)/verify-email': {
+      id: '/(auth)/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof authVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)/setup': {
       id: '/(auth)/setup'
       path: '/setup'
@@ -1408,6 +1428,7 @@ const rootRouteChildren: RootRouteChildren = {
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
   authSetupRoute: authSetupRoute,
+  authVerifyEmailRoute: authVerifyEmailRoute,
   BubbleWidgetIdRoute: BubbleWidgetIdRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalTermsRoute: LegalTermsRoute,
