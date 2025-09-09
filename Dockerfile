@@ -43,8 +43,8 @@ COPY --from=base /app/package.json ./
 COPY --from=base /app/pnpm-lock.yaml* ./
 COPY --from=base /app/pnpm-workspace.yaml ./
 
-# Install only production dependencies
-RUN pnpm install --prod --frozen-lockfile
+# Install all dependencies (including dev) for drizzle-kit
+RUN pnpm install --frozen-lockfile
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
