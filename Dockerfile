@@ -38,6 +38,7 @@ COPY --from=base /app/apps/web/package.json ./apps/web/
 COPY --from=base /app/apps/web/test ./apps/web/test
 COPY --from=base /app/apps/web/drizzle ./apps/web/drizzle
 COPY --from=base /app/apps/web/drizzle.config.ts ./apps/web/
+COPY --from=base /app/apps/web/src ./apps/web/src
 COPY --from=base /app/apps/web/.env* ./apps/web/
 COPY --from=base /app/package.json ./
 COPY --from=base /app/pnpm-lock.yaml* ./
