@@ -47,6 +47,13 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         href: appCss,
       },
     ],
+
+    scripts: [
+      {
+        src: "https://analytics.padyna.com/script.js",
+        "data-website-id": "920f52b8-678e-4f8c-9317-0407d2376480",
+      },
+    ],
   }),
 
   component: RootDocument,
