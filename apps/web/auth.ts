@@ -1,13 +1,13 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { Action, chatbot, session, subscription, user } from "@/db/schema";
+import { Action, chatbot, session, user } from "@/db/schema";
 import {
   sendOrganizationInvitation,
   sendVerificationEmail,
 } from "@/lib/emails/email";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getActiveOrganization } from "@/lib/hooks/get-active-organization";
-import { polar, portal, usage, webhooks } from "@polar-sh/better-auth";
+import { polar, portal, usage } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -25,12 +25,6 @@ export const polarClient = new Polar({
   accessToken: POLAR_ACCESS_TOKEN!,
   server: "sandbox",
 });
-
-function safeParseDate(value: string | Date | null | undefined): Date | null {
-  if (!value) return null;
-  if (value instanceof Date) return value;
-  return new Date(value);
-}
 
 export const createDefaultActions = async (chatbotId: string) => {
   const defaultActions = [
