@@ -33,7 +33,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         description: "Create a custom AI agent for your data",
         keywords:
           "AI, bot, link in bio, custom bot, padyna, customer support, chatbot",
-        image: "https://padyna.com/og.png",
+        image: "/og.png",
       }),
     ],
     links: [
