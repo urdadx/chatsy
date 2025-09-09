@@ -36,6 +36,9 @@ WORKDIR /app
 COPY --from=base /app/apps/web/.output ./apps/web/.output
 COPY --from=base /app/apps/web/package.json ./apps/web/
 COPY --from=base /app/apps/web/test ./apps/web/test
+COPY --from=base /app/apps/web/drizzle ./apps/web/drizzle
+COPY --from=base /app/apps/web/drizzle.config.ts ./apps/web/
+COPY --from=base /app/apps/web/.env* ./apps/web/
 COPY --from=base /app/package.json ./
 COPY --from=base /app/pnpm-lock.yaml* ./
 COPY --from=base /app/pnpm-workspace.yaml ./
@@ -61,6 +64,9 @@ ENV NODE_ENV=production
 
 # Set working directory to the web app for relative paths to work
 WORKDIR /app/apps/web
+
+# Run database migrations/push before starting the app
+RUN pnpm db push
 
 # Start the TanStack Start application
 CMD ["node", ".output/server/index.mjs"]
