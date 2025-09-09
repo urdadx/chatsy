@@ -64,6 +64,7 @@ import { ServerRoute as ApiAnalyticsStreamServerRouteImport } from './routes/api
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
 import { ServerRoute as ApiAgentActionsIndexServerRouteImport } from './routes/api/agent-actions/index'
 import { ServerRoute as ApiActivityIndexServerRouteImport } from './routes/api/activity/index'
+import { ServerRoute as ApiWebhookPolarServerRouteImport } from './routes/api/webhook/polar'
 import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/sources/count'
 import { ServerRoute as ApiEmbedGenerateTokenServerRouteImport } from './routes/api/embed/generate-token'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
@@ -353,6 +354,11 @@ const ApiActivityIndexServerRoute = ApiActivityIndexServerRouteImport.update({
   path: '/api/activity/',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiWebhookPolarServerRoute = ApiWebhookPolarServerRouteImport.update({
+  id: '/api/webhook/polar',
+  path: '/api/webhook/polar',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiSourcesCountServerRoute = ApiSourcesCountServerRouteImport.update({
   id: '/api/sources/count',
   path: '/api/sources/count',
@@ -639,6 +645,7 @@ export interface FileServerRoutesByFullPath {
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
+  '/api/webhook/polar': typeof ApiWebhookPolarServerRoute
   '/api/activity': typeof ApiActivityIndexServerRoute
   '/api/agent-actions': typeof ApiAgentActionsIndexServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
@@ -683,6 +690,7 @@ export interface FileServerRoutesByTo {
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
+  '/api/webhook/polar': typeof ApiWebhookPolarServerRoute
   '/api/activity': typeof ApiActivityIndexServerRoute
   '/api/agent-actions': typeof ApiAgentActionsIndexServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
@@ -728,6 +736,7 @@ export interface FileServerRoutesById {
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
+  '/api/webhook/polar': typeof ApiWebhookPolarServerRoute
   '/api/activity/': typeof ApiActivityIndexServerRoute
   '/api/agent-actions/': typeof ApiAgentActionsIndexServerRoute
   '/api/chat/': typeof ApiChatIndexServerRoute
@@ -774,6 +783,7 @@ export interface FileServerRouteTypes {
     | '/api/chat/history'
     | '/api/embed/generate-token'
     | '/api/sources/count'
+    | '/api/webhook/polar'
     | '/api/activity'
     | '/api/agent-actions'
     | '/api/chat'
@@ -818,6 +828,7 @@ export interface FileServerRouteTypes {
     | '/api/chat/history'
     | '/api/embed/generate-token'
     | '/api/sources/count'
+    | '/api/webhook/polar'
     | '/api/activity'
     | '/api/agent-actions'
     | '/api/chat'
@@ -862,6 +873,7 @@ export interface FileServerRouteTypes {
     | '/api/chat/history'
     | '/api/embed/generate-token'
     | '/api/sources/count'
+    | '/api/webhook/polar'
     | '/api/activity/'
     | '/api/agent-actions/'
     | '/api/chat/'
@@ -907,6 +919,7 @@ export interface RootServerRouteChildren {
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
   ApiEmbedGenerateTokenServerRoute: typeof ApiEmbedGenerateTokenServerRoute
   ApiSourcesCountServerRoute: typeof ApiSourcesCountServerRoute
+  ApiWebhookPolarServerRoute: typeof ApiWebhookPolarServerRoute
   ApiActivityIndexServerRoute: typeof ApiActivityIndexServerRoute
   ApiAgentActionsIndexServerRoute: typeof ApiAgentActionsIndexServerRoute
   ApiChatIndexServerRoute: typeof ApiChatIndexServerRoute
@@ -1296,6 +1309,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiActivityIndexServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/webhook/polar': {
+      id: '/api/webhook/polar'
+      path: '/api/webhook/polar'
+      fullPath: '/api/webhook/polar'
+      preLoaderRoute: typeof ApiWebhookPolarServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/sources/count': {
       id: '/api/sources/count'
       path: '/api/sources/count'
@@ -1472,6 +1492,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
   ApiEmbedGenerateTokenServerRoute: ApiEmbedGenerateTokenServerRoute,
   ApiSourcesCountServerRoute: ApiSourcesCountServerRoute,
+  ApiWebhookPolarServerRoute: ApiWebhookPolarServerRoute,
   ApiActivityIndexServerRoute: ApiActivityIndexServerRoute,
   ApiAgentActionsIndexServerRoute: ApiAgentActionsIndexServerRoute,
   ApiChatIndexServerRoute: ApiChatIndexServerRoute,

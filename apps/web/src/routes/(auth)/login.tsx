@@ -1,9 +1,17 @@
 import { LoginForm } from "@/components/auth/login-form";
 import { Logo } from "@/components/logo-image";
-import { createFileRoute } from "@tanstack/react-router";
+import { getSession } from "@/lib/auth-utils";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(auth)/login")({
   component: RouteComponent,
+  beforeLoad: async ({ location }) => {
+    const session = await getSession();
+
+    if (session) {
+      throw redirect({ to: "/admin/overview", search: location.search });
+    }
+  },
 });
 
 function RouteComponent() {

@@ -22,7 +22,7 @@ export const user = pgTable("user", {
   bio: text("bio"),
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified")
-  .$defaultFn(() => false)
+    .$defaultFn(() => false)
     .notNull(),
   image: text("image"),
   createdAt: timestamp("created_at")
@@ -33,6 +33,9 @@ export const user = pgTable("user", {
     .notNull(),
   username: text("username").unique(),
   externalId: text("external_id").unique(),
+  isSubscribed: boolean("is_subscribed")
+    .notNull()
+    .$defaultFn(() => false),
 });
 
 export const session = pgTable("session", {
@@ -386,6 +389,7 @@ export const subscription = pgTable("subscription", {
   metadata: text("metadata"),
   customFieldData: text("customFieldData"),
   userId: uuid("userId").references(() => user.id, { onDelete: "cascade" }),
+  meters: jsonb("meters").notNull().default({}),
 });
 
 export const creditsUsage = pgTable("credits_usage", {
@@ -446,20 +450,22 @@ export const stream = pgTable(
   ],
 );
 
-export const Action = pgTable("action", {
-  id: uuid("id").primaryKey().notNull().defaultRandom(),
-  chatbotId: uuid("chatbot_id")
-    .notNull()
-    .references(() => chatbot.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  toolName: text("tool_name").notNull(),
-  isActive: boolean("is_active").notNull().default(true),
-  description: text("description"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-}, (table) => [
-  unique().on(table.chatbotId, table.toolName),
-]);
+export const Action = pgTable(
+  "action",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    chatbotId: uuid("chatbot_id")
+      .notNull()
+      .references(() => chatbot.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    toolName: text("tool_name").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    description: text("description"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => [unique().on(table.chatbotId, table.toolName)],
+);
 
 // TYPES
 export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;

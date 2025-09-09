@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import React from "react";
@@ -24,8 +23,6 @@ export const HeroHeader = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const { data: session } = useSession();
 
   return (
     <header>
@@ -88,53 +85,30 @@ export const HeroHeader = () => {
                 </ul>
               </div>
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                {!session ? (
-                  <>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className={cn(isScrolled && "lg:hidden")}
-                    >
-                      <Link to="/login">
-                        <span>Login</span>
-                      </Link>
-                    </Button>
-                    <Button asChild className={cn(isScrolled && "lg:hidden")}>
-                      <Link to="/register">
-                        <span>Get Started</span>
-                      </Link>
-                    </Button>
-                    <Button
-                      asChild
-                      className={cn(isScrolled ? "lg:inline-flex" : "hidden")}
-                    >
-                      <Link to="/register">
-                        <span>Get Started</span>
-                      </Link>
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className={cn(isScrolled && "lg:hidden")}
-                    >
-                      <Link to="/admin/overview">
-                        <span>Dashboard</span>
-                      </Link>
-                    </Button>
-                    <Button
-                      asChild
-                      variant={"outline"}
-                      className={cn(isScrolled ? "lg:inline-flex" : "hidden")}
-                    >
-                      <Link to="/admin/overview">
-                        <span>Dashboard</span>
-                      </Link>
-                    </Button>
-                  </>
-                )}
+                <div className="space-x-2">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className={cn(isScrolled && "lg:hidden")}
+                  >
+                    <Link to="/login">
+                      <span>Login</span>
+                    </Link>
+                  </Button>
+                  <Button asChild className={cn(isScrolled && "lg:hidden")}>
+                    <Link to="/register">
+                      <span>Get Started</span>
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className={cn(isScrolled ? "lg:inline-flex" : "hidden")}
+                  >
+                    <Link to="/register">
+                      <span>Get Started</span>
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

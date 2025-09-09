@@ -23,6 +23,7 @@ export default defineConfig({
     allowedHosts: [
       "padyna.railway.internal",
       "adjusted-strictly-newt.ngrok-free.app",
+      "pointed-intoxicative-katharyn.ngrok-free.app",
       "padyna.com",
     ],
   },
