@@ -67,7 +67,7 @@ ENV NODE_ENV=production
 WORKDIR /app/apps/web
 
 # Run database migrations/push before starting the app
-RUN npx drizzle-kit push
+# RUN npx drizzle-kit push
 
 # Start the TanStack Start application
 CMD ["node", ".output/server/index.mjs"]
