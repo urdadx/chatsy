@@ -173,7 +173,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                   await polarClient.events.ingest({
                     events: [
                       {
-                        name: "ai_usage_two",
+                        name: "token_usage",
                         externalCustomerId,
                         metadata: {
                           totalTokens: usage.totalTokens ?? 0,

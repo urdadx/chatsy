@@ -16,6 +16,8 @@ import { reactStartCookies } from "better-auth/react-start";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 const POLAR_ACCESS_TOKEN = process.env.POLAR_ACCESS_TOKEN!;
 if (!POLAR_ACCESS_TOKEN) {
   throw new Error("Polar access token is not set in environment variables");
@@ -23,7 +25,7 @@ if (!POLAR_ACCESS_TOKEN) {
 
 export const polarClient = new Polar({
   accessToken: POLAR_ACCESS_TOKEN!,
-  server: "sandbox",
+  server: isDevelopment ? "sandbox" : "production",
 });
 
 export const createDefaultActions = async (chatbotId: string) => {
