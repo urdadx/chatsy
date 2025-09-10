@@ -34,7 +34,7 @@ export const UsageTable = () => {
               <div key={meter.meter?.name || idx}>
                 <div className="flex items-center justify-between">
                   <p className="text-gray-600 text-sm">
-                    {meter.meter?.name === "token_usage"
+                    {meter.meter?.name === "ai_token_usage"
                       ? "Message credits"
                       : meter.meter?.name}
                   </p>
