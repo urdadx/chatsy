@@ -167,7 +167,7 @@ export const ServerRoute = createServerFileRoute(
               await polarClient.events.ingest({
                 events: [
                   {
-                    name: "ai_token_usage",
+                    name: "llm_usage",
                     externalCustomerId,
                     metadata: {
                       totalTokens: usage.totalTokens ?? 0,

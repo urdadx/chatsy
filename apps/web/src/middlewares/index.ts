@@ -71,7 +71,7 @@ export const tokenUsageMiddleware = createMiddleware({
     const tokensLeft = meterItem
       ? meterItem.creditedUnits - meterItem.consumedUnits
       : 0;
-    console.log("Tokens left for ai_token_usage:", tokensLeft);
+    console.log("Tokens left for llm_usage:", tokensLeft);
 
     return await next({
       context: {
