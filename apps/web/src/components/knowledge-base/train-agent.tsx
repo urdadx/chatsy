@@ -7,6 +7,7 @@ import { FileText, Globe, Hammer, InfoIcon, Paperclip } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useRetrainingBanner } from "../retraining-banner";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
 
@@ -15,6 +16,7 @@ export const TrainAgent = () => {
   const [lastTrainedAt, setLastTrainedAt] = useState<Date | null>(null);
   const { data: session } = useSession();
   const organizationId = session?.session?.activeOrganizationId;
+  const { show, setBanner } = useRetrainingBanner();
 
   useEffect(() => {
     const storedTimestamp = localStorage.getItem("lastTrainedAt");
@@ -98,6 +100,7 @@ export const TrainAgent = () => {
       const now = new Date();
       setLastTrainedAt(now);
       localStorage.setItem("lastTrainedAt", now.toISOString());
+      setBanner(false);
       queryClient.invalidateQueries({ queryKey: ["training-status"] });
     },
     onError: (error) => {
@@ -107,11 +110,12 @@ export const TrainAgent = () => {
 
   const handleTrainAgent = () => {
     toast.promise(trainAgentMutation.mutateAsync(), {
-      loading: "Agent training started...",
+      loading: "Training your agent...",
       success: () => {
         const now = new Date();
         setLastTrainedAt(now);
         localStorage.setItem("lastTrainedAt", now.toISOString());
+
         queryClient.invalidateQueries({ queryKey: ["training-status"] });
         return "Agent training completed successfully!";
       },
@@ -155,12 +159,13 @@ export const TrainAgent = () => {
 
   return (
     <div className="w-full space-y-3">
-      {isStale && (
-        <Alert variant="warning">
-          <InfoIcon className="h-4 w-4" />
-          <AlertDescription>Retraining required</AlertDescription>
-        </Alert>
-      )}
+      {isStale ||
+        (show && (
+          <Alert variant="warning">
+            <InfoIcon className="h-4 w-4" />
+            <AlertDescription>Retraining required</AlertDescription>
+          </Alert>
+        ))}
       <h1 className="text-lg font-semibold ">Sources</h1>
       <FileStatCard
         icon={<Paperclip className="w-5 h-5 text-primary/70" />}

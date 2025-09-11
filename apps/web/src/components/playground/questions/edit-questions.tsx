@@ -1,3 +1,4 @@
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,6 +46,7 @@ export const EditQuestion = ({
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const queryClient = useQueryClient();
+  const { setBanner } = useRetrainingBanner();
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -57,6 +59,8 @@ export const EditQuestion = ({
     onSuccess: () => {
       toast.success("Question updated!");
       queryClient.invalidateQueries({ queryKey: ["questions"] });
+      setBanner(true, "Retraining required");
+      localStorage.setItem("lastTrainedAt", new Date().toISOString());
       onOpenChange(false);
     },
     onError: () => {

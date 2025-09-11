@@ -9,9 +9,9 @@ import { count, eq } from "drizzle-orm";
 import z from "zod";
 
 const inviteMemberSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.email("Invalid email address"),
   role: z.enum(["member", "owner"], {
-    errorMap: () => ({ message: "Role must be either 'member' or 'owner'" }),
+    message: "Role must be either 'member' or 'owner'",
   }),
 });
 
@@ -60,7 +60,7 @@ export const ServerRoute = createServerFileRoute("/api/invite-member").methods({
         return json(
           {
             message: "Invalid request data",
-            details: parseResult.error.errors,
+            details: parseResult.error.issues,
           },
           { status: 400 },
         );

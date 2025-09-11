@@ -14,6 +14,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { organization } from "better-auth/plugins";
 import { reactStartCookies } from "better-auth/react-start";
 import { eq } from "drizzle-orm";
+import { nanoid } from "nanoid";
 import { v4 as uuidv4 } from "uuid";
 
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -200,7 +201,7 @@ export const auth = betterAuth({
         },
         afterCreate: async ({ organization, user }) => {
           try {
-            const embedToken = `embed_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+            const embedToken = `embed_${nanoid(4)}`;
 
             // Create the default chatbot and get its ID
             const [createdChatbot] = await db

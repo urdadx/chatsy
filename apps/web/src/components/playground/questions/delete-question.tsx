@@ -1,3 +1,4 @@
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +26,7 @@ export function DeleteQuestion({
   onOpenChange,
 }: DeleteQuestionProps) {
   const queryClient = useQueryClient();
+  const { setBanner } = useRetrainingBanner();
 
   const deleteQuestion = useMutation({
     mutationFn: async (id: string) => {
@@ -33,6 +35,8 @@ export function DeleteQuestion({
     onSuccess: () => {
       toast.success("Question deleted");
       queryClient.invalidateQueries({ queryKey: ["questions"] });
+      setBanner(true, "Retraining required");
+      localStorage.setItem("lastTrainedAt", new Date().toISOString());
     },
     onError: () => {
       toast.error("Failed to delete question");

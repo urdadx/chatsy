@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
-import { InfoIcon, Plus, RefreshCcw, Trash2, X } from "lucide-react";
+import { InfoIcon, Plus, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -19,7 +19,7 @@ export function WidgetSettings() {
   const updateChatbotMutation = useUpdateChatbot();
 
   const [isEmbeddingEnabled, setIsEmbeddingEnabled] = useState(false);
-  const [embedToken, setEmbedToken] = useState("");
+  const [_embedToken, setEmbedToken] = useState("");
   const [allowedDomains, setAllowedDomains] = useState<string[]>([]);
   const [newDomain, setNewDomain] = useState("");
 
@@ -31,11 +31,11 @@ export function WidgetSettings() {
     }
   }, [chatbot]);
 
-  const generateEmbedToken = () => {
-    const token = `embed_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-    setEmbedToken(token);
-    updateChatbot({ embedToken: token });
-  };
+  // const generateEmbedToken = () => {
+  //   const token = `embed_${nanoid(4)}`;
+  //   setEmbedToken(token);
+  //   updateChatbot({ embedToken: token });
+  // };
 
   const updateChatbot = async (updates: Partial<typeof chatbot>) => {
     if (!chatbot) return;
@@ -134,8 +134,8 @@ export function WidgetSettings() {
                 </TooltipTrigger>
                 <TooltipContent className="bg-white shadow-sm">
                   <p className="text-black">
-                    Domains where your widget can be embedded. Leave empty to
-                    allow all domains.
+                    Websites where your widget can be embedded. Leave empty to
+                    allow all websites.
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -177,11 +177,10 @@ export function WidgetSettings() {
           </div>
         </div>
 
-        {isEmbeddingEnabled && (
+        {/* {isEmbeddingEnabled && (
           <>
             <Separator className="my-6" />
 
-            {/* Embed Token */}
             <div className="flex flex-col sm:flex-row gap-3 justify-between">
               <div className="flex items-center gap-2">
                 <Label>Embed Token</Label>
@@ -204,7 +203,7 @@ export function WidgetSettings() {
               </div>
             </div>
           </>
-        )}
+        )} */}
       </div>
     </div>
   );

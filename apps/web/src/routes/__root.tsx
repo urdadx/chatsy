@@ -1,3 +1,4 @@
+import { RetrainingBannerProvider } from "@/components/retraining-banner";
 import { Toaster } from "@/components/ui/sonner";
 import { seo } from "@/lib/seo";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
@@ -15,6 +16,8 @@ export type RouterAppContext = {
   queryClient: QueryClient;
 };
 
+const isDevelopment = import.meta.env.VITE_NODE_ENV === "development";
+
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
@@ -29,11 +32,12 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         title: "Padyna",
       },
       ...seo({
-        title: "Padyna - Automate your customer support",
-        description: "Create a custom AI agent for your data",
+        title: "Padyna - AI agents for your business",
+        description:
+          "Magical customer experiences for your business. Create a custom AI agent for your business in minutes.",
         keywords:
           "AI, bot, link in bio, custom bot, padyna, customer support, chatbot",
-        image: "/og.png",
+        image: "https://padyna.com/og.png",
       }),
     ],
     links: [
@@ -48,32 +52,34 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       },
     ],
 
-    scripts: [
-      {
-        src: "https://analytics.padyna.com/script.js",
-        "data-website-id": "920f52b8-678e-4f8c-9317-0407d2376480",
-      },
-    ],
+    scripts: isDevelopment
+      ? []
+      : [
+          {
+            src: "https://analytics.padyna.com/script.js",
+            "data-website-id": "920f52b8-678e-4f8c-9317-0407d2376480",
+          },
+        ],
   }),
 
   component: RootDocument,
 });
 
 function RootDocument() {
-  const isDevelopment = import.meta.env.VITE_NODE_ENV === "development";
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body suppressHydrationWarning>
-        <div className="">
-          <TooltipProvider>
-            <Outlet />
-          </TooltipProvider>
-        </div>
-        <Toaster richColors theme="light" />
-
+        <RetrainingBannerProvider>
+          <div className="">
+            <TooltipProvider>
+              <Outlet />
+            </TooltipProvider>
+          </div>
+          <Toaster richColors theme="light" />
+        </RetrainingBannerProvider>
         <Scripts />
         {isDevelopment && <ReactQueryDevtools initialIsOpen={false} />}
       </body>

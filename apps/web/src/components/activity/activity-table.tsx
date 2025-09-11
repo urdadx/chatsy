@@ -113,7 +113,9 @@ const columns: ColumnDef<Item>[] = [
     header: "Name",
     accessorKey: "name",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("name")}</div>
+      <div className="font-medium truncate max-w-[180px]">
+        {row.getValue("name")}
+      </div>
     ),
     size: 180,
     enableHiding: false,
@@ -122,6 +124,14 @@ const columns: ColumnDef<Item>[] = [
     header: "Email",
     accessorKey: "email",
     size: 200,
+    cell: ({ row }) => (
+      <div
+        className="font-medium truncate max-w-[180px]"
+        title={row.getValue("email") as string}
+      >
+        {row.getValue("email")}
+      </div>
+    ),
   },
   {
     header: "Location",

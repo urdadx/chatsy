@@ -1,3 +1,4 @@
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ export const DeleteWebsiteSource = ({
   id,
 }: DeleteWebsiteSourceProps) => {
   const queryClient = useQueryClient();
+  const { setBanner } = useRetrainingBanner();
 
   const { mutate: deleteSource, isPending } = useMutation({
     mutationFn: async () => {
@@ -33,6 +35,8 @@ export const DeleteWebsiteSource = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["website-sources"] });
       toast.success("Website source deleted");
+      setBanner(true, "Retraining required");
+      localStorage.setItem("lastTrainedAt", new Date().toISOString());
       onOpenChange(false);
     },
     onError: () => {

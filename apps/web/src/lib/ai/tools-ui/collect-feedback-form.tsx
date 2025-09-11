@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 import { useEmbedToken } from "@/lib/contexts/embed-token-context";
 import { getClientLocation } from "@/lib/utils/client-location";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export function CollectFeedbackForm({ color }: { color?: string }) {
@@ -27,16 +27,20 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
     }));
   };
 
-  const embedToken =
-    embedTokenFromContext ||
-    (() => {
-      if (typeof window !== "undefined") {
-        const path = window.location.pathname;
-        const bubbleMatch = path.match(/\/bubble\/(.+)/);
-        return bubbleMatch ? bubbleMatch[1] : undefined;
-      }
-      return undefined;
-    })();
+  // Memoize the embed token calculation
+  const embedToken = useMemo(() => {
+    if (embedTokenFromContext) {
+      return embedTokenFromContext;
+    }
+
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname;
+      const bubbleMatch = path.match(/\/(bubble|talk)\/(.+)/);
+      return bubbleMatch ? bubbleMatch[2] : undefined;
+    }
+
+    return undefined;
+  }, [embedTokenFromContext]);
 
   const mutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -57,7 +61,6 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
       setFormData({ email: "", subject: "", message: "" });
     },
     onError: (error: any) => {
-      console.error("Error sending feedback:", error);
       toast.error(
         error.response?.data?.message || "An unexpected error occurred.",
       );

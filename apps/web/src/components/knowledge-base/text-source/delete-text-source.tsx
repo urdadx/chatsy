@@ -35,6 +35,7 @@ export function DeleteTextSource({
       queryClient.invalidateQueries({
         queryKey: ["text-sources"],
       });
+      localStorage.setItem("lastTrainedAt", new Date().toISOString());
     },
     onError: () => {
       toast.error("Failed to delete text source");

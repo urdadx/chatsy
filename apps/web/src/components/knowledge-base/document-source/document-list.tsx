@@ -1,6 +1,7 @@
 import DocxIcon from "@/assets/docx-icon.png";
 import PDFIcon from "@/assets/pdf-icon.png";
 import TXTIcon from "@/assets/txt-icon.png";
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import { Button } from "@/components/ui/button";
 import { formatBytes } from "@/hooks/use-file-upload";
 import { api } from "@/lib/api";
@@ -32,6 +33,7 @@ const getFileIcon = (file: { type: string; name: string }) => {
 
 export function DocumentList() {
   const queryClient = useQueryClient();
+  const { setBanner } = useRetrainingBanner();
 
   const { data: documents, isLoading: isLoadingDocuments } = useQuery({
     queryKey: ["document-sources"],
@@ -55,6 +57,8 @@ export function DocumentList() {
     onSuccess: () => {
       toast.success("Document deleted successfully!");
       queryClient.invalidateQueries({ queryKey: ["document-sources"] });
+      setBanner(true, "Retraining required");
+      localStorage.setItem("lastTrainedAt", new Date().toISOString());
     },
     onError: () => {
       toast.error("Failed to delete document.");
@@ -64,7 +68,7 @@ export function DocumentList() {
   if (isLoadingDocuments) {
     return (
       <div className="flex items-center justify-center gap-2 py-8">
-        <Loader2 className="size-4 animate-spin" />
+        <Loader2 className="size-4 text-primary animate-spin" />
         <span className="text-sm text-muted-foreground">
           Loading documents...
         </span>

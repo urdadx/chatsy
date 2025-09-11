@@ -158,4 +158,59 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
 
     return json(deletedQuestion);
   },
+
+  PATCH: async ({ request }) => {
+    const session = await auth.api.getSession({
+      headers: request.headers || new Headers(),
+    });
+
+    const userId = session?.user?.id;
+    if (!userId) {
+      return json({ error: "Unauthorized: Please log in" }, { status: 401 });
+    }
+
+    const chatbotId =
+      session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+    if (!chatbotId) {
+      return json({ error: "No active chatbot" }, { status: 400 });
+    }
+
+    const body = await request.json();
+    const schema = z.object({
+      id: z.string(),
+      question: z.string().min(1).optional(),
+      answer: z.string().min(1).optional(),
+    });
+    const parsed = schema.safeParse(body);
+
+    if (!parsed.success) {
+      return json({ error: parsed.error.format() }, { status: 400 });
+    }
+
+    const { id, question: newQuestion, answer: newAnswer } = parsed.data;
+
+    const [updatedQuestion] = await db
+      .update(question)
+      .set({
+        ...(newQuestion !== undefined ? { question: newQuestion } : {}),
+        ...(newAnswer !== undefined ? { answer: newAnswer } : {}),
+      })
+      .where(
+        and(
+          eq(question.id, id),
+          eq(question.userId, userId),
+          eq(question.chatbotId, chatbotId),
+        ),
+      )
+      .returning();
+
+    if (!updatedQuestion) {
+      return json(
+        { error: "Question not found or not updated" },
+        { status: 404 },
+      );
+    }
+
+    return json(updatedQuestion);
+  },
 });

@@ -19,7 +19,12 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 
-export const LinkInBio = ({ chatbotName }: { chatbotName: string }) => {
+interface LinkInBioProps {
+  chatbotName: string;
+  embedToken: string;
+}
+
+export const LinkInBio = ({ embedToken }: LinkInBioProps) => {
   const [copied, setCopied] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -87,7 +92,7 @@ export const LinkInBio = ({ chatbotName }: { chatbotName: string }) => {
     linkedin: "https://www.linkedin.com/",
   };
 
-  const baseUrl = `${window.location.origin}/talk/${chatbotName}`;
+  const baseUrl = `${window.location.origin}/talk/${embedToken}`;
 
   const handleShare = (platform: keyof typeof socialShareContent) => {
     const text = `Check out my profile on ${platform}!`;

@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import z from "zod";
 
 const feedbackSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   subject: z.string().optional(),
   message: z.string().min(1),
   location: z.string().optional(),

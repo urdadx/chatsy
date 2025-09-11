@@ -19,12 +19,11 @@ import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import Spinner from "../ui/spinner";
-
 import { PickColor } from "./pick-color";
 import { WidgetSettings } from "./widget-settings";
 
 export function ChatbotSettings() {
-  const { data: chatbot, error, refetch } = useChatbot();
+  const { data: chatbot, error, refetch, isLoading } = useChatbot();
   const updateChatbotMutation = useUpdateChatbot();
   const { data: session } = useSession();
 
@@ -36,6 +35,14 @@ export function ChatbotSettings() {
   const [suggestedMessages, setSuggestedMessages] = useState<string[]>([]);
   const [showSuggestedInput, setShowSuggestedInput] = useState(false);
   const [addonsDialogOpen, setAddonsDialogOpen] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-64 flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
   useEffect(() => {
     setName(chatbot?.name || "");
@@ -225,7 +232,7 @@ export function ChatbotSettings() {
         <Separator className="my-3" />
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <div className="flex items-center gap-2">
-            <Label>Suggested Messages</Label>
+            <Label>Message suggestions</Label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -233,7 +240,8 @@ export function ChatbotSettings() {
                 </TooltipTrigger>
                 <TooltipContent className="bg-white shadow-sm">
                   <p className="text-black">
-                    Quick reply suggestions for users
+                    Display quick reply suggestions for users to help them start
+                    a conversation.
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -261,16 +269,14 @@ export function ChatbotSettings() {
                   </Button>
                 </div>
               ))}
-            {suggestedMessages.length < 3 && (
-              <Button
-                variant="outline"
-                onClick={addSuggestedMessage}
-                className="w-full sm:w-fit"
-              >
-                <Plus className="h-4 w-4" />
-                Add suggested message
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              onClick={addSuggestedMessage}
+              className="w-full sm:w-fit"
+            >
+              <Plus className="h-4 w-4" />
+              Add a message suggestion
+            </Button>
           </div>
         </div>
         <Separator className="my-6" />
@@ -286,7 +292,7 @@ export function ChatbotSettings() {
                 </TooltipTrigger>
                 <TooltipContent className="bg-white shadow-sm">
                   <p className="text-black">
-                    Remove the "Powered by" text from your site
+                    Remove the "Powered by" text from your chatbot
                   </p>
                 </TooltipContent>
               </Tooltip>
