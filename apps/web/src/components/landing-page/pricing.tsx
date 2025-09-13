@@ -162,16 +162,19 @@ export function Pricing() {
             onValueChange={(value) =>
               setBillingPeriod(value as "monthly" | "yearly")
             }
-            className=" w-full"
+            className=" w-full "
           >
             <div className="flex flex-col items-center justify-center  w-full">
               <div className="flex items-center justify-center gap-2">
-                <TabsList className="grid w-[220px] grid-cols-2 mx-auto rounded-full p-1">
+                <TabsList className="grid w-[300px] grid-cols-2 mx-auto rounded-full p-1">
                   <TabsTrigger className="rounded-full" value="monthly">
                     Monthly
                   </TabsTrigger>
                   <TabsTrigger className="relative rounded-full" value="yearly">
-                    Yearly
+                    Yearly{" "}
+                    <span className="text-xs text-primary font-semibold ml-2">
+                      20% off
+                    </span>
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -285,11 +288,6 @@ export function Pricing() {
                                 suffix="/mo"
                               />
                             </span>
-                            {billingPeriod === "yearly" && (
-                              <span className="text-xs text-primary font-semibold bg-purple-50 rounded-full px-3 py-1">
-                                20% off
-                              </span>
-                            )}
                           </div>
                           {plan.yearlyPrice && (
                             <span className="text-sm text-neutral-500">

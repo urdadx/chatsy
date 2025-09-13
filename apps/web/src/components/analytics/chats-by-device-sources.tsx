@@ -18,12 +18,23 @@ import Spinner from "../ui/spinner";
 import BarList from "./bar-list";
 import { ViewAllStats } from "./view-all-stats";
 
-export function ChatsByDeviceSources() {
+interface ChatsByDeviceSourcesProps {
+  visitorData?: any[];
+}
+
+export function ChatsByDeviceSources({
+  visitorData: propVisitorData,
+}: ChatsByDeviceSourcesProps) {
   const { timeRange } = useSearch({ from: "/admin/analytics" });
-  const { data: analytics, isLoading: metricsPending } = useVisitorHistory(
-    (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
-    true,
-  );
+
+  // Use prop data if provided, otherwise fetch it
+  const { data: fetchedAnalytics, isLoading: metricsPending } =
+    useVisitorHistory(
+      (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
+      true,
+    );
+  const analytics = propVisitorData || fetchedAnalytics;
+
   const [devicesDialogOpen, setDevicesDialogOpen] = useState(false);
   const [browsersDialogOpen, setBrowsersDialogOpen] = useState(false);
   const [osDialogOpen, setOsDialogOpen] = useState(false);

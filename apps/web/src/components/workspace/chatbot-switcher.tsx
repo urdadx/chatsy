@@ -184,9 +184,9 @@ export function ChatbotSwitcher() {
   if (isLoading) {
     return (
       <SidebarMenu className="">
-        <SidebarMenuItem className="bg-sidebar rounded-lg p-1">
+        <SidebarMenuItem className="bg-sidebar rounded-lg">
           <SidebarMenuButton size="lg" disabled>
-            <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse" />
+            <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />
             <div className="grid flex-1 text-left leading-tight">
               <div className="h-4 bg-gray-200 rounded animate-pulse" />
             </div>

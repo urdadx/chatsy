@@ -1,9 +1,4 @@
-import { getVisitorHistory } from "@/hooks/log-visitor-analytics";
-import { useChatHistory } from "@/hooks/use-chat-history";
-import { useActiveMeters } from "@/hooks/use-usage-meters";
-import { api } from "@/lib/api";
 import NumberFlow from "@number-flow/react";
-import { useQuery } from "@tanstack/react-query";
 import {
   BrainCog,
   Globe,
@@ -13,34 +8,22 @@ import {
   ThumbsUp,
 } from "lucide-react";
 
-export function DashboardMetrics() {
-  const { data: sourcesCount } = useQuery({
-    queryKey: ["sources-count"],
-    queryFn: async () => {
-      const response = await api.get("/sources/count");
-      return response.data.count;
-    },
-  });
+interface DashboardMetricsProps {
+  sourcesCount: number;
+  conversationsCount: number;
+  voteCounts: { upvotes: number; downvotes: number };
+  meter: { balance: number } | undefined;
+  visitorData: unknown[] | undefined;
+}
 
-  const { data: chatHistoryData } = useChatHistory("90d");
-  const conversationsCount = chatHistoryData?.pages.reduce(
-    (acc, page) => acc + page.chats.length,
-    0,
-  );
-
-  const { data: voteCounts } = useQuery({
-    queryKey: ["vote-counts"],
-    queryFn: async () => {
-      const response = await api.get("/vote-count");
-      return response.data;
-    },
-  });
-
-  const { data: meter } = useActiveMeters();
-
+export function DashboardMetrics({
+  sourcesCount,
+  conversationsCount,
+  voteCounts,
+  meter,
+  visitorData,
+}: DashboardMetricsProps) {
   const balance = meter?.balance ?? 0;
-
-  const { data: visitorData } = getVisitorHistory("90d");
   const totalVisits = Array.isArray(visitorData) ? visitorData.length : 0;
 
   return (

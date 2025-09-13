@@ -54,7 +54,13 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ChatAnalytics() {
+interface ChatAnalyticsProps {
+  visitorData?: any[];
+}
+
+export function ChatAnalytics({
+  visitorData: propVisitorData,
+}: ChatAnalyticsProps) {
   const navigate = useNavigate({ from: "/admin/analytics" });
   const { timeRange } = useSearch({ from: "/admin/analytics" });
   const selectedTimeRange =
@@ -66,8 +72,14 @@ export function ChatAnalytics() {
 
   const { data, isLoading } = useChatHistory(selectedTimeRange);
 
-  const { data: visitorData, isLoading: visitorHistoryLoading } =
-    getVisitorHistory(selectedTimeRange);
+  // Use prop data if provided, otherwise fetch it
+  const visitorHistoryQuery = getVisitorHistory(selectedTimeRange);
+  const visitorData = propVisitorData || visitorHistoryQuery.data;
+
+  // Only show loading if we're actually fetching data (not when prop data is provided)
+  const shouldShowLoading = propVisitorData
+    ? isLoading
+    : isLoading || visitorHistoryQuery.isLoading;
 
   const {
     data: realTimeData,
@@ -228,7 +240,7 @@ export function ChatAnalytics() {
               />
             </CardTitle>
             <CardDescription className="text-xl md:text-2xl font-semibold text-black">
-              {isLoading ? "..." : <NumberFlow value={totalChats} />}
+              {shouldShowLoading ? "..." : <NumberFlow value={totalChats} />}
             </CardDescription>
           </div>
           <div className="flex flex-col gap-1 text-left min-w-24">

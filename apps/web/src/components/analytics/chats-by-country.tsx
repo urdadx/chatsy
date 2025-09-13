@@ -19,18 +19,26 @@ import { useState } from "react";
 import Spinner from "../ui/spinner";
 import { ViewAllStats } from "./view-all-stats";
 
-export function ChatsByCountry() {
+interface ChatsByCountryProps {
+  visitorData?: any[];
+}
+
+export function ChatsByCountry({
+  visitorData: propVisitorData,
+}: ChatsByCountryProps) {
   const [countriesDialogOpen, setCountriesDialogOpen] = useState(false);
   const [citiesDialogOpen, setCitiesDialogOpen] = useState(false);
   const [continentsDialogOpen, setContinentsDialogOpen] = useState(false);
 
   const { timeRange } = useSearch({ from: "/admin/analytics" });
-  const { data: analytics } = useVisitorHistory(
+
+  // Use prop data if provided, otherwise fetch it
+  const { data: fetchedAnalytics } = useVisitorHistory(
     (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
     true, // Enable real-time updates via SSE for consistency
   );
+  const analytics = propVisitorData || fetchedAnalytics;
 
-  // Always call hooks before any early return!
   const { countryStats, cityStats, continentStats } = useMemo(() => {
     const countryMap: Record<string, number> = {};
     const cityMap: Record<string, number> = {};

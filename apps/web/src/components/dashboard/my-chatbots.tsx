@@ -1,13 +1,16 @@
-import { useChatbots } from "@/hooks/use-chatbot-management";
+import type { ChatbotsResponse } from "@/hooks/use-chatbot-management";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { ChatbotCard } from "../workspace/chatbot-card";
 import { ChatbotManager } from "../workspace/new-chabot";
 
-export const MyChatbots = () => {
+interface MyChatbotsProps {
+  chatbotsData: ChatbotsResponse | undefined;
+}
+
+export const MyChatbots = ({ chatbotsData }: MyChatbotsProps) => {
   const [openChatbot, setOpenChatbot] = useState(false);
-  const { data: chatbotsData } = useChatbots();
 
   const handleCreateBot = () => {
     setOpenChatbot(true);

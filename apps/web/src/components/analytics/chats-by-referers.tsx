@@ -10,16 +10,23 @@ import Spinner from "../ui/spinner";
 import BarList from "./bar-list";
 import { ViewAllStats } from "./view-all-stats";
 
-export function ChatsByReferrers() {
+interface ChatsByReferrersProps {
+  visitorData?: any[];
+}
+
+export function ChatsByReferrers({
+  visitorData: propVisitorData,
+}: ChatsByReferrersProps) {
   const { timeRange } = useSearch({ from: "/admin/analytics" });
 
-  // Option A: Use real-time version (recommended for live dashboards)
+  // Use prop data if provided, otherwise fetch it
   const result = useVisitorHistory(
     (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
     true, // Enable real-time updates via SSE
   );
 
-  const { data: analytics, isLoading: metricsPending } = result;
+  const { data: fetchedAnalytics, isLoading: metricsPending } = result;
+  const analytics = propVisitorData || fetchedAnalytics;
 
   const [referrersDialogOpen, setReferrersDialogOpen] = useState(false);
   const [referrerURLsDialogOpen, setReferrerURLsDialogOpen] = useState(false);

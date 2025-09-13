@@ -83,14 +83,6 @@ const PurePreviewMessage = ({
               }
 
               if (type === "text") {
-                const hasToolCalls = message.parts?.some((part) =>
-                  part.type?.startsWith("tool-escalate"),
-                );
-
-                if (hasToolCalls) {
-                  return null;
-                }
-
                 return (
                   <div key={key} className="flex flex-row gap-2 items-start">
                     <div

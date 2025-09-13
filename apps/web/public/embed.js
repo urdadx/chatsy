@@ -89,13 +89,9 @@
       this.container.style.fontFamily =
         'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-      // Ensure container doesn't clip mobile iframe
-      if (window.innerWidth <= 768) {
-        this.container.style.width = "100vw";
-        this.container.style.height = "100vh";
-        this.container.style.top = "0";
-        this.container.style.left = "0";
-      }
+      // Remove the problematic mobile container styles
+      // The container should maintain its position for the bubble
+      // Only the iframe needs mobile-specific positioning
     }
     createBubble() {
       // Create bubble trigger
@@ -204,7 +200,7 @@
       const src =
         this.config.mode === "bubble"
           ? `${this.config.baseUrl}/bubble/${this.config.embedToken}`
-          : `${this.config.baseUrl}/embed/${this.config.embedToken}`;
+          : `${this.config.baseUrl}/talk/${this.config.embedToken}`;
 
       this.iframe.src = src;
       this.iframe.title = this.chatData?.name || "Padyna Widget";
@@ -268,7 +264,7 @@
     }
 
     positionBubble() {
-      const margin = 10;
+      const margin = 15; // Increased margin for better mobile spacing
 
       switch (this.config.position) {
         case "bottom-right":
@@ -291,6 +287,10 @@
           this.container.style.bottom = `${margin}px`;
           this.container.style.right = `${margin}px`;
       }
+
+      // Ensure container dimensions don't interfere with positioning
+      this.container.style.width = "auto";
+      this.container.style.height = "auto";
     }
 
     getBubbleSize() {
