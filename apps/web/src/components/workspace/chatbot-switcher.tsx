@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SafeBoringAvatar } from "@/components/ui/safe-boring-avatar";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -25,7 +26,6 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { RiCheckboxCircleFill } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";
-import Avatar from "boring-avatars";
 import { ChevronsUpDown, PlusIcon, UserRoundPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
@@ -96,7 +96,7 @@ export function ChatbotSwitcher() {
           />
         </div>
       ) : (
-        <Avatar name={activeChatbot?.name} size={200} />
+        <SafeBoringAvatar name={activeChatbot?.name} size={25} />
       )}
 
       <div className="grid flex-1 text-left leading-tight">
@@ -149,9 +149,10 @@ export function ChatbotSwitcher() {
                     className="h-5 w-5 rounded-full object-cover"
                   />
                 ) : (
-                  <Avatar
+                  <SafeBoringAvatar
                     name={chatbot.name}
                     className="h-8 w-8 rounded-full"
+                    size={32}
                   />
                 )}
 
@@ -252,9 +253,10 @@ export function ChatbotSwitcher() {
                               className="h-5 w-5 rounded-full object-cover"
                             />
                           ) : (
-                            <Avatar
+                            <SafeBoringAvatar
                               name={chatbot.name}
                               className="h-8 w-8 rounded-full"
+                              size={32}
                             />
                           )}
 

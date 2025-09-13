@@ -18,6 +18,7 @@ export default defineConfig({
   ],
   optimizeDeps: {
     exclude: ["@polar-sh/sdk/webhooks.ts"],
+    include: ["boring-avatars", "react", "react-dom"],
   },
   server: {
     allowedHosts: [

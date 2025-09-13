@@ -39,6 +39,7 @@ import { RefreshCcw } from "lucide-react";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Loader } from "../ui/loader";
+import Spinner from "../ui/spinner";
 
 export const description = "An interactive area chart";
 
@@ -65,7 +66,8 @@ export function ChatAnalytics() {
 
   const { data, isLoading } = useChatHistory(selectedTimeRange);
 
-  const { data: visitorData } = getVisitorHistory(selectedTimeRange);
+  const { data: visitorData, isLoading: visitorHistoryLoading } =
+    getVisitorHistory(selectedTimeRange);
 
   const {
     data: realTimeData,

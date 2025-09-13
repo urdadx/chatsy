@@ -1,3 +1,4 @@
+import { SafeBoringAvatar } from "@/components/ui/safe-boring-avatar";
 import {
   Table,
   TableBody,
@@ -8,7 +9,6 @@ import {
 } from "@/components/ui/table";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
-import Avatar from "boring-avatars";
 import { Users } from "lucide-react";
 import { NoDataPlaceholder } from "../no-data-placeholder";
 import Spinner from "../ui/spinner";
@@ -56,17 +56,7 @@ export function MembersTable() {
             <TableRow key={member.id}>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <Avatar
-                    size={40}
-                    name={member.user.email}
-                    colors={[
-                      "#92A1C6",
-                      "#146A7C",
-                      "#F0AB3D",
-                      "#C271B4",
-                      "#C20D90",
-                    ]}
-                  />
+                  <SafeBoringAvatar size={40} name={member.user.email} />
                   <div>
                     <div className="font-medium">{member.user.name}</div>
                   </div>

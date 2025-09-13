@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { SafeBoringAvatar } from "@/components/ui/safe-boring-avatar";
 import {
   Table,
   TableBody,
@@ -9,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
-import Avatar from "boring-avatars";
 import { Mail } from "lucide-react";
 import { NoDataPlaceholder } from "../no-data-placeholder";
 import Spinner from "../ui/spinner";
@@ -70,17 +70,7 @@ export function InvitationsTable() {
             <TableRow key={invitation.id}>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <Avatar
-                    size={40}
-                    name={invitation.email}
-                    colors={[
-                      "#92A1C6",
-                      "#146A7C",
-                      "#F0AB3D",
-                      "#C271B4",
-                      "#C20D90",
-                    ]}
-                  />
+                  <SafeBoringAvatar size={40} name={invitation.email} />
                   <div>
                     <div className="font-medium">{invitation.email}</div>
                   </div>

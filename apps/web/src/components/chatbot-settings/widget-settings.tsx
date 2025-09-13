@@ -134,7 +134,7 @@ export function WidgetSettings() {
                 </TooltipTrigger>
                 <TooltipContent className="bg-white shadow-sm">
                   <p className="text-black">
-                    Websites where your widget can be embedded. Leave empty to
+                    Websites where your chatbot can be embedded. Leave empty to
                     allow all websites.
                   </p>
                 </TooltipContent>

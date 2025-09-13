@@ -11,7 +11,6 @@ export const Route = createFileRoute("/admin")({
       throw redirect({ to: "/login", search: location.search });
     }
     // maybe they haven't created an organization or verified their email after signing up
-    console.log(session.user);
     if (!session.session.activeOrganizationId || !session.user.emailVerified) {
       throw redirect({ to: "/onboarding", search: location.search });
     }

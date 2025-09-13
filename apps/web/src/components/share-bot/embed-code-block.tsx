@@ -26,7 +26,7 @@ export const EmbedCodeBlock = ({
             filename: "iframe.html",
             code: `<!-- Padyna Embedded Iframe -->
 <iframe
-  src="${window.location.origin}/bio-page/${embedToken}"
+  src="${window.location.origin}/talk/${embedToken}"
   width="400"
   height="700"
   title="Padyna Chatbot"

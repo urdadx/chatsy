@@ -1,3 +1,5 @@
+import { Download } from "lucide-react";
+import { motion } from "motion/react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Button } from "../ui/button";
 
@@ -31,12 +33,15 @@ export const QRCodeExport = ({ chatbotName }: { chatbotName: string }) => {
           Share this QR code with your audience to provide access to this
           chatbot.
         </div>
-        <Button
-          className="my-2 w-full text-xs sm:text-sm "
-          onClick={downloadQRCode}
-        >
-          Download
-        </Button>
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            className="my-2 w-full text-xs sm:text-sm flex items-center justify-center gap-2"
+            onClick={downloadQRCode}
+          >
+            <Download className="w-4 h-4" />
+            Download
+          </Button>
+        </motion.div>
       </div>
     </>
   );

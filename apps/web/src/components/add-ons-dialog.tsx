@@ -1,3 +1,5 @@
+"use client";
+
 import { authClient, useSession } from "@/lib/auth-client";
 import { ADDON_PRODUCT_IDS } from "@/lib/plan-slugs";
 import { cn } from "@/lib/utils";
