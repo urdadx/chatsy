@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth-client";
+import { getLastLoginMethod, setLastLoginMethod } from "@/lib/last-login";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Mail } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Spinner from "../ui/spinner";
@@ -17,7 +19,7 @@ interface LoginFormData {
   password: string;
 }
 
-export function LoginForm({
+export function LoginForm({ 
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -25,9 +27,21 @@ export function LoginForm({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    setValue,
   } = useForm<LoginFormData>();
 
   const navigate = useNavigate();
+  const [lastLogin, setLastLogin] = useState<ReturnType<typeof getLastLoginMethod>>(null);
+
+  useEffect(() => {
+    const lastLoginInfo = getLastLoginMethod();
+    setLastLogin(lastLoginInfo);
+    
+    // Pre-fill email if user last signed in with email
+    if (lastLoginInfo?.method === 'email' && lastLoginInfo.email) {
+      setValue('email', lastLoginInfo.email);
+    }
+  }, [setValue]);
 
   const handleEmailSignIn = async (data: LoginFormData) => {
     await signIn.email(
@@ -37,6 +51,7 @@ export function LoginForm({
       },
       {
         onSuccess: () => {
+          setLastLoginMethod('email', data.email);
           toast.success("Signed in successfully");
           navigate({
             to: "/admin/overview",
@@ -58,6 +73,7 @@ export function LoginForm({
       },
       {
         onSuccess: () => {
+          setLastLoginMethod('google');
           navigate({
             to: "/admin/overview",
           });
@@ -76,6 +92,17 @@ export function LoginForm({
           <CardTitle className="text-3xl instrument-serif-regular">
             Welcome back
           </CardTitle>
+          {lastLogin && (
+            <div className="text-sm text-muted-foreground mt-2">
+              You last signed in with{" "}
+              <span className="font-medium text-primary">
+                {lastLogin.method === 'google' ? 'Google' : 'email'}
+                {lastLogin.email && lastLogin.method === 'email' && (
+                  <span className="text-muted-foreground"> ({lastLogin.email})</span>
+                )}
+              </span>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(handleEmailSignIn)}>
@@ -84,11 +111,19 @@ export function LoginForm({
                 <Button
                   onClick={handleGoogleSignIn}
                   variant="outline"
-                  className="w-full"
+                  className={cn(
+                    "w-full relative",
+                    lastLogin?.method === 'google' && "ring-2 ring-primary/20 bg-primary/5"
+                  )}
                   type="button"
                 >
                   <GoogleSVG />
                   Continue with Google
+                  {lastLogin?.method === 'google' && (
+                    <div className="absolute -top-1 -right-1 flex items-center gap-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+                      Last used
+                    </div>
+                  )}
                 </Button>
               </div>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -155,10 +190,14 @@ export function LoginForm({
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  className="relative"
                 >
                   <Button
                     type="submit"
-                    className="w-full"
+                    className={cn(
+                      "w-full",
+                      lastLogin?.method === 'email' && "ring-2 ring-primary/20"
+                    )}
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -170,6 +209,7 @@ export function LoginForm({
                       </>
                     )}
                   </Button>
+                 
                 </motion.div>
               </div>
               <div className="text-center text-sm">

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn, signUp } from "@/lib/auth-client";
+import { setLastLoginMethod } from "@/lib/last-login";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
@@ -41,6 +42,7 @@ export function RegisterForm({
       {
         onSuccess: (ctx: any) => {
           console.log("Registration successful", ctx);
+          setLastLoginMethod('email', data.email);
           toast.success("Account created successfully");
           navigate({
             to: "/verify-email",
@@ -63,6 +65,7 @@ export function RegisterForm({
       },
       {
         onSuccess: () => {
+          setLastLoginMethod('google');
           navigate({
             to: "/onboarding",
           });

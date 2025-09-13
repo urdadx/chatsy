@@ -36,14 +36,6 @@ export function ChatbotSettings() {
   const [showSuggestedInput, setShowSuggestedInput] = useState(false);
   const [addonsDialogOpen, setAddonsDialogOpen] = useState(false);
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-64 flex items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
-
   useEffect(() => {
     setName(chatbot?.name || "");
     setHidePoweredBy(chatbot?.hidePoweredBy || false);
@@ -152,6 +144,16 @@ export function ChatbotSettings() {
     }
   };
 
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <div className="w-full h-64 flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  // Handle error state
   if (error) {
     return (
       <div className="w-full mx-auto px-2 sm:px-0">
