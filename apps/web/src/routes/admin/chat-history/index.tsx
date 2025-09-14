@@ -105,8 +105,8 @@ function RouteComponent() {
 
   if (!isLoading && !isError && chats.length === 0) {
     return (
-      <div className="max-w-5xl lg:max-w-6xl my-4 w-full overflow-hidden max-h-screen mx-auto p-2 sm:p-6">
-        <div className="bg-white border rounded-lg my-4 py-2">
+      <div className="max-w-5xl lg:max-w-6xl w-full overflow-hidden h-screen mx-auto p-1 sm:p-4">
+        <div className="bg-white border rounded-lg py-2 h-full flex flex-col">
           <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white">
             <h1 className="text-md font-semibold hidden sm:flex">Chat Logs</h1>
             <div className="flex items-center space-x-3">
@@ -143,7 +143,7 @@ function RouteComponent() {
               </Button>
             </div>
           </div>
-          <div className="flex justify-center items-center h-[calc(100vh-13rem)]">
+          <div className="flex justify-center items-center flex-1 min-h-0">
             <div className="flex flex-col items-center space-y-2">
               <RiSearch2Line className="h-14 w-14 text-primary" />
               <p className="text-center text-lg text-gray-500">
@@ -158,15 +158,14 @@ function RouteComponent() {
 
   return (
     <>
-      <div className="max-w-5xl lg:max-w-6xl w-full overflow-hidden max-h-screen mx-auto p-2 sm:p-6">
-        {/* <span className="text-md text-muted-foreground hidden sm:flex">
-          View and manage your bot's chat history
-        </span> */}
-        <h1 className="text-lg font-semibold">Chat History</h1>
-        <div className="bg-white border rounded-lg my-4 py-2">
+      <div className="max-w-5xl lg:max-w-6xl w-full overflow-hidden h-screen mx-auto p-1 sm:p-4">
+        <div className="bg-white border rounded-lg py-2 h-full flex flex-col">
           {/* Chat Header */}
           <div className="w-full flex items-center gap-2 justify-between px-4 pt-1 pb-2 border-b bg-white">
-            <div className="relative">
+            <div className="flex items-center space-x-3 relative">
+              <h1 className="text-md font-semibold">Chat History</h1>
+            </div>{" "}
+            <div className="flex items-center space-x-3">
               <Select value={status} onValueChange={handleStatusChange}>
                 <SelectTrigger className="w-full sm:w-[160px]">
                   <SelectValue placeholder="Status" />
@@ -178,8 +177,6 @@ function RouteComponent() {
                   <SelectItem value="escalated">Escalated</SelectItem>
                 </SelectContent>
               </Select>
-            </div>{" "}
-            <div className="flex items-center space-x-3">
               <div className="relative">
                 <Select value={filter} onValueChange={handleFilterChange}>
                   <SelectTrigger className="w-full sm:w-[200px]">
@@ -195,7 +192,7 @@ function RouteComponent() {
                 </Select>
               </div>
 
-              <Button
+              {/* <Button
                 variant="outline"
                 className="text-gray-600 hidden sm:flex"
                 onClick={() => refetch()}
@@ -205,10 +202,10 @@ function RouteComponent() {
                   className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
                 />
                 Refresh
-              </Button>
+              </Button> */}
             </div>
           </div>
-          <div className="flex flex-row h-[calc(100vh-13rem)]">
+          <div className="flex flex-row flex-1 min-h-0">
             {/* Sidebar */}
             <div className={`${isMobile ? "w-full" : "w-96"} bg-white`}>
               <ScrollArea
@@ -291,8 +288,6 @@ function RouteComponent() {
             </div>
           </DrawerContent>
         </Drawer>
-
-        <div className="h-[14px]" />
       </div>
     </>
   );

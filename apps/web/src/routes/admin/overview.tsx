@@ -37,12 +37,11 @@ function RouteComponent() {
     }
   };
 
-  // Show unified loading spinner
   if (isLoading) {
     return (
       <div className="relative p-6 w-full md:max-w-5xl xl:max-w-6xl mx-auto">
         <div className="flex items-center justify-center h-96">
-          <Spinner className="text-primary" />
+          <Spinner size={24} className="text-primary" />
         </div>
       </div>
     );

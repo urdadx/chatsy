@@ -1,9 +1,10 @@
 import { ChatAnalytics } from "@/components/analytics/analytics-graph";
+import { ChatsByChannel } from "@/components/analytics/chats-by-channel-sources";
 import { ChatsByCountry } from "@/components/analytics/chats-by-country";
 import { ChatsByDeviceSources } from "@/components/analytics/chats-by-device-sources";
 import { ChatsByReferrers } from "@/components/analytics/chats-by-referers";
 import Spinner from "@/components/ui/spinner";
-import { useAnalyticsData } from "@/hooks/use-analytics-data";
+import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import z from "zod";
 
@@ -21,15 +22,14 @@ function RouteComponent() {
   const selectedTimeRange =
     (timeRange as "24h" | "7d" | "30d" | "90d") || "24h";
 
-  // Use the custom hook that handles shared data fetching and loading states
-  const { visitorData, isLoading } = useAnalyticsData(selectedTimeRange);
+  const { data: visitorData, isLoading } =
+    useRealTimeVisitorHistory(selectedTimeRange);
 
-  // Show unified loading spinner
   if (isLoading) {
     return (
       <div className="max-w-5xl lg:max-w-6xl w-full max-h-screen mx-auto p-2 sm:p-6">
         <div className="flex items-center justify-center h-96">
-          <Spinner className="text-primary" />
+          <Spinner size={24} className="text-primary" />
         </div>
       </div>
     );
@@ -43,6 +43,7 @@ function RouteComponent() {
           <ChatsByCountry visitorData={visitorData} />
           <ChatsByReferrers visitorData={visitorData} />
           <ChatsByDeviceSources visitorData={visitorData} />
+          <ChatsByChannel />
         </div>
         <div className="h-[14px]" />
       </>

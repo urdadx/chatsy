@@ -144,7 +144,6 @@
         this.bubble.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
       });
     }
-
     setupBubbleContent() {
       // Create bubble content wrapper
       const content = document.createElement("div");
@@ -153,12 +152,29 @@
       content.style.alignItems = "center";
       content.style.justifyContent = "center";
 
-      // Always use default chat icon (SVG)
-      content.innerHTML = `
+      // Chat icon (default state)
+      const chatIcon = document.createElement("div");
+      chatIcon.className = "padyna-chat-icon";
+      chatIcon.style.transition = "opacity 0.2s ease-in-out";
+      chatIcon.innerHTML = `
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       `;
+
+      // Chevron down icon (opened state)
+      const chevronIcon = document.createElement("div");
+      chevronIcon.className = "padyna-chevron-icon";
+      chevronIcon.style.display = "none";
+      chevronIcon.style.transition = "opacity 0.2s ease-in-out";
+      chevronIcon.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `;
+
+      content.appendChild(chatIcon);
+      content.appendChild(chevronIcon);
 
       // Add notification badge if needed
       if (this.config.showBadge && this.unreadCount > 0) {
@@ -166,6 +182,21 @@
       }
 
       this.bubble.appendChild(content);
+    }
+
+    updateBubbleIcon() {
+      const chatIcon = this.bubble?.querySelector(".padyna-chat-icon");
+      const chevronIcon = this.bubble?.querySelector(".padyna-chevron-icon");
+
+      if (chatIcon && chevronIcon) {
+        if (this.isOpen) {
+          chatIcon.style.display = "none";
+          chevronIcon.style.display = "block";
+        } else {
+          chatIcon.style.display = "block";
+          chevronIcon.style.display = "none";
+        }
+      }
     }
 
     createNotificationBadge(parent) {
@@ -322,10 +353,8 @@
         this.iframe.style.transform = "scale(1) translateY(0)";
       });
 
-      // DON'T hide bubble on mobile - comment out or remove this block
-      // if (window.innerWidth <= 768) {
-      //   this.bubble.style.display = "none";
-      // }
+      // Update bubble icon to chevron
+      this.updateBubbleIcon();
 
       // Clear unread count when opened
       this.clearUnreadCount();
@@ -345,13 +374,12 @@
           ? "translateY(100%)"
           : "scale(0.8) translateY(20px)";
 
+      // Update bubble icon back to chat
+      this.updateBubbleIcon();
+
       // Hide iframe after animation
       setTimeout(() => {
         this.iframe.style.display = "none";
-        // Remove this block - keep bubble always visible
-        // if (window.innerWidth <= 768) {
-        //   this.bubble.style.display = "flex";
-        // }
       }, 300);
 
       this.dispatchEvent("padyna-bubble-closed", { isOpen: false });

@@ -49,6 +49,7 @@ export const ChatConversation = () => {
                       message={message}
                       isLoading={false}
                       vote={undefined}
+                      showActions={false}
                     />
                   </div>
                 ))}

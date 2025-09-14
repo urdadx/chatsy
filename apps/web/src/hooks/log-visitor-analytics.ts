@@ -387,35 +387,6 @@ export function useSendVisitorAnalytics({
   };
 }
 
-export function getVisitorHistory(filter: "24h" | "7d" | "30d" | "90d") {
-  return useQuery({
-    queryKey: ["visitor-analytics", filter],
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    staleTime: 1000 * 60 * 2,
-    queryFn: async () => {
-      const { data } = await api.get("/visitor-analytics");
-      if (!Array.isArray(data)) return [];
-
-      const now = new Date();
-      const startDate = new Date(now);
-      if (filter === "24h") {
-        startDate.setDate(now.getDate() - 1);
-      } else if (filter === "7d") {
-        startDate.setDate(now.getDate() - 7);
-      } else if (filter === "30d") {
-        startDate.setDate(now.getDate() - 30);
-      } else if (filter === "90d") {
-        startDate.setDate(now.getDate() - 90);
-      }
-      return data.filter((item) => {
-        const createdAt = new Date(item.createdAt || item.date);
-        return createdAt >= startDate;
-      });
-    },
-  });
-}
-
 // Real-time visitor history hook that integrates with SSE
 export function useRealTimeVisitorHistory(
   filter: "24h" | "7d" | "30d" | "90d",
@@ -431,7 +402,7 @@ export function useRealTimeVisitorHistory(
     queryKey: ["visitor-analytics", filter],
     refetchOnMount: true,
     refetchOnWindowFocus: true,
-    staleTime: 0, // Always fresh when using real-time updates
+    staleTime: 0,
     queryFn: async () => {
       const { data } = await api.get("/visitor-analytics");
       if (!Array.isArray(data)) return [];
@@ -589,27 +560,4 @@ interface VisitorHistoryResult {
   isConnected: boolean;
   reconnect: () => void;
   disconnect: () => void;
-}
-
-// Helper hook that automatically chooses between static and real-time versions
-export function useVisitorHistory(
-  filter: "24h" | "7d" | "30d" | "90d",
-  realTime = false,
-): VisitorHistoryResult {
-  if (realTime) {
-    return useRealTimeVisitorHistory(filter);
-  }
-
-  // For static version, add isConnected: false to match the real-time interface
-  const query = getVisitorHistory(filter);
-  return {
-    data: query.data,
-    isLoading: query.isLoading,
-    isError: query.isError,
-    error: query.error,
-    refetch: query.refetch,
-    isConnected: false,
-    reconnect: () => {},
-    disconnect: () => {},
-  };
 }

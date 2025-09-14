@@ -77,7 +77,7 @@ export function useRealTimeAnalytics() {
 
         // Attempt to reconnect with exponential backoff
         if (reconnectAttempts.current < maxReconnectAttempts) {
-          const delay = 2 ** reconnectAttempts.current * 1000; // 1s, 2s, 4s, 8s, 16s
+          const delay = 2 ** reconnectAttempts.current * 1000;
           console.log(
             `Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts.current + 1}/${maxReconnectAttempts})`,
           );

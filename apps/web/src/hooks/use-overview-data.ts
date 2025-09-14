@@ -1,4 +1,4 @@
-import { getVisitorHistory } from "@/hooks/log-visitor-analytics";
+import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { useChatHistory } from "@/hooks/use-chat-history";
 import { useChatbots } from "@/hooks/use-chatbot-management";
 import { useActiveMeters } from "@/hooks/use-usage-meters";
@@ -15,7 +15,7 @@ export function useOverviewData() {
     useChatHistory("90d");
   const { data: meter, isLoading: metersLoading } = useActiveMeters();
   const { data: visitorData, isLoading: visitorsLoading } =
-    getVisitorHistory("90d");
+    useRealTimeVisitorHistory("90d");
   const { data: chatbotsData, isLoading: chatbotsLoading } = useChatbots();
 
   // Use useQueries with combine for cleaner data handling of simple API calls

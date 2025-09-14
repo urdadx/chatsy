@@ -84,12 +84,14 @@ export async function saveChat({
   title,
   visibility,
   chatbotId,
+  channel = "web",
 }: {
   id?: string;
   userId: string;
   title: string;
   visibility: VisibilityType;
   chatbotId: string;
+  channel?: "web" | "widget" | "whatsapp" | "telegram";
 }) {
   try {
     return await db
@@ -101,6 +103,7 @@ export async function saveChat({
         title,
         visibility,
         chatbotId,
+        channel,
       })
       .onConflictDoNothing();
   } catch (error) {

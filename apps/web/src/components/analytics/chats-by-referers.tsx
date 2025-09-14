@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GOOGLE_FAVICON_URL } from "@/constants/domains";
-import { useVisitorHistory } from "@/hooks/log-visitor-analytics";
+import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { getApexDomain } from "@/lib/utils";
 import { useSearch } from "@tanstack/react-router";
 import { Maximize2, MousePointerClick } from "lucide-react";
@@ -20,9 +20,8 @@ export function ChatsByReferrers({
   const { timeRange } = useSearch({ from: "/admin/analytics" });
 
   // Use prop data if provided, otherwise fetch it
-  const result = useVisitorHistory(
+  const result = useRealTimeVisitorHistory(
     (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
-    true, // Enable real-time updates via SSE
   );
 
   const { data: fetchedAnalytics, isLoading: metricsPending } = result;

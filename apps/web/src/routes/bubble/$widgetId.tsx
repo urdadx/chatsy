@@ -1,15 +1,8 @@
+import { ChatBody } from "@/components/chat/chat-body";
+import { ChatFooter } from "@/components/chat/chat-footer";
+import { ChatHeader } from "@/components/chat/chat-header";
 import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
-import { GreetingMessage } from "@/components/chat/greeting-message";
-import { Messages } from "@/components/chat/messages";
-import { AISuggestion, AISuggestions } from "@/components/ui/ai-suggestions";
 import { Button } from "@/components/ui/button";
-import {
-  ChatContainerContent,
-  ChatContainerRoot,
-  ChatContainerScrollAnchor,
-} from "@/components/ui/chat-container";
-import { Input } from "@/components/ui/input";
-import { ScrollButton } from "@/components/ui/scroll-button";
 import Spinner from "@/components/ui/spinner";
 import type { Vote } from "@/db/schema";
 import { useSendVisitorAnalytics } from "@/hooks/log-visitor-analytics";
@@ -19,11 +12,10 @@ import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
-import { RiBardFill } from "@remixicon/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
-import { ArrowUp, RotateCcw, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -167,7 +159,6 @@ function RouteComponent() {
   );
 
   const showPoweredBy = !chatbot?.hidePoweredBy;
-  const greetingMessage = chatbot?.initialMessage || "";
 
   const { data: votes }: { data: Array<Vote> | undefined } = useQuery({
     queryKey: ["votes", chatId],
@@ -215,176 +206,54 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col w-full h-screen md:h-[550px] md:rounded-2xl overflow-hidden">
-      <div
-        className="flex items-center justify-between p-4 text-white border-b"
-        style={{ backgroundColor: chatbot?.primaryColor || "#2563eb" }}
+      <ChatHeader
+        chatbot={chatbot}
+        onReset={handleResetChat}
+        onClose={handleCloseWidget}
+        showResetButton={messages.length > 0}
+        showCloseButton={true}
+        resetIcon="rotate"
       >
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          {chatbot?.image ? (
-            <img
-              src={chatbot.image}
-              alt="Assistant"
-              className="rounded-full w-8 h-8 flex-shrink-0"
-            />
-          ) : (
-            <div className="rounded-full  w-9 h-9 flex items-center justify-center">
-              <RiBardFill size={20} className="text-white rounded-full" />
-            </div>
-          )}
-          <p className="font-normal text-base">
-            {chatbot?.name || "AI Assistant"}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {messages.length > 0 && (
-            <Button
-              size="icon"
-              onClick={handleResetChat}
-              className="p-1 hover:bg-white/10 rounded-full transition-colors"
-              aria-label="Reset chat"
-              variant="ghost"
-            >
-              <RotateCcw className="text-white" size={16} />
-            </Button>
-          )}
-          <Button
-            size="icon"
-            onClick={handleCloseWidget}
-            className="md:hidden p-1 hover:bg-white/10 rounded-full transition-colors"
-            aria-label="Close chat"
-            variant="ghost"
-          >
-            <X className="text-white" size={20} />
-          </Button>
-        </div>
-      </div>
+        {/* Close button - only visible on mobile */}
+        <Button
+          size="icon"
+          onClick={handleCloseWidget}
+          className="md:hidden p-1 hover:bg-white/10 rounded-full transition-colors"
+          aria-label="Close chat"
+          variant="ghost"
+        >
+          <X className="text-white" size={20} />
+        </Button>
+      </ChatHeader>
 
-      {/* Chat area */}
-      <div className="relative flex-1 min-h-0 overflow-y-hidden">
-        <ChatContainerRoot className="w-full h-full smooth-div">
-          <ChatContainerContent className="p-4">
-            {isDeactivated ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center p-6 max-w-sm">
-                  <div className="mb-4">
-                    <div className="rounded-full  w-9 h-9 flex items-center justify-center">
-                      <RiBardFill
-                        size={20}
-                        className="text-white rounded-full"
-                      />
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Chatbot Unavailable
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    This chatbot is currently deactivated. Please try again
-                    later or contact support.
-                  </p>
-                </div>
-              </div>
-            ) : isLoading ? (
-              <div className="fixed inset-0 flex items-center justify-center bg-white">
-                <Spinner className="text-primary" />
-              </div>
-            ) : error ? (
-              <div className="flex items-center justify-center h-full text-red-500">
-                <div className="text-center">
-                  <p className="text-sm">Error loading messages</p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {messages.length === 0 ? (
-                  <GreetingMessage title={greetingMessage} />
-                ) : (
-                  <Messages
-                    chatId={chatId}
-                    status={status}
-                    votes={votes}
-                    messages={messages}
-                    setMessages={setMessages}
-                    reload={regenerate}
-                    chatbot={chatbot}
-                  />
-                )}
+      <ChatBody
+        isLoading={isLoading}
+        error={error}
+        isDeactivated={isDeactivated}
+        messages={messages}
+        setMessages={setMessages}
+        status={status}
+        chatError={chatError}
+        chatId={chatId}
+        votes={votes}
+        regenerate={regenerate}
+        chatbot={chatbot}
+        className="w-full"
+      />
 
-                {status === "error" && chatError && (
-                  <div className="text-red-500 p-4">
-                    Error: {chatError.message}
-                  </div>
-                )}
-
-                <ChatContainerScrollAnchor />
-              </div>
-            )}
-          </ChatContainerContent>
-
-          <div className="absolute bottom-2 right-2 z-10">
-            <ScrollButton className="shadow-lg" />
-          </div>
-        </ChatContainerRoot>
-      </div>
-
-      {/* Footer */}
       {!isDeactivated && (
-        <div className="border-t bg-gray-50/50 p-3 space-y-3">
-          {SUGGESTIONS.length > 0 && messages.length === 0 && (
-            <div className="space-y-2">
-              <AISuggestions>
-                {SUGGESTIONS.slice(0, 3).map((suggestion: string) => (
-                  <AISuggestion
-                    onClick={handleSuggestionClick}
-                    key={suggestion}
-                    suggestion={suggestion}
-                  />
-                ))}
-              </AISuggestions>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex items-center space-x-2">
-            <Input
-              id="message"
-              placeholder="Type a message..."
-              className="flex-1 text-sm bg-white sm:text-base"
-              style={
-                {
-                  "--tw-ring-color": chatbot?.primaryColor || "#2563eb",
-                } as React.CSSProperties
-              }
-              autoComplete="off"
-              value={input}
-              onChange={handleInputChange}
-            />
-            <button
-              className="rounded-full p-2"
-              style={{ backgroundColor: chatbot?.primaryColor }}
-              type="submit"
-              disabled={status === "streaming" || status === "submitted"}
-              aria-label="Send"
-            >
-              <ArrowUp className="h-4 w-4 text-white" />
-            </button>
-          </form>
-
-          {showPoweredBy ? (
-            <div className="flex items-center justify-center text-xs text-muted-foreground">
-              <span>Powered by </span>
-              <a
-                href="https://padyna.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: chatbot?.primaryColor }}
-                className="ml-1 hover:underline font-semibold"
-              >
-                Padyna
-              </a>
-            </div>
-          ) : (
-            <div className="h-0" />
-          )}
-        </div>
+        <ChatFooter
+          input={input}
+          onInputChange={handleInputChange}
+          onSubmit={handleSubmit}
+          status={status}
+          suggestions={SUGGESTIONS.slice(0, 3)}
+          onSuggestionClick={handleSuggestionClick}
+          showSuggestions={SUGGESTIONS.length > 0 && messages.length === 0}
+          showPoweredBy={showPoweredBy}
+          chatbot={chatbot}
+          placeholder="Type a message..."
+        />
       )}
     </div>
   );

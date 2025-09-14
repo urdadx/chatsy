@@ -134,7 +134,9 @@ export const chat = pgTable("Chat", {
   visibility: varchar("visibility", { enum: ["public", "private"] })
     .notNull()
     .default("private"),
-  channel: varchar("channel", { enum: ["web", "whatsapp", "telegram"] })
+  channel: varchar("channel", {
+    enum: ["web", "widget", "whatsapp", "telegram"],
+  })
     .notNull()
     .default("web"),
   status: varchar("status", { enum: ["unresolved", "resolved", "escalated"] })

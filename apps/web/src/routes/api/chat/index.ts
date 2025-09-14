@@ -107,6 +107,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
               chatbotId,
               title,
               visibility: "private",
+              channel: "web", // Regular web chat from dashboard
             });
           } else {
             if (chat.chatbotId !== chatbotId) {

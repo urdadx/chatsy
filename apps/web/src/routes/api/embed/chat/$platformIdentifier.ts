@@ -109,6 +109,23 @@ export const ServerRoute = createServerFileRoute(
         const title = await generateTitleFromUserMessage({
           message: userMessage,
         });
+
+        // Determine channel based on the current request URL path
+        // Bio pages use /talk/ route, widgets use /bubble/ route
+        const referer = request.headers.get("referer") || "";
+        let channel: "web" | "widget" = "widget"; // default to widget
+
+        if (referer.includes("/talk/")) {
+          // Bio page / link-in-bio
+          channel = "web";
+        } else if (referer.includes("/bubble/")) {
+          // Embedded chat widget (bubble)
+          channel = "widget";
+        } else {
+          // External embedded widget (iframe or bubble on external site)
+          channel = "widget";
+        }
+
         await db
           .insert(chat)
           .values({
@@ -118,6 +135,7 @@ export const ServerRoute = createServerFileRoute(
             chatbotId: chatbotData.id,
             title,
             visibility: "public",
+            channel,
           })
           .onConflictDoNothing();
       }

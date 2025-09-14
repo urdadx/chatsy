@@ -18,7 +18,7 @@ export const Route = createFileRoute("/admin/actions")({
 });
 
 function RouteComponent() {
-  const [searchTerm, _setSearchTerm] = useState("");
+  const [_searchTerm, _setSearchTerm] = useState("");
   const queryClient = useQueryClient();
 
   const {
@@ -73,7 +73,7 @@ function RouteComponent() {
   if (isLoading) {
     return (
       <div className="w-full h-64 flex items-center justify-center">
-        <Spinner />
+        <Spinner size={24} className="text-primary" />
       </div>
     );
   }

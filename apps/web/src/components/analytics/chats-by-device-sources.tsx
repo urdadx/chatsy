@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import {} from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { osCodes } from "@/constants/os";
-import { useVisitorHistory } from "@/hooks/log-visitor-analytics";
+import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { detectDevice } from "@/lib/utils";
 import { useSearch } from "@tanstack/react-router";
 import {
@@ -29,9 +29,8 @@ export function ChatsByDeviceSources({
 
   // Use prop data if provided, otherwise fetch it
   const { data: fetchedAnalytics, isLoading: metricsPending } =
-    useVisitorHistory(
+    useRealTimeVisitorHistory(
       (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
-      true,
     );
   const analytics = propVisitorData || fetchedAnalytics;
 

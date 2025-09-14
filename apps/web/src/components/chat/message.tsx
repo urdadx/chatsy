@@ -25,14 +25,16 @@ const PurePreviewMessage = ({
   vote,
   chatbot,
   requiresScrollPadding,
+  showActions = true,
 }: {
   chatId: string;
   message: UIMessage;
   vote: Vote | undefined;
   isLoading: boolean;
-  setMessages: UseChatHelpers<ChatMessage>["setMessages"];
+  setMessages?: UseChatHelpers<ChatMessage>["setMessages"];
   chatbot?: any;
   requiresScrollPadding?: boolean;
+  showActions?: boolean;
 }) => {
   const { data: fallbackChatbot } = useChatbot();
   const activeChatbot = chatbot || fallbackChatbot;
@@ -278,13 +280,15 @@ const PurePreviewMessage = ({
 
               return null;
             })}
-            <MessageActions
-              key={`action-${message.id}`}
-              chatId={chatId}
-              message={message}
-              vote={vote}
-              isLoading={isLoading}
-            />
+            {showActions && (
+              <MessageActions
+                key={`action-${message.id}`}
+                chatId={chatId}
+                message={message}
+                vote={vote}
+                isLoading={isLoading}
+              />
+            )}
           </div>
         </div>
       </motion.div>

@@ -20,7 +20,7 @@ function RouteComponent() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   return (
-    <div className="relative h-screen w-full overflow-auto hide-scrollbar">
+    <div className="relative h-screen w-full  hide-scrollbar">
       {/* Main content */}
       <div className="md:pr-[420px] ">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">

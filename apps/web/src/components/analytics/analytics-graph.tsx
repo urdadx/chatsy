@@ -27,19 +27,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getVisitorHistory } from "@/hooks/log-visitor-analytics";
-import { useChatHistory } from "@/hooks/use-chat-history";
+import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
 import {
   formatDuration,
   useRealTimeAnalytics,
-} from "@/hooks/use-real-time-analytics";
+} from "@/hooks/use-analytics-stream";
+import { useChatHistory } from "@/hooks/use-chat-history";
 import NumberFlow from "@number-flow/react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { RefreshCcw } from "lucide-react";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Loader } from "../ui/loader";
-import Spinner from "../ui/spinner";
 
 export const description = "An interactive area chart";
 
@@ -73,7 +72,7 @@ export function ChatAnalytics({
   const { data, isLoading } = useChatHistory(selectedTimeRange);
 
   // Use prop data if provided, otherwise fetch it
-  const visitorHistoryQuery = getVisitorHistory(selectedTimeRange);
+  const visitorHistoryQuery = useRealTimeVisitorHistory(selectedTimeRange);
   const visitorData = propVisitorData || visitorHistoryQuery.data;
 
   // Only show loading if we're actually fetching data (not when prop data is provided)
