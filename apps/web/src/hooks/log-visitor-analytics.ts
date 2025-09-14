@@ -176,15 +176,14 @@ export function useSendVisitorAnalytics({
   const sendAnalyticsData = useCallback(
     (data: any, retryCount = 0) => {
       const maxRetries = 2;
-      const retryDelay = Math.min(1000 * 2 ** retryCount, 5000); // Exponential backoff, max 5s
+      const retryDelay = Math.min(1000 * 2 ** retryCount, 5000);
 
       console.debug("Sending visitor analytics data:", data);
 
       if (onLog) onLog(data);
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       fetch("/api/visitor-analytics", {
         method: "POST",
         headers: {
@@ -193,8 +192,7 @@ export function useSendVisitorAnalytics({
         },
         body: JSON.stringify(data),
         signal: controller.signal,
-        // Add request options for better reliability
-        keepalive: true, // Ensure request completes even if page unloads
+        keepalive: true,
       })
         .then((response) => {
           clearTimeout(timeoutId);
@@ -222,13 +220,6 @@ export function useSendVisitorAnalytics({
               console.error("Response body:", text);
             });
           }
-
-          console.debug("Visitor analytics sent successfully");
-
-          // Since SSE handles real-time updates, we don't need manual invalidation
-          // The SSE stream will automatically detect changes and invalidate queries
-          // However, we can optionally invalidate immediately for instant feedback
-          // This ensures even if SSE is temporarily disconnected, data stays fresh
         })
         .catch((error) => {
           clearTimeout(timeoutId);
@@ -380,7 +371,6 @@ export function useSendVisitorAnalytics({
     };
   }, [chatbotId, triggerOnMount, triggerOnUnmount]);
 
-  // Expose for manual logging (e.g., on widget open/close)
   return {
     logVisitorAnalytics,
     mountTimestampRef,

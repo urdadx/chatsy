@@ -27,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
 import {
   formatDuration,
   useRealTimeAnalytics,
@@ -72,13 +71,10 @@ export function ChatAnalytics({
   const { data, isLoading } = useChatHistory(selectedTimeRange);
 
   // Use prop data if provided, otherwise fetch it
-  const visitorHistoryQuery = useRealTimeVisitorHistory(selectedTimeRange);
-  const visitorData = propVisitorData || visitorHistoryQuery.data;
+  const visitorData = propVisitorData;
 
   // Only show loading if we're actually fetching data (not when prop data is provided)
-  const shouldShowLoading = propVisitorData
-    ? isLoading
-    : isLoading || visitorHistoryQuery.isLoading;
+  const shouldShowLoading = propVisitorData ? isLoading : isLoading;
 
   const {
     data: realTimeData,

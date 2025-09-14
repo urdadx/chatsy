@@ -3,7 +3,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useChatHistory } from "@/hooks/use-chat-history";
 import { RiChat1Line, RiTelegramFill, RiWhatsappLine } from "@remixicon/react";
 import { useSearch } from "@tanstack/react-router";
-import { Globe, Maximize2, MessageCircle } from "lucide-react";
+import {
+  Globe,
+  Maximize2,
+  MessageCircle,
+  MousePointerClick,
+} from "lucide-react";
 import { useState } from "react";
 import Spinner from "../ui/spinner";
 import BarList from "./bar-list";
@@ -26,8 +31,8 @@ const channelConfig = {
     label: "Widget",
     icon: RiChat1Line,
     description: "Embedded chat bubbles",
-    color: "bg-green-200",
-    hoverColor: "hover:bg-green-50",
+    color: "bg-purple-200",
+    hoverColor: "hover:bg-purple-50",
   },
   whatsapp: {
     label: "WhatsApp",
@@ -73,7 +78,7 @@ export function ChatsByChannel({
 
   if (Array.isArray(allChats)) {
     allChats.forEach((chat) => {
-      const channel = chat.channel || "web"; // Default to web if no channel specified
+      const channel = chat.channel || "web";
       channelMap[channel] = (channelMap[channel] || 0) + 1;
 
       if (!channelDetailsMap[channel]) {
@@ -106,11 +111,12 @@ export function ChatsByChannel({
         value: totalCount,
         linkId: "",
         description: config.description,
+        barBackground: config.color,
+        hoverBackground: config.hoverColor,
       };
     },
   );
 
-  const topChannels = allChannels.slice(0, 5);
   const hasMoreChannels = allChannels.length > 5;
   const maxChannelCount =
     allChannels.length > 0
@@ -127,12 +133,12 @@ export function ChatsByChannel({
               value="tab-1"
               className="relative text-muted-foreground after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent"
             >
-              Sources
+              Chat Sources
             </TabsTrigger>
           </TabsList>
           <div className="flex items-center gap-2">
             <div className="text-muted-foreground text-sm flex items-center gap-1">
-              <MessageCircle className="h-4 w-4" /> Channels
+              <MousePointerClick className="h-4 w-4" /> Channels
             </div>
           </div>
         </div>
@@ -157,9 +163,7 @@ export function ChatsByChannel({
                   <BarList
                     tab="Channels"
                     unit="chats"
-                    data={topChannels}
-                    barBackground="bg-purple-200"
-                    hoverBackground="hover:bg-purple-50"
+                    data={allChannels}
                     maxValue={maxChannelCount}
                   />
                 </div>

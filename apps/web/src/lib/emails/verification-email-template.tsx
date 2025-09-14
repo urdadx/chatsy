@@ -29,18 +29,14 @@ export default function VerificationEmail({
             <Text style={text}>
               Please verify your email address by clicking the button below:
             </Text>
-            <Button
-              href={verificationLink}
-              style={button}
-            >
+            <Button href={verificationLink} style={button}>
               Verify Email Address
             </Button>
             <Text style={text}>
-              If you didn't create an account with Padyna, you can safely ignore this email.
+              If you didn't create an account with Padyna, you can safely ignore
+              this email.
             </Text>
-            <Text style={footer}>
-              This link will expire in 24 hours.
-            </Text>
+            <Text style={footer}>This link will expire in 24 hours.</Text>
           </Section>
         </Container>
       </Body>
@@ -50,7 +46,8 @@ export default function VerificationEmail({
 
 const main = {
   backgroundColor: "#ffffff",
-  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+  fontFamily:
+    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
 };
 
 const container = {
@@ -66,7 +63,7 @@ const text = {
 };
 
 const button = {
-  backgroundColor: "#000",
+  backgroundColor: "#8b5cf6",
   borderRadius: "3px",
   color: "#fff",
   fontSize: "16px",

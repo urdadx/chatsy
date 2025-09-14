@@ -17,10 +17,12 @@ interface BarListProps {
     href: string;
     value: number;
     linkId?: string;
+    barBackground?: string;
+    hoverBackground?: string;
   }[];
   maxValue: number;
-  barBackground: string;
-  hoverBackground: string;
+  barBackground?: string;
+  hoverBackground?: string;
   setShowModal: Dispatch<SetStateAction<boolean>>;
   limit?: number;
   minBarWidth?: number;
@@ -92,8 +94,8 @@ export default function BarList({
           maxValue={calculatedMaxValue}
           tab={tab}
           unit={unit}
-          barBackground={barBackground}
-          hoverBackground={hoverBackground}
+          barBackground={item.barBackground || barBackground}
+          hoverBackground={item.hoverBackground || hoverBackground}
           minBarWidth={minBarWidth}
         />
       ))}

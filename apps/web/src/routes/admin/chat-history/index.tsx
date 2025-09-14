@@ -191,18 +191,6 @@ function RouteComponent() {
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* <Button
-                variant="outline"
-                className="text-gray-600 hidden sm:flex"
-                onClick={() => refetch()}
-                disabled={isLoading}
-              >
-                <RefreshCw
-                  className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
-                />
-                Refresh
-              </Button> */}
             </div>
           </div>
           <div className="flex flex-row flex-1 min-h-0">
@@ -260,7 +248,7 @@ function RouteComponent() {
 
             {/* Main conversation area - hidden on mobile */}
             {!isMobile && (
-              <div className="flex w-full border-l flex-col h-full relative overflow-hidden">
+              <div className="flex w-full border-l flex-col relative overflow-hidden">
                 {chatId ? (
                   <ChatConversation />
                 ) : (
@@ -289,6 +277,7 @@ function RouteComponent() {
           </DrawerContent>
         </Drawer>
       </div>
+      <div className="h-24" />
     </>
   );
 }

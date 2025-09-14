@@ -10,8 +10,8 @@ interface LineItemProps {
   maxValue: number;
   tab: string;
   unit: string;
-  barBackground: string;
-  hoverBackground: string;
+  barBackground?: string;
+  hoverBackground?: string;
   linkData?: any;
   minBarWidth?: number;
 }
@@ -22,8 +22,8 @@ export function LineItem({
   value,
   maxValue,
   unit,
-  barBackground,
-  hoverBackground,
+  barBackground = "bg-gray-200",
+  hoverBackground = "hover:bg-gray-50",
   minBarWidth = 10,
 }: LineItemProps) {
   const [isHovered, setIsHovered] = useState(false);

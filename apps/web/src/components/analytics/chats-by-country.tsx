@@ -12,8 +12,6 @@ import { useMemo } from "react";
 import BarList from "./bar-list";
 
 import { getCountryCode, getCountryCodeFromCity } from "@/constants/counties";
-import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
-import { useSearch } from "@tanstack/react-router";
 import { Maximize2, MousePointerClick } from "lucide-react";
 import { useState } from "react";
 import Spinner from "../ui/spinner";
@@ -30,13 +28,7 @@ export function ChatsByCountry({
   const [citiesDialogOpen, setCitiesDialogOpen] = useState(false);
   const [continentsDialogOpen, setContinentsDialogOpen] = useState(false);
 
-  const { timeRange } = useSearch({ from: "/admin/analytics" });
-
-  // Use prop data if provided, otherwise fetch it
-  const { data: fetchedAnalytics } = useRealTimeVisitorHistory(
-    (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
-  );
-  const analytics = propVisitorData || fetchedAnalytics;
+  const analytics = propVisitorData;
 
   const { countryStats, cityStats, continentStats } = useMemo(() => {
     const countryMap: Record<string, number> = {};

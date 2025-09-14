@@ -2,9 +2,7 @@ import { Button } from "@/components/ui/button";
 import {} from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { osCodes } from "@/constants/os";
-import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { detectDevice } from "@/lib/utils";
-import { useSearch } from "@tanstack/react-router";
 import {
   Bot,
   Maximize2,
@@ -14,7 +12,6 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MobilePhone } from "../icons/mobile-phone";
-import Spinner from "../ui/spinner";
 import BarList from "./bar-list";
 import { ViewAllStats } from "./view-all-stats";
 
@@ -25,14 +22,7 @@ interface ChatsByDeviceSourcesProps {
 export function ChatsByDeviceSources({
   visitorData: propVisitorData,
 }: ChatsByDeviceSourcesProps) {
-  const { timeRange } = useSearch({ from: "/admin/analytics" });
-
-  // Use prop data if provided, otherwise fetch it
-  const { data: fetchedAnalytics, isLoading: metricsPending } =
-    useRealTimeVisitorHistory(
-      (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
-    );
-  const analytics = propVisitorData || fetchedAnalytics;
+  const analytics = propVisitorData;
 
   const [devicesDialogOpen, setDevicesDialogOpen] = useState(false);
   const [browsersDialogOpen, setBrowsersDialogOpen] = useState(false);
@@ -211,11 +201,7 @@ export function ChatsByDeviceSources({
         <div className="flex-1 min-h-0 overflow-hidden">
           <TabsContent value="tab-1" className="h-full m-0 p-0">
             <div className="px-2 relative">
-              {metricsPending ? (
-                <div className="w-full h-[210px] flex items-center justify-center">
-                  <Spinner />
-                </div>
-              ) : !metrics || allDevices.length === 0 ? (
+              {allDevices.length === 0 ? (
                 <div className="w-full h-[210px] flex items-center justify-center">
                   <span className="text-sm opacity-80">No data available</span>
                 </div>
@@ -257,11 +243,7 @@ export function ChatsByDeviceSources({
 
           <TabsContent value="tab-2">
             <div className="px-2 relative">
-              {metricsPending ? (
-                <div className="w-full h-[210px] flex items-center justify-center">
-                  <Spinner />
-                </div>
-              ) : !metrics || allBrowsers.length === 0 ? (
+              {allBrowsers.length === 0 ? (
                 <div className="w-full h-[210px] flex items-center justify-center">
                   <span className="text-sm opacity-80">No data available</span>
                 </div>
@@ -303,11 +285,7 @@ export function ChatsByDeviceSources({
 
           <TabsContent value="tab-3">
             <div className="px-2 relative">
-              {metricsPending ? (
-                <div className="w-full h-[210px] flex items-center justify-center">
-                  <Spinner />
-                </div>
-              ) : !metrics || allOperatingSystems.length === 0 ? (
+              {allOperatingSystems.length === 0 ? (
                 <div className="w-full h-[210px] flex items-center justify-center">
                   <span className="text-sm opacity-80">No data available</span>
                 </div>

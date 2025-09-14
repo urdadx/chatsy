@@ -1,12 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GOOGLE_FAVICON_URL } from "@/constants/domains";
-import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { getApexDomain } from "@/lib/utils";
-import { useSearch } from "@tanstack/react-router";
 import { Maximize2, MousePointerClick } from "lucide-react";
 import { useState } from "react";
-import Spinner from "../ui/spinner";
 import BarList from "./bar-list";
 import { ViewAllStats } from "./view-all-stats";
 
@@ -17,15 +14,7 @@ interface ChatsByReferrersProps {
 export function ChatsByReferrers({
   visitorData: propVisitorData,
 }: ChatsByReferrersProps) {
-  const { timeRange } = useSearch({ from: "/admin/analytics" });
-
-  // Use prop data if provided, otherwise fetch it
-  const result = useRealTimeVisitorHistory(
-    (timeRange as "24h" | "7d" | "30d" | "90d") || "24h",
-  );
-
-  const { data: fetchedAnalytics, isLoading: metricsPending } = result;
-  const analytics = propVisitorData || fetchedAnalytics;
+  const analytics = propVisitorData;
 
   const [referrersDialogOpen, setReferrersDialogOpen] = useState(false);
   const [referrerURLsDialogOpen, setReferrerURLsDialogOpen] = useState(false);
@@ -119,11 +108,7 @@ export function ChatsByReferrers({
         {/* Content area - Takes remaining space */}
         <div className="flex-1 min-h-0 overflow-hidden">
           <TabsContent value="tab-1" className="h-full m-0 p-0">
-            {metricsPending ? (
-              <div className="h-full flex items-center justify-center">
-                <Spinner />
-              </div>
-            ) : allReferrers.length === 0 ? (
+            {allReferrers.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <span className="text-sm opacity-80">No data available</span>
               </div>
@@ -167,11 +152,7 @@ export function ChatsByReferrers({
           </TabsContent>
 
           <TabsContent value="tab-2" className="h-full m-0 p-0">
-            {metricsPending ? (
-              <div className="h-full flex items-center justify-center">
-                <Spinner />
-              </div>
-            ) : allReferrerURLs.length === 0 ? (
+            {allReferrerURLs.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <span className="text-sm opacity-80">No data available</span>
               </div>
