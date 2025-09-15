@@ -302,8 +302,6 @@ export function useSendVisitorAnalytics({
         pendingRequestsRef.current.delete(requestKey);
       }, 5000);
 
-      console.debug("Logging visitor analytics for organization:", chatbotId);
-
       const { id: visitorId, isFirstVisit } = getVisitorId();
       const userAgent = navigator.userAgent;
       const deviceInfo = {

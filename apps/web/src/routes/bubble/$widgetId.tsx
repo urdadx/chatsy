@@ -140,6 +140,7 @@ function RouteComponent() {
     if (window.parent && window.parent !== window) {
       window.parent.postMessage({ type: "padyna-widget-close" }, "*");
       window.parent.postMessage({ type: "page_unload" }, "*");
+      window.parent.postMessage({ type: "widget_page_unload" }, "*");
     }
   }, []);
 
@@ -211,7 +212,7 @@ function RouteComponent() {
         showResetButton={messages.length > 0}
         showCloseButton={true}
         resetIcon="rotate"
-      />
+      ></ChatHeader>
 
       <ChatBody
         isLoading={isLoading}
