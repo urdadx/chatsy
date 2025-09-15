@@ -2,7 +2,6 @@ import { ChatBody } from "@/components/chat/chat-body";
 import { ChatFooter } from "@/components/chat/chat-footer";
 import { ChatHeader } from "@/components/chat/chat-header";
 import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
-import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import type { Vote } from "@/db/schema";
 import { useSendVisitorAnalytics } from "@/hooks/log-visitor-analytics";
@@ -15,7 +14,6 @@ import { useChat } from "@ai-sdk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
-import { X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -213,18 +211,7 @@ function RouteComponent() {
         showResetButton={messages.length > 0}
         showCloseButton={true}
         resetIcon="rotate"
-      >
-        {/* Close button - only visible on mobile */}
-        <Button
-          size="icon"
-          onClick={handleCloseWidget}
-          className="md:hidden p-1 hover:bg-white/10 rounded-full transition-colors"
-          aria-label="Close chat"
-          variant="ghost"
-        >
-          <X className="text-white" size={20} />
-        </Button>
-      </ChatHeader>
+      />
 
       <ChatBody
         isLoading={isLoading}
