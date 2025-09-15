@@ -267,20 +267,19 @@
 
       if (window.innerWidth <= 768) {
         // Mobile responsive
-        // Mobile responsive
         Object.assign(this.iframe.style, {
           width: "100vw",
           height: "calc(100vh - 80px)",
           maxHeight: "calc(100vh - 80px)",
           borderRadius: "0",
-          position: "fixed", // Changed from absolute to fixed
-          top: "0", // Position from top instead of bottom
-          left: "0", // Ensure it starts from left edge
-          right: "0", // Ensure it spans full width
-          bottom: "80px", // Leave space for bubble
-          transform: "translateY(100%)", // Start hidden below viewport
+          position: "fixed",
+          top: "0",
+          left: "0",
+          right: "0",
+          bottom: "80px",
+          transform: "translateY(100%)",
           transformOrigin: "bottom center",
-          zIndex: this.config.zIndex + 1, // Ensure it's above everything
+          zIndex: this.config.zIndex + 1,
         });
       }
     }
@@ -346,6 +345,12 @@
 
       this.isOpen = true;
       this.iframe.style.display = "block";
+
+      // Notify the iframe that user actually opened the widget
+      this.iframe.contentWindow?.postMessage(
+        { type: "padyna-widget-user-opened" },
+        this.config.baseUrl,
+      );
 
       // Animate iframe in
       requestAnimationFrame(() => {
@@ -431,6 +436,17 @@
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && this.isOpen) {
           this.closeChat();
+        }
+      });
+
+      // Handle page unload to notify widget for analytics
+      window.addEventListener("beforeunload", () => {
+        if (this.iframe && this.isOpen) {
+          // Notify the widget that the parent page is being unloaded
+          this.iframe.contentWindow.postMessage(
+            { type: "parent-page-unload" },
+            this.config.baseUrl,
+          );
         }
       });
     }

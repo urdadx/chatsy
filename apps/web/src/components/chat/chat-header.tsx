@@ -5,7 +5,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { RiBardFill } from "@remixicon/react";
-import { RefreshCcw, RotateCcw, X } from "lucide-react";
+import { RotateCcw, X } from "lucide-react";
 import type { ReactNode } from "react";
 
 interface ChatHeaderProps {
@@ -29,12 +29,9 @@ export function ChatHeader({
   onClose,
   showResetButton = true,
   showCloseButton = false,
-  resetIcon = "refresh",
   className,
   children,
 }: ChatHeaderProps) {
-  const ResetIcon = resetIcon === "refresh" ? RefreshCcw : RotateCcw;
-
   return (
     <div
       className={`flex items-center justify-between p-4 text-white border-b ${className}`}
@@ -70,7 +67,7 @@ export function ChatHeader({
                 aria-label="Reset chat"
                 variant="ghost"
               >
-                <ResetIcon className="text-white" size={16} />
+                <RotateCcw className="text-white" size={16} />
               </Button>
             </TooltipTrigger>
             <TooltipContent className="bg-white shadow-sm" side="top">

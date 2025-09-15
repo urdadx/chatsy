@@ -10,29 +10,192 @@ import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
+import { seo } from "@/lib/seo";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
-import { X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  type JSX,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/talk/$pageId")({
   component: RouteComponent,
 });
 
-function RouteComponent() {
+const ANALYTICS_EVENTS = {
+  BIO_PAGE_CHAT_RESET: "bio_page_chat_reset",
+  BIO_PAGE_CHAT_CLOSED: "bio_page_chat_closed",
+} as const;
+
+interface UIState {
+  input: string;
+  isDeactivated: boolean;
+}
+
+type UIAction =
+  | { type: "SET_INPUT"; payload: string }
+  | { type: "SET_DEACTIVATED"; payload: boolean }
+  | { type: "RESET" };
+
+interface ErrorData {
+  error?: string;
+}
+
+const uiStateReducer = (state: UIState, action: UIAction): UIState => {
+  switch (action.type) {
+    case "SET_INPUT":
+      return { ...state, input: action.payload };
+    case "SET_DEACTIVATED":
+      return { ...state, isDeactivated: action.payload };
+    case "RESET":
+      return { ...state, input: "" };
+    default:
+      return state;
+  }
+};
+
+const useAnalytics = (pageId: string, chatbotId?: string) => {
+  const analyticsExtra = useMemo(
+    () => ({
+      page_type: "bio_page" as const,
+      page_id: pageId,
+    }),
+    [pageId],
+  );
+
+  return useSendVisitorAnalytics({
+    chatbotId: chatbotId || "placeholder",
+    extra: analyticsExtra,
+  });
+};
+
+const useRetry = () => {
+  const [retryCount, setRetryCount] = useState(0);
+
+  const retry = useCallback(() => {
+    setRetryCount((prev) => prev + 1);
+  }, []);
+
+  return { retryCount, retry };
+};
+
+const LoadingState: React.FC = () => (
+  <div
+    className="flex items-center justify-center"
+    style={{ height: "calc(var(--vh, 1vh) * 100)" }}
+  >
+    <div className="text-center">
+      <Spinner className="text-primary mb-2" />
+      <p className="text-gray-600">Loading chat...</p>
+    </div>
+  </div>
+);
+
+interface ErrorStateProps {
+  error?: Error | null;
+  onRetry?: () => void;
+}
+
+const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => (
+  <div
+    className="flex items-center justify-center"
+    style={{ height: "calc(var(--vh, 1vh) * 100)" }}
+  >
+    <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-sm">
+      <p className="text-red-600 text-sm mb-2">
+        {error?.message || "Failed to load chat widget"}
+      </p>
+      {onRetry && (
+        <Button
+          onClick={onRetry}
+          className="text-blue-600 underline hover:text-blue-800"
+        >
+          Try again
+        </Button>
+      )}
+    </div>
+  </div>
+);
+
+const useChatHandlers = (
+  uiState: UIState,
+  dispatchUiState: React.Dispatch<UIAction>,
+  sendMessage: (options: { text: string }) => void,
+  setMessages: (messages: any[]) => void,
+  logVisitorAnalytics: (options: { event: string }) => void,
+) => {
+  const handleSubmit = useCallback(
+    (event?: React.FormEvent) => {
+      event?.preventDefault();
+      if (!uiState.input.trim()) return;
+
+      sendMessage({ text: uiState.input });
+      dispatchUiState({ type: "SET_INPUT", payload: "" });
+    },
+    [uiState.input, sendMessage, dispatchUiState],
+  );
+
+  const handleResetChat = useCallback(() => {
+    setMessages([]);
+    dispatchUiState({ type: "RESET" });
+    logVisitorAnalytics({ event: ANALYTICS_EVENTS.BIO_PAGE_CHAT_RESET });
+  }, [setMessages, dispatchUiState, logVisitorAnalytics]);
+
+  const handleCloseChat = useCallback(() => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.close();
+    }
+    logVisitorAnalytics({ event: ANALYTICS_EVENTS.BIO_PAGE_CHAT_CLOSED });
+  }, [logVisitorAnalytics]);
+
+  const handleSuggestionClick = useCallback(
+    (suggestion: string) => {
+      dispatchUiState({ type: "SET_INPUT", payload: suggestion });
+    },
+    [dispatchUiState],
+  );
+
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      dispatchUiState({ type: "SET_INPUT", payload: event.target.value });
+    },
+    [dispatchUiState],
+  );
+
+  return {
+    handleSubmit,
+    handleResetChat,
+    handleCloseChat,
+    handleSuggestionClick,
+    handleInputChange,
+  };
+};
+
+function RouteComponent(): JSX.Element {
   const { pageId } = Route.useParams();
   const { chatId } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
-  const [input, setInput] = useState("");
-  const [isDeactivated, setIsDeactivated] = useState(false);
+  const { retry } = useRetry();
 
-  const initialMessages = messagesFromDb
-    ? convertToUIMessages(messagesFromDb)
-    : [];
+  const [uiState, dispatchUiState] = useReducer(uiStateReducer, {
+    input: "",
+    isDeactivated: false,
+  });
+
+  const initialMessages = useMemo(
+    () => (messagesFromDb ? convertToUIMessages(messagesFromDb) : []),
+    [messagesFromDb],
+  );
 
   const queryClient = useQueryClient();
 
@@ -42,21 +205,7 @@ function RouteComponent() {
     error: chatbotError,
   } = useChatWidget(pageId);
 
-  useEffect(() => {
-    const setVh = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-    };
-
-    setVh();
-    window.addEventListener("resize", setVh);
-    window.addEventListener("orientationchange", setVh);
-
-    return () => {
-      window.removeEventListener("resize", setVh);
-      window.removeEventListener("orientationchange", setVh);
-    };
-  }, []);
+  const { logVisitorAnalytics } = useAnalytics(pageId, chatbot?.id);
 
   const {
     messages,
@@ -68,19 +217,16 @@ function RouteComponent() {
   } = useChat({
     id: chatId,
     transport: new DefaultChatTransport({
-      fetch: async (url, options) => {
-        const response = await fetchWithErrorHandlers(url, options);
+      fetch: async (input: RequestInfo | URL, options?: RequestInit) => {
+        const response = await fetchWithErrorHandlers(input, options);
 
-        // Check if the response indicates deactivation (status 403 with specific message)
         if (!response.ok && response.status === 403) {
           try {
-            const errorData = await response.clone().json();
+            const errorData: ErrorData = await response.clone().json();
             if (errorData.error?.includes("offline")) {
-              setIsDeactivated(true);
+              dispatchUiState({ type: "SET_DEACTIVATED", payload: true });
             }
-          } catch (e) {
-            // Ignore JSON parsing errors for error responses
-          }
+          } catch (e) {}
         }
 
         return response;
@@ -89,8 +235,8 @@ function RouteComponent() {
     }),
     messages: initialMessages,
     experimental_throttle: 100,
-    onError: (error) => {
-      if (!isDeactivated) {
+    onError: (error: Error) => {
+      if (!uiState.isDeactivated) {
         if (error instanceof ChatSDKError) {
           toast.error(error.message);
         } else {
@@ -112,67 +258,32 @@ function RouteComponent() {
     }
   }, [initialMessages, messages.length, setMessages]);
 
-  const chatbotId = chatbot?.id;
-
-  const analyticsExtra = useMemo(
-    () => ({
-      page_type: "bio_page",
-      page_id: pageId,
-    }),
-    [pageId],
+  const {
+    handleSubmit,
+    handleResetChat,
+    handleCloseChat,
+    handleSuggestionClick,
+    handleInputChange,
+  } = useChatHandlers(
+    uiState,
+    dispatchUiState,
+    sendMessage,
+    setMessages,
+    logVisitorAnalytics,
   );
 
-  const { logVisitorAnalytics } = useSendVisitorAnalytics({
-    chatbotId: chatbotId || "placeholder",
-    extra: analyticsExtra,
-  });
-
-  const handleSubmit = useCallback(
-    (event?: React.FormEvent) => {
-      event?.preventDefault();
-
-      if (!input.trim()) return;
-
-      sendMessage({ text: input });
-      setInput("");
-    },
-    [input, sendMessage, messages.length, logVisitorAnalytics],
+  const suggestions = useMemo(
+    () => chatbot?.suggestedMessages || [],
+    [chatbot?.suggestedMessages],
   );
-
-  const handleResetChat = useCallback(() => {
-    setMessages([]);
-    setInput("");
-    toast.success("Chat reset successfully");
-    logVisitorAnalytics({ event: "bio_page_chat_reset" });
-  }, [setMessages, setInput, logVisitorAnalytics]);
-
-  const handleCloseChat = useCallback(() => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.close();
-    }
-    logVisitorAnalytics({ event: "bio_page_chat_closed" });
-  }, [logVisitorAnalytics]);
-
-  const SUGGESTIONS = chatbot?.suggestedMessages || [];
-
-  const handleSuggestionClick = useCallback((suggestion: string) => {
-    setInput(suggestion);
-  }, []);
-
-  const handleInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput(event.target.value);
-    },
-    [],
+  const showPoweredBy = useMemo(
+    () => !chatbot?.hidePoweredBy,
+    [chatbot?.hidePoweredBy],
   );
-
-  const showPoweredBy = !chatbot?.hidePoweredBy;
 
   const { data: votes }: { data: Array<Vote> | undefined } = useQuery({
     queryKey: ["votes", chatId],
-    queryFn: () =>
+    queryFn: (): Promise<Vote[]> =>
       fetchWithErrorHandlers(`/api/vote?chatId=${chatId}`).then((res) =>
         res.json(),
       ),
@@ -180,27 +291,11 @@ function RouteComponent() {
   });
 
   if (chatbotError) {
-    return (
-      <div
-        className="flex items-center justify-center"
-        style={{ height: "calc(var(--vh, 1vh) * 100)" }}
-      >
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-sm">
-          <p className="text-red-600 text-sm">Failed to load chat widget</p>
-        </div>
-      </div>
-    );
+    return <ErrorState error={chatbotError} onRetry={retry} />;
   }
 
   if (isChatbotLoading) {
-    return (
-      <div
-        className="flex items-center justify-center"
-        style={{ height: "calc(var(--vh, 1vh) * 100)" }}
-      >
-        <Spinner className="text-primary" />
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return (
@@ -217,23 +312,12 @@ function RouteComponent() {
           showCloseButton={true}
           resetIcon="refresh"
           className="flex-shrink-0"
-        >
-          {/* Close button - only visible on mobile */}
-          <Button
-            size="icon"
-            className="p-1 hover:bg-white/10 rounded-full transition-colors md:hidden"
-            aria-label="Close chat"
-            variant="ghost"
-            onClick={handleCloseChat}
-          >
-            <X className="text-white" size={20} />
-          </Button>
-        </ChatHeader>
+        />
 
         <ChatBody
           isLoading={isLoading}
           error={error}
-          isDeactivated={isDeactivated}
+          isDeactivated={uiState.isDeactivated}
           messages={messages}
           setMessages={setMessages}
           status={status}
@@ -245,15 +329,15 @@ function RouteComponent() {
           className="h-full"
         />
 
-        {!isDeactivated && (
+        {!uiState.isDeactivated && (
           <ChatFooter
-            input={input}
+            input={uiState.input}
             onInputChange={handleInputChange}
             onSubmit={handleSubmit}
             status={status}
-            suggestions={SUGGESTIONS}
+            suggestions={suggestions}
             onSuggestionClick={handleSuggestionClick}
-            showSuggestions={SUGGESTIONS.length > 0}
+            showSuggestions={suggestions.length > 0}
             showPoweredBy={showPoweredBy}
             chatbot={chatbot}
             placeholder="Chat with me..."
