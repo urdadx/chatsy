@@ -89,7 +89,7 @@ function RouteComponent() {
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex fixed top-0 right-0 h-screen w-[340px] border-l bg-gray-50 p-4 items-center justify-center">
+      <div className="hidden lg:flex fixed top-0 right-0 border-l  w-[340px] h-full bg-gray-50 p-4 items-center justify-center">
         <TrainAgent />
       </div>
       {/* Mobile Drawer */}

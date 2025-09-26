@@ -264,7 +264,7 @@ export function ChatbotSettings() {
                     disabled={updateChatbotMutation.isPending}
                   />
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={() => removeSuggestedMessage(index)}
                   >
                     <Trash2 className="h-4 w-4 text-red-500" />
@@ -306,6 +306,8 @@ export function ChatbotSettings() {
               checked={hidePoweredBy}
               onCheckedChange={handleHidePoweredByChange}
               disabled={updateChatbotMutation.isPending}
+              className="data-[state=checked]:bg-green-500"
+
             />
             {updateChatbotMutation.isPending &&
               hidePoweredBy !== chatbot?.hidePoweredBy && (

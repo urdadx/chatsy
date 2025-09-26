@@ -12,13 +12,13 @@ import { z } from "zod";
 
 const createChatbotSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  image: z.string().url().optional(),
+  image: z.string().optional(),
   primaryColor: z.string().default("#9333ea"),
   theme: z.enum(["light", "dark"]).default("light"),
   hidePoweredBy: z.boolean().default(false),
   initialMessage: z
     .string()
-    .default("Hello there👋, how can i help you today?"),
+    .default("Hello there👋, how can I help you today?"),
   suggestedMessages: z.array(z.string()).optional(),
   isEmbeddingEnabled: z.boolean().default(true),
   allowedDomains: z.array(z.string()).optional(),
@@ -259,7 +259,10 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       }
 
       if (existingChatbot.organizationId !== organizationId) {
-        return json({ error: "Forbidden: You don't own this chatbot" }, { status: 403 });
+        return json(
+          { error: "Forbidden: You don't own this chatbot" },
+          { status: 403 },
+        );
       }
 
       // Check if this is the last chatbot in the organization
@@ -269,9 +272,12 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         .where(eq(chatbot.organizationId, organizationId));
 
       if (chatbotCount?.count <= 1) {
-        return json({ 
-          error: "Cannot delete the last chatbot in an organization" 
-        }, { status: 400 });
+        return json(
+          {
+            error: "Cannot delete the last chatbot in an organization",
+          },
+          { status: 400 },
+        );
       }
 
       // Delete the chatbot (cascade deletes will handle related records)
@@ -299,20 +305,22 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
           // Update all sessions for this user to use the new active chatbot
           await db
             .update(sessionTable)
-            .set({ 
+            .set({
               activeChatbotId: newActiveChatbot.id,
-              updatedAt: new Date()
+              updatedAt: new Date(),
             })
             .where(eq(sessionTable.userId, userId));
         }
       }
 
-      return json({ 
-        message: "Chatbot deleted successfully",
-        deletedChatbotId: chatbotId,
-        wasActive: isActiveChatbot
-      }, { status: 200 });
-
+      return json(
+        {
+          message: "Chatbot deleted successfully",
+          deletedChatbotId: chatbotId,
+          wasActive: isActiveChatbot,
+        },
+        { status: 200 },
+      );
     } catch (err) {
       console.error("DELETE /api/my-chatbot error:", err);
       return new Response("Failed to delete chatbot", { status: 500 });

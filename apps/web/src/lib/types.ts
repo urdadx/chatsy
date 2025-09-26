@@ -45,3 +45,29 @@ export type ChatMessage = UIMessage<
   CustomUIDataTypes,
   ChatTools
 >;
+
+export type ChatbotDetails = {
+  id: string;
+  organizationId: string;
+  name: string | null;
+  image: string | null;
+  primaryColor: string;
+  theme: string;
+  hidePoweredBy: boolean;
+  personality: "support" | "sales" | "lead";
+  initialMessage: string;
+  suggestedMessages: string[] | null;
+  trainingStatus: string | null;
+  lastTrainedAt: Date | null;
+  sourcesCount: number;
+  isEmbeddingEnabled: boolean;
+  embedToken: string | null;
+  allowedDomains: string[] | null;
+  whatsappEnabled: boolean;
+  whatsappPhoneNumberId: string | null;
+  whatsappBusinessAccountId: string | null;
+  whatsappWelcomeMessage: string | null;
+  whatsappSettings: any;
+  createdAt: Date;
+  updatedAt: Date;
+};

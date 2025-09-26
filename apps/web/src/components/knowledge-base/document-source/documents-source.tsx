@@ -1,3 +1,4 @@
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,7 @@ export function DocumentSource() {
   const maxSize = 100 * 1024 * 1024;
   const maxFiles = 10;
   const queryClient = useQueryClient();
+  const { setBanner } = useRetrainingBanner();
 
   const { mutateAsync: uploadAndCreateDocument, isPending: isUploading } =
     useMutation({
@@ -34,6 +36,7 @@ export function DocumentSource() {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["document-sources"] });
+        setBanner(true, "Retraining required");
       },
     });
 
@@ -82,7 +85,7 @@ export function DocumentSource() {
 
   return (
     <>
-      <div className="flex flex-col gap-2 rounded-md p-5 border">
+      <div className="flex flex-col gap-2 rounded-3xl p-5 border">
         <div className="flex justify-between items-center mb-2">
           <div className="flex flex-col gap-2">
             <h2 className="font-semibold text-lg">Files</h2>

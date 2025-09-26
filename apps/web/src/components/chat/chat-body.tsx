@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
 import {
-  ChatContainerContent,
-  ChatContainerRoot,
-  ChatContainerScrollAnchor,
-} from "@/components/ui/chat-container";
-import { ScrollButton } from "@/components/ui/scroll-button";
+  Conversation,
+  ConversationContent,
+  ConversationEmptyState,
+  ConversationScrollButton,
+} from "@/components/ai-elements/conversation";
+import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import type { Vote } from "@/db/schema";
 import type { ChatMessage } from "@/lib/types";
@@ -12,8 +12,10 @@ import { RiBardFill } from "@remixicon/react";
 import type { useQueryClient } from "@tanstack/react-query";
 import type { ChatRequestOptions, ChatStatus } from "ai";
 import type { ReactNode } from "react";
+
+import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
 import { GreetingMessage } from "./greeting-message";
-import { Messages } from "./messages";
+import { PreviewMessage, ThinkingMessage } from "./preview-message";
 
 interface ChatBodyProps {
   isLoading?: boolean;
@@ -49,13 +51,15 @@ export function ChatBody({
   chatError,
   chatId,
   votes,
-  regenerate,
   chatbot,
   queryClient,
   className,
   children,
 }: ChatBodyProps) {
   const greetingMessage = chatbot?.initialMessage || "";
+  const [messagesContainerRef, messagesEndRef] =
+    useScrollToBottom<HTMLDivElement>();
+
 
   if (isDeactivated) {
     return (
@@ -114,38 +118,59 @@ export function ChatBody({
   }
 
   return (
-    <div className={`relative flex-1 min-h-0 overflow-hidden ${className}`}>
-      <ChatContainerRoot className="h-full smooth-div">
-        <ChatContainerContent className="p-4">
-          <div className="space-y-4">
-            {messages.length === 0 ? (
-              <GreetingMessage title={greetingMessage} />
-            ) : (
-              <Messages
-                chatId={chatId}
-                status={status}
-                votes={votes}
-                messages={messages}
-                setMessages={setMessages}
-                reload={regenerate}
-                chatbot={chatbot}
-              />
-            )}
+    <div ref={messagesContainerRef} className={`relative flex-1 min-h-0 overflow-hidden ${className}`}>
+      <Conversation className="h-full overflow-hidden">
+        <ConversationContent>
+          {messages.length === 0 ? (
+            <ConversationEmptyState
+              title={greetingMessage}
+              description=""
+              icon={<RiBardFill size={20} className="text-muted-foreground" />}
+            />
+          ) : (
+            <Conversation className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 md:gap-6">
+              <ConversationContent className="flex  flex-col gap-4 px-2 py-4 md:gap-6 md:px-4">
+                {messages.length === 0 && <GreetingMessage />}
 
-            {status === "error" && chatError && (
-              <div className="text-red-500 p-4">Error: {chatError.message}</div>
-            )}
+                {messages.map((message, index) => (
+                  <PreviewMessage
+                    key={message.id}
+                    chatId={chatId}
+                    message={message}
+                    isLoading={
+                      status === 'streaming' && messages.length - 1 === index
+                    }
+                    vote={
+                      votes
+                        ? votes.find((vote) => vote.messageId === message.id)
+                        : undefined
+                    }
+                    setMessages={setMessages}
+                    chatbot={chatbot}
+                  />
+                ))}
 
-            {children}
+                {status === 'submitted' &&
+                  messages.length > 0 &&
+                  messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
 
-            <ChatContainerScrollAnchor />
-          </div>
-        </ChatContainerContent>
+                <div
+                  ref={messagesEndRef}
+                  className="shrink-0 min-w-[24px] min-h-[24px]"
+                />
+              </ConversationContent>
+            </Conversation>
+          )}
 
-        <div className="absolute bottom-2 right-2 z-10">
-          <ScrollButton className="shadow-lg" />
-        </div>
-      </ChatContainerRoot>
+          {status === "error" && chatError && (
+            <div className="text-red-500 p-4">Error: {chatError.message}</div>
+          )}
+          {children}
+        </ConversationContent>
+
+        <ConversationScrollButton className="shadow-lg" />
+      </Conversation>
+
     </div>
   );
 }

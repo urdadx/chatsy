@@ -48,7 +48,7 @@ export const WebsiteSourceList = () => {
   const filteredSources = filterSources(sources, searchTerm);
 
   return (
-    <div className="my-5 border  rounded-md p-6">
+    <div className="my-5 border  rounded-3xl p-6">
       <SourcesHeader searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
       {filteredSources.length > 0 ? (

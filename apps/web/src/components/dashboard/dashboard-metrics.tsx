@@ -1,4 +1,3 @@
-import NumberFlow from "@number-flow/react";
 import {
   BrainCog,
   Globe,
@@ -7,6 +6,7 @@ import {
   ThumbsDown,
   ThumbsUp,
 } from "lucide-react";
+import { DashboardCard } from "./dashboard-card";
 
 interface DashboardMetricsProps {
   sourcesCount: number;
@@ -28,116 +28,53 @@ export function DashboardMetrics({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* Total Links Card */}
-      <div className="bg-white rounded-lg p-4 border">
-        <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-              <BrainCog className="w-4 h-4 text-primary" />
-            </div>
-            <h3 className="text-sm font-medium text-gray-600">
-              Connected sources
-            </h3>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="text-3xl font-bold text-gray-700 px-10">
-            {sourcesCount ?? 0}
-          </div>
-        </div>
-      </div>
-      {/* Total conversations */}
+      <DashboardCard
+        icon={BrainCog}
+        title="Connected sources"
+        value={sourcesCount ?? 0}
+        gradientFrom="purple-50"
+        gradientVia="purple-25"
+      />
 
-      <div className="bg-white rounded-lg p-4 border">
-        <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
-              <MessageCircle className="w-4 h-4 text-slate-600" />
-            </div>
-            <h3 className="text-sm font-medium text-gray-600">
-              Total conversations
-            </h3>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <NumberFlow
-            className="text-3xl font-bold text-gray-700 px-10 pt-0"
-            value={conversationsCount ?? 0}
-          />
-        </div>
-      </div>
-      <div className="bg-white rounded-lg p-4 border">
-        <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Star className="w-4 h-4 text-orange-600" />
-            </div>
-            <h3 className="text-sm font-medium text-gray-600">
-              Credits remaining
-            </h3>
-          </div>
-        </div>
-        <NumberFlow
-          className="text-3xl font-bold text-gray-700 px-10 pt-0"
-          value={balance}
-        />
-      </div>
-      {/* Leads generated */}
-      <div className="bg-white rounded-lg p-4 border">
-        <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Globe className="w-4 h-4 text-blue-600" />
-            </div>
-            <h3 className="text-sm font-medium text-gray-600">Total visits</h3>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <NumberFlow
-            className="text-3xl font-bold text-gray-700 px-10 pt-0"
-            value={totalVisits}
-          />{" "}
-        </div>
-      </div>
+      <DashboardCard
+        icon={MessageCircle}
+        title="Total conversations"
+        value={conversationsCount ?? 0}
+        gradientFrom="slate-50"
+        gradientVia="slate-25"
+      />
 
-      {/* Positive sentiments */}
-      <div className="bg-white rounded-lg p-4 border">
-        <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-              <ThumbsUp className="w-4 h-4 text-green-600" />
-            </div>
-            <h3 className="text-sm font-medium text-gray-600">
-              Positive sentiments
-            </h3>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <NumberFlow
-            className="text-3xl font-bold text-gray-700 px-10 pt-0"
-            value={voteCounts?.upvotes ?? 0}
-          />
-        </div>
-      </div>
-      {/* Negative sentiments */}
-      <div className="bg-white rounded-lg p-4 border">
-        <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-              <ThumbsDown className="w-4 h-4 text-red-600" />
-            </div>
-            <h3 className="text-sm font-medium text-gray-600">
-              Negative sentiments
-            </h3>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <NumberFlow
-            className="text-3xl font-bold text-gray-700 px-10 pt-0"
-            value={voteCounts?.downvotes ?? 0}
-          />
-        </div>
-      </div>
+      <DashboardCard
+        icon={Star}
+        title="Credits remaining"
+        value={balance}
+        gradientFrom="orange-50"
+        gradientVia="orange-25"
+      />
+
+      <DashboardCard
+        icon={Globe}
+        title="Total visits"
+        value={totalVisits}
+        gradientFrom="blue-50"
+        gradientVia="blue-25"
+      />
+
+      <DashboardCard
+        icon={ThumbsUp}
+        title="Positive sentiments"
+        value={voteCounts?.upvotes ?? 0}
+        gradientFrom="green-50"
+        gradientVia="green-25"
+      />
+
+      <DashboardCard
+        icon={ThumbsDown}
+        title="Negative sentiments"
+        value={voteCounts?.downvotes ?? 0}
+        gradientFrom="red-50"
+        gradientVia="red-25"
+      />
     </div>
   );
 }

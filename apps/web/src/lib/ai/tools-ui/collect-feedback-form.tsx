@@ -128,10 +128,10 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
         {mutation.isPending ? (
           <>
             <Spinner className="text-white h-4 w-4 inline-block" />
-            Sending...
+            Submitting...
           </>
         ) : (
-          "Send Feedback"
+          "Submit"
         )}
       </Button>
     </form>

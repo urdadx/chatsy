@@ -50,19 +50,16 @@ export function DocumentList() {
     initialData: [],
   });
 
-  const { mutate: deleteDocumentSource, isPending: isDeleting } = useMutation({
-    mutationFn: (id: string) => {
-      return api.delete("/document-source", { data: { id } });
+  const { mutateAsync: deleteDocumentSource, isPending: isDeleting } = useMutation({
+    mutationFn: async (doc: { id: string; url: string }) => {
+      await api.delete("/document-source", { data: { id: doc.id } });
     },
     onSuccess: () => {
-      toast.success("Document deleted successfully!");
       queryClient.invalidateQueries({ queryKey: ["document-sources"] });
       setBanner(true, "Retraining required");
       localStorage.setItem("lastTrainedAt", new Date().toISOString());
     },
-    onError: () => {
-      toast.error("Failed to delete document.");
-    },
+
   });
 
   if (isLoadingDocuments) {
@@ -86,7 +83,7 @@ export function DocumentList() {
           {documents.map((doc) => (
             <div
               key={doc.id}
-              className="bg-background flex items-center justify-between gap-2 rounded-md border p-2 pe-3"
+              className="bg-background flex items-center justify-between gap-2 rounded-2xl border p-2 pe-3"
             >
               <div className="flex items-center gap-3 overflow-hidden">
                 {getFileIcon({ type: doc.type, name: doc.name })}
@@ -102,11 +99,17 @@ export function DocumentList() {
                 size="icon"
                 variant="ghost"
                 className="text-red-500 hover:text-red-400 -me-2 size-8 hover:bg-transparent"
-                onClick={() => deleteDocumentSource(doc.id)}
+                onClick={() =>
+                  toast.promise(deleteDocumentSource({ id: doc.id, url: doc.url }), {
+                    loading: "Deleting document...",
+                    success: "Document deleted",
+                    error: "Error deleting document",
+                  })
+                }
                 aria-label="Remove file"
                 disabled={isDeleting}
               >
-                <Trash2Icon className="size-4" aria-hidden="true" />
+                <Trash2Icon className="size-4" />
               </Button>
             </div>
           ))}

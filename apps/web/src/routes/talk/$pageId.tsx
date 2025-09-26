@@ -1,6 +1,7 @@
 import { ChatBody } from "@/components/chat/chat-body";
 import { ChatFooter } from "@/components/chat/chat-footer";
 import { ChatHeader } from "@/components/chat/chat-header";
+import { ChatLanding } from "@/components/chat/chat-landing";
 import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
@@ -10,7 +11,6 @@ import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
-import { seo } from "@/lib/seo";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -38,11 +38,13 @@ const ANALYTICS_EVENTS = {
 interface UIState {
   input: string;
   isDeactivated: boolean;
+  showLanding: boolean;
 }
 
 type UIAction =
   | { type: "SET_INPUT"; payload: string }
   | { type: "SET_DEACTIVATED"; payload: boolean }
+  | { type: "SET_SHOW_LANDING"; payload: boolean }
   | { type: "RESET" };
 
 interface ErrorData {
@@ -55,6 +57,8 @@ const uiStateReducer = (state: UIState, action: UIAction): UIState => {
       return { ...state, input: action.payload };
     case "SET_DEACTIVATED":
       return { ...state, isDeactivated: action.payload };
+    case "SET_SHOW_LANDING":
+      return { ...state, showLanding: action.payload };
     case "RESET":
       return { ...state, input: "" };
     default:
@@ -131,6 +135,7 @@ const useChatHandlers = (
   sendMessage: (options: { text: string }) => void,
   setMessages: (messages: any[]) => void,
   logVisitorAnalytics: (options: { event: string }) => void,
+  pageId: string,
 ) => {
   const handleSubmit = useCallback(
     (event?: React.FormEvent) => {
@@ -148,6 +153,16 @@ const useChatHandlers = (
     dispatchUiState({ type: "RESET" });
     logVisitorAnalytics({ event: ANALYTICS_EVENTS.BIO_PAGE_CHAT_RESET });
   }, [setMessages, dispatchUiState, logVisitorAnalytics]);
+
+  const handleGoToMain = useCallback(() => {
+    localStorage.setItem(`talk-${pageId}-interface`, "chat");
+    dispatchUiState({ type: "SET_SHOW_LANDING", payload: false });
+  }, [dispatchUiState, pageId]);
+
+  const handleBackToLanding = useCallback(() => {
+    localStorage.setItem(`talk-${pageId}-interface`, "landing");
+    dispatchUiState({ type: "SET_SHOW_LANDING", payload: true });
+  }, [dispatchUiState, pageId]);
 
   const handleCloseChat = useCallback(() => {
     if (window.history.length > 1) {
@@ -178,6 +193,8 @@ const useChatHandlers = (
     handleCloseChat,
     handleSuggestionClick,
     handleInputChange,
+    handleGoToMain,
+    handleBackToLanding,
   };
 };
 
@@ -190,6 +207,7 @@ function RouteComponent(): JSX.Element {
   const [uiState, dispatchUiState] = useReducer(uiStateReducer, {
     input: "",
     isDeactivated: false,
+    showLanding: localStorage.getItem(`talk-${pageId}-interface`) !== "chat",
   });
 
   const initialMessages = useMemo(
@@ -226,7 +244,7 @@ function RouteComponent(): JSX.Element {
             if (errorData.error?.includes("offline")) {
               dispatchUiState({ type: "SET_DEACTIVATED", payload: true });
             }
-          } catch (e) {}
+          } catch (e) { }
         }
 
         return response;
@@ -264,12 +282,15 @@ function RouteComponent(): JSX.Element {
     handleCloseChat,
     handleSuggestionClick,
     handleInputChange,
+    handleGoToMain,
+    handleBackToLanding,
   } = useChatHandlers(
     uiState,
     dispatchUiState,
     sendMessage,
     setMessages,
     logVisitorAnalytics,
+    pageId,
   );
 
   const suggestions = useMemo(
@@ -304,45 +325,57 @@ function RouteComponent(): JSX.Element {
       style={{ height: "calc(var(--vh, 1vh) * 100)" }}
     >
       <div className="flex flex-col w-full max-w-[500px] overflow-hidden bg-white shadow-lg md:rounded-2xl mobile-full-height">
-        <ChatHeader
-          chatbot={chatbot}
-          onReset={handleResetChat}
-          onClose={handleCloseChat}
-          showResetButton={true}
-          showCloseButton={true}
-          resetIcon="refresh"
-          className="flex-shrink-0"
-        />
-
-        <ChatBody
-          isLoading={isLoading}
-          error={error}
-          isDeactivated={uiState.isDeactivated}
-          messages={messages}
-          setMessages={setMessages}
-          status={status}
-          chatError={chatError}
-          chatId={chatId}
-          votes={votes}
-          regenerate={regenerate}
-          chatbot={chatbot}
-          className="h-full"
-        />
-
-        {!uiState.isDeactivated && (
-          <ChatFooter
-            input={uiState.input}
-            onInputChange={handleInputChange}
-            onSubmit={handleSubmit}
-            status={status}
-            suggestions={suggestions}
-            onSuggestionClick={handleSuggestionClick}
-            showSuggestions={suggestions.length > 0}
-            showPoweredBy={showPoweredBy}
+        {uiState.showLanding ? (
+          <ChatLanding
+            onGoToMain={handleGoToMain}
             chatbot={chatbot}
-            placeholder="Chat with me..."
-            className="flex-shrink-0 space-y-2"
+            className="h-full rounded-2xl"
           />
+        ) : (
+          <>
+            <ChatHeader
+              chatbot={chatbot}
+              onReset={handleResetChat}
+              onClose={handleCloseChat}
+              onBack={handleBackToLanding}
+              showResetButton={true}
+              showCloseButton={true}
+              showBackButton={true}
+              resetIcon="refresh"
+              className="flex-shrink-0"
+            />
+
+            <ChatBody
+              isLoading={isLoading}
+              error={error}
+              isDeactivated={uiState.isDeactivated}
+              messages={messages}
+              setMessages={setMessages}
+              status={status}
+              chatError={chatError}
+              chatId={chatId}
+              votes={votes}
+              regenerate={regenerate}
+              chatbot={chatbot}
+              className="h-full"
+            />
+
+            {!uiState.isDeactivated && (
+              <ChatFooter
+                input={uiState.input}
+                onInputChange={handleInputChange}
+                onSubmit={handleSubmit}
+                status={status}
+                suggestions={suggestions}
+                onSuggestionClick={handleSuggestionClick}
+                showSuggestions={suggestions.length > 0}
+                showPoweredBy={showPoweredBy}
+                chatbot={chatbot}
+                placeholder="Chat with me..."
+                className="flex-shrink-0 space-y-2"
+              />
+            )}
+          </>
         )}
       </div>
     </div>

@@ -13,12 +13,16 @@ import { toast } from "sonner";
 import { ChatBody } from "./chat-body";
 import { ChatFooter } from "./chat-footer";
 import { ChatHeader } from "./chat-header";
+import { ChatLanding } from "./chat-landing";
 import { convertToUIMessages } from "./convert-to-ui-message";
 
 export function ChatPreview() {
   const { chatId, resetChat } = useChatWithReset();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
   const [input, setInput] = useState("");
+  const [showLanding, setShowLanding] = useState(() => {
+    return localStorage.getItem("chat-preview-interface") === "landing";
+  });
 
   const initialMessages = messagesFromDb
     ? convertToUIMessages(messagesFromDb)
@@ -83,6 +87,16 @@ export function ChatPreview() {
     queryClient.invalidateQueries({ queryKey: ["messages"] });
   }, [resetChat, setInput, queryClient]);
 
+  const handleGoToMain = useCallback(() => {
+    localStorage.setItem("chat-preview-interface", "chat");
+    setShowLanding(false);
+  }, []);
+
+  const handleBackToLanding = useCallback(() => {
+    localStorage.setItem("chat-preview-interface", "landing");
+    setShowLanding(true);
+  }, []);
+
   const { data: chatbot } = useChatbot();
 
   const SUGGESTIONS = chatbot?.suggestedMessages || [];
@@ -102,12 +116,26 @@ export function ChatPreview() {
     enabled: messages.length >= 2,
   });
 
+  if (showLanding) {
+    return (
+      <div className="flex flex-col w-full h-full max-h-[80vh] md:h-[550px] shadow-sm md:rounded-2xl overflow-hidden">
+        <ChatLanding
+          onGoToMain={handleGoToMain}
+          chatbot={chatbot}
+          className="h-full rounded-2xl"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col w-full h-full max-h-[80vh] md:h-[550px] shadow-sm md:rounded-2xl overflow-hidden">
       <ChatHeader
         chatbot={chatbot}
         onReset={handleResetChat}
+        onBack={handleBackToLanding}
         showResetButton={true}
+        showBackButton={true}
         resetIcon="refresh"
         className="rounded-t-2xl"
       />

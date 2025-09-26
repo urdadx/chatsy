@@ -53,7 +53,7 @@
 }
 
 :root {
-  --radius: 0.75rem;
+  --radius: 0.9rem;
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.141 0.005 285.823);
@@ -173,7 +173,7 @@ html {
   @font-face {
     font-family: "Inter";
     font-style: normal;
-    font-weight: normal;
+    font-weight: 100;
     font-display: swap;
     src: url("./assets/fonts/Inter-Regular.ttf") format("truetype");
   }

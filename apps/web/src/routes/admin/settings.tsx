@@ -1,4 +1,6 @@
 import { Billing } from "@/components/settings/billing-page";
+import { ProfileDelete } from "@/components/settings/profile-delete";
+import { UserProfileImageSettings } from "@/components/settings/user-profile-image-settings";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -102,7 +104,10 @@ function RouteComponent() {
             <div className="space-y-6 mt-5">
               <WorkspaceNameSettings />
               <WorkspaceLogoSettings />
+              <UserProfileImageSettings />
               <WorkspaceDelete />
+              <ProfileDelete />
+
             </div>
             <div className="h-14" />
           </TabsContent>
@@ -120,7 +125,7 @@ function RouteComponent() {
                 </Button>
               )}
             </div>
-            <div className="w-full border rounded-lg p-4">
+            <div className="w-full border rounded-3xl p-4">
               <MembersTable />
             </div>
           </TabsContent>
@@ -134,7 +139,7 @@ function RouteComponent() {
                 </Button>
               )}
             </div>
-            <div className="w-full border rounded-lg p-4">
+            <div className="w-full border rounded-3xl p-4">
               <InvitationsTable />
             </div>
           </TabsContent>

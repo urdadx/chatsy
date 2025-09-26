@@ -1,7 +1,5 @@
 import { useUpdatePrimaryColor } from "@/lib/hooks/use-primary-color";
-import { getChatbotDetails } from "@/lib/server-functions/onboarding-queries";
 import { cn, containerVariants } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -12,13 +10,6 @@ import { ColorPickerDialog } from "./pick-color-onboard";
 export const StepTwo = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>("#8b5cf6");
   const updatePrimaryColorMutation = useUpdatePrimaryColor();
-
-  const { data: chatbot } = useQuery({
-    queryKey: ["chatbot"],
-    queryFn: async () => getChatbotDetails(),
-  });
-
-  console.log("Chatbot Data:", chatbot);
 
   const colors = [
     "#8b5cf6",
@@ -49,9 +40,9 @@ export const StepTwo = () => {
     >
       <div className="flex flex-col gap-6 pt-6 flex-1 min-h-[350px]">
         <div className="flex flex-col">
-          <h1 className="text-2xl text-start font-semibold">Chatbot</h1>
+          <h1 className="text-2xl text-start font-semibold">Appearance</h1>
           <p className="text-start text-muted-foreground">
-            Customize your bot to your brand
+            Customize your chatbot to your brand
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -63,7 +54,7 @@ export const StepTwo = () => {
                 "w-8 h-8 rounded-full transition-all duration-200",
                 selectedColor === color && "ring-2 ring-offset-2",
                 updatePrimaryColorMutation.isPending &&
-                  "opacity-50 cursor-not-allowed",
+                "opacity-50 cursor-not-allowed",
               )}
               style={{
                 backgroundColor: color,

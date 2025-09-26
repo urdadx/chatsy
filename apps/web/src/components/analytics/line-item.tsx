@@ -75,7 +75,7 @@ export function LineItem({
                 width: `${percentWidth}%`,
               }}
               className={cn(
-                "absolute h-full origin-left rounded",
+                "absolute h-full origin-left rounded-md",
                 barBackground,
                 isHovered ? "opacity-80" : "opacity-70",
               )}

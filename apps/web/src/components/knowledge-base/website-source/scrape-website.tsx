@@ -1,3 +1,4 @@
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PlayIcon } from "lucide-react";
@@ -11,6 +12,7 @@ import Spinner from "../../ui/spinner";
 export const ScrapeWebsite = () => {
   const [url, setUrl] = useState("");
   const queryClient = useQueryClient();
+  const { setBanner } = useRetrainingBanner();
 
   const mutation = useMutation({
     mutationFn: async (url: string) => {
@@ -20,10 +22,7 @@ export const ScrapeWebsite = () => {
     onSuccess: (data) => {
       if (data.success) {
         queryClient.invalidateQueries({ queryKey: ["website-sources"] });
-
-        // Clear lastTrainedAt to trigger retraining banner
-        localStorage.removeItem("lastTrainedAt");
-
+        setBanner(true, "Retraining required");
         toast.success("Content extracted successfully!");
         setUrl("");
       } else {

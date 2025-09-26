@@ -13,13 +13,13 @@ export const SUBSCRIPTION_TIERS: Record<string, SubscriptionTier> = {
   starter: {
     name: "Starter",
     chatbotLimit: 1,
-    memberLimit: 1,
+    memberLimit: 2,
     slug: "starter",
   },
   growth: {
     name: "Growth",
     chatbotLimit: 3,
-    memberLimit: 4,
+    memberLimit: 5,
     slug: "growth",
   },
   professional: {

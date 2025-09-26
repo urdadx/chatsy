@@ -25,7 +25,7 @@ export function UsageBanner() {
       <Card className="shadow-none h-fit">
         <div className="px-4 grid gap-4">
           <Skeleton className="h-4 w-32 mb-2" />
-          <Skeleton className="h-3 w-full mb-4" />
+          {/* <Skeleton className="h-3 w-full mb-4" /> */}
           <Skeleton className="h-8 w-full" />
         </div>
       </Card>
@@ -40,18 +40,19 @@ export function UsageBanner() {
     <Card className="shadow-none h-fit">
       <div className="px-4 grid gap-4">
         {activeMeters ? (
-          <h3 className="text-sm font-medium text-gray-600">
-            Usage: {currentUsage} / {totalUsage}
-          </h3>
+          ""
         ) : (
           <h3 className="text-sm font-medium text-gray-600">
             No subscription found
           </h3>
         )}
-        <div className="mb-2">
-          <div className="flex justify-between text-xs">
-            <span className="mb-2">
-              Resets in {getDaysUntilReset(createdAt)}
+        <div className="">
+          <div className="flex justify-between text-xs mb-2">
+            <span className="">
+              Credits used
+            </span>
+            <span>
+              {currentUsage} / {totalUsage}{" "}
             </span>
           </div>
           <Progress value={usagePercentage} />

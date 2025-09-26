@@ -44,11 +44,11 @@ export const FailedStatus = () => {
     <div className="flex flex-col gap-4">
       <p className="text-lg font-semibold text-gray-800">Training status</p>
 
-      <div className="p-4 bg-red-50 border border-red-200 rounded-xl shadow-sm">
-        <div className="flex items-start gap-3">
-          <RiCheckboxCircleFill className="h-6 w-6 text-red-600 mt-0.5" />
+      <div className="group relative overflow-hidden rounded-3xl border border-foreground/10 bg-gradient-to-bl from-red-50 via-red-25 to-background p-2.5 shadow-xs transition-transform hover:scale-[1.02] dark:shadow-none dark:from-red-950/20 dark:via-red-900/10">
+        <div className="flex items-start gap-3 p-1.5">
           <div>
-            <p className="text-base font-medium text-red-700">
+            <p className="text-base flex items-center gap-2 font-medium text-red-700">
+              <RiCheckboxCircleFill className="h-6 w-6 text-red-600 mt-0.5" />
               Training failed
             </p>
             <p className="text-sm text-red-600 mt-1 leading-relaxed max-w-2xl">

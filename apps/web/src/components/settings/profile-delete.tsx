@@ -74,7 +74,7 @@ export const ProfileDelete = () => {
 
   return (
     <div className="mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-red-300 overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-sm border border-red-300 overflow-hidden">
         <div className="p-6">
           <h2 className="text-base font-semibold mb-2">Delete Account</h2>
           <p className="text-gray-600 text-sm">

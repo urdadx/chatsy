@@ -91,13 +91,12 @@ export const WorkspaceDelete = () => {
 
   return (
     <div className="mx-auto">
-      <div className="bg-white rounded-xl shadow-xs border border-red-300 overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-xs border border-red-300 overflow-hidden">
         <div className="p-6">
           <h2 className="text-base font-semibold mb-2">Delete organization</h2>
           <p className="text-gray-600 text-sm">
             Permanently remove your organization "{workspaceName}" and all of
-            its contents. This action is not reversible, so please continue with
-            caution.
+            its contents. This action is not reversible.
           </p>
         </div>
         <div className="bg-red-50 px-6 py-4 flex justify-end border-t border-red-300">

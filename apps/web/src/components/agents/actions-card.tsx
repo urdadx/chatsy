@@ -57,7 +57,7 @@ export const ActionCard = ({
   };
 
   return (
-    <div className="bg-white rounded-md p-3 sm:p-4 border border-gray-200 shadow-xs w-full max-w-xs mx-auto h-full">
+    <div className="bg-white rounded-3xl p-3 sm:p-4 border border-gray-200 shadow-xs w-full max-w-xs mx-auto h-full">
       <div className="flex flex-col gap-3 sm:gap-4 h-full">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">

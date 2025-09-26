@@ -201,8 +201,6 @@ export const ServerRoute = createServerFileRoute(
             },
           });
 
-          result.consumeStream();
-
           dataStream.merge(
             result.toUIMessageStream({
               sendReasoning: false,

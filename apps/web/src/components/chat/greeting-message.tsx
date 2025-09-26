@@ -33,7 +33,7 @@ export const GreetingMessage = ({ title }: any) => {
                 className="flex flex-col gap-4 text-foreground bg-gray-50 prose px-3 py-2 rounded-md break-words whitespace-normal"
               >
                 <ResponseStream
-                  textStream={sanitizeText(title)}
+                  textStream={title}
                   mode="typewriter"
                   speed={25}
                   className="text-md"

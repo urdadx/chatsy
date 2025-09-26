@@ -114,6 +114,8 @@ export function WidgetSettings() {
               checked={isEmbeddingEnabled}
               onCheckedChange={handleEmbeddingToggle}
               disabled={updateChatbotMutation.isPending}
+              className="data-[state=checked]:bg-green-500"
+
             />
             {updateChatbotMutation.isPending && (
               <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-r-transparent" />

@@ -392,7 +392,7 @@ export default function Component() {
       </div>
 
       {/* Table */}
-      <div className="bg-background overflow-hidden rounded-md border">
+      <div className="bg-background overflow-hidden rounded-3xl border">
         <Table className="table-fixed">
           <TableHeader className="bg-purple-50 ">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -408,7 +408,7 @@ export default function Component() {
                         <div
                           className={cn(
                             header.column.getCanSort() &&
-                              "flex h-full cursor-pointer items-center justify-between gap-2 select-none",
+                            "flex h-full cursor-pointer items-center justify-between gap-2 select-none",
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                           onKeyDown={(e) => {
@@ -527,8 +527,8 @@ export default function Component() {
               {Math.min(
                 Math.max(
                   table.getState().pagination.pageIndex *
-                    table.getState().pagination.pageSize +
-                    table.getState().pagination.pageSize,
+                  table.getState().pagination.pageSize +
+                  table.getState().pagination.pageSize,
                   0,
                 ),
                 table.getRowCount(),

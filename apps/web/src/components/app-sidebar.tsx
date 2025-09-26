@@ -7,6 +7,7 @@ import {
   SidebarProvider,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useSession } from "@/lib/auth-client";
 import { Outlet } from "@tanstack/react-router";
 import {
   Book,
@@ -22,6 +23,7 @@ import type * as React from "react";
 import { NavMain } from "./nav-main";
 import { Navbar } from "./navbar";
 import { UsageBanner } from "./usage-banner";
+import { UserDropdown } from "./user-dropdown";
 import { ChatbotSwitcher } from "./workspace/chatbot-switcher";
 
 const data = {
@@ -72,9 +74,13 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: session } = useSession();
+
+  const user = session?.user;
+
   return (
     <SidebarProvider>
-      <Sidebar className="z-0" collapsible="offcanvas" {...props}>
+      <Sidebar variant="floating" className="z-0 bg-slate-25 " collapsible="offcanvas" {...props}>
         <SidebarHeader className="pb-2">
           {/* <div className="flex gap-2 items-center pb-2">
             <Logo />
@@ -91,10 +97,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarContent>
         <SidebarFooter>
           <UsageBanner />
+          <UserDropdown user={user} />
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>
-      <SidebarInset>
+      <SidebarInset className="bg-white">
         <Navbar />
         <Outlet />
       </SidebarInset>

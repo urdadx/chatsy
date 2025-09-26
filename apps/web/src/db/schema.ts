@@ -201,9 +201,12 @@ export const chatbot = pgTable("chatbot", {
   primaryColor: text("primary_color").notNull().default("#9333ea"),
   theme: text("theme").notNull().default("light"),
   hidePoweredBy: boolean("hide_powered_by").notNull().default(false),
+  personality: varchar("personality", { enum: ["support", "sales", "lead"] })
+    .notNull()
+    .default("support"),
   initialMessage: text("initial_message")
     .notNull()
-    .default("Hello there👋, how can i help you today?"),
+    .default("Hello there👋, how can I help you today?"),
   suggestedMessages: text("suggested_messages").array(),
 
   // Training and sources fields moved from organization

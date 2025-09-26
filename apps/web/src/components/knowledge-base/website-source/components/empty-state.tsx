@@ -8,10 +8,10 @@ export const EmptyState = ({
   hasFilteredSources,
 }: EmptyStateProps) => {
   return (
-    <div className="text-muted-foreground">
+    <div className="text-muted-foreground text-center">
       {hasAllSources && !hasFilteredSources
         ? "No matching sources found."
-        : "No website sources found."}
+        : "No link sources found."}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useChatbot } from "@/hooks/use-chatbot";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Globe, Users } from "lucide-react";
+import { ArrowRight, Globe, Rocket, Users } from "lucide-react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useMediaQuery } from "usehooks-ts";
@@ -67,7 +67,7 @@ export const ShareBot = () => {
 
   const triggerButton = (
     <Button variant={"outline"} className="w-fit text-primary">
-      <Users className="w-4 h-4" />
+      <Rocket className="w-4 h-4" />
       <span className="hidden sm:inline">Share your bot</span>
       <span className="inline sm:hidden">Share</span>
     </Button>

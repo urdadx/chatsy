@@ -190,13 +190,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                 },
               });
 
-              result.consumeStream();
-
-              dataStream.merge(
-                result.toUIMessageStream({
-                  sendReasoning: false,
-                }),
-              );
+              dataStream.merge(result.toUIMessageStream());
             },
             generateId: generateUUID,
             onFinish: async ({ messages }) => {
@@ -216,11 +210,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             stream.pipeThrough(new JsonToSseTransformStream()),
           );
 
-          // Add custom headers including chat ID
           const headers = new Headers(response.headers);
-          headers.set("X-Chat-Id", id);
-          headers.set("Cache-Control", "no-cache");
-          headers.set("Connection", "keep-alive");
           headers.set("Content-Type", "text/event-stream");
 
           return new Response(response.body, {

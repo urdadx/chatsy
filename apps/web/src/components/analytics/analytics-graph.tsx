@@ -200,7 +200,7 @@ export function ChatAnalytics({
           </SelectContent>
         </Select>
       </div>
-      <div className="px-1 py-5 w-full rounded-xl border bg-white">
+      <div className="px-1 py-5 w-full rounded-3xl border bg-white">
         <CardHeader className=" flex flex-row flex-wrap justify-between gap-4">
           <div className="flex flex-col gap-1 text-left min-w-24">
             <CardTitle className="flex items-center gap-3 text-muted-foreground text-xs">

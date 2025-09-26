@@ -1,3 +1,4 @@
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
@@ -13,6 +14,7 @@ export const QuestionSource = () => {
   const queryClient = useQueryClient();
   const [questionText, setQuestionText] = useState("");
   const [answerText, setAnswerText] = useState("");
+  const { setBanner } = useRetrainingBanner();
 
   const addQuestionMutation = useMutation({
     mutationFn: async (newQuestion: { question: string; answer: string }) => {
@@ -21,6 +23,7 @@ export const QuestionSource = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["questions"] });
+      setBanner(true, "Retraining required");
       setQuestionText("");
       setAnswerText("");
       toast.success("Question added successfully!");
@@ -42,7 +45,7 @@ export const QuestionSource = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-2 rounded-md p-6 border">
+      <div className="flex flex-col gap-2 rounded-3xl p-6 border">
         <div className="flex flex-col gap-2 mb-3">
           <h2 className="font-semibold text-lg">Q&A</h2>
           <p className="text-semibold text-base text-muted-foreground">

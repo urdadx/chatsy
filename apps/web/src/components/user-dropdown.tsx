@@ -51,6 +51,7 @@ export function UserDropdown({ user }: any) {
   const { data: chatbot } = useChatbot();
 
   const triggerButton = (
+
     <SidebarMenuButton
       size="lg"
       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
@@ -61,6 +62,12 @@ export function UserDropdown({ user }: any) {
           <User className="h-5 w-5 text-gray-600" />
         </AvatarFallback>
       </Avatar>
+      <div className="grid flex-1 text-left text-sm leading-tight">
+        <span className="truncate font-medium">{user?.name}</span>
+        <span className="text-muted-foreground truncate text-xs">
+          {user?.email}
+        </span>
+      </div>
     </SidebarMenuButton>
   );
 
@@ -111,7 +118,7 @@ export function UserDropdown({ user }: any) {
             <DropdownMenuContent
               className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
               side="bottom"
-              align="end"
+              align="start"
               sideOffset={4}
             >
               <DropdownMenuGroup>

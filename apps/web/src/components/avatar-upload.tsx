@@ -24,6 +24,8 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
 import { useFileUpload } from "@/hooks/use-file-upload";
+import type { AnyColumn } from "drizzle-orm";
+import { toast } from "sonner";
 
 // Define type for pixel crop area
 type Area = { x: number; y: number; width: number; height: number };
@@ -139,18 +141,15 @@ export function AvatarUpload() {
     try {
       setIsUploading(true);
 
-      // 1. Get the cropped image blob
       const croppedBlob = await getCroppedImg(previewUrl, croppedAreaPixels);
 
       if (!croppedBlob) {
         throw new Error("Failed to generate cropped image blob.");
       }
 
-      // 2. Create FormData for upload
       const formData = new FormData();
       formData.append("file", croppedBlob, "avatar.jpg");
 
-      // 3. Upload via API endpoint
       const uploadResponse = await fetch("/api/upload-images", {
         method: "POST",
         body: formData,
@@ -162,7 +161,6 @@ export function AvatarUpload() {
 
       const { url: uploadedImageUrl } = await uploadResponse.json();
 
-      // 4. Update chatbot with new image URL
       const updatedChatbot = {
         ...chatbot,
         image: uploadedImageUrl,
@@ -170,19 +168,16 @@ export function AvatarUpload() {
 
       await updateChatbotMutation.mutateAsync(updatedChatbot);
 
-      // 6. Update local state
       if (finalImageUrl?.startsWith("blob:")) {
         URL.revokeObjectURL(finalImageUrl);
       }
       setFinalImageUrl(uploadedImageUrl as string);
 
-      // 7. Clean up
       removeFile(fileId);
       setIsDialogOpen(false);
       setCroppedAreaPixels(null);
     } catch (error) {
       console.error("Error during apply:", error);
-      // You might want to show a toast notification here
     } finally {
       setIsUploading(false);
     }
@@ -207,7 +202,6 @@ export function AvatarUpload() {
       setFinalImageUrl(null);
     } catch (error) {
       console.error("Error removing image:", error);
-      // You might want to show a toast notification here
     }
   };
 
@@ -242,10 +236,10 @@ export function AvatarUpload() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative inline-flex w-fit">
+      <div className="relative inline-flex w-fit border border-dashed rounded-full border-primary">
         <button
           type="button"
-          className="border-primary h-14 w-14 hover:bg-accent/50 data-[dragging=true]:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/50 relative flex items-center justify-center overflow-hidden rounded-full border border-dashed transition-colors outline-none focus-visible:ring-[3px] has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none"
+          className="border-primary h-14 w-14 hover:bg-accent/50 data-[dragging=true]:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/50 relative flex items-center justify-center overflow-hidden rounded-full  transition-colors outline-none focus-visible:ring-[3px] has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none"
           onClick={openFileDialog}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}

@@ -16,7 +16,7 @@ import {
 import { useSubscriptionLimits } from "@/hooks/use-subscription-limits";
 import { cn } from "@/lib/utils";
 import { RiCheckboxCircleFill } from "@remixicon/react";
-import { ArrowRight, Bot, Plus } from "lucide-react";
+import { ArrowRight, Bot } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -207,10 +207,8 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
               >
                 <Button
                   onClick={handleCreateNewClick}
-                  variant="outline"
                   className="w-full"
                 >
-                  <Plus className="w-4 h-4" />
                   Create New Chatbot
                 </Button>
               </motion.div>

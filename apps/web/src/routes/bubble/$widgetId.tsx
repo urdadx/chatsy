@@ -1,6 +1,7 @@
 import { ChatBody } from "@/components/chat/chat-body";
 import { ChatFooter } from "@/components/chat/chat-footer";
 import { ChatHeader } from "@/components/chat/chat-header";
+import { ChatLanding } from "@/components/chat/chat-landing";
 import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
@@ -44,6 +45,8 @@ const uiStateReducer = (state: any, action: any) => {
       return { ...state, input: action.payload };
     case "SET_DEACTIVATED":
       return { ...state, isDeactivated: action.payload };
+    case "SET_SHOW_LANDING":
+      return { ...state, showLanding: action.payload };
     case "RESET":
       return { ...state, input: "" };
     default:
@@ -179,6 +182,7 @@ function RouteComponent() {
   const [uiState, dispatchUiState] = useReducer(uiStateReducer, {
     input: "",
     isDeactivated: false,
+    showLanding: localStorage.getItem(`bubble-${widgetId}-interface`) !== "chat",
   });
 
   const initialMessages = useMemo(
@@ -300,6 +304,16 @@ function RouteComponent() {
     dispatchUiState({ type: "RESET" });
   }, [resetChat, setMessages]);
 
+  const handleGoToMain = useCallback(() => {
+    localStorage.setItem(`bubble-${widgetId}-interface`, "chat");
+    dispatchUiState({ type: "SET_SHOW_LANDING", payload: false });
+  }, [widgetId]);
+
+  const handleBackToLanding = useCallback(() => {
+    localStorage.setItem(`bubble-${widgetId}-interface`, "landing");
+    dispatchUiState({ type: "SET_SHOW_LANDING", payload: true });
+  }, [widgetId]);
+
   const suggestions = useMemo(
     () => chatbot?.suggestedMessages || [],
     [chatbot?.suggestedMessages],
@@ -333,43 +347,55 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col w-full h-screen md:h-[550px] md:rounded-2xl overflow-hidden">
-      <ChatHeader
-        chatbot={chatbot}
-        onReset={handleResetChat}
-        onClose={handleCloseWidget}
-        showResetButton={messages.length > 0}
-        showCloseButton={true}
-        resetIcon="rotate"
-      />
-
-      <ChatBody
-        isLoading={isLoading}
-        error={error}
-        isDeactivated={uiState.isDeactivated}
-        messages={messages}
-        setMessages={setMessages}
-        status={status}
-        chatError={chatError}
-        chatId={chatId}
-        votes={votes}
-        regenerate={regenerate}
-        chatbot={chatbot}
-        className="w-full"
-      />
-
-      {!uiState.isDeactivated && (
-        <ChatFooter
-          input={uiState.input}
-          onInputChange={handleInputChange}
-          onSubmit={handleSubmit}
-          status={status}
-          suggestions={suggestions}
-          onSuggestionClick={handleSuggestionClick}
-          showSuggestions={suggestions.length > 0}
-          showPoweredBy={showPoweredBy}
+      {uiState.showLanding ? (
+        <ChatLanding
+          onGoToMain={handleGoToMain}
           chatbot={chatbot}
-          placeholder="Type a message..."
+          className="h-full rounded-2xl"
         />
+      ) : (
+        <>
+          <ChatHeader
+            chatbot={chatbot}
+            onReset={handleResetChat}
+            onClose={handleCloseWidget}
+            onBack={handleBackToLanding}
+            showResetButton={messages.length > 0}
+            showCloseButton={true}
+            showBackButton={true}
+            resetIcon="rotate"
+          />
+
+          <ChatBody
+            isLoading={isLoading}
+            error={error}
+            isDeactivated={uiState.isDeactivated}
+            messages={messages}
+            setMessages={setMessages}
+            status={status}
+            chatError={chatError}
+            chatId={chatId}
+            votes={votes}
+            regenerate={regenerate}
+            chatbot={chatbot}
+            className="w-full"
+          />
+
+          {!uiState.isDeactivated && (
+            <ChatFooter
+              input={uiState.input}
+              onInputChange={handleInputChange}
+              onSubmit={handleSubmit}
+              status={status}
+              suggestions={suggestions}
+              onSuggestionClick={handleSuggestionClick}
+              showSuggestions={suggestions.length > 0}
+              showPoweredBy={showPoweredBy}
+              chatbot={chatbot}
+              placeholder="Type a message..."
+            />
+          )}
+        </>
       )}
     </div>
   );

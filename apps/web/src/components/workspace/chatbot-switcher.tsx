@@ -26,9 +26,10 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { RiCheckboxCircleFill } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronsUpDown, PlusIcon, UserRoundPlus } from "lucide-react";
+import { ChevronsUpDown, PlusIcon, User, UserRoundPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { InviteMembers } from "./invite-members";
 import { ChatbotManager } from "./new-chabot";
 
@@ -69,6 +70,8 @@ export function ChatbotSwitcher() {
     }
   };
 
+
+
   const [openCreateChatbot, setOpenCreateChatbot] = useState(false);
   const [inviteMembersOpen, setInviteMembersOpen] = useState(false);
 
@@ -88,12 +91,15 @@ export function ChatbotSwitcher() {
       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
     >
       {currentLogo ? (
-        <div className="rounded-full w-4 h-4">
-          <img
-            src={currentLogo}
-            alt={activeChatbot?.name}
-            className="h-full w-full rounded-full object-cover "
-          />
+        <div className="rounded-full w-8 h-8">
+          <Avatar className="h-8 w-8 rounded-full object-cover "
+          >
+            <AvatarImage src={currentLogo} alt={activeChatbot?.name} />
+            <AvatarFallback>
+              <User className="h-5 w-5 text-gray-600" />
+            </AvatarFallback>
+          </Avatar>
+
         </div>
       ) : (
         <SafeBoringAvatar name={activeChatbot?.name} size={25} />
@@ -136,18 +142,18 @@ export function ChatbotSwitcher() {
                 key={chatbot.id}
                 type="button"
                 onClick={() => handleSwitchChatbot(chatbot.id)}
-                className={`flex items-center gap-2 w-full p-2 rounded transition-colors ${
-                  chatbot.id === activeChatbot?.id
-                    ? "bg-accent text-accent-foreground"
-                    : "hover:bg-gray-100"
-                }`}
+                className={`flex items-center gap-2 w-full p-2 rounded transition-colors ${chatbot.id === activeChatbot?.id
+                  ? "bg-accent text-accent-foreground"
+                  : "hover:bg-gray-100"
+                  }`}
               >
                 {chatbot.image ? (
-                  <img
-                    src={chatbot.image}
-                    alt={chatbot.name}
-                    className="h-5 w-5 rounded-full object-cover"
-                  />
+                  <Avatar className="h-10 w-10 rounded-full border-2 border-primary">
+                    <AvatarImage src={chatbot?.image} alt={chatbot?.name} />
+                    <AvatarFallback>
+                      <User className="h-5 w-5 text-gray-600" />
+                    </AvatarFallback>
+                  </Avatar>
                 ) : (
                   <SafeBoringAvatar
                     name={chatbot.name}
@@ -208,13 +214,13 @@ export function ChatbotSwitcher() {
           setOpen={setInviteMembersOpen}
         />
         <SidebarMenu>
-          <SidebarMenuItem className="bg-transparent border-2 rounded-lg p-1">
+          <SidebarMenuItem className="bg-transparent border-1 rounded-lg p-1">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-[--radix-dropdown-menu-trigger-width] min-w-58 rounded-lg"
                 side="bottom"
-                align="end"
+                align="start"
               >
                 {isAdmin && (
                   <>
@@ -247,11 +253,13 @@ export function ChatbotSwitcher() {
                           }
                         >
                           {chatbot.image ? (
-                            <img
-                              src={chatbot.image}
-                              alt={chatbot.name}
-                              className="h-5 w-5 rounded-full object-cover"
-                            />
+                            <Avatar className="h-6 w-6 rounded-full border-2 border-primary">
+                              <AvatarImage src={chatbot?.image} alt={chatbot?.name} />
+                              <AvatarFallback>
+                                <User className="h-5 w-5 text-gray-600" />
+                              </AvatarFallback>
+                            </Avatar>
+
                           ) : (
                             <SafeBoringAvatar
                               name={chatbot.name}

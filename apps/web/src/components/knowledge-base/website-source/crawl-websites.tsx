@@ -1,3 +1,4 @@
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
@@ -10,6 +11,7 @@ import Spinner from "../../ui/spinner";
 
 export const CrawlWebsites = () => {
   const [url, setUrl] = useState("");
+  const { setBanner } = useRetrainingBanner();
 
   const mutation = useMutation({
     mutationFn: async (url: string) => {
@@ -18,6 +20,8 @@ export const CrawlWebsites = () => {
     },
     onSuccess: (data) => {
       if (data.success) {
+        setBanner(true, "Retraining required");
+
         const toastId = toast.loading("Crawling in progress...", {
           description: `Extracting content from ${new URL(data.url).hostname}`,
           duration: Number.POSITIVE_INFINITY,
@@ -61,7 +65,7 @@ export const CrawlWebsites = () => {
           Enter a website URL to crawl and extract content from all pages.
         </p>
         <div className="w-full flex justify-between items-center gap-2">
-          <div className="flex rounded-md shadow-xs flex-1">
+          <div className="flex rounded-3xl shadow-xs flex-1">
             <span className="border-input bg-gray-50 text-gray-500 inline-flex items-center rounded-s-md border px-3 text-sm">
               https://
             </span>

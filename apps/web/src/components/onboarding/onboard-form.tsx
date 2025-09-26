@@ -1,6 +1,5 @@
 import GirlPointing from "@/assets/svgs/girl-pointing";
 import { Card, CardContent } from "@/components/ui/card";
-
 import { cn } from "@/lib/utils";
 import OnboardStepper from "./onboard-stepper";
 

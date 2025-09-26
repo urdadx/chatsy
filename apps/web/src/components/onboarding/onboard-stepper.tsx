@@ -6,11 +6,12 @@ import {
 } from "@/components/ui/stepper";
 import { useStepperStore } from "../store/stepper-store";
 import { Completed } from "./completed";
+import { StepFour } from "./step-four";
 import { StepOne } from "./step-one";
 import { StepThree } from "./step-three";
 import { StepTwo } from "./step-two";
 
-const steps = [1, 2, 3, 4];
+const steps = [1, 2, 3, 4, 5];
 
 const renderStepComponent = (step: number) => {
   switch (step) {
@@ -21,6 +22,8 @@ const renderStepComponent = (step: number) => {
     case 3:
       return <StepThree />;
     case 4:
+      return <StepFour />;
+    case 5:
       return <Completed />;
     default:
       return null;

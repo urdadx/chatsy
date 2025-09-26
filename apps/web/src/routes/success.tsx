@@ -21,7 +21,7 @@ function RouteComponent() {
       />
       <main className="relative min-h-screen w-full bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] before:absolute before:-z-10 before:inset-0 before:bg-[radial-gradient(circle_at_left,rgba(251,146,60,0.05),rgba(139,92,246,0.05),transparent_50%)] after:absolute after:-z-10 after:inset-0 after:bg-[radial-gradient(circle_at_right,rgba(251,146,60,0.05),rgba(139,92,246,0.05),transparent_50%)]">
         <div className="flex min-h-screen items-center justify-center p-4 sm:p-6 lg:p-8">
-          <Card className="w-full max-w-md bg-white ">
+          <Card className="w-full rounded-3xl max-w-md bg-white ">
             <CardContent className="p-6 sm:p-8 text-center">
               <div className="relative mb-6 sm:mb-8">
                 <div className="relative mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">

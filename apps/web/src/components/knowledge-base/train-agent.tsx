@@ -16,7 +16,7 @@ export const TrainAgent = () => {
   const [lastTrainedAt, setLastTrainedAt] = useState<Date | null>(null);
   const { data: session } = useSession();
   const organizationId = session?.session?.activeOrganizationId;
-  const { show, setBanner } = useRetrainingBanner();
+  const { show, message, setBanner } = useRetrainingBanner();
 
   useEffect(() => {
     const storedTimestamp = localStorage.getItem("lastTrainedAt");
@@ -159,13 +159,12 @@ export const TrainAgent = () => {
 
   return (
     <div className="w-full space-y-3">
-      {isStale ||
-        (show && (
-          <Alert variant="warning">
-            <InfoIcon className="h-4 w-4" />
-            <AlertDescription>Retraining required</AlertDescription>
-          </Alert>
-        ))}
+      {(isStale || show) && (
+        <Alert variant="warning">
+          <InfoIcon className="h-4 w-4" />
+          <AlertDescription>{show ? message : "Retraining required"}</AlertDescription>
+        </Alert>
+      )}
       <h1 className="text-lg font-semibold ">Sources</h1>
       <FileStatCard
         icon={<Paperclip className="w-5 h-5 text-primary/70" />}
@@ -220,7 +219,7 @@ function FileStatCard({
     typeof size === "string" ? size.replace(/(\d)([A-Za-z])/, "$1 $2") : size;
 
   return (
-    <div className="w-full border bg-white rounded-lg ">
+    <div className="w-full border bg-white rounded-2xl ">
       <div className="p-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           {icon}

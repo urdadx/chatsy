@@ -63,8 +63,8 @@ export function ChatbotCard({
 
   return (
     <>
-      <div className="w-full max-w-sm mx-auto">
-        <div className="overflow-hidden border rounded-lg">
+      <div className="w-full max-w-sm ">
+        <div className="overflow-hidden border rounded-3xl">
           <div className="relative h-24 overflow-hidden">
             {logo ? (
               <img

@@ -25,6 +25,7 @@ export function createRouter() {
     queryClient,
     handleRedirects: true,
     wrapQueryClient: true,
+
   });
 
   return router;

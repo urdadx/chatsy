@@ -105,9 +105,9 @@ function RouteComponent() {
 
   if (!isLoading && !isError && chats.length === 0) {
     return (
-      <div className="max-w-5xl lg:max-w-6xl w-full overflow-hidden h-screen mx-auto p-1 sm:p-4">
-        <div className="bg-white border rounded-lg py-2 h-full flex flex-col">
-          <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white">
+      <div className="max-w-5xl lg:max-w-6xl w-full h-[90vh] mx-auto p-1 sm:p-4">
+        <div className="bg-white border rounded-3xl py-2 h-full flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white rounded-t-3xl">
             <h1 className="text-md font-semibold hidden sm:flex">Chat Logs</h1>
             <div className="flex items-center space-x-3">
               <Select value={filter} onValueChange={handleFilterChange}>
@@ -158,10 +158,10 @@ function RouteComponent() {
 
   return (
     <>
-      <div className="max-w-5xl lg:max-w-6xl w-full overflow-hidden h-screen mx-auto p-1 sm:p-4">
-        <div className="bg-white border rounded-lg py-2 h-full flex flex-col">
+      <div className="max-w-5xl lg:max-w-6xl w-full h-[90vh] mx-auto p-1 sm:p-6">
+        <div className="bg-white border rounded-3xl py-2 h-full flex flex-col overflow-hidden">
           {/* Chat Header */}
-          <div className="w-full flex items-center gap-2 justify-between px-4 pt-1 pb-2 border-b bg-white">
+          <div className="w-full flex items-center gap-2 justify-between px-4 pt-1 pb-2 border-b bg-white rounded-t-3xl">
             <div className="flex items-center space-x-3 relative">
               <h1 className="text-md font-semibold">Chat History</h1>
             </div>{" "}

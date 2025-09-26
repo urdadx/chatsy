@@ -1,6 +1,7 @@
 import { db } from "@/db";
-import { chatbot, documentSource, member } from "@/db/schema";
+import { chatbot, documentSource } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
+import { deleteFileFromStorage } from "@/lib/hooks/delete-from-storage";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -131,7 +132,6 @@ export const ServerRoute = createServerFileRoute(
       return json({ error: "No active chatbot" }, { status: 400 });
     }
 
-    // Verify chatbot exists and user has access to its organization
     const [chatbotData] = await db
       .select({ organizationId: chatbot.organizationId })
       .from(chatbot)
@@ -142,19 +142,12 @@ export const ServerRoute = createServerFileRoute(
       return json({ error: "Chatbot not found" }, { status: 404 });
     }
 
-    // Verify user is a member of the chatbot's organization
-    const [membership] = await db
-      .select({ id: member.id })
-      .from(member)
-      .where(
-        and(
-          eq(member.organizationId, chatbotData.organizationId),
-          eq(member.userId, userId),
-        ),
-      )
-      .limit(1);
+    const isMember = await isUserMemberOfOrganization(
+      userId,
+      chatbotData.organizationId,
+    );
 
-    if (!membership) {
+    if (!isMember) {
       return json({ error: "Unauthorized: Access denied" }, { status: 403 });
     }
 
@@ -190,6 +183,12 @@ export const ServerRoute = createServerFileRoute(
           sourcesCount: sql`greatest(0, ${chatbot.sourcesCount} - 1)`,
         })
         .where(eq(chatbot.id, chatbotId));
+      // Delete the file from firebase storage
+      try {
+        await deleteFileFromStorage(deleted.url);
+      } catch (error) {
+        console.error("Failed to delete file from storage:", error);
+      }
     }
 
     return json({ message: "Document source deleted", deleted });
