@@ -19,6 +19,7 @@ import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import Spinner from "../ui/spinner";
+import { PersonalitySelector } from "./personality-selector";
 import { PickColor } from "./pick-color";
 import { WidgetSettings } from "./widget-settings";
 
@@ -54,7 +55,6 @@ export function ChatbotSettings() {
       await updateChatbotMutation.mutateAsync(updatedChatbot);
     } catch (error) {
       toast.error("Failed to update");
-      console.error("Error updating branding:", error);
     }
   };
 
@@ -144,7 +144,6 @@ export function ChatbotSettings() {
     }
   };
 
-  // Handle loading state
   if (isLoading) {
     return (
       <div className="w-full h-64 flex items-center justify-center">
@@ -153,7 +152,6 @@ export function ChatbotSettings() {
     );
   }
 
-  // Handle error state
   if (error) {
     return (
       <div className="w-full mx-auto px-2 sm:px-0">
@@ -229,6 +227,15 @@ export function ChatbotSettings() {
                   <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-r-transparent" />
                 </div>
               )}
+          </div>
+        </div>
+        <Separator className="my-3" />
+        <div className="flex flex-col items-center sm:flex-row gap-3 justify-between">
+          <div className="flex items-center gap-2">
+            <Label>Chatbot Personality</Label>
+          </div>
+          <div className="relative">
+            <PersonalitySelector personality={chatbot?.personality} />
           </div>
         </div>
         <Separator className="my-3" />

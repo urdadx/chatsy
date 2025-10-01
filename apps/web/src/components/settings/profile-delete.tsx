@@ -90,7 +90,7 @@ export const ProfileDelete = () => {
                   Delete Account
                 </Button>
               </DialogTrigger>
-              <DialogContent className="w-[95%] max-w-[450px] px-4 py-4 sm:px-6 sm:py-6">
+              <DialogContent className="w-[95%] max-w-[500px] px-4 py-4 sm:px-6 sm:py-4">
                 <DialogHeader>
                   <DialogTitle className="text-lg flex items-center gap-2">
                     <div
@@ -121,7 +121,7 @@ export const ProfileDelete = () => {
                   </DialogClose>
                   <Button
                     variant="destructive"
-                    className="transition-all text-xs sm:text-sm py-1.5 sm:py-2"
+                    className="transition-all text-white text-xs sm:text-sm py-1.5 sm:py-2"
                   >
                     Yes, delete
                   </Button>

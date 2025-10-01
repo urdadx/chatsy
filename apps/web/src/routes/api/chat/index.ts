@@ -2,7 +2,6 @@ import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { db } from "@/db";
 import { chatbot, message } from "@/db/schema";
 import {
-  createStreamId,
   deleteChatById,
   getChatById,
   getMessagesByChatId,
@@ -11,8 +10,8 @@ import {
 } from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import { getActiveTools } from "@/lib/ai/get-active-tools";
+import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
 import { google } from "@/lib/ai/providers";
-import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
 import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
@@ -80,6 +79,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             .select({
               organizationId: chatbot.organizationId,
               name: chatbot.name,
+              personality: chatbot.personality,
             })
             .from(chatbot)
             .where(eq(chatbot.id, chatbotId));
@@ -107,7 +107,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
               chatbotId,
               title,
               visibility: "private",
-              channel: "web", // Regular web chat from dashboard
+              channel: "web",
             });
           } else {
             if (chat.chatbotId !== chatbotId) {
@@ -140,19 +140,21 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             }
           }
 
-          const streamId = generateUUID();
-          await createStreamId({ streamId, chatId: id });
-
-          // Get active tools from database
+          // Get chatbot details
           const activeTools = await getActiveTools();
+          const chatbotName = chatbotData.name || "AI Assistant";
+          const chatbotPersonality = chatbotData.personality || "support";
+          const organizationId = chatbotData.organizationId;
+          const chatId = id;
 
           const stream = createUIMessageStream({
             execute: ({ writer: dataStream }) => {
               const result = streamText({
                 model: google("gemini-2.0-flash"),
                 system: systemPrompt(
-                  chatbotData.name ?? "Assistant",
+                  chatbotName,
                   activeTools,
+                  chatbotPersonality,
                 ),
                 messages: convertToModelMessages(uiMessages, {
                   ignoreIncompleteToolCalls: true,
@@ -165,9 +167,9 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                   collect_feedback: collectFeedbackTool,
                   collect_leads: collectLeadsTool,
                   escalate_to_human: escalateToHumanTool({
-                    chatId: id,
+                    chatId,
                     chatbotId,
-                    organizationId: chatbotData.organizationId,
+                    organizationId,
                   }),
                 },
                 onFinish: async ({ usage }) => {

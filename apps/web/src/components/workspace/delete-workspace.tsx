@@ -9,9 +9,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useDeleteChatbot } from "@/hooks/use-chatbot";
-import { authClient } from "@/lib/auth-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+
 
 interface DeleteWorkspaceProps {
   workspaceId: string;

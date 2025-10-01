@@ -201,7 +201,9 @@ export const chatbot = pgTable("chatbot", {
   primaryColor: text("primary_color").notNull().default("#9333ea"),
   theme: text("theme").notNull().default("light"),
   hidePoweredBy: boolean("hide_powered_by").notNull().default(false),
-  personality: varchar("personality", { enum: ["support", "sales", "lead"] })
+  personality: varchar("personality", {
+    enum: ["support", "sales", "lead", "custom"],
+  })
     .notNull()
     .default("support"),
   initialMessage: text("initial_message")
@@ -209,17 +211,14 @@ export const chatbot = pgTable("chatbot", {
     .default("Hello there👋, how can I help you today?"),
   suggestedMessages: text("suggested_messages").array(),
 
-  // Training and sources fields moved from organization
   trainingStatus: text("training_status").default("idle"),
   lastTrainedAt: timestamp("last_trained_at"),
   sourcesCount: integer("sources_count").default(0).notNull(),
 
-  // Embedding configuration
   isEmbeddingEnabled: boolean("is_embedding_enabled").notNull().default(true),
   embedToken: text("embed_token").unique(),
   allowedDomains: text("allowed_domains").array(),
 
-  // WhatsApp integration fields
   whatsappEnabled: boolean("whatsapp_enabled").notNull().default(false),
   whatsappPhoneNumberId: text("whatsapp_phone_number_id"),
   whatsappBusinessAccountId: text("whatsapp_business_account_id"),
@@ -442,19 +441,6 @@ export const whatsappIntegration = pgTable("whatsapp_integration", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const stream = pgTable(
-  "stream",
-  {
-    id: uuid("id").notNull().defaultRandom(),
-    chatId: uuid("chatId").notNull(),
-    createdAt: timestamp("createdAt").notNull(),
-  },
-  (t) => [
-    primaryKey({ columns: [t.id] }),
-    foreignKey({ columns: [t.chatId], foreignColumns: [chat.id] }),
-  ],
-);
-
 export const Action = pgTable(
   "action",
   {
@@ -499,5 +485,4 @@ export type WhatsappMessageMetadata = InferSelectModel<
   typeof whatsappMessageMetadata
 >;
 export type WhatsappIntegration = InferSelectModel<typeof whatsappIntegration>;
-export type Stream = InferSelectModel<typeof stream>;
 export type ActionType = InferSelectModel<typeof Action>;

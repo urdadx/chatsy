@@ -1,5 +1,4 @@
 import { useChatbot } from "@/hooks/use-chatbot";
-import { sanitizeText } from "@/lib/utils";
 import { SparklesIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { ResponseStream } from "./response-stream";
@@ -36,7 +35,7 @@ export const GreetingMessage = ({ title }: any) => {
                   textStream={title}
                   mode="typewriter"
                   speed={25}
-                  className="text-md"
+                  className="text-sm  "
                 />{" "}
               </div>
             </div>

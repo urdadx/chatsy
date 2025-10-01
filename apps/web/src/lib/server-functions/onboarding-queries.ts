@@ -9,7 +9,7 @@ import { isUserMemberOfOrganization } from "../ai/chat-functions";
 
 const UpdateChatbotSchema = z.object({
   primaryColor: z.string().optional(),
-  personality: z.enum(["support", "sales", "lead"]).optional(),
+  personality: z.enum(["support", "sales", "lead", "custom"]).optional(),
   name: z.string().optional(),
   theme: z.string().optional(),
   hidePoweredBy: z.boolean().optional(),

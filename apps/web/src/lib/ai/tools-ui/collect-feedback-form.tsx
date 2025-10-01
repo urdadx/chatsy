@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Spinner from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
@@ -73,16 +74,16 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div >
+        <Label htmlFor="email" className="block text-sm font-medium mb-2">
           Your Email
-        </label>
+        </Label>
         <Input
           id="email"
           name="email"
           type="email"
-          placeholder="your@example.com"
+          placeholder="jon@example.com"
           value={formData.email}
           onChange={handleChange}
           required
@@ -90,9 +91,9 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
       </div>
 
       <div>
-        <label htmlFor="subject" className="block text-sm font-medium mb-1">
+        <Label htmlFor="subject" className="block text-sm font-medium mb-2">
           Subject (Optional)
-        </label>
+        </Label>
         <Input
           id="subject"
           name="subject"
@@ -103,9 +104,9 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-sm font-medium mb-1">
+        <Label htmlFor="message" className="block text-sm font-medium mb-2">
           Message
-        </label>
+        </Label>
         <Textarea
           id="message"
           name="message"

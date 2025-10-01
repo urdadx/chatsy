@@ -129,7 +129,7 @@ export function ChatBody({
             />
           ) : (
             <Conversation className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 md:gap-6">
-              <ConversationContent className="flex  flex-col gap-4 px-2 py-4 md:gap-6 md:px-4">
+              <ConversationContent className="flex  flex-col gap-4 px-2 py-4 md:gap-6">
                 {messages.length === 0 && <GreetingMessage />}
 
                 {messages.map((message, index) => (

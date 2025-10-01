@@ -83,6 +83,7 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         "allowedDomains",
         "suggestedMessages",
         "initialMessage",
+        "personality",
       ];
 
       allowedFields.forEach((field) => {

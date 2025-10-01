@@ -26,7 +26,7 @@ export function useUpdateChatbot() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: Chatbot) => {
+    mutationFn: async (payload: Partial<Chatbot>) => {
       const response = await api.patch("/my-chatbot", payload);
       return response.data;
     },

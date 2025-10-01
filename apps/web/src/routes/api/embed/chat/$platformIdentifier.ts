@@ -8,8 +8,8 @@ import {
 } from "@/lib/ai/chat-functions";
 import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import { getActiveTools } from "@/lib/ai/get-active-tools";
+import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
 import { google } from "@/lib/ai/providers";
-import { systemPrompt } from "@/lib/ai/system-prompt";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
 import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
@@ -110,8 +110,6 @@ export const ServerRoute = createServerFileRoute(
           message: userMessage,
         });
 
-        // Determine channel based on the current request URL path
-        // Bio pages use /talk/ route, widgets use /bubble/ route
         const referer = request.headers.get("referer") || "";
         let channel: "web" | "widget" = "widget"; // default to widget
 
@@ -158,13 +156,15 @@ export const ServerRoute = createServerFileRoute(
         }
       }
 
+      // Get chatbot details
       const activeTools = await getActiveTools();
+      const chatbotName = chatbotData.name || "AI Assistant";
 
       const stream = createUIMessageStream({
         execute: ({ writer: dataStream }) => {
           const result = streamText({
             model: google("gemini-2.0-flash"),
-            system: systemPrompt(chatbotData.name ?? "Assistant", activeTools),
+            system: systemPrompt(chatbotName, activeTools),
             messages: convertToModelMessages(uiMessages, {
               ignoreIncompleteToolCalls: true,
             }),

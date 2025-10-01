@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActiveMeters } from "@/hooks/use-usage-meters";
-import { getDaysUntilReset } from "@/lib/utils";
 import { motion } from "motion/react";
 import { AddOnsDialog } from "./add-ons-dialog";
 import { Button } from "./ui/button";
@@ -18,7 +17,6 @@ export function UsageBanner() {
   const currentUsage = creditedUnits - balance;
   const usagePercentage =
     creditedUnits > 0 ? (balance / creditedUnits) * 100 : 0;
-  const createdAt = activeMeters?.createdAt;
 
   if (isLoading) {
     return (
@@ -52,7 +50,7 @@ export function UsageBanner() {
               Credits used
             </span>
             <span>
-              {currentUsage} / {totalUsage}{" "}
+              {currentUsage} of {totalUsage}{" "}
             </span>
           </div>
           <Progress value={usagePercentage} />

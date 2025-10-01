@@ -47,7 +47,7 @@ export function ChatLanding({
 
             <h2 className="text-base font-semibold text-white">Send us feedback</h2>
           </div>
-          <div className="p-4">
+          <div className="p-6 my-4">
             <CollectFeedbackForm color={primaryColor || undefined} />
           </div>
         </ScrollArea>
@@ -61,7 +61,7 @@ export function ChatLanding({
     >
       <ScrollArea className="w-full h-full">
         {/* Bot Avatar/Icon */}
-        <div className="w-full flex flex-col gap-6 p-4 h-[200px] border-b dark:shadow-none" style={{
+        <div className="w-full flex flex-col gap-6 p-4 h-[190px] border-b dark:shadow-none" style={{
           background: primaryColor ? `linear-gradient(to bottom left, ${primaryColor}, ${primaryColor}80)` : undefined
         }}>
           <div className="flex gap-2 w-full ">
@@ -81,9 +81,9 @@ export function ChatLanding({
           </div>
 
         </div>
-        <div onClick={onGoToMain} className="mx-4 mt-4 rounded-lg border shadow-sm hover:bg-gray-50 cursor-pointer bg-white">
-          <div className=" p-3 ">
-            <div className="flex items-center justify-between">
+        <div onClick={onGoToMain} className="mx-4 mt-4 rounded-md shadow-sm hover:bg-gray-50 cursor-pointer bg-white">
+          <div className="p-3">
+            <div className="pl-2 flex items-center justify-between">
               <div className="flex flex-col gap-1">
                 <span className="text-gray-900 text-sm font-semibold">Send us a message</span>
                 <span className="text-gray-500 text-sm">We are here to help you!</span>
@@ -101,12 +101,12 @@ export function ChatLanding({
         </div>
 
         {/* Actions*/}
-        <div className="p-4 pt-6">
+        <div className="p-4 pt-4">
           <h1 className="text-sm font-semibold text-gray-900">Quick Actions</h1>
         </div>
-        <div className="flex flex-col gap-2 px-4 pb-4">
+        <div className="flex flex-col gap-2 px-4 pb-2">
           <div
-            className="border shadow-sm bg-white rounded-md w-full p-4 cursor-pointer hover:bg-gray-50 flex items-center justify-between"
+            className="shadow-sm bg-white rounded-md w-full p-4 cursor-pointer hover:bg-gray-50 flex items-center justify-between"
             onClick={() => setShowFeedbackForm(true)}
           >
             <div className="flex items-center gap-3">
@@ -118,7 +118,7 @@ export function ChatLanding({
               }} className="w-3 h-3" />
             </Button>
           </div>
-          <div className="border shadow-sm bg-white rounded-md w-full p-4 cursor-pointer hover:bg-gray-50 flex items-center justify-between">
+          <div className="shadow-sm bg-white rounded-md w-full p-4 cursor-pointer hover:bg-gray-50 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-sm">Book a meeting</span>
             </div>
@@ -128,7 +128,7 @@ export function ChatLanding({
               }} className="w-3 h-3" />
             </Button>
           </div>
-          <div className="border shadow-sm bg-white rounded-md w-full p-4 cursor-pointer hover:bg-gray-50 flex items-center justify-between">
+          <div className="shadow-sm bg-white rounded-md w-full p-4 cursor-pointer hover:bg-gray-50 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-sm">Report an issue</span>
             </div>
@@ -139,7 +139,21 @@ export function ChatLanding({
             </Button>
           </div>
         </div>
+        <div className="flex items-center justify-center text-xs text-muted-foreground">
+          <span>Powered by </span>
+          <a
+            href="https://padyna.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: chatbot?.primaryColor || "#2563eb" }}
+            className="ml-1 hover:underline font-semibold"
+          >
+            Padyna
+          </a>
+        </div>
+        <div className="h-4" />
       </ScrollArea>
+
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import { db } from "@/db";
 import { message, whatsappIntegration } from "@/db/schema";
-import { systemPrompt } from "@/lib/ai/system-prompt";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { and, eq } from "drizzle-orm";
+import { systemPrompt } from "./prompts/system-prompt";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY!,

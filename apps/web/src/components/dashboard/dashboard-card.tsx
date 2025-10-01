@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button"
 import NumberFlow from "@number-flow/react"
+import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react"
-import type { LucideIcon } from "lucide-react"
 
 interface DashboardCardProps {
-  icon: LucideIcon;
+  icon: any;
   title?: string;
   value: number;
   href?: string;
@@ -58,13 +58,13 @@ export function DashboardCard({
         <Button
           variant="outline"
           size="sm"
-          className="absolute bottom-2.5 right-2.5 h-6 gap-1 rounded-md px-2 text-xs text-muted-foreground bg-transparent"
+          className="absolute bottom-2.5 right-2.5 h-6 gap-1 rounded-sm text-xs text-muted-foreground bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           asChild
         >
-          <a href={href}>
-            More
-            <ChevronRight className="size-3.5" />
-          </a>
+          <Link to={href}>
+            View
+            <ChevronRight className="size-3" />
+          </Link>
         </Button>
       )}
     </div>

@@ -34,6 +34,7 @@ export function DashboardMetrics({
         value={sourcesCount ?? 0}
         gradientFrom="purple-50"
         gradientVia="purple-25"
+        href="/admin/knowledge-base"
       />
 
       <DashboardCard
@@ -42,6 +43,7 @@ export function DashboardMetrics({
         value={conversationsCount ?? 0}
         gradientFrom="slate-50"
         gradientVia="slate-25"
+        href="/admin/chat-history"
       />
 
       <DashboardCard
@@ -50,6 +52,8 @@ export function DashboardMetrics({
         value={balance}
         gradientFrom="orange-50"
         gradientVia="orange-25"
+        href="/admin/settings?tab=billing"
+
       />
 
       <DashboardCard
@@ -58,6 +62,7 @@ export function DashboardMetrics({
         value={totalVisits}
         gradientFrom="blue-50"
         gradientVia="blue-25"
+        href="/admin/analytics"
       />
 
       <DashboardCard
@@ -66,6 +71,7 @@ export function DashboardMetrics({
         value={voteCounts?.upvotes ?? 0}
         gradientFrom="green-50"
         gradientVia="green-25"
+        href="/admin/analytics"
       />
 
       <DashboardCard
@@ -74,6 +80,7 @@ export function DashboardMetrics({
         value={voteCounts?.downvotes ?? 0}
         gradientFrom="red-50"
         gradientVia="red-25"
+        href="/admin/analytics"
       />
     </div>
   );

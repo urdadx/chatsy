@@ -236,7 +236,6 @@ function RouteComponent() {
       api: `/api/embed/chat/${widgetId}`,
     }),
     messages: initialMessages,
-    experimental_throttle: 100,
     onError: (error) => {
       if (!uiState.isDeactivated) {
         if (error instanceof ChatSDKError) {
