@@ -228,59 +228,53 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
         }
       }),
 
-    DELETE: api
-      .middleware([subscriptionMiddleware])
-      .handler(async ({ request }) => {
-        const { searchParams } = new URL(request.url);
-        const id = searchParams.get("id");
+    DELETE: api.handler(async ({ request }) => {
+      const { searchParams } = new URL(request.url);
+      const id = searchParams.get("id");
 
-        if (!id) {
+      if (!id) {
+        const error = new ChatSDKError("not_found:chat", "Chat ID is required");
+        return error.toResponse();
+      }
+
+      const session = await auth.api.getSession({ headers: request.headers });
+      if (!session) {
+        const error = new ChatSDKError("unauthorized:chat");
+        return error.toResponse();
+      }
+      const userId = session?.user.id || "";
+
+      const chatbotId =
+        session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+      if (!chatbotId) {
+        const error = new ChatSDKError(
+          "bad_request:api",
+          "No active chatbot selected",
+        );
+        return error.toResponse();
+      }
+
+      try {
+        const chat = await getChatById({ id });
+
+        if (!chat || chat.chatbotId !== chatbotId) {
           const error = new ChatSDKError(
-            "not_found:chat",
-            "Chat ID is required",
+            "forbidden:chat",
+            "Chat not found or access denied",
           );
           return error.toResponse();
         }
 
-        const session = await auth.api.getSession({ headers: request.headers });
-        if (!session) {
-          const error = new ChatSDKError("unauthorized:chat");
-          return error.toResponse();
-        }
-        const userId = session?.user.id || "";
-
-        const chatbotId =
-          session?.session?.activeChatbotId ||
-          (await getActiveChatbotId(userId));
-        if (!chatbotId) {
-          const error = new ChatSDKError(
-            "bad_request:api",
-            "No active chatbot selected",
-          );
-          return error.toResponse();
-        }
-
-        try {
-          const chat = await getChatById({ id });
-
-          if (!chat || chat.chatbotId !== chatbotId) {
-            const error = new ChatSDKError(
-              "forbidden:chat",
-              "Chat not found or access denied",
-            );
-            return error.toResponse();
-          }
-
-          const deletedChat = await deleteChatById({ id });
-          return json(deletedChat, { status: 200 });
-        } catch (error) {
-          console.error(error);
-          const chatError = new ChatSDKError(
-            "bad_request:api",
-            "An error occurred while processing your request",
-          );
-          return chatError.toResponse();
-        }
-      }),
+        const deletedChat = await deleteChatById({ id });
+        return json(deletedChat, { status: 200 });
+      } catch (error) {
+        console.error(error);
+        const chatError = new ChatSDKError(
+          "bad_request:api",
+          "An error occurred while processing your request",
+        );
+        return chatError.toResponse();
+      }
+    }),
   }),
 );

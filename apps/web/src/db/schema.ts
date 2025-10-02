@@ -1,7 +1,6 @@
 import type { InferSelectModel } from "drizzle-orm";
 import {
   boolean,
-  foreignKey,
   integer,
   json,
   jsonb,
@@ -347,6 +346,20 @@ export const feedback = pgTable("feedback", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const featureRequest = pgTable("feature_request", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  chatbotId: uuid("chatbot_id")
+    .notNull()
+    .references(() => chatbot.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  screenshot: text("screenshot"), // URL to uploaded screenshot
+  email: text("email"),
+  location: text("location"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const visitorAnalytics = pgTable("visitor_analytics", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   chatbotId: uuid("chatbot_id")
@@ -461,6 +474,7 @@ export const Action = pgTable(
 // TYPES
 export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;
 export type Feedback = InferSelectModel<typeof feedback>;
+export type FeatureRequest = InferSelectModel<typeof featureRequest>;
 export type Knowledge = InferSelectModel<typeof knowledge>;
 export type WebsiteSource = InferSelectModel<typeof websiteSource>;
 export type DocumentSource = InferSelectModel<typeof documentSource>;

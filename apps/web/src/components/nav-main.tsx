@@ -37,23 +37,23 @@ export function NavMain({
                     tooltip={item.title}
                     className={
                       isMainItemActive
-                        ? "bg-purple-50 dark:bg-purple-900/30"
+                        ? "bg-purple-50  dark:bg-purple-900/30"
                         : ""
                     }
                   >
                     {item.icon && (
                       <item.icon
-                        className={
-                          isMainItemActive
-                            ? "text-purple-600 dark:text-purple-400"
-                            : ""
-                        }
+                        color="currentColor"
+                        className={`!size-4 text-muted-foreground ${isMainItemActive
+                          ? "text-purple-600  dark:text-purple-400"
+                          : ""
+                          }`}
                       />
                     )}
                     <span
                       className={
                         isMainItemActive
-                          ? "text-purple-600 dark:text-purple-400 font-medium"
+                          ? "text-purple-600  dark:text-purple-400 font-medium"
                           : ""
                       }
                     >

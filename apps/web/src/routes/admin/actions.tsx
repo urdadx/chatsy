@@ -1,5 +1,6 @@
 import { ActionCard } from "@/components/agents/actions-card";
 import Spinner from "@/components/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ActionType } from "@/db/schema";
 import { api } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -79,19 +80,18 @@ function RouteComponent() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-0 py-6 min-h-screen">
+    <div className="px-4 sm:px-12 py-6 min-h-screen">
       {/* Header - fixed position */}
-      <div className="w-full mb-6">
+      <div className="w-full mb-4">
         <div className="flex flex-col items-start gap-2">
           <h1 className="text-xl font-semibold">Agent Actions</h1>
-          <span className="text-md text-muted-foreground">
+          {/* <span className="text-md text-muted-foreground">
             Enhance your bot's capabilities with powerful AI actions and
             integrations
-          </span>
+          </span> */}
         </div>
       </div>
 
-      {/* Content area - maintains consistent height and position */}
       <div className="w-full min-h-screen">
         {error && (
           <div className="w-full h-64 flex items-center justify-center">
@@ -99,18 +99,45 @@ function RouteComponent() {
           </div>
         )}
 
-        {!isLoading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {filteredActions.map((action) => (
-              <ActionCard
-                key={action.id}
-                action={action}
-                onToggle={handleToggleAction}
-                isLoading={toggleMutation.isPending}
-              />
-            ))}
-          </div>
-        )}
+        <Tabs
+          className="w-full max-w-6xl mx-auto "
+          defaultValue="agent-actions"
+
+        >
+          <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0 ">
+
+
+            <TabsTrigger
+              value="agent-actions"
+              className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            >
+              Actions
+            </TabsTrigger>
+            <TabsTrigger
+              value="integrations"
+              className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            >
+              Integrations
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="agent-actions" className="mt-4 mb-8">
+            {!isLoading && !error && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {filteredActions.map((action) => (
+                  <ActionCard
+                    key={action.id}
+                    action={action}
+                    onToggle={handleToggleAction}
+                    isLoading={toggleMutation.isPending}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+
+
+
       </div>
     </div>
   );

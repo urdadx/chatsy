@@ -147,6 +147,7 @@ export function ChatBody({
                     }
                     setMessages={setMessages}
                     chatbot={chatbot}
+                    showActions={false}
                   />
                 ))}
 

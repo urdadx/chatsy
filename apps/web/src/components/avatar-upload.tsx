@@ -24,8 +24,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
 import { useFileUpload } from "@/hooks/use-file-upload";
-import type { AnyColumn } from "drizzle-orm";
-import { toast } from "sonner";
+import Spinner from "./ui/spinner";
 
 // Define type for pixel crop area
 type Area = { x: number; y: number; width: number; height: number };
@@ -313,7 +312,10 @@ export function AvatarUpload() {
                 disabled={!previewUrl || isUploading || !chatbot}
                 autoFocus
               >
-                {isUploading ? "Uploading..." : "Apply"}
+                {isUploading ? <>
+                  <Spinner className="mr-1" size={16} />
+                  Applying
+                </> : "Apply"}
               </Button>
             </DialogTitle>
           </DialogHeader>

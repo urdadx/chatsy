@@ -4,6 +4,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { RiBardFill } from "@remixicon/react";
 import type { UIMessage } from "ai";
 import { type VariantProps, cva } from "class-variance-authority";
 import type { ComponentProps, HTMLAttributes } from "react";
@@ -75,6 +76,8 @@ export const MessageAvatar = ({
 }: MessageAvatarProps) => (
   <Avatar className={cn("size-8 ring-1 ring-border", className)} {...props}>
     <AvatarImage alt="" className="mt-0 mb-0" src={src} />
-    <AvatarFallback>{name?.slice(0, 2) || "ME"}</AvatarFallback>
+    <AvatarFallback>
+      <RiBardFill className="size-4 text-muted-foreground" />
+    </AvatarFallback>
   </Avatar>
 );

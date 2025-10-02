@@ -248,8 +248,8 @@
 
     setupBubbleIframeStyles() {
       Object.assign(this.iframe.style, {
-        width: "450px",
-        height: "550px",
+        width: "400px",
+        height: "580px",
         maxHeight: "90vh",
         border: "none",
         borderRadius: "16px",
@@ -257,7 +257,7 @@
         background: "white",
         position: "absolute",
         overflow: "hidden",
-        bottom: "80px",
+        bottom: "75px",
         right: "0",
         transform: "scale(0.8) translateY(20px)",
         opacity: "0",

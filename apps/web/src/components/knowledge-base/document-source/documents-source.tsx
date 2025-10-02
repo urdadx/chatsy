@@ -1,9 +1,10 @@
+import { SolarUploadBoldDuotone } from "@/assets/icons/upload";
 import { useRetrainingBanner } from "@/components/retraining-banner";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AlertCircleIcon, FileUpIcon } from "lucide-react";
+import { AlertCircleIcon } from "lucide-react";
 import { toast } from "sonner";
 import { DocumentList } from "./document-list";
 
@@ -124,7 +125,7 @@ export function DocumentSource() {
                 className="bg-white mb-2 flex size-16 shrink-0 items-center justify-center rounded-full border"
                 aria-hidden="true"
               >
-                <FileUpIcon className="size-6 opacity-60" />
+                <SolarUploadBoldDuotone className="size-8" />
               </div>
               <p className="mb-1.5 text-base font-medium">Upload files</p>
               <p className="text-muted-foreground mb-2 text-sm">

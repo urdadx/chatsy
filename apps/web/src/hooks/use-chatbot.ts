@@ -9,7 +9,7 @@ export function useChatbot() {
   const organizationId = session?.session?.activeOrganizationId;
 
   return useQuery<Chatbot>({
-    queryKey: ["chatbot", organizationId],
+    queryKey: ["chatbot"],
     queryFn: async () => {
       if (!organizationId) {
         throw new Error("No active organization");
@@ -32,6 +32,7 @@ export function useUpdateChatbot() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chatbot"] });
+      queryClient.invalidateQueries({ queryKey: ["chatbots"] });
       toast.success("Saved!");
     },
   });

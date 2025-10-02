@@ -1,3 +1,11 @@
+import { SolarChartBoldDuotone } from "@/assets/icons/bar-duotone";
+import { SolarBoltBoldDuotone } from "@/assets/icons/bolt-duotone";
+import { SolarBookBoldDuotone } from "@/assets/icons/book-duotone";
+import { SolarChatRoundUnreadBoldDuotone } from "@/assets/icons/chat-doutone";
+import { SolarChecklistMinimalisticBoldDuotone } from "@/assets/icons/checklist-duotone";
+import { SolarSledgehammerBoldDuotone } from "@/assets/icons/hammer-duotone";
+import { SolarHomeAngleBoldDuotone } from "@/assets/icons/home-duotone";
+import { SolarSettingsBoldDuotone } from "@/assets/icons/settings-duotone";
 import {
   Sidebar,
   SidebarContent,
@@ -9,16 +17,6 @@ import {
 } from "@/components/ui/sidebar";
 import { useSession } from "@/lib/auth-client";
 import { Outlet } from "@tanstack/react-router";
-import {
-  Book,
-  ChartNoAxesColumnIncreasing,
-  Flame,
-  Hammer,
-  MessageCircle,
-  RotateCcwIcon,
-  Settings,
-  Zap,
-} from "lucide-react";
 import type * as React from "react";
 import { NavMain } from "./nav-main";
 import { Navbar } from "./navbar";
@@ -31,44 +29,44 @@ const data = {
     {
       title: "Overview",
       url: "/admin/overview",
-      icon: Flame,
+      icon: SolarHomeAngleBoldDuotone,
     },
     {
-      title: "Knowlege Base",
+      title: "Knowledge Base",
       url: "/admin/knowledge-base",
-      icon: Book,
+      icon: SolarBookBoldDuotone,
     },
     {
       title: "Playground",
       url: "/admin/playground",
-      icon: Hammer,
+      icon: SolarSledgehammerBoldDuotone,
     },
 
     {
       title: "Actions",
       url: "/admin/actions",
-      icon: Zap,
+      icon: SolarBoltBoldDuotone,
     },
 
     {
       title: "Analytics",
       url: "/admin/analytics",
-      icon: ChartNoAxesColumnIncreasing,
+      icon: SolarChartBoldDuotone,
     },
     {
       title: "Chat History",
       url: "/admin/chat-history",
-      icon: MessageCircle,
+      icon: SolarChatRoundUnreadBoldDuotone,
     },
     {
       title: "Activity",
       url: "/admin/activity",
-      icon: RotateCcwIcon,
+      icon: SolarChecklistMinimalisticBoldDuotone,
     },
     {
       title: "Settings",
       url: "/admin/settings",
-      icon: Settings,
+      icon: SolarSettingsBoldDuotone,
     },
   ],
 };

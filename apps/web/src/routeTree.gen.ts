@@ -46,6 +46,7 @@ import { ServerRoute as ApiTextSourcesServerRouteImport } from './routes/api/tex
 import { ServerRoute as ApiSimilaritySearchServerRouteImport } from './routes/api/similarity-search'
 import { ServerRoute as ApiSetActiveChatbotServerRouteImport } from './routes/api/set-active-chatbot'
 import { ServerRoute as ApiScrapeServerRouteImport } from './routes/api/scrape'
+import { ServerRoute as ApiReportIssueServerRouteImport } from './routes/api/report-issue'
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
 import { ServerRoute as ApiOgServerRouteImport } from './routes/api/og'
 import { ServerRoute as ApiMyChatbotServerRouteImport } from './routes/api/my-chatbot'
@@ -258,6 +259,11 @@ const ApiSetActiveChatbotServerRoute =
 const ApiScrapeServerRoute = ApiScrapeServerRouteImport.update({
   id: '/api/scrape',
   path: '/api/scrape',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiReportIssueServerRoute = ApiReportIssueServerRouteImport.update({
+  id: '/api/report-issue',
+  path: '/api/report-issue',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiQuestionsServerRoute = ApiQuestionsServerRouteImport.update({
@@ -614,6 +620,7 @@ export interface FileServerRoutesByFullPath {
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/og': typeof ApiOgServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
+  '/api/report-issue': typeof ApiReportIssueServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/set-active-chatbot': typeof ApiSetActiveChatbotServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
@@ -659,6 +666,7 @@ export interface FileServerRoutesByTo {
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/og': typeof ApiOgServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
+  '/api/report-issue': typeof ApiReportIssueServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/set-active-chatbot': typeof ApiSetActiveChatbotServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
@@ -705,6 +713,7 @@ export interface FileServerRoutesById {
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/og': typeof ApiOgServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
+  '/api/report-issue': typeof ApiReportIssueServerRoute
   '/api/scrape': typeof ApiScrapeServerRoute
   '/api/set-active-chatbot': typeof ApiSetActiveChatbotServerRoute
   '/api/similarity-search': typeof ApiSimilaritySearchServerRoute
@@ -752,6 +761,7 @@ export interface FileServerRouteTypes {
     | '/api/my-chatbot'
     | '/api/og'
     | '/api/questions'
+    | '/api/report-issue'
     | '/api/scrape'
     | '/api/set-active-chatbot'
     | '/api/similarity-search'
@@ -797,6 +807,7 @@ export interface FileServerRouteTypes {
     | '/api/my-chatbot'
     | '/api/og'
     | '/api/questions'
+    | '/api/report-issue'
     | '/api/scrape'
     | '/api/set-active-chatbot'
     | '/api/similarity-search'
@@ -842,6 +853,7 @@ export interface FileServerRouteTypes {
     | '/api/my-chatbot'
     | '/api/og'
     | '/api/questions'
+    | '/api/report-issue'
     | '/api/scrape'
     | '/api/set-active-chatbot'
     | '/api/similarity-search'
@@ -888,6 +900,7 @@ export interface RootServerRouteChildren {
   ApiMyChatbotServerRoute: typeof ApiMyChatbotServerRoute
   ApiOgServerRoute: typeof ApiOgServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
+  ApiReportIssueServerRoute: typeof ApiReportIssueServerRoute
   ApiScrapeServerRoute: typeof ApiScrapeServerRoute
   ApiSetActiveChatbotServerRoute: typeof ApiSetActiveChatbotServerRoute
   ApiSimilaritySearchServerRoute: typeof ApiSimilaritySearchServerRoute
@@ -1168,6 +1181,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/scrape'
       fullPath: '/api/scrape'
       preLoaderRoute: typeof ApiScrapeServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/report-issue': {
+      id: '/api/report-issue'
+      path: '/api/report-issue'
+      fullPath: '/api/report-issue'
+      preLoaderRoute: typeof ApiReportIssueServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/questions': {
@@ -1452,6 +1472,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiMyChatbotServerRoute: ApiMyChatbotServerRoute,
   ApiOgServerRoute: ApiOgServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,
+  ApiReportIssueServerRoute: ApiReportIssueServerRoute,
   ApiScrapeServerRoute: ApiScrapeServerRoute,
   ApiSetActiveChatbotServerRoute: ApiSetActiveChatbotServerRoute,
   ApiSimilaritySearchServerRoute: ApiSimilaritySearchServerRoute,

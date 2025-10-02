@@ -44,11 +44,11 @@ TOOL USAGE:
   - Use when users express satisfaction/dissatisfaction or want to report issues
   - Provide contextual response, then call tool immediately
 
-3. collect_leads: Capture contact details for sales follow-up.
+4. collect_leads: Capture contact details for sales follow-up.
   - Use when users express interest in services, request quotes/demos, or want to be contacted
   - Provide contextual response, then call tool immediately
 
-4. escalate_to_human: Transfer to human agent.
+5. escalate_to_human: Transfer to human agent.
   - Use when explicitly requested, for complex unresolved issues, frustration requiring human intervention, or sensitive topics
    - Do NOT combine with other tools.
 

@@ -70,8 +70,6 @@ export function ChatbotSwitcher() {
     }
   };
 
-
-
   const [openCreateChatbot, setOpenCreateChatbot] = useState(false);
   const [inviteMembersOpen, setInviteMembersOpen] = useState(false);
 

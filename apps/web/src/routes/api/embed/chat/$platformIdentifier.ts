@@ -120,7 +120,6 @@ export const ServerRoute = createServerFileRoute(
           // Embedded chat widget (bubble)
           channel = "widget";
         } else {
-          // External embedded widget (iframe or bubble on external site)
           channel = "widget";
         }
 

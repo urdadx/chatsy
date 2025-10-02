@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { stream, chat, chatbot, member, message, vote } from "@/db/schema";
+import { chat, chatbot, member, message, vote } from "@/db/schema";
 import type { Chat, DBMessage } from "@/db/schema";
 import type { CustomerSubscription } from "@polar-sh/sdk/models/components/customersubscription.js";
 import { auth } from "auth";
@@ -114,9 +114,18 @@ export async function saveChat({
 
 export const deleteChatById = async ({ id }: { id: string }) => {
   try {
+    const [existingChat] = await db
+      .select()
+      .from(chat)
+      .where(eq(chat.id, id))
+      .limit(1);
+
+    if (!existingChat) {
+      throw new ChatSDKError("not_found:chat", "Chat not found");
+    }
+
     await db.delete(vote).where(eq(vote.chatId, id));
     await db.delete(message).where(eq(message.chatId, id));
-    await db.delete(stream).where(eq(stream.chatId, id));
 
     const [chatsDeleted] = await db
       .delete(chat)
@@ -126,7 +135,13 @@ export const deleteChatById = async ({ id }: { id: string }) => {
     return chatsDeleted;
   } catch (error) {
     console.error("Error deleting chat:", error);
-    throw new Error("Failed to delete chat by id");
+    if (error instanceof ChatSDKError) {
+      throw error;
+    }
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to delete chat by id",
+    );
   }
 };
 
@@ -384,43 +399,6 @@ export async function getMessageCountByUserId({
     throw new ChatSDKError(
       "bad_request:database",
       "Failed to get message count by user id",
-    );
-  }
-}
-
-export async function createStreamId({
-  streamId,
-  chatId,
-}: {
-  streamId: string;
-  chatId: string;
-}) {
-  try {
-    await db
-      .insert(stream)
-      .values({ id: streamId, chatId, createdAt: new Date() });
-  } catch (error) {
-    throw new ChatSDKError(
-      "bad_request:database",
-      "Failed to create stream id",
-    );
-  }
-}
-
-export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
-  try {
-    const streamIds = await db
-      .select({ id: stream.id })
-      .from(stream)
-      .where(eq(stream.chatId, chatId))
-      .orderBy(asc(stream.createdAt))
-      .execute();
-
-    return streamIds.map(({ id }) => id);
-  } catch (error) {
-    throw new ChatSDKError(
-      "bad_request:database",
-      "Failed to get stream ids by chat id",
     );
   }
 }

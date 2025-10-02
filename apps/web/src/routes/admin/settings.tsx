@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InvitationsTable } from "@/components/workspace/invitations-table";
 import { InviteMembers } from "@/components/workspace/invite-members";
 import { MembersTable } from "@/components/workspace/members-table";
-import { WorkspaceDelete } from "@/components/workspace/workspace-delete";
 import { WorkspaceLogoSettings } from "@/components/workspace/workspace-logo-settings";
 import { WorkspaceNameSettings } from "@/components/workspace/workspace-name-settings";
 import { authClient } from "@/lib/auth-client";
@@ -105,7 +104,7 @@ function RouteComponent() {
               <WorkspaceNameSettings />
               <WorkspaceLogoSettings />
               <UserProfileImageSettings />
-              <WorkspaceDelete />
+              {/* <WorkspaceDelete /> */}
               <ProfileDelete />
 
             </div>

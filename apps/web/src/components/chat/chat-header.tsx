@@ -41,7 +41,7 @@ export function ChatHeader({
       className={`flex items-center justify-between p-4 text-white border-b ${className}`}
       style={{ backgroundColor: chatbot?.primaryColor || "#2563eb" }}
     >
-      <div className="flex items-center gap-3 min-w-0 flex-1">
+      <div className="flex items-center gap-2 min-w-0 flex-1">
         {showBackButton && onBack && (
           <Tooltip>
             <TooltipTrigger asChild>
