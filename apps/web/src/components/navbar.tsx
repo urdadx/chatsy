@@ -1,5 +1,5 @@
+import { SolarLetterBoldDuotone } from "@/assets/icons/letter";
 import { useLocation } from "@tanstack/react-router";
-import { Mail } from "lucide-react";
 import { useState } from "react";
 import { ShareBot } from "./share-bot/share-bot";
 import { Button } from "./ui/button";
@@ -40,7 +40,7 @@ export const Navbar = () => {
           <Button
             onClick={() => setInviteMembersOpen(true)}
           >
-            <Mail className="w-4 h-4 " />
+            <SolarLetterBoldDuotone color="#FFFFFF" className="w-5 h-5 " />
             Invite team
           </Button>
         </div>

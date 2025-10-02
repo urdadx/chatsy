@@ -71,7 +71,6 @@ export function DashboardMetrics({
         value={voteCounts?.upvotes ?? 0}
         gradientFrom="green-50"
         gradientVia="green-25"
-        href="/admin/analytics"
       />
 
       <DashboardCard
@@ -80,7 +79,6 @@ export function DashboardMetrics({
         value={voteCounts?.downvotes ?? 0}
         gradientFrom="red-50"
         gradientVia="red-25"
-        href="/admin/analytics"
       />
     </div>
   );

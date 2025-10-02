@@ -173,7 +173,7 @@ export function ChatLanding({
           </div>
 
         </div>
-        <div className="flex items-center justify-center text-xs text-muted-foreground">
+        <div className="flex my-3 items-center justify-center text-xs text-muted-foreground">
           <span>Powered by </span>
           <a
             href="https://padyna.com"
@@ -185,7 +185,6 @@ export function ChatLanding({
             Padyna
           </a>
         </div>
-        <div className="h-4" />
       </ScrollArea>
 
     </div>

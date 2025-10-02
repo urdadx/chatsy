@@ -1,3 +1,4 @@
+import { SolarLetterBoldDuotone } from "@/assets/icons/letter";
 import { Badge } from "@/components/ui/badge";
 import { SafeBoringAvatar } from "@/components/ui/safe-boring-avatar";
 import {
@@ -47,7 +48,7 @@ export function InvitationsTable() {
   if (!invitations?.data || invitations.data.length === 0) {
     return (
       <NoDataPlaceholder
-        icon={Mail}
+        icon={SolarLetterBoldDuotone}
         title="No Invitations found"
         description="You have not sent any invitations yet."
       />

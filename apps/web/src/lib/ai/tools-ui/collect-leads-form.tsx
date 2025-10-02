@@ -79,7 +79,7 @@ export function CollectLeadsForm({ color }: { color?: string }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="w-full space-y-4">
       <div className="space-y-2">
         <label htmlFor="name" className="block text-sm font-medium ">
           Name
@@ -127,6 +127,7 @@ export function CollectLeadsForm({ color }: { color?: string }) {
           color: "#FFFFFF",
         }}
         type="submit"
+        className="w-full"
         disabled={mutation.isPending}
       >
         {mutation.isPending ? (

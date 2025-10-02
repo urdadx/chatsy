@@ -1,3 +1,4 @@
+import { SolarUploadBoldDuotone } from "@/assets/icons/upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +8,7 @@ import { api } from "@/lib/api";
 import { useEmbedToken } from "@/lib/contexts/embed-token-context";
 import { getClientLocation } from "@/lib/utils/client-location";
 import { useMutation } from "@tanstack/react-query";
-import { Upload, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -135,7 +136,7 @@ export function IssueReportForm({ color }: { color?: string }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="title" className="block text-sm font-medium mb-2">
           Issue Title
@@ -143,7 +144,7 @@ export function IssueReportForm({ color }: { color?: string }) {
         <Input
           id="title"
           name="title"
-          placeholder="e.g. Add dark mode support"
+          placeholder="e.g. Page not loading"
           value={formData.title}
           onChange={handleChange}
           required
@@ -172,10 +173,10 @@ export function IssueReportForm({ color }: { color?: string }) {
         <div className="space-y-3">
           {!screenshotPreview ? (
             <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer transition-colors hover:border-primary"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-colors hover:border-primary"
               onClick={() => fileInputRef.current?.click()}
             >
-              <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+              <SolarUploadBoldDuotone className="mx-auto h-8 w-8 text-gray-400 mb-2" />
               <p className="text-sm text-gray-600">
                 Click to upload a screenshot or mockup
               </p>
@@ -184,16 +185,26 @@ export function IssueReportForm({ color }: { color?: string }) {
               </p>
             </div>
           ) : (
-            <div className="relative">
-              <img
-                src={screenshotPreview}
-                alt="Screenshot preview"
-                className="w-full max-h-48 object-contain rounded-lg border"
-              />
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                <img
+                  src={screenshotPreview}
+                  alt="Preview"
+                  className="w-8 h-8 object-cover rounded border"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {formData.screenshot?.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {formData.screenshot ? `${(formData.screenshot.size / 1024 / 1024).toFixed(2)} MB` : ''}
+                  </p>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={removeScreenshot}
-                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                className="ml-3 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors flex-shrink-0"
               >
                 <X className="h-4 w-4" />
               </button>

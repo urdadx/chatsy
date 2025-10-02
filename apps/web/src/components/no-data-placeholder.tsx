@@ -1,7 +1,6 @@
-import type { LucideIcon } from "lucide-react";
 
 interface NoDataPlaceholderProps {
-  icon: LucideIcon;
+  icon: any;
   title: string;
   description: string;
 }

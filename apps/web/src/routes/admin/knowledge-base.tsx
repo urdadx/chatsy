@@ -93,7 +93,6 @@ function RouteComponent() {
       <div className="hidden lg:flex fixed top-0 right-0 border-l  w-[340px] h-full bg-gray-50 p-4 items-center justify-center">
         <TrainAgent />
       </div>
-      {/* Mobile Drawer */}
       <div className="lg:hidden fixed bottom-4 right-0 left-0 z-50 flex justify-center">
         <Drawer>
           <DrawerTrigger asChild>

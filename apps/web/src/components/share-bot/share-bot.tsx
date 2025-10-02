@@ -1,3 +1,4 @@
+import { SolarRocketBoldDuotone } from "@/assets/icons/rocket";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Globe, Rocket, Users } from "lucide-react";
@@ -67,7 +68,7 @@ export const ShareBot = () => {
 
   const triggerButton = (
     <Button variant={"outline"} className="w-fit text-primary">
-      <Rocket className="w-4 h-4" />
+      <SolarRocketBoldDuotone color="#8b5cf6" className="w-5 h-5" />
       <span className="hidden sm:inline">Share your bot</span>
       <span className="inline sm:hidden">Share</span>
     </Button>

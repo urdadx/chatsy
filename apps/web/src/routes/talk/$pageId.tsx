@@ -324,7 +324,7 @@ function RouteComponent(): JSX.Element {
       className="flex items-center justify-center bg-muted md:p-4"
       style={{ height: "calc(var(--vh, 1vh) * 100)" }}
     >
-      <div className="flex flex-col w-full max-w-[500px] overflow-hidden bg-white shadow-lg md:rounded-2xl mobile-full-height">
+      <div className="flex flex-col w-full max-w-[450px] overflow-hidden bg-white shadow-lg md:rounded-2xl mobile-full-height">
         {uiState.showLanding ? (
           <ChatLanding
             onGoToMain={handleGoToMain}

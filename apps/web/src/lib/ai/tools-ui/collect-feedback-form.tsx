@@ -74,7 +74,7 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="w-full space-y-6">
       <div >
         <Label htmlFor="email" className="block text-sm font-medium mb-2">
           Your Email
@@ -124,12 +124,13 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
           color: "#FFFFFF",
         }}
         type="submit"
+        className="w-full"
         disabled={mutation.isPending}
       >
         {mutation.isPending ? (
           <>
             <Spinner className="text-white h-4 w-4 inline-block" />
-            Submitting...
+            Submitting
           </>
         ) : (
           "Submit"

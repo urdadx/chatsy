@@ -80,14 +80,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <SidebarProvider>
       <Sidebar variant="floating" className="z-0 bg-slate-25 " collapsible="offcanvas" {...props}>
         <SidebarHeader className="pb-2">
-          {/* <div className="flex gap-2 items-center pb-2">
-            <Logo />
-            <div className="hidden lg:flex">
-              <h1 className="text-xl font-bold instrument-serif-regular-italic">
-                Padyna
-              </h1>
-            </div>
-          </div> */}
           <ChatbotSwitcher />
         </SidebarHeader>
         <SidebarContent>
