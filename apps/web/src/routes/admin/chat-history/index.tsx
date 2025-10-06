@@ -9,6 +9,7 @@ import {
 import { RefreshCw } from "lucide-react";
 import { useEffect } from "react";
 
+import { SolarRoundedMagniferZoomInBoldDuotone } from "@/assets/icons/search-icon";
 import { ChatConversation } from "@/components/chat-history/chat-conversation";
 import { ChatLogItem } from "@/components/chat-history/chat-log-item";
 import { ChatLogItemSkeleton } from "@/components/chat-history/chat-log-item-skeleton";
@@ -27,7 +28,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { RiSearch2Line } from "@remixicon/react";
 import { useState } from "react";
 import z from "zod";
 
@@ -106,9 +106,9 @@ function RouteComponent() {
   if (!isLoading && !isError && chats.length === 0) {
     return (
       <div className="max-w-5xl lg:max-w-6xl w-full h-[90vh] mx-auto p-1 sm:p-4">
-        <div className="bg-white border rounded-3xl py-2 h-full flex flex-col overflow-hidden">
+        <div className="bg-white border rounded-xl py-2 h-full flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white rounded-t-3xl">
-            <h1 className="text-md font-semibold hidden sm:flex">Chat Logs</h1>
+            <h1 className="text-xl font-semibold hidden sm:flex">Chat History</h1>
             <div className="flex items-center space-x-3">
               <Select value={filter} onValueChange={handleFilterChange}>
                 <SelectTrigger className="w-[200px]">
@@ -145,7 +145,7 @@ function RouteComponent() {
           </div>
           <div className="flex justify-center items-center flex-1 min-h-0">
             <div className="flex flex-col items-center space-y-2">
-              <RiSearch2Line className="h-14 w-14 text-primary" />
+              <SolarRoundedMagniferZoomInBoldDuotone color="#8b5cf6" className="h-14 w-14 text-primary" />
               <p className="text-center text-lg text-gray-500">
                 No chat logs found
               </p>
@@ -159,11 +159,11 @@ function RouteComponent() {
   return (
     <>
       <div className="max-w-5xl lg:max-w-6xl w-full h-[90vh] mx-auto p-1 sm:p-6">
-        <div className="bg-white border rounded-3xl py-2 h-full flex flex-col overflow-hidden">
+        <div className="bg-white border rounded-xl py-2 h-full flex flex-col overflow-hidden">
           {/* Chat Header */}
           <div className="w-full flex items-center gap-2 justify-between px-4 pt-1 pb-2 border-b bg-white rounded-t-3xl">
             <div className="flex items-center space-x-3 relative">
-              <h1 className="text-md font-semibold">Chat History</h1>
+              <h1 className="text-xl font-semibold">Chat History</h1>
             </div>{" "}
             <div className="flex items-center space-x-3">
               <Select value={status} onValueChange={handleStatusChange}>

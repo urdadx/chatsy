@@ -65,7 +65,7 @@ export const TextSourceList = () => {
 
   return (
     <>
-      <div className="my-5 border rounded-3xl p-4 sm:p-6">
+      <div className="my-5 border rounded-xl p-4 sm:p-6">
         <div className="flex justify-between gap-2 items-center mb-4">
           <h3 className="font-semibold text-lg hidden sm:block">
             Text Sources
@@ -82,7 +82,7 @@ export const TextSourceList = () => {
             {filteredTextSources.map((ts) => (
               <div
                 key={ts.id}
-                className="border p-4 rounded-3xl flex justify-between items-start"
+                className="border p-4 rounded-lg flex justify-between items-start"
               >
                 <div className="flex flex-row gap-3 items-center">
                   <div className="bg-gray-100 rounded-full p-2">

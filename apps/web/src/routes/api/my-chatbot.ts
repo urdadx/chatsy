@@ -1,5 +1,10 @@
 import { db } from "@/db";
-import { chatbot, organization, session as sessionTable } from "@/db/schema";
+import {
+  Action,
+  chatbot,
+  organization,
+  session as sessionTable,
+} from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { checkSubscriptionLimits } from "@/lib/subscription/subscription-utils";
@@ -54,7 +59,13 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       });
     }
 
-    return json(userChatbot);
+    // Fetch related actions (quick menu actions) for the chatbot
+    const actions = await db
+      .select()
+      .from(Action)
+      .where(eq(Action.chatbotId, activeChatbotId));
+
+    return json({ ...userChatbot, actions });
   },
   PATCH: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
@@ -110,7 +121,12 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
           return new Response("Chatbot not found", { status: 404 });
         }
 
-        return json(updated);
+        const actions = await db
+          .select()
+          .from(Action)
+          .where(eq(Action.chatbotId, activeChatbotId));
+
+        return json({ ...updated, actions });
       }
 
       const [current] = await db
@@ -118,9 +134,14 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         .from(chatbot)
         .where(eq(chatbot.id, activeChatbotId));
 
-      return current
-        ? json(current)
-        : new Response("Chatbot not found", { status: 404 });
+      if (!current) return new Response("Chatbot not found", { status: 404 });
+
+      const actions = await db
+        .select()
+        .from(Action)
+        .where(eq(Action.chatbotId, activeChatbotId));
+
+      return json({ ...current, actions });
     } catch (err) {
       console.error("PATCH /api/my-chatbot error:", err);
       return new Response("Failed to update chatbot", { status: 500 });
@@ -219,7 +240,13 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
 
       await createDefaultActions(newChatbot.id);
 
-      return json(newChatbot, { status: 201 });
+      // Fetch actions after seeding defaults
+      const actions = await db
+        .select()
+        .from(Action)
+        .where(eq(Action.chatbotId, newChatbot.id));
+
+      return json({ ...newChatbot, actions }, { status: 201 });
     } catch (err) {
       console.error("POST /api/my-chatbot error:", err);
       return new Response("Failed to create chatbot", { status: 500 });

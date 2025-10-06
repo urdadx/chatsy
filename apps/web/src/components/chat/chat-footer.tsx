@@ -80,14 +80,14 @@ export function ChatFooter({
       </form>
 
       {showPoweredBy ? (
-        <div className="flex items-center justify-center text-xs text-muted-foreground">
+        <div className="flex system-font items-center justify-center text-xs text-muted-foreground">
           <span>Powered by </span>
           <a
             href="https://padyna.com"
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: chatbot?.primaryColor || "#2563eb" }}
-            className="ml-1 hover:underline font-semibold"
+            className="ml-1 hover:underline font-semibold "
           >
             Padyna
           </a>

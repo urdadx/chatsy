@@ -2,12 +2,14 @@ import { SolarChatRoundUnreadBoldDuotone } from "@/assets/icons/chat-doutone";
 import { SolarHeadphonesRoundBoldDuotone } from "@/assets/icons/support-duotone";
 import { SolarUsersGroupRoundedBoldDuotone } from "@/assets/icons/users-duotone";
 import type { ActionType } from "@/db/schema";
-import { Switch } from "../ui/switch";
 import { ActionIcon } from "./action-icon";
+import { ActionSettings } from "./action-settings";
 
-interface IntegrationCardProps {
+interface ActionCardProps {
   action: ActionType;
-  onToggle: (actionId: string, isActive: boolean) => void;
+  onToggle: (actionId: string, field: 'isActive' | 'showInQuickMenu', value: boolean) => void;
+  onDescriptionChange?: (actionId: string, description: string) => void;
+  onDelete?: (actionId: string) => void;
   isLoading?: boolean;
 }
 
@@ -44,13 +46,40 @@ const getIconForToolName = (toolName: string) => {
 export const ActionCard = ({
   action,
   onToggle,
+  onDescriptionChange,
+  onDelete,
   isLoading = false,
-}: IntegrationCardProps) => {
-  const handleToggle = (checked: boolean) => {
-    onToggle(action.id, checked);
+}: ActionCardProps) => {
+  const handleToggleActive = (checked: boolean) => {
+    onToggle(action.id, 'isActive', checked);
+  };
+
+  const handleToggleQuickMenu = (checked: boolean) => {
+    onToggle(action.id, 'showInQuickMenu', checked);
+  };
+
+  const handleDescriptionChange = (description: string) => {
+    onDescriptionChange?.(action.id, description);
+  };
+
+  const handleDelete = () => {
+    onDelete?.(action.id);
+  };
+
+  const props = {
+    isActive: action.isActive,
+    showInQuickMenu: action.showInQuickMenu,
+    description: action.description || undefined,
+    isLoading: isLoading,
+    handleToggleActive: handleToggleActive,
+    handleToggleQuickMenu: handleToggleQuickMenu,
+    handleDescriptionChange: handleDescriptionChange,
+    handleDelete: handleDelete,
   };
 
   return (
+
+
     <div className="bg-white rounded-2xl p-3 sm:p-4 border border-gray-200 shadow-xs w-full max-w-xs mx-auto h-full">
       <div className="flex flex-col gap-3 sm:gap-4 h-full">
         <div className="flex justify-between items-center">
@@ -58,12 +87,9 @@ export const ActionCard = ({
             {getIconForToolName(action.toolName)}
           </div>
           <div className="flex items-center gap-2">
-            <Switch
-              checked={action.isActive}
-              onCheckedChange={handleToggle}
-              disabled={isLoading}
-              className="data-[state=checked]:bg-green-500"
-            />
+
+            <ActionSettings {...props} />
+
           </div>
         </div>
         <h3 className="font-medium text-sm sm:text-md">{action.name}</h3>

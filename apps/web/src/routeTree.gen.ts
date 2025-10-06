@@ -27,13 +27,14 @@ import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
 import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
 import { Route as AdminKnowledgeBaseRouteImport } from './routes/admin/knowledge-base'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
-import { Route as AdminActionsRouteImport } from './routes/admin/actions'
 import { Route as authVerifyEmailRouteImport } from './routes/(auth)/verify-email'
 import { Route as authSetupRouteImport } from './routes/(auth)/setup'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
 import { Route as AdminActivityIndexRouteImport } from './routes/admin/activity/index'
+import { Route as AdminActionsIndexRouteImport } from './routes/admin/actions/index'
+import { Route as AdminActionsNewActionRouteImport } from './routes/admin/actions/new-action'
 import { ServerRoute as ApiVoteCountServerRouteImport } from './routes/api/vote-count'
 import { ServerRoute as ApiVoteServerRouteImport } from './routes/api/vote'
 import { ServerRoute as ApiVisitorAnalyticsServerRouteImport } from './routes/api/visitor-analytics'
@@ -64,6 +65,7 @@ import { ServerRoute as ApiAnalyticsStreamServerRouteImport } from './routes/api
 import { ServerRoute as ApiChatIndexServerRouteImport } from './routes/api/chat/index'
 import { ServerRoute as ApiAgentActionsIndexServerRouteImport } from './routes/api/agent-actions/index'
 import { ServerRoute as ApiActivityIndexServerRouteImport } from './routes/api/activity/index'
+import { ServerRoute as IntegrationsCalendlyCallbackServerRouteImport } from './routes/integrations/calendly/callback'
 import { ServerRoute as ApiWebhookPolarServerRouteImport } from './routes/api/webhook/polar'
 import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/sources/count'
 import { ServerRoute as ApiEmbedGenerateTokenServerRouteImport } from './routes/api/embed/generate-token'
@@ -73,11 +75,10 @@ import { ServerRoute as ApiActivityActivityIdServerRouteImport } from './routes/
 import { ServerRoute as ApiAcceptInvitationInvitationIdServerRouteImport } from './routes/api/accept-invitation/$invitationId'
 import { ServerRoute as ApiEmbedChatbotIdentifierServerRouteImport } from './routes/api/embed/chatbot/$identifier'
 import { ServerRoute as ApiEmbedChatPlatformIdentifierServerRouteImport } from './routes/api/embed/chat/$platformIdentifier'
-import { ServerRoute as ApiIntegrationsWhatsappWebhooksVerifyServerRouteImport } from './routes/api/integrations/whatsapp/webhooks/verify'
-import { ServerRoute as ApiIntegrationsWhatsappWebhooksReceiveServerRouteImport } from './routes/api/integrations/whatsapp/webhooks/receive'
-import { ServerRoute as ApiIntegrationsWhatsappSettingsChatbotIdServerRouteImport } from './routes/api/integrations/whatsapp/settings/$chatbotId'
-import { ServerRoute as ApiIntegrationsWhatsappAuthConnectServerRouteImport } from './routes/api/integrations/whatsapp/auth/connect'
-import { ServerRoute as ApiIntegrationsWhatsappAuthCallbackServerRouteImport } from './routes/api/integrations/whatsapp/auth/callback'
+import { ServerRoute as ApiIntegrationsCalendlySettingsChatbotIdServerRouteImport } from './routes/api/integrations/calendly/settings/$chatbotId'
+import { ServerRoute as ApiIntegrationsCalendlyAuthRefreshServerRouteImport } from './routes/api/integrations/calendly/auth/refresh'
+import { ServerRoute as ApiIntegrationsCalendlyAuthDisconnectServerRouteImport } from './routes/api/integrations/calendly/auth/disconnect'
+import { ServerRoute as ApiIntegrationsCalendlyAuthConnectServerRouteImport } from './routes/api/integrations/calendly/auth/connect'
 
 const rootServerRouteImport = createServerRootRoute()
 
@@ -161,11 +162,6 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminActionsRoute = AdminActionsRouteImport.update({
-  id: '/actions',
-  path: '/actions',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
 const authVerifyEmailRoute = authVerifyEmailRouteImport.update({
   id: '/(auth)/verify-email',
   path: '/verify-email',
@@ -194,6 +190,16 @@ const AdminChatHistoryIndexRoute = AdminChatHistoryIndexRouteImport.update({
 const AdminActivityIndexRoute = AdminActivityIndexRouteImport.update({
   id: '/activity/',
   path: '/activity/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminActionsIndexRoute = AdminActionsIndexRouteImport.update({
+  id: '/actions/',
+  path: '/actions/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminActionsNewActionRoute = AdminActionsNewActionRouteImport.update({
+  id: '/actions/new-action',
+  path: '/actions/new-action',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const ApiVoteCountServerRoute = ApiVoteCountServerRouteImport.update({
@@ -354,6 +360,12 @@ const ApiActivityIndexServerRoute = ApiActivityIndexServerRouteImport.update({
   path: '/api/activity/',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const IntegrationsCalendlyCallbackServerRoute =
+  IntegrationsCalendlyCallbackServerRouteImport.update({
+    id: '/integrations/calendly/callback',
+    path: '/integrations/calendly/callback',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiWebhookPolarServerRoute = ApiWebhookPolarServerRouteImport.update({
   id: '/api/webhook/polar',
   path: '/api/webhook/polar',
@@ -404,34 +416,28 @@ const ApiEmbedChatPlatformIdentifierServerRoute =
     path: '/api/embed/chat/$platformIdentifier',
     getParentRoute: () => rootServerRouteImport,
   } as any)
-const ApiIntegrationsWhatsappWebhooksVerifyServerRoute =
-  ApiIntegrationsWhatsappWebhooksVerifyServerRouteImport.update({
-    id: '/api/integrations/whatsapp/webhooks/verify',
-    path: '/api/integrations/whatsapp/webhooks/verify',
+const ApiIntegrationsCalendlySettingsChatbotIdServerRoute =
+  ApiIntegrationsCalendlySettingsChatbotIdServerRouteImport.update({
+    id: '/api/integrations/calendly/settings/$chatbotId',
+    path: '/api/integrations/calendly/settings/$chatbotId',
     getParentRoute: () => rootServerRouteImport,
   } as any)
-const ApiIntegrationsWhatsappWebhooksReceiveServerRoute =
-  ApiIntegrationsWhatsappWebhooksReceiveServerRouteImport.update({
-    id: '/api/integrations/whatsapp/webhooks/receive',
-    path: '/api/integrations/whatsapp/webhooks/receive',
+const ApiIntegrationsCalendlyAuthRefreshServerRoute =
+  ApiIntegrationsCalendlyAuthRefreshServerRouteImport.update({
+    id: '/api/integrations/calendly/auth/refresh',
+    path: '/api/integrations/calendly/auth/refresh',
     getParentRoute: () => rootServerRouteImport,
   } as any)
-const ApiIntegrationsWhatsappSettingsChatbotIdServerRoute =
-  ApiIntegrationsWhatsappSettingsChatbotIdServerRouteImport.update({
-    id: '/api/integrations/whatsapp/settings/$chatbotId',
-    path: '/api/integrations/whatsapp/settings/$chatbotId',
+const ApiIntegrationsCalendlyAuthDisconnectServerRoute =
+  ApiIntegrationsCalendlyAuthDisconnectServerRouteImport.update({
+    id: '/api/integrations/calendly/auth/disconnect',
+    path: '/api/integrations/calendly/auth/disconnect',
     getParentRoute: () => rootServerRouteImport,
   } as any)
-const ApiIntegrationsWhatsappAuthConnectServerRoute =
-  ApiIntegrationsWhatsappAuthConnectServerRouteImport.update({
-    id: '/api/integrations/whatsapp/auth/connect',
-    path: '/api/integrations/whatsapp/auth/connect',
-    getParentRoute: () => rootServerRouteImport,
-  } as any)
-const ApiIntegrationsWhatsappAuthCallbackServerRoute =
-  ApiIntegrationsWhatsappAuthCallbackServerRouteImport.update({
-    id: '/api/integrations/whatsapp/auth/callback',
-    path: '/api/integrations/whatsapp/auth/callback',
+const ApiIntegrationsCalendlyAuthConnectServerRoute =
+  ApiIntegrationsCalendlyAuthConnectServerRouteImport.update({
+    id: '/api/integrations/calendly/auth/connect',
+    path: '/api/integrations/calendly/auth/connect',
     getParentRoute: () => rootServerRouteImport,
   } as any)
 
@@ -445,7 +451,6 @@ export interface FileRoutesByFullPath {
   '/register': typeof authRegisterRoute
   '/setup': typeof authSetupRoute
   '/verify-email': typeof authVerifyEmailRoute
-  '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
   '/admin/leads': typeof AdminLeadsRoute
@@ -457,6 +462,8 @@ export interface FileRoutesByFullPath {
   '/legal/terms': typeof LegalTermsRoute
   '/talk/$pageId': typeof TalkPageIdRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/admin/actions/new-action': typeof AdminActionsNewActionRoute
+  '/admin/actions': typeof AdminActionsIndexRoute
   '/admin/activity': typeof AdminActivityIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
@@ -470,7 +477,6 @@ export interface FileRoutesByTo {
   '/register': typeof authRegisterRoute
   '/setup': typeof authSetupRoute
   '/verify-email': typeof authVerifyEmailRoute
-  '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
   '/admin/leads': typeof AdminLeadsRoute
@@ -482,6 +488,8 @@ export interface FileRoutesByTo {
   '/legal/terms': typeof LegalTermsRoute
   '/talk/$pageId': typeof TalkPageIdRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/admin/actions/new-action': typeof AdminActionsNewActionRoute
+  '/admin/actions': typeof AdminActionsIndexRoute
   '/admin/activity': typeof AdminActivityIndexRoute
   '/admin/chat-history': typeof AdminChatHistoryIndexRoute
 }
@@ -496,7 +504,6 @@ export interface FileRoutesById {
   '/(auth)/register': typeof authRegisterRoute
   '/(auth)/setup': typeof authSetupRoute
   '/(auth)/verify-email': typeof authVerifyEmailRoute
-  '/admin/actions': typeof AdminActionsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
   '/admin/leads': typeof AdminLeadsRoute
@@ -508,6 +515,8 @@ export interface FileRoutesById {
   '/legal/terms': typeof LegalTermsRoute
   '/talk/$pageId': typeof TalkPageIdRoute
   '/onboarding/': typeof OnboardingIndexRoute
+  '/admin/actions/new-action': typeof AdminActionsNewActionRoute
+  '/admin/actions/': typeof AdminActionsIndexRoute
   '/admin/activity/': typeof AdminActivityIndexRoute
   '/admin/chat-history/': typeof AdminChatHistoryIndexRoute
 }
@@ -523,7 +532,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/setup'
     | '/verify-email'
-    | '/admin/actions'
     | '/admin/analytics'
     | '/admin/knowledge-base'
     | '/admin/leads'
@@ -535,6 +543,8 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/talk/$pageId'
     | '/onboarding'
+    | '/admin/actions/new-action'
+    | '/admin/actions'
     | '/admin/activity'
     | '/admin/chat-history'
   fileRoutesByTo: FileRoutesByTo
@@ -548,7 +558,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/setup'
     | '/verify-email'
-    | '/admin/actions'
     | '/admin/analytics'
     | '/admin/knowledge-base'
     | '/admin/leads'
@@ -560,6 +569,8 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/talk/$pageId'
     | '/onboarding'
+    | '/admin/actions/new-action'
+    | '/admin/actions'
     | '/admin/activity'
     | '/admin/chat-history'
   id:
@@ -573,7 +584,6 @@ export interface FileRouteTypes {
     | '/(auth)/register'
     | '/(auth)/setup'
     | '/(auth)/verify-email'
-    | '/admin/actions'
     | '/admin/analytics'
     | '/admin/knowledge-base'
     | '/admin/leads'
@@ -585,6 +595,8 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/talk/$pageId'
     | '/onboarding/'
+    | '/admin/actions/new-action'
+    | '/admin/actions/'
     | '/admin/activity/'
     | '/admin/chat-history/'
   fileRoutesById: FileRoutesById
@@ -640,16 +652,16 @@ export interface FileServerRoutesByFullPath {
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/webhook/polar': typeof ApiWebhookPolarServerRoute
+  '/integrations/calendly/callback': typeof IntegrationsCalendlyCallbackServerRoute
   '/api/activity': typeof ApiActivityIndexServerRoute
   '/api/agent-actions': typeof ApiAgentActionsIndexServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
   '/api/embed/chat/$platformIdentifier': typeof ApiEmbedChatPlatformIdentifierServerRoute
   '/api/embed/chatbot/$identifier': typeof ApiEmbedChatbotIdentifierServerRoute
-  '/api/integrations/whatsapp/auth/callback': typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
-  '/api/integrations/whatsapp/auth/connect': typeof ApiIntegrationsWhatsappAuthConnectServerRoute
-  '/api/integrations/whatsapp/settings/$chatbotId': typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
-  '/api/integrations/whatsapp/webhooks/receive': typeof ApiIntegrationsWhatsappWebhooksReceiveServerRoute
-  '/api/integrations/whatsapp/webhooks/verify': typeof ApiIntegrationsWhatsappWebhooksVerifyServerRoute
+  '/api/integrations/calendly/auth/connect': typeof ApiIntegrationsCalendlyAuthConnectServerRoute
+  '/api/integrations/calendly/auth/disconnect': typeof ApiIntegrationsCalendlyAuthDisconnectServerRoute
+  '/api/integrations/calendly/auth/refresh': typeof ApiIntegrationsCalendlyAuthRefreshServerRoute
+  '/api/integrations/calendly/settings/$chatbotId': typeof ApiIntegrationsCalendlySettingsChatbotIdServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/analytics-stream': typeof ApiAnalyticsStreamServerRoute
@@ -686,16 +698,16 @@ export interface FileServerRoutesByTo {
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/webhook/polar': typeof ApiWebhookPolarServerRoute
+  '/integrations/calendly/callback': typeof IntegrationsCalendlyCallbackServerRoute
   '/api/activity': typeof ApiActivityIndexServerRoute
   '/api/agent-actions': typeof ApiAgentActionsIndexServerRoute
   '/api/chat': typeof ApiChatIndexServerRoute
   '/api/embed/chat/$platformIdentifier': typeof ApiEmbedChatPlatformIdentifierServerRoute
   '/api/embed/chatbot/$identifier': typeof ApiEmbedChatbotIdentifierServerRoute
-  '/api/integrations/whatsapp/auth/callback': typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
-  '/api/integrations/whatsapp/auth/connect': typeof ApiIntegrationsWhatsappAuthConnectServerRoute
-  '/api/integrations/whatsapp/settings/$chatbotId': typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
-  '/api/integrations/whatsapp/webhooks/receive': typeof ApiIntegrationsWhatsappWebhooksReceiveServerRoute
-  '/api/integrations/whatsapp/webhooks/verify': typeof ApiIntegrationsWhatsappWebhooksVerifyServerRoute
+  '/api/integrations/calendly/auth/connect': typeof ApiIntegrationsCalendlyAuthConnectServerRoute
+  '/api/integrations/calendly/auth/disconnect': typeof ApiIntegrationsCalendlyAuthDisconnectServerRoute
+  '/api/integrations/calendly/auth/refresh': typeof ApiIntegrationsCalendlyAuthRefreshServerRoute
+  '/api/integrations/calendly/settings/$chatbotId': typeof ApiIntegrationsCalendlySettingsChatbotIdServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
@@ -733,16 +745,16 @@ export interface FileServerRoutesById {
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/webhook/polar': typeof ApiWebhookPolarServerRoute
+  '/integrations/calendly/callback': typeof IntegrationsCalendlyCallbackServerRoute
   '/api/activity/': typeof ApiActivityIndexServerRoute
   '/api/agent-actions/': typeof ApiAgentActionsIndexServerRoute
   '/api/chat/': typeof ApiChatIndexServerRoute
   '/api/embed/chat/$platformIdentifier': typeof ApiEmbedChatPlatformIdentifierServerRoute
   '/api/embed/chatbot/$identifier': typeof ApiEmbedChatbotIdentifierServerRoute
-  '/api/integrations/whatsapp/auth/callback': typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
-  '/api/integrations/whatsapp/auth/connect': typeof ApiIntegrationsWhatsappAuthConnectServerRoute
-  '/api/integrations/whatsapp/settings/$chatbotId': typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
-  '/api/integrations/whatsapp/webhooks/receive': typeof ApiIntegrationsWhatsappWebhooksReceiveServerRoute
-  '/api/integrations/whatsapp/webhooks/verify': typeof ApiIntegrationsWhatsappWebhooksVerifyServerRoute
+  '/api/integrations/calendly/auth/connect': typeof ApiIntegrationsCalendlyAuthConnectServerRoute
+  '/api/integrations/calendly/auth/disconnect': typeof ApiIntegrationsCalendlyAuthDisconnectServerRoute
+  '/api/integrations/calendly/auth/refresh': typeof ApiIntegrationsCalendlyAuthRefreshServerRoute
+  '/api/integrations/calendly/settings/$chatbotId': typeof ApiIntegrationsCalendlySettingsChatbotIdServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
@@ -781,16 +793,16 @@ export interface FileServerRouteTypes {
     | '/api/embed/generate-token'
     | '/api/sources/count'
     | '/api/webhook/polar'
+    | '/integrations/calendly/callback'
     | '/api/activity'
     | '/api/agent-actions'
     | '/api/chat'
     | '/api/embed/chat/$platformIdentifier'
     | '/api/embed/chatbot/$identifier'
-    | '/api/integrations/whatsapp/auth/callback'
-    | '/api/integrations/whatsapp/auth/connect'
-    | '/api/integrations/whatsapp/settings/$chatbotId'
-    | '/api/integrations/whatsapp/webhooks/receive'
-    | '/api/integrations/whatsapp/webhooks/verify'
+    | '/api/integrations/calendly/auth/connect'
+    | '/api/integrations/calendly/auth/disconnect'
+    | '/api/integrations/calendly/auth/refresh'
+    | '/api/integrations/calendly/settings/$chatbotId'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/analytics-stream'
@@ -827,16 +839,16 @@ export interface FileServerRouteTypes {
     | '/api/embed/generate-token'
     | '/api/sources/count'
     | '/api/webhook/polar'
+    | '/integrations/calendly/callback'
     | '/api/activity'
     | '/api/agent-actions'
     | '/api/chat'
     | '/api/embed/chat/$platformIdentifier'
     | '/api/embed/chatbot/$identifier'
-    | '/api/integrations/whatsapp/auth/callback'
-    | '/api/integrations/whatsapp/auth/connect'
-    | '/api/integrations/whatsapp/settings/$chatbotId'
-    | '/api/integrations/whatsapp/webhooks/receive'
-    | '/api/integrations/whatsapp/webhooks/verify'
+    | '/api/integrations/calendly/auth/connect'
+    | '/api/integrations/calendly/auth/disconnect'
+    | '/api/integrations/calendly/auth/refresh'
+    | '/api/integrations/calendly/settings/$chatbotId'
   id:
     | '__root__'
     | '/api/analytics-stream'
@@ -873,16 +885,16 @@ export interface FileServerRouteTypes {
     | '/api/embed/generate-token'
     | '/api/sources/count'
     | '/api/webhook/polar'
+    | '/integrations/calendly/callback'
     | '/api/activity/'
     | '/api/agent-actions/'
     | '/api/chat/'
     | '/api/embed/chat/$platformIdentifier'
     | '/api/embed/chatbot/$identifier'
-    | '/api/integrations/whatsapp/auth/callback'
-    | '/api/integrations/whatsapp/auth/connect'
-    | '/api/integrations/whatsapp/settings/$chatbotId'
-    | '/api/integrations/whatsapp/webhooks/receive'
-    | '/api/integrations/whatsapp/webhooks/verify'
+    | '/api/integrations/calendly/auth/connect'
+    | '/api/integrations/calendly/auth/disconnect'
+    | '/api/integrations/calendly/auth/refresh'
+    | '/api/integrations/calendly/settings/$chatbotId'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
@@ -920,16 +932,16 @@ export interface RootServerRouteChildren {
   ApiEmbedGenerateTokenServerRoute: typeof ApiEmbedGenerateTokenServerRoute
   ApiSourcesCountServerRoute: typeof ApiSourcesCountServerRoute
   ApiWebhookPolarServerRoute: typeof ApiWebhookPolarServerRoute
+  IntegrationsCalendlyCallbackServerRoute: typeof IntegrationsCalendlyCallbackServerRoute
   ApiActivityIndexServerRoute: typeof ApiActivityIndexServerRoute
   ApiAgentActionsIndexServerRoute: typeof ApiAgentActionsIndexServerRoute
   ApiChatIndexServerRoute: typeof ApiChatIndexServerRoute
   ApiEmbedChatPlatformIdentifierServerRoute: typeof ApiEmbedChatPlatformIdentifierServerRoute
   ApiEmbedChatbotIdentifierServerRoute: typeof ApiEmbedChatbotIdentifierServerRoute
-  ApiIntegrationsWhatsappAuthCallbackServerRoute: typeof ApiIntegrationsWhatsappAuthCallbackServerRoute
-  ApiIntegrationsWhatsappAuthConnectServerRoute: typeof ApiIntegrationsWhatsappAuthConnectServerRoute
-  ApiIntegrationsWhatsappSettingsChatbotIdServerRoute: typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRoute
-  ApiIntegrationsWhatsappWebhooksReceiveServerRoute: typeof ApiIntegrationsWhatsappWebhooksReceiveServerRoute
-  ApiIntegrationsWhatsappWebhooksVerifyServerRoute: typeof ApiIntegrationsWhatsappWebhooksVerifyServerRoute
+  ApiIntegrationsCalendlyAuthConnectServerRoute: typeof ApiIntegrationsCalendlyAuthConnectServerRoute
+  ApiIntegrationsCalendlyAuthDisconnectServerRoute: typeof ApiIntegrationsCalendlyAuthDisconnectServerRoute
+  ApiIntegrationsCalendlyAuthRefreshServerRoute: typeof ApiIntegrationsCalendlyAuthRefreshServerRoute
+  ApiIntegrationsCalendlySettingsChatbotIdServerRoute: typeof ApiIntegrationsCalendlySettingsChatbotIdServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1046,13 +1058,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/actions': {
-      id: '/admin/actions'
-      path: '/actions'
-      fullPath: '/admin/actions'
-      preLoaderRoute: typeof AdminActionsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/(auth)/verify-email': {
       id: '/(auth)/verify-email'
       path: '/verify-email'
@@ -1093,6 +1098,20 @@ declare module '@tanstack/react-router' {
       path: '/activity'
       fullPath: '/admin/activity'
       preLoaderRoute: typeof AdminActivityIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/actions/': {
+      id: '/admin/actions/'
+      path: '/actions'
+      fullPath: '/admin/actions'
+      preLoaderRoute: typeof AdminActionsIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/actions/new-action': {
+      id: '/admin/actions/new-action'
+      path: '/actions/new-action'
+      fullPath: '/admin/actions/new-action'
+      preLoaderRoute: typeof AdminActionsNewActionRouteImport
       parentRoute: typeof AdminRouteRoute
     }
   }
@@ -1309,6 +1328,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiActivityIndexServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/integrations/calendly/callback': {
+      id: '/integrations/calendly/callback'
+      path: '/integrations/calendly/callback'
+      fullPath: '/integrations/calendly/callback'
+      preLoaderRoute: typeof IntegrationsCalendlyCallbackServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/webhook/polar': {
       id: '/api/webhook/polar'
       path: '/api/webhook/polar'
@@ -1372,64 +1398,59 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiEmbedChatPlatformIdentifierServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/api/integrations/whatsapp/webhooks/verify': {
-      id: '/api/integrations/whatsapp/webhooks/verify'
-      path: '/api/integrations/whatsapp/webhooks/verify'
-      fullPath: '/api/integrations/whatsapp/webhooks/verify'
-      preLoaderRoute: typeof ApiIntegrationsWhatsappWebhooksVerifyServerRouteImport
+    '/api/integrations/calendly/settings/$chatbotId': {
+      id: '/api/integrations/calendly/settings/$chatbotId'
+      path: '/api/integrations/calendly/settings/$chatbotId'
+      fullPath: '/api/integrations/calendly/settings/$chatbotId'
+      preLoaderRoute: typeof ApiIntegrationsCalendlySettingsChatbotIdServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/api/integrations/whatsapp/webhooks/receive': {
-      id: '/api/integrations/whatsapp/webhooks/receive'
-      path: '/api/integrations/whatsapp/webhooks/receive'
-      fullPath: '/api/integrations/whatsapp/webhooks/receive'
-      preLoaderRoute: typeof ApiIntegrationsWhatsappWebhooksReceiveServerRouteImport
+    '/api/integrations/calendly/auth/refresh': {
+      id: '/api/integrations/calendly/auth/refresh'
+      path: '/api/integrations/calendly/auth/refresh'
+      fullPath: '/api/integrations/calendly/auth/refresh'
+      preLoaderRoute: typeof ApiIntegrationsCalendlyAuthRefreshServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/api/integrations/whatsapp/settings/$chatbotId': {
-      id: '/api/integrations/whatsapp/settings/$chatbotId'
-      path: '/api/integrations/whatsapp/settings/$chatbotId'
-      fullPath: '/api/integrations/whatsapp/settings/$chatbotId'
-      preLoaderRoute: typeof ApiIntegrationsWhatsappSettingsChatbotIdServerRouteImport
+    '/api/integrations/calendly/auth/disconnect': {
+      id: '/api/integrations/calendly/auth/disconnect'
+      path: '/api/integrations/calendly/auth/disconnect'
+      fullPath: '/api/integrations/calendly/auth/disconnect'
+      preLoaderRoute: typeof ApiIntegrationsCalendlyAuthDisconnectServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/api/integrations/whatsapp/auth/connect': {
-      id: '/api/integrations/whatsapp/auth/connect'
-      path: '/api/integrations/whatsapp/auth/connect'
-      fullPath: '/api/integrations/whatsapp/auth/connect'
-      preLoaderRoute: typeof ApiIntegrationsWhatsappAuthConnectServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/api/integrations/whatsapp/auth/callback': {
-      id: '/api/integrations/whatsapp/auth/callback'
-      path: '/api/integrations/whatsapp/auth/callback'
-      fullPath: '/api/integrations/whatsapp/auth/callback'
-      preLoaderRoute: typeof ApiIntegrationsWhatsappAuthCallbackServerRouteImport
+    '/api/integrations/calendly/auth/connect': {
+      id: '/api/integrations/calendly/auth/connect'
+      path: '/api/integrations/calendly/auth/connect'
+      fullPath: '/api/integrations/calendly/auth/connect'
+      preLoaderRoute: typeof ApiIntegrationsCalendlyAuthConnectServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
   }
 }
 
 interface AdminRouteRouteChildren {
-  AdminActionsRoute: typeof AdminActionsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminKnowledgeBaseRoute: typeof AdminKnowledgeBaseRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminOverviewRoute: typeof AdminOverviewRoute
   AdminPlaygroundRoute: typeof AdminPlaygroundRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminActionsNewActionRoute: typeof AdminActionsNewActionRoute
+  AdminActionsIndexRoute: typeof AdminActionsIndexRoute
   AdminActivityIndexRoute: typeof AdminActivityIndexRoute
   AdminChatHistoryIndexRoute: typeof AdminChatHistoryIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminActionsRoute: AdminActionsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminKnowledgeBaseRoute: AdminKnowledgeBaseRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminOverviewRoute: AdminOverviewRoute,
   AdminPlaygroundRoute: AdminPlaygroundRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminActionsNewActionRoute: AdminActionsNewActionRoute,
+  AdminActionsIndexRoute: AdminActionsIndexRoute,
   AdminActivityIndexRoute: AdminActivityIndexRoute,
   AdminChatHistoryIndexRoute: AdminChatHistoryIndexRoute,
 }
@@ -1493,22 +1514,22 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiEmbedGenerateTokenServerRoute: ApiEmbedGenerateTokenServerRoute,
   ApiSourcesCountServerRoute: ApiSourcesCountServerRoute,
   ApiWebhookPolarServerRoute: ApiWebhookPolarServerRoute,
+  IntegrationsCalendlyCallbackServerRoute:
+    IntegrationsCalendlyCallbackServerRoute,
   ApiActivityIndexServerRoute: ApiActivityIndexServerRoute,
   ApiAgentActionsIndexServerRoute: ApiAgentActionsIndexServerRoute,
   ApiChatIndexServerRoute: ApiChatIndexServerRoute,
   ApiEmbedChatPlatformIdentifierServerRoute:
     ApiEmbedChatPlatformIdentifierServerRoute,
   ApiEmbedChatbotIdentifierServerRoute: ApiEmbedChatbotIdentifierServerRoute,
-  ApiIntegrationsWhatsappAuthCallbackServerRoute:
-    ApiIntegrationsWhatsappAuthCallbackServerRoute,
-  ApiIntegrationsWhatsappAuthConnectServerRoute:
-    ApiIntegrationsWhatsappAuthConnectServerRoute,
-  ApiIntegrationsWhatsappSettingsChatbotIdServerRoute:
-    ApiIntegrationsWhatsappSettingsChatbotIdServerRoute,
-  ApiIntegrationsWhatsappWebhooksReceiveServerRoute:
-    ApiIntegrationsWhatsappWebhooksReceiveServerRoute,
-  ApiIntegrationsWhatsappWebhooksVerifyServerRoute:
-    ApiIntegrationsWhatsappWebhooksVerifyServerRoute,
+  ApiIntegrationsCalendlyAuthConnectServerRoute:
+    ApiIntegrationsCalendlyAuthConnectServerRoute,
+  ApiIntegrationsCalendlyAuthDisconnectServerRoute:
+    ApiIntegrationsCalendlyAuthDisconnectServerRoute,
+  ApiIntegrationsCalendlyAuthRefreshServerRoute:
+    ApiIntegrationsCalendlyAuthRefreshServerRoute,
+  ApiIntegrationsCalendlySettingsChatbotIdServerRoute:
+    ApiIntegrationsCalendlySettingsChatbotIdServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

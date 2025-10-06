@@ -36,7 +36,7 @@ function RouteComponent() {
       </div>
 
       {/* Fixed Sidebar - Hidden on mobile */}
-      <aside className="hidden sm:flex fixed top-7 right-0 w-[420px] h-full border-l px-4 py-6 z-0">
+      <aside className="hidden bg-gray-50 sm:flex fixed top-7 right-0 w-[420px] h-full border-l px-4 py-6 z-0">
         <div className="w-full h-full flex items-center justify-center">
           <ChatPreview />
         </div>

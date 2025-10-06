@@ -8,7 +8,7 @@ export const CompletedStatus = () => {
     <div className="flex flex-col gap-4">
       <p className="text-lg text-foreground font-semibold ">Training status</p>
 
-      <div className="group relative overflow-hidden rounded-3xl border border-foreground/10 bg-gradient-to-bl from-green-50 via-green-25 to-background p-2.5 shadow-xs  dark:shadow-none dark:from-green-950/20 dark:via-green-900/10">
+      <div className="group relative overflow-hidden rounded-xl border border-foreground/10 bg-gradient-to-bl from-green-50 via-green-25 to-background p-2.5 shadow-xs  dark:shadow-none dark:from-green-950/20 dark:via-green-900/10">
         <div className="flex items-start gap-3 p-1.5">
           <div>
             <p className="text-base flex gap-2 items-center font-medium text-green-700">

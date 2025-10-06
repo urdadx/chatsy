@@ -118,7 +118,7 @@ export function ChatPreview() {
 
   if (showLanding) {
     return (
-      <div className="flex flex-col w-full h-full max-h-[80vh] md:h-[550px] shadow-sm md:rounded-2xl overflow-hidden">
+      <div className="bg-white flex flex-col w-full h-full max-h-[80vh] md:h-[550px] shadow-sm md:rounded-2xl overflow-hidden">
         <ChatLanding
           onGoToMain={handleGoToMain}
           chatbot={chatbot}

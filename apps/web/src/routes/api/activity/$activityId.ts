@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { feedback, lead } from "@/db/schema";
+import { feedback, issueReport, lead } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -18,7 +18,7 @@ export const ServerRoute = createServerFileRoute(
     const searchParams = new URL(request.url).searchParams;
     const type = searchParams.get("type");
 
-    if (!type || !["lead", "feedback"].includes(type)) {
+    if (!type || !["lead", "feedback", "issue"].includes(type)) {
       return json(
         { error: "Invalid or missing type parameter" },
         { status: 400 },
@@ -35,7 +35,7 @@ export const ServerRoute = createServerFileRoute(
         .limit(1);
 
       result = leadResult[0] ? { ...leadResult[0], type: "lead" } : null;
-    } else {
+    } else if (type === "feedback") {
       const feedbackResult = await db
         .select()
         .from(feedback)
@@ -45,6 +45,14 @@ export const ServerRoute = createServerFileRoute(
       result = feedbackResult[0]
         ? { ...feedbackResult[0], type: "feedback" }
         : null;
+    } else if (type === "issue") {
+      const issueResult = await db
+        .select()
+        .from(issueReport)
+        .where(eq(issueReport.id, activityId))
+        .limit(1);
+
+      result = issueResult[0] ? { ...issueResult[0], type: "issue" } : null;
     }
 
     if (!result) {

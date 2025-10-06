@@ -124,7 +124,7 @@ export function ChatsByChannel({
       : 0;
 
   return (
-    <div className="h-[350px] w-full rounded-3xl border bg-white flex flex-col overflow-hidden">
+    <div className="h-[350px] w-full rounded-xl border bg-white flex flex-col overflow-hidden">
       <Tabs defaultValue="tab-1" className="flex flex-col h-full">
         {/* Header - Fixed height */}
         <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">

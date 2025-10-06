@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chatbot } from "@/db/schema";
+import { Action, chatbot } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
@@ -48,6 +48,11 @@ export const ServerRoute = createServerFileRoute(
         });
       }
 
+      const actions = await db
+        .select()
+        .from(Action)
+        .where(eq(Action.chatbotId, publicChatbot.id));
+
       // Check if the request is coming from an allowed domain
       const referer = request.headers.get("referer");
 
@@ -75,22 +80,21 @@ export const ServerRoute = createServerFileRoute(
         "Access-Control-Allow-Headers": "Content-Type",
       });
 
-      return json(publicChatbot, { headers });
+      return json({ ...publicChatbot, actions }, { headers });
     } catch (error) {
       console.error("Error fetching public chatbot:", error);
       return new Response("Internal server error", { status: 500 });
     }
   },
 
-  OPTIONS: async ({ request }) => {
+  OPTIONS: async () => {
     // Handle CORS preflight requests
-    console.log(request.headers.get("origin"));
-    const headers = new Headers({
+    const corsHeaders = new Headers({
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     });
 
-    return new Response(null, { status: 200, headers });
+    return new Response(null, { status: 200, headers: corsHeaders });
   },
 });

@@ -11,7 +11,7 @@ export const UsageTable = () => {
 
   return (
     <div className="mx-auto w-full">
-      <div className="bg-white rounded-3xl shadow-xs border border-gray-300 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-xs border border-gray-300 overflow-hidden">
         <div className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-base font-semibold">Usage</h2>

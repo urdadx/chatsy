@@ -169,7 +169,7 @@ export function ChatsByDeviceSources({
       : 0;
 
   return (
-    <div className="h-[350px] w-full rounded-3xl border bg-white">
+    <div className="h-[350px] w-full rounded-xl border bg-white">
       <Tabs defaultValue="tab-1" className="flex flex-col h-full">
         <div className="flex items-center justify-between px-4 py-3">
           <TabsList className="h-auto gap-2 rounded-none border-border bg-transparent px-0 text-foreground">

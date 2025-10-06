@@ -1,4 +1,4 @@
-import type { Chatbot } from "@/db/schema";
+import type { ActionType, Chatbot } from "@/db/schema";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -8,7 +8,7 @@ export function useChatbot() {
   const { data: session } = useSession();
   const organizationId = session?.session?.activeOrganizationId;
 
-  return useQuery<Chatbot>({
+  return useQuery<Chatbot & { actions?: ActionType[] }>({
     queryKey: ["chatbot"],
     queryFn: async () => {
       if (!organizationId) {
@@ -17,7 +17,7 @@ export function useChatbot() {
       const response = await api.get("/my-chatbot", {
         params: { organizationId },
       });
-      return response.data;
+      return response.data as Chatbot & { actions?: ActionType[] };
     },
   });
 }

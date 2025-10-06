@@ -227,7 +227,7 @@ function FileStatCard({
     typeof size === "string" ? size.replace(/(\d)([A-Za-z])/, "$1 $2") : size;
 
   return (
-    <div className="w-full border bg-white rounded-2xl ">
+    <div className="w-full border bg-white rounded-lg ">
       <div className="p-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           {icon}

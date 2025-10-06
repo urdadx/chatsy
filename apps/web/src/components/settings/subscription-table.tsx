@@ -40,7 +40,7 @@ export const SubscriptionTable = () => {
 
   return (
     <div className="mx-auto">
-      <div className="bg-white rounded-3xl shadow-xs border border-gray-300 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-xs border border-gray-300 overflow-hidden">
         <div className="p-6">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">

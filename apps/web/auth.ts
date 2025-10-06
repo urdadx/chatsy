@@ -40,10 +40,25 @@ export const createDefaultActions = async (chatbotId: string) => {
     },
     {
       chatbotId,
-      name: "Feedback form",
+      name: "Give us feedback",
       toolName: "collect_feedback",
       description:
         "Collects feedback, reviews, complaints, or suggestions from users.",
+      isActive: true,
+    },
+    {
+      chatbotId,
+      name: "Report an issue",
+      toolName: "report_issue",
+      description:
+        "Allow users to report bugs, problems, or issues they encounter.",
+      isActive: true,
+    },
+    {
+      chatbotId,
+      name: "Book a meeting",
+      toolName: "book_meeting",
+      description: "Allow users to book meetings.",
       isActive: true,
     },
     {

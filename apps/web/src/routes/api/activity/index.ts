@@ -1,11 +1,11 @@
 import { db } from "@/db";
-import { feedback, lead } from "@/db/schema";
+import { feedback, issueReport, lead } from "@/db/schema";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { desc, eq, sql } from "drizzle-orm";
-import { unionAll } from "drizzle-orm/pg-core"; // adjust for your database
+import { unionAll } from "drizzle-orm/pg-core";
 
 export const ServerRoute = createServerFileRoute("/api/activity/").methods({
   GET: async ({ request }) => {
@@ -47,6 +47,22 @@ export const ServerRoute = createServerFileRoute("/api/activity/").methods({
         })
         .from(feedback)
         .where(eq(feedback.chatbotId, activeChatbotId)),
+
+      db
+        .select({
+          id: issueReport.id,
+          created_at: issueReport.createdAt,
+          name: sql<string>`COALESCE(NULLIF(TRIM(${issueReport.email}), ''), 'Anonymous')`.as(
+            "name",
+          ),
+          contact: sql<string>`COALESCE(${issueReport.email}, '')`.as(
+            "contact",
+          ),
+          location: issueReport.location,
+          type: sql<string>`'issue'`.as("type"),
+        })
+        .from(issueReport)
+        .where(eq(issueReport.chatbotId, activeChatbotId)),
     ).as("combined");
 
     // Now select from the union with proper ordering

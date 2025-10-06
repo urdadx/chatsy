@@ -47,7 +47,7 @@ export const WorkspaceNameSettings = () => {
 
   return (
     <div className="mx-auto">
-      <div className="bg-white rounded-3xl shadow-xs border overflow-hidden">
+      <div className="bg-white rounded-xl shadow-xs border overflow-hidden">
         <div className="flex justify-between p-6 pb-0">
           <div className="">
             <h2 className="text-base font-semibold mb-2">Organization Name</h2>

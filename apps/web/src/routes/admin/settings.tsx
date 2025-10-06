@@ -124,7 +124,7 @@ function RouteComponent() {
                 </Button>
               )}
             </div>
-            <div className="w-full border rounded-3xl p-4">
+            <div className="w-full border rounded-xl p-4">
               <MembersTable />
             </div>
           </TabsContent>
@@ -138,7 +138,7 @@ function RouteComponent() {
                 </Button>
               )}
             </div>
-            <div className="w-full border rounded-3xl p-4">
+            <div className="w-full border rounded-xl p-4">
               <InvitationsTable />
             </div>
           </TabsContent>

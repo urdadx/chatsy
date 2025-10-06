@@ -28,7 +28,6 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
     }));
   };
 
-  // Memoize the embed token calculation
   const embedToken = useMemo(() => {
     if (embedTokenFromContext) {
       return embedTokenFromContext;
@@ -45,9 +44,7 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
 
   const mutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      // Get user location before sending
       const location = await getClientLocation();
-
       const requestData = {
         ...data,
         location,
@@ -58,12 +55,12 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Feedback sent successfully!");
+      toast.success("Submitted!");
       setFormData({ email: "", subject: "", message: "" });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast.error(
-        error.response?.data?.message || "An unexpected error occurred.",
+        "An unexpected error occurred."
       );
     },
   });

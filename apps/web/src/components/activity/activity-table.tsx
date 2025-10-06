@@ -124,14 +124,17 @@ const columns: ColumnDef<Item>[] = [
     header: "Email",
     accessorKey: "email",
     size: 200,
-    cell: ({ row }) => (
-      <div
-        className="font-medium truncate max-w-[180px]"
-        title={row.getValue("email") as string}
-      >
-        {row.getValue("email")}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const email = row.getValue("email") as string;
+      return (
+        <div
+          className="font-medium truncate max-w-[180px]"
+          title={email || "Not available"}
+        >
+          {email || "Not available"}
+        </div>
+      );
+    },
   },
   {
     header: "Location",
@@ -148,7 +151,9 @@ const columns: ColumnDef<Item>[] = [
             ? "bg-orange-100 text-orange-800"
             : row.getValue("type") === "lead"
               ? "bg-green-100 text-green-800"
-              : "bg-muted-foreground/60 text-primary-foreground",
+              : row.getValue("type") === "issue"
+                ? "bg-red-100 text-red-800"
+                : "bg-muted-foreground/60 text-primary-foreground",
         )}
       >
         {row.getValue("type")}
@@ -392,7 +397,7 @@ export default function Component() {
       </div>
 
       {/* Table */}
-      <div className="bg-background overflow-hidden rounded-3xl border">
+      <div className="bg-background overflow-hidden rounded-xl border">
         <Table className="table-fixed">
           <TableHeader className="bg-purple-50 ">
             {table.getHeaderGroups().map((headerGroup) => (

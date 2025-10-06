@@ -63,7 +63,7 @@ export function ChatBody({
 
   if (isDeactivated) {
     return (
-      <div className={`relative flex-1 min-h-0 overflow-hidden ${className}`}>
+      <div className={`relative bg-white flex-1 min-h-0 overflow-hidden ${className}`}>
         <div className="flex items-center justify-center h-full">
           <div className="text-center p-6 max-w-sm">
             <div className="mb-4">
@@ -86,7 +86,7 @@ export function ChatBody({
 
   if (isLoading) {
     return (
-      <div className={`relative flex-1 min-h-0 overflow-hidden ${className}`}>
+      <div className={`relative bg-white flex-1 min-h-0 overflow-hidden ${className}`}>
         <div className="flex items-center justify-center h-full">
           <Spinner className="text-primary" />
         </div>
@@ -96,7 +96,7 @@ export function ChatBody({
 
   if (error) {
     return (
-      <div className={`relative flex-1 min-h-0 overflow-hidden ${className}`}>
+      <div className={`relative bg-white flex-1 min-h-0 overflow-hidden ${className}`}>
         <div className="flex items-center justify-center h-full text-red-500">
           <div className="text-center">
             <p className="text-sm">Error loading messages</p>
@@ -118,7 +118,7 @@ export function ChatBody({
   }
 
   return (
-    <div ref={messagesContainerRef} className={`relative flex-1 min-h-0 overflow-hidden ${className}`}>
+    <div ref={messagesContainerRef} className={`bg-white relative flex-1 min-h-0 overflow-hidden ${className}`}>
       <Conversation className="h-full overflow-hidden">
         <ConversationContent>
           {messages.length === 0 ? (

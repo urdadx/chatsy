@@ -61,7 +61,7 @@ export function RowActions({ row }: any) {
         className="right-2 bg-background z-10 top-2 bottom-2 fixed outline-none w-[400px] flex"
         style={{ ["--initial-transform" as any]: "calc(100% + 16px)" }}
       >
-        <div className="bg-white h-full w-full grow p-6 flex flex-col rounded-[16px]">
+        <div className="bg-white smooth-div h-full w-full grow p-6 flex flex-col rounded-[16px]">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center justify-between w-full">
@@ -106,10 +106,10 @@ export function RowActions({ row }: any) {
                     <AvatarFallback>
                       {data.name
                         ? data.name
-                            .split(" ")
-                            .map((n: string) => n[0])
-                            .join("")
-                            .slice(0, 2)
+                          .split(" ")
+                          .map((n: string) => n[0])
+                          .join("")
+                          .slice(0, 2)
                         : "?"}
                     </AvatarFallback>
                   </Avatar>
@@ -129,10 +129,10 @@ export function RowActions({ row }: any) {
                     {data.fibuStartDate ||
                       (data.createdAt
                         ? new Date(data.createdAt).toLocaleDateString("en-GB", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
                         : "-")}
                   </span>
                 </div>
@@ -177,13 +177,15 @@ export function RowActions({ row }: any) {
                   <span className="text-sm font-medium text-gray-700">
                     Message
                   </span>
-                  {!data.subject && !data.message ? (
+                  {!data.subject && !data.message && !data.title && !data.description ? (
                     <div
                       className={cn(
                         "text-sm text-gray-900 border w-full flex flex-col gap-3 whitespace-pre-wrap break-words p-4 rounded-lg",
                         data.type === "lead"
                           ? "border-green-300 bg-green-100"
-                          : "border-orange-300 bg-orange-100",
+                          : data.type === "feedback"
+                            ? "border-orange-300 bg-orange-100"
+                            : "border-red-300 bg-red-100",
                       )}
                     >
                       No info provided
@@ -194,11 +196,25 @@ export function RowActions({ row }: any) {
                         "text-sm text-gray-900 border w-full flex flex-col gap-3 whitespace-pre-wrap break-words p-4 rounded-lg",
                         data.type === "lead"
                           ? "border-green-300 bg-green-100"
-                          : "border-orange-300 bg-orange-100",
+                          : data.type === "feedback"
+                            ? "border-orange-300 bg-orange-100"
+                            : "border-red-300 bg-red-100",
                       )}
                     >
-                      {data.subject && <span>{data.subject}</span>}
-                      <span>{data.message || "No message provided"}</span>
+                      {(data.subject || data.title) && <span className="font-medium">{data.subject || data.title}</span>}
+                      <span>{data.message || data.description || "No message provided"}</span>
+                    </div>
+                  )}
+                  {data.screenshot && (
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm font-medium text-gray-700">
+                        Screenshot
+                      </span>
+                      <img
+                        src={data.screenshot}
+                        alt="Issue screenshot"
+                        className="max-w-full h-auto rounded-lg border"
+                      />
                     </div>
                   )}
                 </div>

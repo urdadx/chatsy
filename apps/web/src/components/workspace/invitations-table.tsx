@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/table";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
-import { Mail } from "lucide-react";
 import { NoDataPlaceholder } from "../no-data-placeholder";
 import Spinner from "../ui/spinner";
 import { InvitationActions } from "./invitation-actions";

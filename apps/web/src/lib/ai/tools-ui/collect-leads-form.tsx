@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Spinner from "@/components/ui/spinner";
-import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useEmbedToken } from "@/lib/contexts/embed-token-context";
 import { getClientLocation } from "@/lib/utils/client-location";
@@ -58,17 +57,16 @@ export function CollectLeadsForm({ color }: { color?: string }) {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Lead information collected successfully!");
+      toast.success("Submitted!");
       setFormData({
         name: "",
         contact: "",
         message: "",
       });
     },
-    onError: (error: any) => {
-      console.error("Error collecting lead:", error);
+    onError: () => {
       toast.error(
-        error.response?.data?.message || "An unexpected error occurred.",
+        "An unexpected error occurred."
       );
     },
   });
@@ -95,29 +93,15 @@ export function CollectLeadsForm({ color }: { color?: string }) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="contact">Contact</Label>
+        <Label htmlFor="contact">Contact details</Label>
         <Input
           id="contact"
           name="contact"
           type="contact"
-          placeholder="Enter your email or phone number"
+          placeholder="Email or phone number"
           value={formData.contact}
           onChange={handleChange}
           required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="message" className="block text-sm font-medium ">
-          Message (Optional)
-        </label>
-        <Textarea
-          id="message"
-          name="message"
-          className="w-full"
-          placeholder="Tell us more..."
-          value={formData.message}
-          onChange={handleChange}
         />
       </div>
 
@@ -136,7 +120,7 @@ export function CollectLeadsForm({ color }: { color?: string }) {
             Submitting...
           </>
         ) : (
-          "Submit Information"
+          "Submit"
         )}
       </Button>
     </form>

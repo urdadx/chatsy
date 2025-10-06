@@ -118,7 +118,7 @@ export const PreviewMessage = ({
                   }
 
                   return (
-                    <div key={toolCallId}>
+                    <div className="px-2" key={toolCallId}>
                       <CollectFeedbackForm
                         color={activeChatbot?.primaryColor}
                       />
@@ -132,7 +132,7 @@ export const PreviewMessage = ({
 
                 if (state === "input-available") {
                   return (
-                    <div key={toolCallId}>
+                    <div className="px-2" key={toolCallId}>
                       <CollectLeadsForm color={activeChatbot?.primaryColor} />
                     </div>
                   );

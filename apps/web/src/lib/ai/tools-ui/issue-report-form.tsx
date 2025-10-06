@@ -95,14 +95,10 @@ export function IssueReportForm({ color }: { color?: string }) {
         formData.append('file', data.screenshot);
 
         try {
-          const uploadResponse = await api.post("/api/upload-images", formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
+          const uploadResponse = await api.post("/upload-images", formData);
           screenshotUrl = uploadResponse.data.url;
         } catch (error) {
-          console.warn('Screenshot upload failed, continuing without it:', error);
+          throw new Error("Screenshot upload failed");
         }
       }
 
@@ -168,7 +164,7 @@ export function IssueReportForm({ color }: { color?: string }) {
 
       <div>
         <Label htmlFor="screenshot" className="block text-sm font-medium mb-2">
-          Screenshot (Optional)
+          Screenshot (if applicable)
         </Label>
         <div className="space-y-3">
           {!screenshotPreview ? (

@@ -86,10 +86,10 @@ export function DocumentSource() {
 
   return (
     <>
-      <div className="flex flex-col gap-2 rounded-3xl p-5 border">
+      <div className="flex flex-col gap-2 rounded-xl p-5 border">
         <div className="flex justify-between items-center mb-2">
           <div className="flex flex-col gap-2">
-            <h2 className="font-semibold text-lg">Files</h2>
+            <h2 className="font-semibold text-lg tracking-tight ">Files</h2>
             <p className=" text-semibold text-base text-muted-foreground">
               Upload and manage various documents to train your AI agent
             </p>
@@ -108,7 +108,7 @@ export function DocumentSource() {
             onDrop={handleDrop}
             data-dragging={isDragging || undefined}
             className={cn(
-              "border-input border-2 bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 flex min-h-52 flex-col items-center justify-center rounded-xl border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px] hover:border-primary",
+              "border-input border-2 bg-gray-50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 flex min-h-52 flex-col items-center justify-center rounded-xl border-dashed p-6 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px] hover:border-primary",
               isDragging && "border-primary",
             )}
           >

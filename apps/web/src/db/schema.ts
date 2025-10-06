@@ -218,12 +218,6 @@ export const chatbot = pgTable("chatbot", {
   embedToken: text("embed_token").unique(),
   allowedDomains: text("allowed_domains").array(),
 
-  whatsappEnabled: boolean("whatsapp_enabled").notNull().default(false),
-  whatsappPhoneNumberId: text("whatsapp_phone_number_id"),
-  whatsappBusinessAccountId: text("whatsapp_business_account_id"),
-  whatsappWelcomeMessage: text("whatsapp_welcome_message"),
-  whatsappSettings: jsonb("whatsapp_settings"),
-
   createdAt: timestamp("created_at")
     .notNull()
     .$defaultFn(() => new Date()),
@@ -346,14 +340,14 @@ export const feedback = pgTable("feedback", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const featureRequest = pgTable("feature_request", {
+export const issueReport = pgTable("issue_report", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   chatbotId: uuid("chatbot_id")
     .notNull()
     .references(() => chatbot.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  screenshot: text("screenshot"), // URL to uploaded screenshot
+  screenshot: text("screenshot"),
   email: text("email"),
   location: text("location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -421,20 +415,7 @@ export const creditsUsage = pgTable("credits_usage", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-// WhatsApp message metadata (extends existing message table)
-export const whatsappMessageMetadata = pgTable("whatsapp_message_metadata", {
-  id: uuid("id").primaryKey().notNull().defaultRandom(),
-  messageId: uuid("message_id")
-    .notNull()
-    .references(() => message.id, { onDelete: "cascade" }),
-  whatsappMessageId: text("whatsapp_message_id").unique(),
-  status: varchar("status").notNull().default("sent"),
-  timestamp: timestamp("timestamp").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-// WhatsApp Business integration table
-export const whatsappIntegration = pgTable("whatsapp_integration", {
+export const calendlyIntegration = pgTable("calendly_integration", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
@@ -442,13 +423,13 @@ export const whatsappIntegration = pgTable("whatsapp_integration", {
   chatbotId: uuid("chatbot_id")
     .notNull()
     .references(() => chatbot.id, { onDelete: "cascade" }),
-  businessAccountId: text("business_account_id").notNull(),
   accessToken: text("access_token").notNull(),
   refreshToken: text("refresh_token"),
   accessTokenExpiresAt: timestamp("access_token_expires_at"),
   scope: text("scope"),
-  phoneNumbers: jsonb("phone_numbers"),
-  primaryPhoneNumberId: text("primary_phone_number_id"),
+  organizationUri: text("organization_uri").notNull(),
+  userUri: text("user_uri").notNull(),
+  eventTypes: jsonb("event_types"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -464,6 +445,7 @@ export const Action = pgTable(
     name: text("name").notNull(),
     toolName: text("tool_name").notNull(),
     isActive: boolean("is_active").notNull().default(true),
+    showInQuickMenu: boolean("show_in_quick_menu").notNull().default(false),
     description: text("description"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -474,7 +456,7 @@ export const Action = pgTable(
 // TYPES
 export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;
 export type Feedback = InferSelectModel<typeof feedback>;
-export type FeatureRequest = InferSelectModel<typeof featureRequest>;
+export type IssueReport = InferSelectModel<typeof issueReport>;
 export type Knowledge = InferSelectModel<typeof knowledge>;
 export type WebsiteSource = InferSelectModel<typeof websiteSource>;
 export type DocumentSource = InferSelectModel<typeof documentSource>;
@@ -495,8 +477,5 @@ export type CreditsUsage = InferSelectModel<typeof creditsUsage>;
 export type Chatbot = InferSelectModel<typeof chatbot> & {
   name: string;
 };
-export type WhatsappMessageMetadata = InferSelectModel<
-  typeof whatsappMessageMetadata
->;
-export type WhatsappIntegration = InferSelectModel<typeof whatsappIntegration>;
+export type CalendlyIntegration = InferSelectModel<typeof calendlyIntegration>;
 export type ActionType = InferSelectModel<typeof Action>;

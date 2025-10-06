@@ -1,4 +1,4 @@
-import { GooglePaLM, MagicUI, Replit, WhatsappIcon } from "@/components/logos";
+import { MagicUI, Replit, TelegramLogo, WhatsappIcon } from "@/components/logos";
 import { UserImage } from "../logo-image";
 
 export default function IntegrationsSection() {
@@ -36,7 +36,7 @@ export default function IntegrationsSection() {
                     description="Integrate with messenger to automate and optimize your support."
                   />
                   <Integration
-                    icon={<GooglePaLM />}
+                    icon={<TelegramLogo />}
                     name="Telegram"
                     description="Enhance Telegram chats with intelligent AI-powered responses."
                   />

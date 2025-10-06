@@ -111,7 +111,7 @@ export const ServerRoute = createServerFileRoute(
         });
 
         const referer = request.headers.get("referer") || "";
-        let channel: "web" | "widget" = "widget"; // default to widget
+        let channel: "web" | "widget" = "widget";
 
         if (referer.includes("/talk/")) {
           // Bio page / link-in-bio

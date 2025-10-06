@@ -38,7 +38,7 @@ export function ChatHeader({
 }: ChatHeaderProps) {
   return (
     <div
-      className={`flex items-center justify-between p-4 text-white border-b ${className}`}
+      className={`system-font flex items-center justify-between p-4 text-white border-b ${className}`}
       style={{ backgroundColor: chatbot?.primaryColor || "#2563eb" }}
     >
       <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -71,7 +71,7 @@ export function ChatHeader({
             <RiBardFill size={20} className="text-white rounded-full" />
           </div>
         )}
-        <p className="font-normal text-base truncate">
+        <p className="font-normal system-font text-base truncate">
           {chatbot?.name || "AI Assistant"}
         </p>
       </div>
