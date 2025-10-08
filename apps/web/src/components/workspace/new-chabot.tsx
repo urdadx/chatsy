@@ -129,7 +129,7 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
               <Bot className="size-5 stroke-zinc-800 dark:stroke-zinc-100" />
             </div>
             <DialogHeader>
-              <DialogTitle className="sm:text-center">
+              <DialogTitle className="sm:text-center text-xl">
                 {view === "list" ? "Manage Chatbots" : "Create New Chatbot"}
               </DialogTitle>
               <DialogDescription className="sm:text-center underline-offset-4">

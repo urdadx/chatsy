@@ -1,0 +1,51 @@
+import { CalendlyForm } from '@/components/agents/forms/calendly-form'
+import { CustomButtonForm } from '@/components/agents/forms/custom-btn-form'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
+import z from 'zod'
+
+const editActionSchema = z.object({
+  actionId: z.string(),
+  toolName: z.string(),
+})
+
+export const Route = createFileRoute('/admin/actions/edit-action')({
+  component: RouteComponent,
+  validateSearch: editActionSchema,
+})
+
+function RouteComponent() {
+  const { actionId, toolName } = useSearch({ from: '/admin/actions/edit-action' })
+
+  const getFormComponent = () => {
+    switch (toolName) {
+      case 'custom_button':
+        return <CustomButtonForm actionId={actionId} />
+      case 'calendly':
+      case 'book_meeting':
+        return <CalendlyForm actionId={actionId} />
+
+      default:
+
+        return (
+          <div className="w-full max-w-3xl bg-card rounded-lg border border-border shadow-xs p-6">
+            <div className="text-center">
+              <h1 className="text-lg font-semibold text-foreground mb-2">
+                Customize {toolName}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Form customization for "{toolName}" is coming soon.
+              </p>
+            </div>
+          </div>
+        )
+    }
+  }
+
+  return (
+    <div className="flex flex-col justify-center p-4">
+      <div className="flex justify-center">
+        {getFormComponent()}
+      </div>
+    </div>
+  )
+}

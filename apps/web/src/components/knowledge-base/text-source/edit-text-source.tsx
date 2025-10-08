@@ -140,7 +140,7 @@ export const EditTextSource = ({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-full sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-md">Edit Text Source</DialogTitle>
+            <DialogTitle className="text-xl">Edit text details</DialogTitle>
           </DialogHeader>
           {formContent}
         </DialogContent>
@@ -152,7 +152,7 @@ export const EditTextSource = ({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="h-[50%]">
         <DrawerHeader className="text-left">
-          <DrawerTitle className="text-md">Edit Text Source</DrawerTitle>
+          <DrawerTitle className="text-xl">Edit text details</DrawerTitle>
         </DrawerHeader>
         <div className="px-4">{formContent}</div>
       </DrawerContent>

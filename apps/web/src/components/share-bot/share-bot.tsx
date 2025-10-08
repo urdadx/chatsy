@@ -1,7 +1,8 @@
+import { SolarEarthBoldDuotone } from "@/assets/icons/globe-icon";
 import { SolarRocketBoldDuotone } from "@/assets/icons/rocket";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Globe, Rocket, Users } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useMediaQuery } from "usehooks-ts";
@@ -117,8 +118,8 @@ export const ShareBot = () => {
         </Tabs>
       ) : (
         <div className="flex flex-col items-center justify-center gap-3">
-          <Globe className="w-8 h-8 text-primary" />
-          <div className="text-base font-semibold text-muted-foreground">
+          <SolarEarthBoldDuotone color="#8b5cf6" className="w-8 h-8 text-primary" />
+          <div className="text-xl font-semibold">
             Chatbot is not activated
           </div>
           <div className="text-sm text-muted-foreground text-center">
@@ -140,7 +141,7 @@ export const ShareBot = () => {
         <DialogTrigger asChild>{triggerButton}</DialogTrigger>
         <DialogContent className={`w-full ${getDialogWidth()}`}>
           <DialogHeader>
-            <DialogTitle className="text-left text-base">
+            <DialogTitle className="text-left text-xl">
               Share your bot
             </DialogTitle>
           </DialogHeader>
@@ -155,7 +156,7 @@ export const ShareBot = () => {
       <DrawerTrigger asChild>{triggerButton}</DrawerTrigger>
       <DrawerContent className="h-[65%]">
         <DrawerHeader className="text-left">
-          <DrawerTitle className="text-base">Share your bot</DrawerTitle>
+          <DrawerTitle className="text-xl">Share your bot</DrawerTitle>
         </DrawerHeader>
         <div className="px-4 pb-4">{shareContent}</div>
         {!isEmbeddingEnabled && (

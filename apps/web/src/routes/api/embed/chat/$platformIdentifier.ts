@@ -3,17 +3,18 @@ import { db } from "@/db";
 import { chat, member, message } from "@/db/schema";
 import {
   getChatbotDataByPlatformIdentifier,
+  getCustomButtonActions,
   getMessagesByChatId,
   saveMessages,
 } from "@/lib/ai/chat-functions";
-import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import { getActiveTools } from "@/lib/ai/get-active-tools";
 import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
 import { google } from "@/lib/ai/providers";
-import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
-import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
+import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback-tool";
+import { collectLeadsTool } from "@/lib/ai/tools/collect-leads-tool";
+import { customButtonTool } from "@/lib/ai/tools/custom-button-tool";
 import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
-import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
+import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search-tool";
 import { ChatSDKError } from "@/lib/errors";
 import { generateUUID } from "@/lib/utils";
 import { json } from "@tanstack/react-start";
@@ -106,9 +107,7 @@ export const ServerRoute = createServerFileRoute(
       const userMessage = messages[messages.length - 1];
 
       if (!existingChat) {
-        const title = await generateTitleFromUserMessage({
-          message: userMessage,
-        });
+        const title = userMessage.parts[0].text;
 
         const referer = request.headers.get("referer") || "";
         let channel: "web" | "widget" = "widget";
@@ -158,12 +157,19 @@ export const ServerRoute = createServerFileRoute(
       // Get chatbot details
       const activeTools = await getActiveTools();
       const chatbotName = chatbotData.name || "AI Assistant";
+      const chatbotPersonality = chatbotData.personality || "support";
+      const customButtonActions = await getCustomButtonActions(chatbotData.id);
 
       const stream = createUIMessageStream({
         execute: ({ writer: dataStream }) => {
           const result = streamText({
             model: google("gemini-2.0-flash"),
-            system: systemPrompt(chatbotName, activeTools),
+            system: systemPrompt(
+              chatbotName,
+              activeTools,
+              chatbotPersonality,
+              customButtonActions,
+            ),
             messages: convertToModelMessages(uiMessages, {
               ignoreIncompleteToolCalls: true,
             }),
@@ -174,6 +180,7 @@ export const ServerRoute = createServerFileRoute(
               knowledge_base: knowledgeSearchTool(chatbotData.id),
               collect_feedback: collectFeedbackTool,
               collect_leads: collectLeadsTool,
+              custom_button: customButtonTool(chatbotData.id),
               escalate_to_human: escalateToHumanTool({
                 chatId: id,
                 chatbotId: chatbotData.id,

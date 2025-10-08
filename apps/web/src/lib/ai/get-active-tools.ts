@@ -2,15 +2,14 @@ import { db } from "@/db";
 import { Action } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-// Define the valid tool names as a const array to ensure type safety
 const VALID_TOOL_NAMES = [
   "knowledge_base",
   "collect_feedback",
   "collect_leads",
   "escalate_to_human",
+  "custom_button",
 ] as const;
 
-// Create a type from the valid tool names
 export type ValidToolName = (typeof VALID_TOOL_NAMES)[number];
 
 export async function getActiveTools(): Promise<ValidToolName[]> {
@@ -33,6 +32,7 @@ export async function getActiveTools(): Promise<ValidToolName[]> {
       "collect_feedback",
       "collect_leads",
       "escalate_to_human",
+      "custom_button",
     ];
   }
 }

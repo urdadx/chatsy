@@ -23,7 +23,6 @@ export const CalendlyIntegrationCard = () => {
   const queryClient = useQueryClient();
   const [isConnecting, setIsConnecting] = useState(false);
 
-  // Fetch Calendly settings for the current chatbot
   const { data: calendlySettings } = useQuery<CalendlySettings>({
     queryKey: ["calendly-settings", chatbot?.id],
     queryFn: async () => {
@@ -52,7 +51,6 @@ export const CalendlyIntegrationCard = () => {
     }
   };
 
-  // Connect to Calendly
   const connectCalendly = async () => {
     if (!chatbot?.organizationId) {
       toast.error("No organization found");
@@ -90,7 +88,6 @@ export const CalendlyIntegrationCard = () => {
 
       window.addEventListener("message", messageHandler);
 
-      // Handle window closed manually
       const checkClosed = setInterval(() => {
         if (authWindow?.closed) {
           clearInterval(checkClosed);
@@ -101,14 +98,14 @@ export const CalendlyIntegrationCard = () => {
     } catch (error: any) {
       setIsConnecting(false);
       toast.error(
-        error.response?.data?.error || "Failed to initiate Calendly connection",
+        "Failed to initiate Calendly connection"
       );
     }
   };
 
   return (
     <>
-      <div className="bg-white rounded-2xl p-3 sm:p-4 border border-gray-200 shadow-xs w-full max-w-xs mx-auto h-full">
+      <div className="bg-white rounded-2xl p-3 sm:p-4 border border-gray-200 shadow-xs w-full max-w-md mx-auto h-full">
         <div className="flex flex-col gap-3 sm:gap-4 h-full">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">

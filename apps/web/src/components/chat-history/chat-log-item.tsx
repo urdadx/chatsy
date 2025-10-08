@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { cn, timeAgo } from "@/lib/utils";
 import {
   RiAlarmFill,
   RiAlertFill,
@@ -95,7 +95,7 @@ export const ChatLogItem = ({
             </h3>
           </div>
           <p className="text-sm text-gray-500 mt-1 truncate">
-            Created on {description}
+            {timeAgo(description)}
           </p>
         </div>
 

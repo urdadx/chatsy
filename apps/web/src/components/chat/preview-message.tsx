@@ -8,6 +8,7 @@ import type { Vote } from "@/db/schema";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { CollectFeedbackForm } from "@/lib/ai/tools-ui/collect-feedback-form";
 import { CollectLeadsForm } from "@/lib/ai/tools-ui/collect-leads-form";
+import { CustomButton } from "@/lib/ai/tools-ui/custom-button";
 import { EscalateToHumanNotification } from "@/lib/ai/tools-ui/escalate-to-human-notification";
 import type { ChatMessage } from "@/lib/types";
 import { sanitizeText } from "@/lib/utils";
@@ -91,7 +92,7 @@ export const PreviewMessage = ({
 
                 if (state === "input-available") {
                   return (
-                    <div key={toolCallId}>
+                    <div className="px-2" key={toolCallId}>
                       <CollectFeedbackForm
                         color={activeChatbot?.primaryColor}
                       />
@@ -253,6 +254,67 @@ export const PreviewMessage = ({
                       <span>Escalating to human agent...</span>
                     </div>
                   );
+                }
+              }
+
+              if (type === "tool-custom_button") {
+                const { toolCallId, state } = part;
+
+                if (state === "input-available") {
+                  return (
+                    <div
+                      key={toolCallId}
+                      className="flex items-center gap-2 text-muted-foreground text-sm"
+                    >
+                      <Loader
+                        variant="dots"
+                        className="text-muted-foreground"
+                      />
+                      <span>Loading button...</span>
+                    </div>
+                  );
+                }
+
+                if (state === "output-available") {
+                  const { output } = part;
+
+                  if (
+                    output &&
+                    typeof output === "object" &&
+                    "error" in output
+                  ) {
+                    return (
+                      <div
+                        key={toolCallId}
+                        className="text-red-500 p-2 border rounded"
+                      >
+                        Error: {String(output.error)}
+                      </div>
+                    );
+                  }
+
+                  if (
+                    output &&
+                    typeof output === "object" &&
+                    "success" in output &&
+                    output.success
+                  ) {
+                    const outputData = output as any;
+                    return (
+                      <div key={toolCallId}>
+                        <CustomButton
+                          buttonText={outputData.buttonText}
+                          buttonUrl={outputData.buttonUrl}
+                          name={outputData.name}
+                          description={outputData.description}
+                          context={outputData.context}
+                          color={activeChatbot?.primaryColor}
+                        />
+                      </div>
+                    );
+                  }
+
+                  return null;
                 }
               }
 

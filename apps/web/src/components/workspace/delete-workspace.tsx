@@ -27,7 +27,6 @@ export function DeleteWorkspace({
     try {
       await deleteChatbotMutation.mutateAsync(workspaceId);
     } catch (error) {
-      // Error handling is done in the mutation
     }
   };
 
@@ -35,7 +34,7 @@ export function DeleteWorkspace({
     <AlertDialog open onOpenChange={onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogTitle className="text-xl">Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
             workspace and all of its data.

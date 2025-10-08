@@ -7,6 +7,15 @@ import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
 import { eq } from "drizzle-orm";
+import z from "zod";
+
+const createActionSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  toolName: z.string().min(1, "Tool name is required"),
+  showInQuickMenu: z.boolean().optional().default(false),
+  actionProperties: z.record(z.string(), z.any()).optional(),
+});
 
 export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
   (api) => ({
@@ -47,6 +56,82 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
           return json({ actions }, { status: 200 });
         } catch (error) {
           console.error("Error fetching actions:", error);
+          return new Response("Internal Server Error", { status: 500 });
+        }
+      }),
+
+    POST: api
+      .middleware([subscriptionMiddleware])
+      .handler(async ({ request }) => {
+        try {
+          const session = await auth.api.getSession({
+            headers: request.headers,
+          });
+
+          if (!session) {
+            return new Response("Unauthorized: No session found", {
+              status: 401,
+            });
+          }
+
+          const userId = session?.user.id || "";
+
+          const chatbotId =
+            session?.session?.activeChatbotId ||
+            (await getActiveChatbotId(userId));
+
+          if (!chatbotId) {
+            const error = new ChatSDKError(
+              "bad_request:api",
+              "No active chatbot selected",
+            );
+            return error.toResponse();
+          }
+
+          const body = await request.json();
+          const parsed = createActionSchema.safeParse(body);
+
+          if (!parsed.success) {
+            return json(
+              {
+                error: "Validation failed",
+                details: parsed.error.format(),
+              },
+              { status: 400 },
+            );
+          }
+
+          const {
+            name,
+            description,
+            toolName,
+            showInQuickMenu,
+            actionProperties,
+          } = parsed.data;
+
+          const [newAction] = await db
+            .insert(Action)
+            .values({
+              chatbotId,
+              name,
+              description,
+              toolName,
+              showInQuickMenu,
+              actionProperties: actionProperties || null,
+              isActive: true,
+            })
+            .returning();
+
+          return json(
+            {
+              success: true,
+              action: newAction,
+              message: "Action created successfully",
+            },
+            { status: 201 },
+          );
+        } catch (error) {
+          console.error("Error creating action:", error);
           return new Response("Internal Server Error", { status: 500 });
         }
       }),

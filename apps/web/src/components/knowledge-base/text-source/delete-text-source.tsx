@@ -57,7 +57,7 @@ export function DeleteTextSource({
             <CircleAlertIcon className="opacity-80" size={16} />
           </div>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl">Are you sure?</AlertDialogTitle>
             <AlertDialogDescription className="text-md">
               This text source will be permanently deleted
             </AlertDialogDescription>

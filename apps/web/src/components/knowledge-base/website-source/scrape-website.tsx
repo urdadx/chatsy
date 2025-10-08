@@ -46,7 +46,7 @@ export const ScrapeWebsite = () => {
     <>
       <div className="flex flex-col gap-2 mt-6">
         <p className="text-sm text-muted-foreground">
-          Enter a single URL to extract content from that page.
+          Enter a single URL to extract content from it.
         </p>
         <div className="w-full flex justify-between items-center gap-2">
           <div className="flex rounded-md shadow-xs flex-1">

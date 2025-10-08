@@ -35,6 +35,7 @@ import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-h
 import { Route as AdminActivityIndexRouteImport } from './routes/admin/activity/index'
 import { Route as AdminActionsIndexRouteImport } from './routes/admin/actions/index'
 import { Route as AdminActionsNewActionRouteImport } from './routes/admin/actions/new-action'
+import { Route as AdminActionsEditActionRouteImport } from './routes/admin/actions/edit-action'
 import { ServerRoute as ApiVoteCountServerRouteImport } from './routes/api/vote-count'
 import { ServerRoute as ApiVoteServerRouteImport } from './routes/api/vote'
 import { ServerRoute as ApiVisitorAnalyticsServerRouteImport } from './routes/api/visitor-analytics'
@@ -71,6 +72,7 @@ import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/so
 import { ServerRoute as ApiEmbedGenerateTokenServerRouteImport } from './routes/api/embed/generate-token'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
+import { ServerRoute as ApiAgentActionsActionIdServerRouteImport } from './routes/api/agent-actions/$actionId'
 import { ServerRoute as ApiActivityActivityIdServerRouteImport } from './routes/api/activity/$activityId'
 import { ServerRoute as ApiAcceptInvitationInvitationIdServerRouteImport } from './routes/api/accept-invitation/$invitationId'
 import { ServerRoute as ApiEmbedChatbotIdentifierServerRouteImport } from './routes/api/embed/chatbot/$identifier'
@@ -200,6 +202,11 @@ const AdminActionsIndexRoute = AdminActionsIndexRouteImport.update({
 const AdminActionsNewActionRoute = AdminActionsNewActionRouteImport.update({
   id: '/actions/new-action',
   path: '/actions/new-action',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminActionsEditActionRoute = AdminActionsEditActionRouteImport.update({
+  id: '/actions/edit-action',
+  path: '/actions/edit-action',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const ApiVoteCountServerRoute = ApiVoteCountServerRouteImport.update({
@@ -392,6 +399,12 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiAgentActionsActionIdServerRoute =
+  ApiAgentActionsActionIdServerRouteImport.update({
+    id: '/api/agent-actions/$actionId',
+    path: '/api/agent-actions/$actionId',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiActivityActivityIdServerRoute =
   ApiActivityActivityIdServerRouteImport.update({
     id: '/api/activity/$activityId',
@@ -462,6 +475,7 @@ export interface FileRoutesByFullPath {
   '/legal/terms': typeof LegalTermsRoute
   '/talk/$pageId': typeof TalkPageIdRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/admin/actions/edit-action': typeof AdminActionsEditActionRoute
   '/admin/actions/new-action': typeof AdminActionsNewActionRoute
   '/admin/actions': typeof AdminActionsIndexRoute
   '/admin/activity': typeof AdminActivityIndexRoute
@@ -488,6 +502,7 @@ export interface FileRoutesByTo {
   '/legal/terms': typeof LegalTermsRoute
   '/talk/$pageId': typeof TalkPageIdRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/admin/actions/edit-action': typeof AdminActionsEditActionRoute
   '/admin/actions/new-action': typeof AdminActionsNewActionRoute
   '/admin/actions': typeof AdminActionsIndexRoute
   '/admin/activity': typeof AdminActivityIndexRoute
@@ -515,6 +530,7 @@ export interface FileRoutesById {
   '/legal/terms': typeof LegalTermsRoute
   '/talk/$pageId': typeof TalkPageIdRoute
   '/onboarding/': typeof OnboardingIndexRoute
+  '/admin/actions/edit-action': typeof AdminActionsEditActionRoute
   '/admin/actions/new-action': typeof AdminActionsNewActionRoute
   '/admin/actions/': typeof AdminActionsIndexRoute
   '/admin/activity/': typeof AdminActivityIndexRoute
@@ -543,6 +559,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/talk/$pageId'
     | '/onboarding'
+    | '/admin/actions/edit-action'
     | '/admin/actions/new-action'
     | '/admin/actions'
     | '/admin/activity'
@@ -569,6 +586,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/talk/$pageId'
     | '/onboarding'
+    | '/admin/actions/edit-action'
     | '/admin/actions/new-action'
     | '/admin/actions'
     | '/admin/activity'
@@ -595,6 +613,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/talk/$pageId'
     | '/onboarding/'
+    | '/admin/actions/edit-action'
     | '/admin/actions/new-action'
     | '/admin/actions/'
     | '/admin/activity/'
@@ -647,6 +666,7 @@ export interface FileServerRoutesByFullPath {
   '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/accept-invitation/$invitationId': typeof ApiAcceptInvitationInvitationIdServerRoute
   '/api/activity/$activityId': typeof ApiActivityActivityIdServerRoute
+  '/api/agent-actions/$actionId': typeof ApiAgentActionsActionIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
@@ -693,6 +713,7 @@ export interface FileServerRoutesByTo {
   '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/accept-invitation/$invitationId': typeof ApiAcceptInvitationInvitationIdServerRoute
   '/api/activity/$activityId': typeof ApiActivityActivityIdServerRoute
+  '/api/agent-actions/$actionId': typeof ApiAgentActionsActionIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
@@ -740,6 +761,7 @@ export interface FileServerRoutesById {
   '/api/vote-count': typeof ApiVoteCountServerRoute
   '/api/accept-invitation/$invitationId': typeof ApiAcceptInvitationInvitationIdServerRoute
   '/api/activity/$activityId': typeof ApiActivityActivityIdServerRoute
+  '/api/agent-actions/$actionId': typeof ApiAgentActionsActionIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
@@ -788,6 +810,7 @@ export interface FileServerRouteTypes {
     | '/api/vote-count'
     | '/api/accept-invitation/$invitationId'
     | '/api/activity/$activityId'
+    | '/api/agent-actions/$actionId'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/embed/generate-token'
@@ -834,6 +857,7 @@ export interface FileServerRouteTypes {
     | '/api/vote-count'
     | '/api/accept-invitation/$invitationId'
     | '/api/activity/$activityId'
+    | '/api/agent-actions/$actionId'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/embed/generate-token'
@@ -880,6 +904,7 @@ export interface FileServerRouteTypes {
     | '/api/vote-count'
     | '/api/accept-invitation/$invitationId'
     | '/api/activity/$activityId'
+    | '/api/agent-actions/$actionId'
     | '/api/auth/$'
     | '/api/chat/history'
     | '/api/embed/generate-token'
@@ -927,6 +952,7 @@ export interface RootServerRouteChildren {
   ApiVoteCountServerRoute: typeof ApiVoteCountServerRoute
   ApiAcceptInvitationInvitationIdServerRoute: typeof ApiAcceptInvitationInvitationIdServerRoute
   ApiActivityActivityIdServerRoute: typeof ApiActivityActivityIdServerRoute
+  ApiAgentActionsActionIdServerRoute: typeof ApiAgentActionsActionIdServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
   ApiEmbedGenerateTokenServerRoute: typeof ApiEmbedGenerateTokenServerRoute
@@ -1112,6 +1138,13 @@ declare module '@tanstack/react-router' {
       path: '/actions/new-action'
       fullPath: '/admin/actions/new-action'
       preLoaderRoute: typeof AdminActionsNewActionRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/actions/edit-action': {
+      id: '/admin/actions/edit-action'
+      path: '/actions/edit-action'
+      fullPath: '/admin/actions/edit-action'
+      preLoaderRoute: typeof AdminActionsEditActionRouteImport
       parentRoute: typeof AdminRouteRoute
     }
   }
@@ -1370,6 +1403,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiAuthSplatServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/agent-actions/$actionId': {
+      id: '/api/agent-actions/$actionId'
+      path: '/api/agent-actions/$actionId'
+      fullPath: '/api/agent-actions/$actionId'
+      preLoaderRoute: typeof ApiAgentActionsActionIdServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/activity/$activityId': {
       id: '/api/activity/$activityId'
       path: '/api/activity/$activityId'
@@ -1436,6 +1476,7 @@ interface AdminRouteRouteChildren {
   AdminOverviewRoute: typeof AdminOverviewRoute
   AdminPlaygroundRoute: typeof AdminPlaygroundRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminActionsEditActionRoute: typeof AdminActionsEditActionRoute
   AdminActionsNewActionRoute: typeof AdminActionsNewActionRoute
   AdminActionsIndexRoute: typeof AdminActionsIndexRoute
   AdminActivityIndexRoute: typeof AdminActivityIndexRoute
@@ -1449,6 +1490,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminOverviewRoute: AdminOverviewRoute,
   AdminPlaygroundRoute: AdminPlaygroundRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminActionsEditActionRoute: AdminActionsEditActionRoute,
   AdminActionsNewActionRoute: AdminActionsNewActionRoute,
   AdminActionsIndexRoute: AdminActionsIndexRoute,
   AdminActivityIndexRoute: AdminActivityIndexRoute,
@@ -1509,6 +1551,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAcceptInvitationInvitationIdServerRoute:
     ApiAcceptInvitationInvitationIdServerRoute,
   ApiActivityActivityIdServerRoute: ApiActivityActivityIdServerRoute,
+  ApiAgentActionsActionIdServerRoute: ApiAgentActionsActionIdServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
   ApiEmbedGenerateTokenServerRoute: ApiEmbedGenerateTokenServerRoute,

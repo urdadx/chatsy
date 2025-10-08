@@ -33,13 +33,6 @@ export const createDefaultActions = async (chatbotId: string) => {
   const defaultActions = [
     {
       chatbotId,
-      name: "Knowledge base",
-      toolName: "knowledge_base",
-      description: "Search the knowledge base for relevant information.",
-      isActive: true,
-    },
-    {
-      chatbotId,
       name: "Give us feedback",
       toolName: "collect_feedback",
       description:
@@ -52,13 +45,6 @@ export const createDefaultActions = async (chatbotId: string) => {
       toolName: "report_issue",
       description:
         "Allow users to report bugs, problems, or issues they encounter.",
-      isActive: true,
-    },
-    {
-      chatbotId,
-      name: "Book a meeting",
-      toolName: "book_meeting",
-      description: "Allow users to book meetings.",
       isActive: true,
     },
     {

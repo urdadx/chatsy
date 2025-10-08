@@ -11,13 +11,40 @@ import { api } from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 import { useRouter } from "@tanstack/react-router"
 import { ArrowLeft } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-export function CalendlyForm() {
+interface CalendlyFormProps {
+  actionId?: string
+}
+
+export function CalendlyForm({ actionId }: CalendlyFormProps) {
   const { data: chatbot } = useChatbot()
   const [selectedEventType, setSelectedEventType] = useState<string | undefined>(undefined)
   const [showInQuickMenu, setShowInQuickMenu] = useState(false)
   const router = useRouter()
+  const isEditing = !!actionId
+
+  // Fetch existing action data if editing
+  const { data: existingAction, isLoading: isLoadingAction } = useQuery({
+    queryKey: ["action", actionId],
+    queryFn: async () => {
+      if (!actionId) return null
+      const response = await api.get(`/agent-actions/${actionId}`)
+      return response.data
+    },
+    enabled: !!actionId,
+  })
+
+  useEffect(() => {
+    if (existingAction) {
+      setShowInQuickMenu(existingAction.showInQuickMenu || false)
+
+      const props = existingAction.actionProperties
+      if (props?.eventTypeUri) {
+        setSelectedEventType(props.eventTypeUri)
+      }
+    }
+  }, [existingAction])
 
   const { data: calendlySettings, isLoading: isLoadingCalendly, isError } = useQuery<{ chatbotId: string; calendlyAccount?: { connected: boolean; eventTypes?: any[] } }>({
     queryKey: ["calendly-settings", chatbot?.id],
@@ -47,7 +74,9 @@ export function CalendlyForm() {
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-semibold text-foreground">Book Calendly meetings</h1>
+            <h1 className="text-lg font-semibold text-foreground">
+              {isEditing ? 'Edit Calendly Meeting' : 'Book Calendly meetings'}
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
               Allow AI agent to automatically book meetings, call or demos with your customers
             </p>
@@ -140,7 +169,7 @@ export function CalendlyForm() {
           <Textarea
             autoComplete="false"
             id="description"
-            placeholder="Describe when to trigger this action..."
+            placeholder="Example: Use this action when the user wants to schedule a meeting..."
             className="w-full"
           />
         </div>
@@ -154,9 +183,7 @@ export function CalendlyForm() {
       </div>
 
       <div className="border-t rounded-b-lg  bg-gray-50 border-border p-6 flex items-center justify-end gap-3">
-        <Button variant="outline" className="text-sm">
-          Dismiss
-        </Button>
+
         <Button className="text-sm">Create action</Button>
       </div>
     </div>

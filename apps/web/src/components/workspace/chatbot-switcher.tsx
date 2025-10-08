@@ -66,7 +66,7 @@ export function ChatbotSwitcher() {
       await setActiveChatbotMutation.mutateAsync({ chatbotId });
       setOpen(false);
     } catch (error) {
-      // Error handling is done in the mutation
+      console.error("Error switching chatbot:", error);
     }
   };
 
@@ -122,7 +122,7 @@ export function ChatbotSwitcher() {
             className="flex items-center gap-2 w-full p-2 rounded hover:bg-gray-100 transition-colors"
           >
             <UserRoundPlus className="text-primary h-4 w-4" />
-            <span className="text-primary">Invite team members</span>
+            <span className="text-primary text-xl">Invite team members</span>
           </button>
         )}
       </div>

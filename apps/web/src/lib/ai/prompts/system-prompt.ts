@@ -1,4 +1,3 @@
-// Role definitions
 const ROLES = {
   sales: {
     name: "Sales Agent",
@@ -26,14 +25,32 @@ export const systemPrompt = (
   name: string,
   activeTools: string[],
   role: "sales" | "custom" | "support" | "lead" = "support",
+  customButtonActions?: Array<{
+    name: string | null;
+    description: string | null;
+  }>,
 ) => {
   const selectedRole = ROLES[role];
+
+  const customButtonsSection =
+    customButtonActions && customButtonActions.length > 0
+      ? `\nAVAILABLE CUSTOM BUTTON ACTIONS:
+${customButtonActions
+  .map(
+    (action, index) =>
+      `${index + 1}. ${action.name || "Unnamed Action"}: ${action.description || "No description"}`,
+  )
+  .join("\n")}
+When users ask for actions that match any of the above descriptions, use the custom_button tool.
+`
+      : "";
 
   return `
 ROLE (PRIMARY FUNCTION):
 You are ${name}, ${selectedRole.primaryFunction}
 
-AVAILABLE TOOLS: ${activeTools.join(", ")}
+AVAILABLE TOOLS: knowledge_base, ${activeTools.join(", ")}
+${customButtonsSection}
 
 TOOL USAGE:
 1. knowledge_base: Search your knowledge base for answers. Present results as factual information without mentioning the source.
@@ -47,7 +64,14 @@ TOOL USAGE:
 4. collect_leads: Execute this tool at the beginning of the conversation immediately after the user's first message to show the form to collect user information. 
   - For example: Respond or answer the user's query first and then say "Can I get your contact information to better assist you?", then call the tool immediately.
 
-5. escalate_to_human: Transfer to human agent.
+5. custom_button: Display a custom action button when user requests match the available custom button actions listed above.
+  - ONLY use when user asks for actions that clearly match one of the available custom button actions
+  - Match user intent with the action descriptions from the available custom button actions
+  - IMPORTANT: Do NOT use this tool if no custom button actions are available or if user request doesn't match any available actions. Do NOT say I have a custom button for that request or anything similar after calling the tool.
+  - Answer the user's query first, then call the tool.
+  - The tool will find the best matching button based on your assessment
+
+6. escalate_to_human: Transfer to human agent.
   - Use when explicitly requested, for complex unresolved issues, frustration requiring human intervention, or sensitive topics
    - Do NOT combine with other tools.
 

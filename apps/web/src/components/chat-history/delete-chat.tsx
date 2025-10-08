@@ -51,7 +51,7 @@ export function DeleteChat({ open, id, onOpenChange }: DeleteChatProps) {
             <CircleAlertIcon className="opacity-80" size={16} />
           </div>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl">Are you sure?</AlertDialogTitle>
             <AlertDialogDescription className="text-md">
               This chat will be permanently deleted
             </AlertDialogDescription>

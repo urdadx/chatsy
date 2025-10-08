@@ -74,24 +74,24 @@ export const CreateActionDialog = () => {
               <ActionCard
                 href="/admin/actions/new-action"
                 icon={<SolarBoltBoldDuotone color="#8b5cf6" className="w-6 h-6" />}
-                title="Custom action"
-                description="Add a custom action to trigger workflows or external integrations"
+                title="Custom workflow"
+                description="Add an action to trigger workflows or external integrations"
               />
               <ActionCard
                 href="/admin/actions/new-action"
-                icon={<SolarClipboardBoldDuotone color="#8b5cf6" className="w-6 h-6" />}
+                icon={<SolarClipboardBoldDuotone color="#00ad69" className="w-6 h-6" />}
                 title="Custom form"
                 description="Create a custom form to collect information from customers with validation"
               />
 
               <ActionCard
-                href="/admin/actions/new-action"
-                icon={<SolarBoxMinimalisticBoldDuotone color="#8b5cf6" className="w-6 h-6" />}
+                href="/admin/actions/new-action?actionType=custom-button"
+                icon={<SolarBoxMinimalisticBoldDuotone color="#e500b9" className="w-6 h-6" />}
                 title="Custom button"
                 description="Add a custom button action to trigger workflows or external integrations"
               />
               <ActionCard
-                href="/admin/actions/new-action"
+                href="/admin/actions/new-action?actionType=calendly"
                 iconSrc={CalendlyIcon}
                 title="Get Calendly booking slots"
                 description="Allow customers to book meetings via Calendly "

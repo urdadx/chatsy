@@ -9,7 +9,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { RiRobot2Fill } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Bot, MessageCircle, User, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -96,7 +96,7 @@ export const AddOnsDialog = ({
     } catch (error) {
       console.error("Checkout error:", error);
       toast.error("An error occurred during checkout. Please try again.");
-      setIsCheckingOut(false); // Only reset loading on error
+      setIsCheckingOut(false);
     }
 
     if (onOpenChange) {
@@ -278,7 +278,7 @@ export const AddOnsDialog = ({
       <DialogContent className="w-full max-w-lg">
         <div className="space-y-1">
           <DialogTitle className="text-xl font-semibold">Add-ons</DialogTitle>
-          <p className="text-sm text-gray-600">Unlock more features with add-ons</p>
+          <p className="text-base text-gray-600">Unlock more features with add-ons</p>
         </div>
         {addonsContent}
       </DialogContent>
@@ -289,7 +289,7 @@ export const AddOnsDialog = ({
     <DrawerContent>
       <DrawerHeader className="text-left">
         <DrawerTitle className="text-xl font-semibold">Add-ons</DrawerTitle>
-        <p className="text-sm text-gray-600">Unlock more features with add-ons</p>
+        <p className="text-base text-gray-600">Unlock more features with add-ons</p>
       </DrawerHeader>
       <div className="px-4 space-y-4">{addonsContent}</div>
       <DrawerFooter className="pt-2">

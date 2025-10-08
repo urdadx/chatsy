@@ -1,9 +1,14 @@
+import { SolarAtomBoldDuotone } from "@/assets/icons/atom-icon";
+import { SolarBoxMinimalisticBoldDuotone } from "@/assets/icons/box-icon";
 import { SolarChatRoundUnreadBoldDuotone } from "@/assets/icons/chat-doutone";
+import { SolarClipboardBoldDuotone } from "@/assets/icons/clipboard-icon";
 import { SolarHeadphonesRoundBoldDuotone } from "@/assets/icons/support-duotone";
 import { SolarUsersGroupRoundedBoldDuotone } from "@/assets/icons/users-duotone";
 import type { ActionType } from "@/db/schema";
+import { useRouter } from "@tanstack/react-router";
+import { Button } from "../ui/button";
+import { Switch } from "../ui/switch";
 import { ActionIcon } from "./action-icon";
-import { ActionSettings } from "./action-settings";
 
 interface ActionCardProps {
   action: ActionType;
@@ -31,6 +36,16 @@ const getIconForToolName = (toolName: string) => {
         <SolarHeadphonesRoundBoldDuotone className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
       </ActionIcon>
     ),
+    custom_form: (
+      <ActionIcon>
+        <SolarClipboardBoldDuotone color="#00ad69" className="w-6 h-6 sm:w-8 sm:h-8 " />
+      </ActionIcon>
+    ),
+    custom_button: (
+      <ActionIcon>
+        <SolarBoxMinimalisticBoldDuotone color="#e500b9" className="w-6 h-6 sm:w-8 sm:h-8 " />
+      </ActionIcon>
+    ),
 
   };
 
@@ -50,6 +65,8 @@ export const ActionCard = ({
   onDelete,
   isLoading = false,
 }: ActionCardProps) => {
+  const router = useRouter()
+
   const handleToggleActive = (checked: boolean) => {
     onToggle(action.id, 'isActive', checked);
   };
@@ -66,6 +83,13 @@ export const ActionCard = ({
     onDelete?.(action.id);
   };
 
+  const handleCustomize = () => {
+    router.navigate({
+      to: '/admin/actions/edit-action',
+      search: { actionId: action.id, toolName: action.toolName }
+    })
+  };
+
   const props = {
     isActive: action.isActive,
     showInQuickMenu: action.showInQuickMenu,
@@ -77,28 +101,44 @@ export const ActionCard = ({
     handleDelete: handleDelete,
   };
 
+  function replaceSpecialChars(text: string): string {
+    return text.replace(/[^a-zA-Z0-9]/g, ' ');
+  }
+
   return (
 
 
-    <div className="bg-white rounded-2xl p-3 sm:p-4 border border-gray-200 shadow-xs w-full max-w-xs mx-auto h-full">
-      <div className="flex flex-col gap-3 sm:gap-4 h-full">
+    <div className="bg-white rounded-2xl p-3 sm:p-4 border border-gray-200 shadow-xs w-full max-w-sm mx-auto h-full">
+      <div className="flex flex-col gap-2 h-full">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             {getIconForToolName(action.toolName)}
           </div>
           <div className="flex items-center gap-2">
-
-            <ActionSettings {...props} />
-
+            <Switch
+              checked={props.isActive}
+              onCheckedChange={props.handleToggleActive}
+              aria-label={props.isActive ? "Disable action" : "Enable action"}
+              disabled={props.isLoading}
+              className="data-[state=checked]:bg-green-500"
+            />
           </div>
         </div>
         <h3 className="font-medium text-sm sm:text-md">{action.name}</h3>
-        <p className="text-gray-600 text-xs sm:text-sm flex-grow">
-          {action.description}
+        <p className="text-gray-600 text-xs lowercase sm:text-sm flex-grow">
+          <SolarAtomBoldDuotone className="inline w-4 h-4 mr-1" />
+          {replaceSpecialChars(action.toolName || 'new action')}
         </p>
+        <div
+          className="flex items-center gap-1">
+          <Button className="w-full" variant="outline" onClick={handleCustomize}>
+            Customize
+          </Button>
+
+        </div>
 
       </div>
 
-    </div>
+    </div >
   );
 };

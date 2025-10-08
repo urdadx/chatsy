@@ -1,8 +1,8 @@
 import type { UIMessage } from "ai";
 import z from "zod";
-import type { collectFeatureRequestTool } from "./ai/tools/collect-feature-request";
 import type { collectFeedbackTool } from "./ai/tools/collect-feedback";
-import type { collectLeadsTool } from "./ai/tools/collect-leads";
+import type { collectLeadsTool } from "./ai/tools/collect-leads-tool";
+import type { customButtonTool } from "./ai/tools/custom-button-tool";
 import type { knowledgeSearchTool } from "./ai/tools/knowledge-search";
 
 export interface UserSession {
@@ -20,8 +20,8 @@ export type VisibilityType = "private" | "public";
 export type ChatTools = {
   knowledge_base: typeof knowledgeSearchTool;
   collect_feedback: typeof collectFeedbackTool;
-  collect_feature_request: typeof collectFeatureRequestTool;
   collect_leads: typeof collectLeadsTool;
+  custom_button: typeof customButtonTool;
 };
 
 export const messageMetadataSchema = z.object({

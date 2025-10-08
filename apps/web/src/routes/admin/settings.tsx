@@ -104,9 +104,7 @@ function RouteComponent() {
               <WorkspaceNameSettings />
               <WorkspaceLogoSettings />
               <UserProfileImageSettings />
-              {/* <WorkspaceDelete /> */}
               <ProfileDelete />
-
             </div>
             <div className="h-14" />
           </TabsContent>

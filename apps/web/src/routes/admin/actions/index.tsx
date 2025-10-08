@@ -189,8 +189,6 @@ function RouteComponent() {
 
         >
           <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0 ">
-
-
             <TabsTrigger
               value="agent-actions"
               className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
@@ -205,13 +203,14 @@ function RouteComponent() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="agent-actions" className="mt-4 space-y-4">
-
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Agent Actions</h2>
+              {/* biome-ignore lint/a11y/useHeadingContent: <explanation> */}
+              <h2 className="text-xl font-semibold flex sm:hidden"></h2>
+              <h2 className="text-xl font-semibold hidden sm:flex">Agent Actions</h2>
               <CreateActionDialog />
             </div>
             {!isLoading && !isError && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {filteredActions.map((action) => (
                   <ActionCard
                     key={action.id}
@@ -227,7 +226,9 @@ function RouteComponent() {
           </TabsContent>
           <TabsContent className="mt-6 space-y-6" value="integrations">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Platform Integrations</h2>
+              <h2 className="text-xl font-semibold hidden sm:flex">Platform Integrations</h2>
+              {/* biome-ignore lint/a11y/useHeadingContent: <explanation> */}
+              <h2 className="text-xl font-semibold flex sm:hidden"></h2>
             </div>
             <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <CalendlyIntegrationCard />

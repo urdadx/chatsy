@@ -65,7 +65,7 @@ export function RowActions({ row }: any) {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center justify-between w-full">
-              <h2 className="text-lg capitalize font-medium text-gray-900">
+              <h2 className="text-xl capitalize font-semibold text-gray-900">
                 {type} details
               </h2>
               <Button

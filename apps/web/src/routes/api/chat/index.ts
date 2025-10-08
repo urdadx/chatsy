@@ -4,18 +4,19 @@ import { chatbot, message } from "@/db/schema";
 import {
   deleteChatById,
   getChatById,
+  getCustomButtonActions,
   getMessagesByChatId,
   saveChat,
   saveMessages,
 } from "@/lib/ai/chat-functions";
-import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
 import { getActiveTools } from "@/lib/ai/get-active-tools";
 import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
 import { google } from "@/lib/ai/providers";
-import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
-import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
+import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback-tool";
+import { collectLeadsTool } from "@/lib/ai/tools/collect-leads-tool";
+import { customButtonTool } from "@/lib/ai/tools/custom-button-tool";
 import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
-import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
+import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search-tool";
 import { ChatSDKError } from "@/lib/errors";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getCustomerExternalId } from "@/lib/subscription/subscription-functions";
@@ -98,9 +99,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
           const userMessage = messages[messages.length - 1];
 
           if (!chat) {
-            const title = await generateTitleFromUserMessage({
-              message: userMessage,
-            });
+            const title = userMessage.parts[0].text;
             await saveChat({
               id,
               userId: session?.user.id,
@@ -145,7 +144,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
           const chatbotName = chatbotData.name || "AI Assistant";
           const chatbotPersonality = chatbotData.personality || "support";
           const organizationId = chatbotData.organizationId;
-          const chatId = id;
+          const customButtonActions = await getCustomButtonActions(chatbotId);
 
           const stream = createUIMessageStream({
             execute: ({ writer: dataStream }) => {
@@ -155,6 +154,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                   chatbotName,
                   activeTools,
                   chatbotPersonality,
+                  customButtonActions,
                 ),
                 messages: convertToModelMessages(uiMessages, {
                   ignoreIncompleteToolCalls: true,
@@ -166,8 +166,9 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                   knowledge_base: knowledgeSearchTool(chatbotId),
                   collect_feedback: collectFeedbackTool,
                   collect_leads: collectLeadsTool,
+                  custom_button: customButtonTool(chatbotId),
                   escalate_to_human: escalateToHumanTool({
-                    chatId,
+                    chatId: id,
                     chatbotId,
                     organizationId,
                   }),

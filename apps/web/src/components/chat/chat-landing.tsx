@@ -48,6 +48,12 @@ export function ChatLanding({ onGoToMain, chatbot, className }: ChatLandingProps
       setShowIssueReportForm(true);
     } else if (action.toolName === "book_meeting") {
       console.log("Book meeting action clicked");
+    } else if (action.toolName === "custom_button") {
+      // Handle custom button clicks
+      const properties = action.actionProperties as { buttonText: string; buttonUrl: string } | null;
+      if (properties && properties.buttonUrl) {
+        window.open(properties.buttonUrl, "_blank", "noopener,noreferrer");
+      }
     }
   };
 

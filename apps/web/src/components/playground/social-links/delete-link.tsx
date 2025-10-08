@@ -50,7 +50,7 @@ export function DeleteLink({ open, id, onOpenChange }: DeleteLinkProps) {
             <CircleAlertIcon className="opacity-80" size={16} />
           </div>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl">Are you sure?</AlertDialogTitle>
             <AlertDialogDescription className="text-md">
               This link will be permanently deleted
             </AlertDialogDescription>

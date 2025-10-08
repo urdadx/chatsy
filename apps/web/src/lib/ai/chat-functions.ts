@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chat, chatbot, member, message, vote } from "@/db/schema";
+import { Action, chat, chatbot, member, message, vote } from "@/db/schema";
 import type { Chat, DBMessage } from "@/db/schema";
 import type { CustomerSubscription } from "@polar-sh/sdk/models/components/customersubscription.js";
 import { auth } from "auth";
@@ -33,6 +33,23 @@ export async function isUserMemberOfOrganization(
   return !!membership;
 }
 
+// GET CUSTOM BUTTON ACTIONS
+export const getCustomButtonActions = async (chatbotId: string) => {
+  return await db
+    .select({
+      name: Action.name,
+      description: Action.description,
+    })
+    .from(Action)
+    .where(
+      and(
+        eq(Action.toolName, "custom_button"),
+        eq(Action.isActive, true),
+        eq(Action.chatbotId, chatbotId),
+      ),
+    );
+};
+
 // FUNCTION TO GET CHATBOT DATA BY EMBED TOKEN
 export async function getChatbotDataByPlatformIdentifier(
   platformIdentifier: string,
@@ -46,6 +63,7 @@ export async function getChatbotDataByPlatformIdentifier(
       name: chatbot.name,
       isEmbeddingEnabled: chatbot.isEmbeddingEnabled,
       allowedDomains: chatbot.allowedDomains,
+      personality: chatbot.personality,
     })
     .from(chatbot)
     .where(

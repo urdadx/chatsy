@@ -9,7 +9,6 @@ import {
   primaryKey,
   text,
   timestamp,
-  unique,
   uuid,
   varchar,
   vector,
@@ -435,23 +434,20 @@ export const calendlyIntegration = pgTable("calendly_integration", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const Action = pgTable(
-  "action",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    chatbotId: uuid("chatbot_id")
-      .notNull()
-      .references(() => chatbot.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
-    toolName: text("tool_name").notNull(),
-    isActive: boolean("is_active").notNull().default(true),
-    showInQuickMenu: boolean("show_in_quick_menu").notNull().default(false),
-    description: text("description"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  },
-  (table) => [unique().on(table.chatbotId, table.toolName)],
-);
+export const Action = pgTable("action", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  chatbotId: uuid("chatbot_id")
+    .notNull()
+    .references(() => chatbot.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  toolName: text("tool_name").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  showInQuickMenu: boolean("show_in_quick_menu").notNull().default(false),
+  description: text("description"),
+  actionProperties: jsonb("action_properties"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
 // TYPES
 export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;

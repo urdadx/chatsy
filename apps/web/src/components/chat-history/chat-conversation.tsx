@@ -33,7 +33,6 @@ export const ChatConversation = () => {
 
   return (
     <div className="relative flex-1 h-full flex flex-col min-h-0">
-      {/* Scrollable messages area */}
       <ChatContainerRoot optimize className="flex-1 smooth-div relative">
         <ChatContainerContent className="p-4 space-y-4">
           <div className="w-full space-y-4">
@@ -68,13 +67,11 @@ export const ChatConversation = () => {
             )}
           </div>
         </ChatContainerContent>
-        {/* Floating scroll button inside root (not affected by input height) */}
         <div className="pointer-events-none absolute bottom-4 right-4 z-10">
           <ScrollButton className="shadow-lg pointer-events-auto" />
         </div>
       </ChatContainerRoot>
 
-      {/* Input bar (outside scroll container) */}
       <form
         onSubmit={handleSubmit}
         className="border-t bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3 flex gap-2 items-center"

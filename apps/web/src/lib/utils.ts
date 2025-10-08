@@ -323,9 +323,15 @@ export const signalIframe = () => {
   }
 };
 
-export const timeAgo = (timestamp: any) => {
+export const timeAgo = (
+  timestamp: string | number | Date | null | undefined,
+) => {
   if (!timestamp) return "Just now";
-  const diff = Date.now() - new Date(timestamp).getTime();
+
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return "Just now";
+
+  const diff = Date.now() - date.getTime();
 
   if (diff < 60000) {
     // less than 1 minute
