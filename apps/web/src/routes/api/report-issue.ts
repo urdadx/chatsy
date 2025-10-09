@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import z from "zod";
 
 const issueReportSchema = z.object({
-  title: z.string().min(1, "Title is required"),
+  title: z.string().optional().nullable(),
   description: z.string().min(1, "Description is required"),
   screenshot: z.string().optional().nullable(),
   email: z.string().optional().nullable(),

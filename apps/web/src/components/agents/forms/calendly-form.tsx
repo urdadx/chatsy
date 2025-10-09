@@ -8,10 +8,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useChatbot } from "@/hooks/use-chatbot"
 import { api } from "@/lib/api"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "@tanstack/react-router"
 import { ArrowLeft } from "lucide-react"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { FormSkeleton } from "./form-skeleton"
 
 interface CalendlyFormProps {
   actionId?: string
@@ -21,22 +23,26 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
   const { data: chatbot } = useChatbot()
   const [selectedEventType, setSelectedEventType] = useState<string | undefined>(undefined)
   const [showInQuickMenu, setShowInQuickMenu] = useState(false)
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
   const router = useRouter()
+  const queryClient = useQueryClient()
   const isEditing = !!actionId
 
-  // Fetch existing action data if editing
-  const { data: existingAction, isLoading: isLoadingAction } = useQuery({
+  const { data: existingAction, isLoading } = useQuery({
     queryKey: ["action", actionId],
     queryFn: async () => {
       if (!actionId) return null
       const response = await api.get(`/agent-actions/${actionId}`)
-      return response.data
+      return response.data?.action ?? null
     },
     enabled: !!actionId,
   })
 
   useEffect(() => {
     if (existingAction) {
+      setName(existingAction.name || "")
+      setDescription(existingAction.description || "")
       setShowInQuickMenu(existingAction.showInQuickMenu || false)
 
       const props = existingAction.actionProperties
@@ -46,7 +52,14 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
     }
   }, [existingAction])
 
-  const { data: calendlySettings, isLoading: isLoadingCalendly, isError } = useQuery<{ chatbotId: string; calendlyAccount?: { connected: boolean; eventTypes?: any[] } }>({
+  const { data: calendlySettings, isLoading: isLoadingCalendly, isError } = useQuery<{
+    chatbotId: string;
+    calendlyAccount?: {
+      connected: boolean;
+      eventTypes?: any[];
+      userEmail?: string;
+    }
+  }>({
     queryKey: ["calendly-settings", chatbot?.id],
     queryFn: async () => {
       const res = await api.get(`/integrations/calendly/settings/${chatbot!.id}`)
@@ -59,9 +72,131 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
   const eventTypes = calendlySettings?.calendlyAccount?.eventTypes || []
   const calendlyConnected = !!calendlySettings?.calendlyAccount?.connected
   const showCalendlyTooltip = !isLoadingCalendly && !calendlyConnected
+  const userEmail = calendlySettings?.calendlyAccount?.userEmail
 
+  const selectedEventTypeData = eventTypes.find((et: any) => et.uri === selectedEventType)
+
+  useEffect(() => {
+    const uri = existingAction?.actionProperties?.eventTypeUri
+    if (!uri) return
+    if (!selectedEventType && eventTypes.length > 0) {
+      const exists = eventTypes.some((et: any) => et?.uri === uri)
+      if (exists) setSelectedEventType(uri)
+    }
+  }, [existingAction, eventTypes, selectedEventType])
+
+  const createActionMutation = useMutation({
+    mutationFn: async (data: {
+      name: string
+      description: string
+      eventTypeUri: string
+      eventTypeName: string
+      userEmail?: string
+      showInQuickMenu: boolean
+    }) => {
+      const payload = {
+        name: data.name,
+        description: data.description,
+        toolName: "calendly_booking",
+        showInQuickMenu: data.showInQuickMenu,
+        actionProperties: {
+          eventTypeUri: data.eventTypeUri,
+          eventTypeName: data.eventTypeName,
+          userEmail: data.userEmail,
+        },
+      }
+
+      if (isEditing) {
+        const response = await api.put(`/agent-actions/${actionId}`, payload)
+        return response.data
+      }
+
+      const response = await api.post("/agent-actions", payload)
+      return response.data
+    },
+    onSuccess: () => {
+      toast.success(isEditing ? "Calendly action updated successfully" : "Calendly action created successfully")
+      queryClient.invalidateQueries({ queryKey: ["actions"] })
+      if (isEditing) {
+        queryClient.invalidateQueries({ queryKey: ["action", actionId] })
+      }
+      router.history.back()
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to save Calendly action")
+    },
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!name.trim()) {
+      toast.error("Please enter a name for the action")
+      return
+    }
+
+    if (!description.trim()) {
+      toast.error("Please enter a description for the action")
+      return
+    }
+
+    if (!selectedEventType) {
+      toast.error("Please select an event type")
+      return
+    }
+
+    if (!selectedEventTypeData) {
+      toast.error("Selected event type not found")
+      return
+    }
+
+    await createActionMutation.mutateAsync({
+      name: name.trim(),
+      description: description.trim(),
+      eventTypeUri: selectedEventType,
+      eventTypeName: getEventTypeSlug(selectedEventTypeData),
+      userEmail,
+      showInQuickMenu,
+    })
+  }
+
+  // Extract event type name/slug for URL
+  const getEventTypeSlug = (eventType: any) => {
+    if (eventType?.slug) return eventType.slug
+    if (eventType?.name) {
+      return eventType.name.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim()
+    }
+    return 'meeting'
+  }
+
+  const deleteActionMutation = useMutation({
+    mutationFn: async () => {
+      const response = await api.delete(`/agent-actions/${actionId}`)
+      return response.data
+    },
+    onSuccess: () => {
+      toast.success("Action deleted")
+      queryClient.invalidateQueries({ queryKey: ["actions"] })
+      router.history.back()
+    },
+    onError: () => {
+      toast.error(
+        "Failed to delete action. Please try again."
+      )
+    }
+  })
+
+  if (isLoading) {
+    return (
+      <FormSkeleton />
+    )
+  }
   return (
-    <div className="w-full max-w-3xl bg-card rounded-lg border border-border shadow-xs">
+    <form onSubmit={handleSubmit} className="w-full max-w-3xl bg-card rounded-lg border border-border shadow-xs">
       <div className="border-b border-border p-6">
         <div className="flex items-start justify-between gap-4">
           <Button
@@ -89,7 +224,16 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
           <Label htmlFor="name" className="text-sm font-medium">
             Name
           </Label>
-          <Input autoComplete="false" id="name" type="text" placeholder="Enter action name" className="w-full" />
+          <Input
+            autoComplete="off"
+            id="name"
+            type="text"
+            placeholder="Enter action name"
+            className="w-full"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="event-types" className="text-sm font-medium">
@@ -147,14 +291,15 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
                     No event types available
                   </SelectItem>
                 )}
-                {eventTypes.map((et: any) => (
-                  <SelectItem
-                    key={et.uri || et.slug || et.name}
-                    value={et.uri || et.slug || et.name}
-                  >
-                    {et.name || et.internal_name || et.slug || "Unnamed Event"}
-                  </SelectItem>
-                ))}
+                {eventTypes.map((et: any) => {
+                  const value: string | undefined = et?.uri
+                  if (!value) return null
+                  return (
+                    <SelectItem key={value} value={value}>
+                      {et.name || et.internal_name || et.slug || "Unnamed Event"}
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
           )}
@@ -167,15 +312,18 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
             Description (when to trigger action)
           </Label>
           <Textarea
-            autoComplete="false"
+            autoComplete="off"
             id="description"
             placeholder="Example: Use this action when the user wants to schedule a meeting..."
             className="w-full"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
           />
         </div>
 
         <div className="flex items-center gap-3">
-          <Switch id="enable-webhook" checked={showInQuickMenu} onCheckedChange={setShowInQuickMenu} />
+          <Switch id="show-quick-menu" checked={showInQuickMenu} onCheckedChange={setShowInQuickMenu} />
           <Label htmlFor="show-quick-menu" className="text-sm font-medium cursor-pointer">
             Show in quick menu page on the chat widget
           </Label>
@@ -183,9 +331,39 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
       </div>
 
       <div className="border-t rounded-b-lg  bg-gray-50 border-border p-6 flex items-center justify-end gap-3">
-
-        <Button className="text-sm">Create action</Button>
+        {isEditing && (
+          <Button
+            onClick={() => deleteActionMutation.mutate()}
+            variant="outline"
+            className="text-sm text-red-500 hover:text-red-300"
+            type="button"
+            disabled={deleteActionMutation.isPending}
+          >
+            {deleteActionMutation.isPending ? (
+              <>
+                <Spinner className="text-red-500" />
+                Deleting
+              </>
+            ) : (
+              "Delete"
+            )}
+          </Button>
+        )}
+        <Button
+          type="submit"
+          className="text-sm"
+          disabled={createActionMutation.isPending || !selectedEventType || !name.trim() || !description.trim()}
+        >
+          {createActionMutation.isPending ? (
+            <>
+              <Spinner className="w-4 h-4 mr-2" />
+              {isEditing ? "Updating..." : "Creating..."}
+            </>
+          ) : (
+            isEditing ? "Update action" : "Create action"
+          )}
+        </Button>
       </div>
-    </div>
+    </form>
   )
 }

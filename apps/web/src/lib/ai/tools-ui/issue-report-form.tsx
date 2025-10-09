@@ -38,13 +38,11 @@ export function IssueReportForm({ color }: { color?: string }) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         toast.error('Please select an image file');
         return;
       }
 
-      // Validate file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
         toast.error('File size must be less than 5MB');
         return;
@@ -52,7 +50,6 @@ export function IssueReportForm({ color }: { color?: string }) {
 
       setFormData(prev => ({ ...prev, screenshot: file }));
 
-      // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       setScreenshotPreview(previewUrl);
     }
@@ -69,7 +66,6 @@ export function IssueReportForm({ color }: { color?: string }) {
     }
   };
 
-  // Memoize the embed token calculation
   const embedToken = useMemo(() => {
     if (embedTokenFromContext) {
       return embedTokenFromContext;
@@ -134,6 +130,19 @@ export function IssueReportForm({ color }: { color?: string }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
+        <Label htmlFor="email" className="block text-sm font-medium mb-2">
+          Your email
+        </Label>
+        <Input
+          id="email"
+          name="email"
+          placeholder="e.g. jane@gmail.com"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      {/* <div>
         <Label htmlFor="title" className="block text-sm font-medium mb-2">
           Issue Title
         </Label>
@@ -145,17 +154,17 @@ export function IssueReportForm({ color }: { color?: string }) {
           onChange={handleChange}
           required
         />
-      </div>
+      </div> */}
 
       <div>
         <Label htmlFor="description" className="block text-sm font-medium mb-2">
-          Description
+          Issue Description
         </Label>
         <Textarea
           id="description"
           name="description"
           className="w-full min-h-[90px]"
-          placeholder="Describe the feature you'd like to see..."
+          placeholder="Describe the issue you're facing..."
           value={formData.description}
           onChange={handleChange}
           required

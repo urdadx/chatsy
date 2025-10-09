@@ -344,7 +344,7 @@ export const issueReport = pgTable("issue_report", {
   chatbotId: uuid("chatbot_id")
     .notNull()
     .references(() => chatbot.id, { onDelete: "cascade" }),
-  title: text("title").notNull(),
+  title: text("title"),
   description: text("description").notNull(),
   screenshot: text("screenshot"),
   email: text("email"),

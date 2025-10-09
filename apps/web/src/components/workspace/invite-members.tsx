@@ -99,10 +99,10 @@ export const InviteMembers = ({ open, setOpen }: any) => {
             </div>
             <DialogHeader>
               <DialogTitle className="sm:text-center text-xl">
-                Invite Teammates
+                Invite your team
               </DialogTitle>
               <DialogDescription className="sm:text-center text-base underline-offset-4">
-                Invite member with different roles to your workspace
+                Invite members with different roles to your organization.
               </DialogDescription>
             </DialogHeader>
           </div>

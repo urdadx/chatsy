@@ -2,10 +2,12 @@ import CalendlyIcon from "@/assets/calendly.png"
 import { SolarBoltBoldDuotone } from "@/assets/icons/bolt-duotone"
 import { SolarBoxMinimalisticBoldDuotone } from "@/assets/icons/box-icon"
 import { SolarClipboardBoldDuotone } from "@/assets/icons/clipboard-icon"
+import { SolarMagniferBoldDuotone } from "@/assets/icons/glass-search-icon"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog"
 import { DialogTitle } from "@radix-ui/react-dialog"
 import { Link } from "@tanstack/react-router"
+import { Badge } from "../ui/badge"
 import { Input } from "../ui/input"
 
 interface ActionCardProps {
@@ -23,6 +25,7 @@ const ActionCard = ({
   description,
   iconSrc
 }: ActionCardProps) => {
+  const isComingSoon = title === 'Custom workflow' || title === 'Custom form'
   return (
     <Link
       to={href}
@@ -39,9 +42,14 @@ const ActionCard = ({
           )}
         </div>
         <div className="flex flex-col flex-1 min-w-0">
-          <h3 className="font-semibold text-foreground mb-1">
-            {title}
-          </h3>
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-semibold text-foreground">
+              {title}
+            </h3>
+            {isComingSoon && (
+              <Badge variant="secondary" className="uppercase">Coming soon</Badge>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground leading-relaxed">
             {description}
           </p>
@@ -70,18 +78,17 @@ export const CreateActionDialog = () => {
         <div className="max-h-[60vh] flex-1 overflow-y-auto smooth-div">
           <div className="px-6 pt-2 pb-6">
             <div className="flex flex-col gap-3">
-
+              <ActionCard
+                href="/admin/actions/new-action?actionType=calendly"
+                iconSrc={CalendlyIcon}
+                title="Get Calendly booking slots"
+                description="Allow customers to book meetings via Calendly "
+              />
               <ActionCard
                 href="/admin/actions/new-action"
                 icon={<SolarBoltBoldDuotone color="#8b5cf6" className="w-6 h-6" />}
                 title="Custom workflow"
                 description="Add an action to trigger workflows or external integrations"
-              />
-              <ActionCard
-                href="/admin/actions/new-action"
-                icon={<SolarClipboardBoldDuotone color="#00ad69" className="w-6 h-6" />}
-                title="Custom form"
-                description="Create a custom form to collect information from customers with validation"
               />
 
               <ActionCard
@@ -90,12 +97,22 @@ export const CreateActionDialog = () => {
                 title="Custom button"
                 description="Add a custom button action to trigger workflows or external integrations"
               />
+
               <ActionCard
-                href="/admin/actions/new-action?actionType=calendly"
-                iconSrc={CalendlyIcon}
-                title="Get Calendly booking slots"
-                description="Allow customers to book meetings via Calendly "
+                href="/admin/actions/new-action"
+                icon={<SolarMagniferBoldDuotone color="#ec1313" className="w-6 h-6" />}
+                title="Collect leads"
+                description="Create a lead generation form to capture potential customer information"
               />
+              <ActionCard
+                href="/admin/actions/new-action"
+                icon={<SolarClipboardBoldDuotone color="#00ad69" className="w-6 h-6" />}
+                title="Custom form"
+                description="Create a custom form to collect information from customers with validation"
+              />
+
+
+
             </div>
           </div>
         </div>

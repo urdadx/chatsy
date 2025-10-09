@@ -11,6 +11,7 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TestRouteImport } from './routes/test'
 import { Route as SuccessRouteImport } from './routes/success'
 import { Route as ChoosePlanRouteImport } from './routes/choose-plan'
 import { Route as AcceptInvitationRouteImport } from './routes/accept-invitation'
@@ -84,6 +85,11 @@ import { ServerRoute as ApiIntegrationsCalendlyAuthConnectServerRouteImport } fr
 
 const rootServerRouteImport = createServerRootRoute()
 
+const TestRoute = TestRouteImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SuccessRoute = SuccessRouteImport.update({
   id: '/success',
   path: '/success',
@@ -460,6 +466,7 @@ export interface FileRoutesByFullPath {
   '/accept-invitation': typeof AcceptInvitationRoute
   '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
+  '/test': typeof TestRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/setup': typeof authSetupRoute
@@ -487,6 +494,7 @@ export interface FileRoutesByTo {
   '/accept-invitation': typeof AcceptInvitationRoute
   '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
+  '/test': typeof TestRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/setup': typeof authSetupRoute
@@ -515,6 +523,7 @@ export interface FileRoutesById {
   '/accept-invitation': typeof AcceptInvitationRoute
   '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
+  '/test': typeof TestRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/(auth)/setup': typeof authSetupRoute
@@ -544,6 +553,7 @@ export interface FileRouteTypes {
     | '/accept-invitation'
     | '/choose-plan'
     | '/success'
+    | '/test'
     | '/login'
     | '/register'
     | '/setup'
@@ -571,6 +581,7 @@ export interface FileRouteTypes {
     | '/accept-invitation'
     | '/choose-plan'
     | '/success'
+    | '/test'
     | '/login'
     | '/register'
     | '/setup'
@@ -598,6 +609,7 @@ export interface FileRouteTypes {
     | '/accept-invitation'
     | '/choose-plan'
     | '/success'
+    | '/test'
     | '/(auth)/login'
     | '/(auth)/register'
     | '/(auth)/setup'
@@ -626,6 +638,7 @@ export interface RootRouteChildren {
   AcceptInvitationRoute: typeof AcceptInvitationRoute
   ChoosePlanRoute: typeof ChoosePlanRoute
   SuccessRoute: typeof SuccessRoute
+  TestRoute: typeof TestRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
   authSetupRoute: typeof authSetupRoute
@@ -972,6 +985,13 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/test': {
+      id: '/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof TestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/success': {
       id: '/success'
       path: '/success'
@@ -1507,6 +1527,7 @@ const rootRouteChildren: RootRouteChildren = {
   AcceptInvitationRoute: AcceptInvitationRoute,
   ChoosePlanRoute: ChoosePlanRoute,
   SuccessRoute: SuccessRoute,
+  TestRoute: TestRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
   authSetupRoute: authSetupRoute,

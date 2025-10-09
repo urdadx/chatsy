@@ -8,6 +8,7 @@ const VALID_TOOL_NAMES = [
   "collect_leads",
   "escalate_to_human",
   "custom_button",
+  "calendly_booking",
 ] as const;
 
 export type ValidToolName = (typeof VALID_TOOL_NAMES)[number];
@@ -33,6 +34,7 @@ export async function getActiveTools(): Promise<ValidToolName[]> {
       "collect_leads",
       "escalate_to_human",
       "custom_button",
+      "calendly_booking",
     ];
   }
 }

@@ -21,6 +21,7 @@ function RouteComponent() {
       case 'custom_button':
         return <CustomButtonForm actionId={actionId} />
       case 'calendly':
+      case 'calendly_booking':
       case 'book_meeting':
         return <CalendlyForm actionId={actionId} />
 

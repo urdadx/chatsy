@@ -6,6 +6,7 @@ import {
 import { Response } from '@/components/ai-elements/response';
 import type { Vote } from "@/db/schema";
 import { useChatbot } from "@/hooks/use-chatbot";
+import { CalendlyBooking } from "@/lib/ai/tools-ui/calendly-booking";
 import { CollectFeedbackForm } from "@/lib/ai/tools-ui/collect-feedback-form";
 import { CollectLeadsForm } from "@/lib/ai/tools-ui/collect-leads-form";
 import { CustomButton } from "@/lib/ai/tools-ui/custom-button";
@@ -308,6 +309,67 @@ export const PreviewMessage = ({
                           name={outputData.name}
                           description={outputData.description}
                           context={outputData.context}
+                          color={activeChatbot?.primaryColor}
+                        />
+                      </div>
+                    );
+                  }
+
+                  return null;
+                }
+              }
+
+              if (type === "tool-calendly_booking") {
+                const { toolCallId, state } = part;
+
+                if (state === "input-available") {
+                  return (
+                    <div
+                      key={toolCallId}
+                      className="flex items-center gap-2 text-muted-foreground text-sm"
+                    >
+                      <Loader
+                        variant="dots"
+                        className="text-muted-foreground"
+                      />
+                      <span>Setting up meeting...</span>
+                    </div>
+                  );
+                }
+
+                if (state === "output-available") {
+                  const { output } = part;
+
+                  // if (
+                  //   output &&
+                  //   typeof output === "object" &&
+                  //   "error" in output
+                  // ) {
+                  //   return (
+                  //     <div
+                  //       key={toolCallId}
+                  //       className=" "
+                  //     >
+                  //       Sorry, I can't help you with that right now.
+                  //     </div>
+                  //   );
+                  // }
+
+                  if (
+                    output &&
+                    typeof output === "object" &&
+                    "success" in output &&
+                    output.success
+                  ) {
+                    const outputData = output as any;
+                    return (
+                      <div className="px-2" key={toolCallId}>
+                        <CalendlyBooking
+                          eventTypeUri={outputData.eventTypeUri}
+                          eventTypeName={outputData.eventTypeName}
+                          userEmail={outputData.userEmail}
+                          name={outputData.name}
+                          description={outputData.description}
                           color={activeChatbot?.primaryColor}
                         />
                       </div>

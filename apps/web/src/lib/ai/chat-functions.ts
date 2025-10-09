@@ -50,6 +50,23 @@ export const getCustomButtonActions = async (chatbotId: string) => {
     );
 };
 
+// GET CALENDLY BOOKING ACTIONS
+export const getCalendlyBookingActions = async (chatbotId: string) => {
+  return await db
+    .select({
+      name: Action.name,
+      description: Action.description,
+    })
+    .from(Action)
+    .where(
+      and(
+        eq(Action.toolName, "calendly_booking"),
+        eq(Action.isActive, true),
+        eq(Action.chatbotId, chatbotId),
+      ),
+    );
+};
+
 // FUNCTION TO GET CHATBOT DATA BY EMBED TOKEN
 export async function getChatbotDataByPlatformIdentifier(
   platformIdentifier: string,

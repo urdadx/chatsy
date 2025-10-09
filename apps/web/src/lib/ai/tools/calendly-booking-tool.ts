@@ -4,22 +4,30 @@ import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
 
-export const customButtonTool = (chatbotId: string) =>
+export const calendlyBookingTool = (chatbotId: string) =>
   tool({
-    description: `Display a custom button when user requests match configured actions. Only use this tool when the user's request clearly matches one of the available custom button descriptions for this chatbot.`,
+    description:
+      "Allow users to book, schedule, or arrange meetings, calls, demos, or appointments when they express intent to do so.",
     inputSchema: z.object({
       userIntent: z
         .string()
-        .describe("Description of what the user is trying to do or asking for"),
+        .describe(
+          "Description of what the user is trying to schedule or their meeting request",
+        ),
       context: z
         .string()
         .optional()
-        .describe("Additional context about the conversation"),
+        .describe("Additional context about the meeting request"),
+      preferredMeetingType: z
+        .string()
+        .optional()
+        .describe(
+          "Type of meeting if specified (e.g., demo, consultation, sales call)",
+        ),
     }),
-    execute: async ({ userIntent, context }) => {
+    execute: async ({ userIntent, context, preferredMeetingType }) => {
       try {
-        // Get all active custom button actions for this chatbot
-        const customButtonActions = await db
+        const calendlyActions = await db
           .select({
             id: Action.id,
             name: Action.name,
@@ -30,26 +38,30 @@ export const customButtonTool = (chatbotId: string) =>
           .from(Action)
           .where(
             and(
-              eq(Action.toolName, "custom_button"),
+              eq(Action.toolName, "calendly_booking"),
               eq(Action.isActive, true),
               eq(Action.chatbotId, chatbotId),
             ),
           );
 
-        if (!customButtonActions.length) {
+        if (!calendlyActions.length) {
           return {
-            error: "No custom button actions configured",
+            error: "No Calendly booking actions configured",
             userIntent,
           };
         }
 
-        const bestMatch = findBestMatch(userIntent, customButtonActions);
+        const bestMatch = findBestCalendlyMatch(
+          userIntent,
+          preferredMeetingType,
+          calendlyActions,
+        );
 
         if (!bestMatch) {
           return {
-            error: "No matching custom button found for this request",
+            error: "No matching Calendly booking found for this request",
             userIntent,
-            availableActions: customButtonActions.map((a) => ({
+            availableActions: calendlyActions.map((a) => ({
               name: a.name,
               description: a.description,
             })),
@@ -57,40 +69,57 @@ export const customButtonTool = (chatbotId: string) =>
         }
 
         const properties = bestMatch.actionProperties as {
-          buttonText: string;
-          buttonUrl: string;
+          eventTypeUri: string;
+          eventTypeName?: string;
+          userEmail?: string;
         } | null;
 
-        if (!properties || !properties.buttonText || !properties.buttonUrl) {
+        if (!properties || !properties.eventTypeUri) {
           return {
-            error: "Invalid button configuration",
+            error: "Invalid Calendly configuration - missing event type",
             actionId: bestMatch.id,
           };
         }
+
+        // Extract the event type slug/name from the URI for the booking URL
+        const eventTypeSlug = extractEventTypeSlug(
+          properties.eventTypeUri,
+          properties.eventTypeName,
+        );
+
+        // Generate the Calendly booking URL
+        const calendlyUrl = generateCalendlyUrl(
+          properties.eventTypeUri,
+          eventTypeSlug,
+        );
 
         return {
           success: true,
           actionId: bestMatch.id,
           name: bestMatch.name,
           description: bestMatch.description,
-          buttonText: properties.buttonText,
-          buttonUrl: properties.buttonUrl,
+          eventTypeUri: properties.eventTypeUri,
+          eventTypeName: properties.eventTypeName,
+          userEmail: properties.userEmail,
+          calendlyUrl,
           userIntent,
           context: context || undefined,
+          meetingType: preferredMeetingType,
         };
       } catch (error) {
-        console.error("Error executing custom button tool:", error);
+        console.error("Error executing Calendly booking tool:", error);
         return {
-          error: "Failed to load custom button",
+          error: "Failed to process Calendly booking request",
           userIntent,
         };
       }
     },
   });
 
-// Improved matching algorithm
-function findBestMatch(
+// Find the best matching Calendly action based on user intent and meeting type
+function findBestCalendlyMatch(
   userIntent: string,
+  preferredMeetingType: string | undefined,
   actions: Array<{
     id: string;
     name: string | null;
@@ -100,8 +129,12 @@ function findBestMatch(
   }>,
 ) {
   const normalizedIntent = normalizeText(userIntent);
+  const normalizedMeetingType = preferredMeetingType
+    ? normalizeText(preferredMeetingType)
+    : "";
   const intentWords = tokenize(normalizedIntent);
-  const intentWordSet = new Set(intentWords);
+  const meetingTypeWords = tokenize(normalizedMeetingType);
+  const allIntentWords = new Set([...intentWords, ...meetingTypeWords]);
 
   let bestMatch = null;
   let bestScore = 0;
@@ -117,7 +150,7 @@ function findBestMatch(
 
     // 1. Exact phrase match in description (highest priority)
     if (description && normalizedIntent.includes(description)) {
-      score = 1000 + description.length; // Longer matches rank higher
+      score = 1000 + description.length;
     } else if (description?.includes(normalizedIntent)) {
       score = 900 + normalizedIntent.length;
     }
@@ -127,7 +160,16 @@ function findBestMatch(
     } else if (name?.includes(normalizedIntent)) {
       score = 700 + name.length;
     }
-    // 3. Word overlap scoring
+    // 3. Meeting type specific matching
+    else if (preferredMeetingType) {
+      if (
+        description?.includes(normalizedMeetingType) ||
+        name?.includes(normalizedMeetingType)
+      ) {
+        score = 600 + normalizedMeetingType.length;
+      }
+    }
+    // 4. Word overlap scoring
     else {
       const descWords = tokenize(description);
       const nameWords = tokenize(name);
@@ -140,7 +182,7 @@ function findBestMatch(
       for (const word of allActionWords) {
         if (word.length <= 3) continue; // Skip short words
 
-        for (const intentWord of intentWords) {
+        for (const intentWord of allIntentWords) {
           if (intentWord.length <= 3) continue;
 
           // Exact word match
@@ -162,7 +204,7 @@ function findBestMatch(
 
         // Bonus for matching more unique words
         const uniqueMatchRatio =
-          matchCount / Math.max(allActionWords.size, intentWords.length);
+          matchCount / Math.max(allActionWords.size, allIntentWords.size);
         score += uniqueMatchRatio * 50;
       }
     }
@@ -176,6 +218,51 @@ function findBestMatch(
 
   // Only return match if score meets minimum threshold
   return bestScore > 0 ? bestMatch : null;
+}
+
+// Extract event type slug from URI or use provided name
+function extractEventTypeSlug(
+  eventTypeUri: string,
+  eventTypeName?: string,
+): string {
+  if (eventTypeName) {
+    return eventTypeName
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
+  }
+
+  // Extract from URI if no name provided
+  // URI format: https://api.calendly.com/event_types/XXXXXXXX
+  const match = eventTypeUri.match(/\/event_types\/([^\/]+)$/);
+  if (match) {
+    return match[1];
+  }
+
+  return "meeting";
+}
+
+// Generate Calendly booking URL
+function generateCalendlyUrl(
+  eventTypeUri: string,
+  eventTypeSlug: string,
+): string {
+  // Extract user identifier from the event type URI
+  // This would need to be adapted based on your actual Calendly API response structure
+  // For now, we'll create a generic URL that should work with most Calendly setups
+
+  // The URI typically contains the user's calendly username/organization
+  // We need to construct the public booking URL
+  const match = eventTypeUri.match(/\/event_types\/(.+)/);
+  if (match) {
+    // This is a simplified approach - you might need to store the actual booking URL
+    // or retrieve it from your Calendly integration
+    return `https://calendly.com/book/${eventTypeSlug}`;
+  }
+
+  return `https://calendly.com/book/${eventTypeSlug}`;
 }
 
 // Normalize text for comparison
@@ -214,6 +301,18 @@ function tokenize(text: string): string[] {
     "was",
     "will",
     "with",
+    "i",
+    "want",
+    "need",
+    "would",
+    "like",
+    "can",
+    "could",
+    "should",
+    "book",
+    "schedule",
+    "meeting",
+    "appointment",
   ]);
 
   return text

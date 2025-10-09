@@ -1,7 +1,7 @@
 import { db } from "@/db";
-import { calendlyIntegration, chatbot, member } from "@/db/schema"; // added calendlyIntegration
+import { calendlyIntegration, chatbot } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
-import { ensureCalendlyAccessToken } from "@/lib/integrations/calendly"; // added
+import { ensureCalendlyAccessToken } from "@/lib/integrations/calendly";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -10,7 +10,6 @@ import z from "zod";
 
 const updateSettingsSchema = z.object({});
 
-// Helper function to fetch event types from Calendly API
 async function fetchEventTypes(
   organizationUri: string,
   accessToken: string,
@@ -19,7 +18,7 @@ async function fetchEventTypes(
   try {
     const collected: any[] = [];
     let nextPage: string | undefined;
-    // Build base URL with filters (include user to ensure personal event types are returned)
+
     const base = new URL("https://api.calendly.com/event_types");
     base.searchParams.set("organization", organizationUri);
     if (userUri) base.searchParams.set("user", userUri);
@@ -107,6 +106,28 @@ export const ServerRoute = createServerFileRoute(
 
       let calendlyAccount: any = null;
       if (integrationData) {
+        let userEmail: string | undefined;
+        if (integrationData.userUri) {
+          try {
+            const userResponse = await fetch(
+              `https://api.calendly.com/users/${integrationData.userUri.split("/").pop()}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${integrationData.accessToken}`,
+                  "Content-Type": "application/json",
+                },
+              },
+            );
+
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+              userEmail = userData.resource?.email;
+            }
+          } catch (e) {
+            console.warn("Failed to fetch Calendly user email:", e);
+          }
+        }
+
         const eventTypes =
           Array.isArray(integrationData.eventTypes) &&
           integrationData.eventTypes.length > 0
@@ -138,6 +159,7 @@ export const ServerRoute = createServerFileRoute(
           connected: true,
           organizationUri: integrationData.organizationUri,
           userUri: integrationData.userUri,
+          userEmail,
           eventTypes,
           accessTokenExpiresAt: integrationData.accessTokenExpiresAt,
         };
@@ -161,21 +183,16 @@ export const ServerRoute = createServerFileRoute(
       return json({ error: "No active organization" }, { status: 400 });
     }
 
-    const [membership] = await db
-      .select()
-      .from(member)
-      .where(
-        and(
-          eq(member.userId, session.user.id),
-          eq(member.organizationId, organizationId),
-        ),
-      );
+    const membership = await isUserMemberOfOrganization(
+      session.user.id,
+      organizationId,
+    );
+
     if (!membership) {
       return json({ error: "Forbidden" }, { status: 403 });
     }
 
     try {
-      // Placeholder: no chatbot-level fields to update now.
       const body = await request.json().catch(() => ({}));
       const parsed = updateSettingsSchema.safeParse(body);
       if (!parsed.success) {

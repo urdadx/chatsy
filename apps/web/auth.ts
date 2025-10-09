@@ -38,6 +38,7 @@ export const createDefaultActions = async (chatbotId: string) => {
       description:
         "Collects feedback, reviews, complaints, or suggestions from users.",
       isActive: true,
+      showInQuickMenu: true,
     },
     {
       chatbotId,
@@ -46,6 +47,7 @@ export const createDefaultActions = async (chatbotId: string) => {
       description:
         "Allow users to report bugs, problems, or issues they encounter.",
       isActive: true,
+      showInQuickMenu: true,
     },
     {
       chatbotId,
@@ -53,6 +55,7 @@ export const createDefaultActions = async (chatbotId: string) => {
       toolName: "collect_leads",
       description: "Capture leads from conversations with customers.",
       isActive: true,
+      showInQuickMenu: false,
     },
     {
       chatbotId,
@@ -60,6 +63,7 @@ export const createDefaultActions = async (chatbotId: string) => {
       toolName: "escalate_to_human",
       description: "Escalates the conversation to a human agent.",
       isActive: true,
+      showInQuickMenu: false,
     },
   ];
 

@@ -47,11 +47,10 @@ export function ChatLanding({ onGoToMain, chatbot, className }: ChatLandingProps
     } else if (action.toolName === "report_issue") {
       setShowIssueReportForm(true);
     } else if (action.toolName === "book_meeting") {
-      console.log("Book meeting action clicked");
+
     } else if (action.toolName === "custom_button") {
-      // Handle custom button clicks
       const properties = action.actionProperties as { buttonText: string; buttonUrl: string } | null;
-      if (properties && properties.buttonUrl) {
+      if (properties?.buttonUrl) {
         window.open(properties.buttonUrl, "_blank", "noopener,noreferrer");
       }
     }

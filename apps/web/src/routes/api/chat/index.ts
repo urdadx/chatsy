@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { chatbot, message } from "@/db/schema";
 import {
   deleteChatById,
+  getCalendlyBookingActions,
   getChatById,
   getCustomButtonActions,
   getMessagesByChatId,
@@ -12,6 +13,7 @@ import {
 import { getActiveTools } from "@/lib/ai/get-active-tools";
 import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
 import { google } from "@/lib/ai/providers";
+import { calendlyBookingTool } from "@/lib/ai/tools/calendly-booking-tool";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback-tool";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads-tool";
 import { customButtonTool } from "@/lib/ai/tools/custom-button-tool";
@@ -145,6 +147,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
           const chatbotPersonality = chatbotData.personality || "support";
           const organizationId = chatbotData.organizationId;
           const customButtonActions = await getCustomButtonActions(chatbotId);
+          const calendlyActions = await getCalendlyBookingActions(chatbotId);
 
           const stream = createUIMessageStream({
             execute: ({ writer: dataStream }) => {
@@ -155,6 +158,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                   activeTools,
                   chatbotPersonality,
                   customButtonActions,
+                  calendlyActions,
                 ),
                 messages: convertToModelMessages(uiMessages, {
                   ignoreIncompleteToolCalls: true,
@@ -167,6 +171,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                   collect_feedback: collectFeedbackTool,
                   collect_leads: collectLeadsTool,
                   custom_button: customButtonTool(chatbotId),
+                  calendly_booking: calendlyBookingTool(chatbotId),
                   escalate_to_human: escalateToHumanTool({
                     chatId: id,
                     chatbotId,
