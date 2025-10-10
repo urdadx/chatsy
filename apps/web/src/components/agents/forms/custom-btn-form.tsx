@@ -146,12 +146,12 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-3xl bg-card rounded-lg border border-border shadow-xs">
-      <div className="border-b border-border p-6">
-        <div className="flex items-start justify-between gap-4">
+    <form onSubmit={handleSubmit} className="w-full h-fit max-w-3xl bg-card rounded-lg border border-border shadow-xs">
+      <div className="border-b border-border p-4">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            className="text-sm gap-2 px-2"
+            className="text-sm"
             type="button"
             aria-label="Go back"
             onClick={() => router.history.back()}
@@ -162,9 +162,7 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
             <h1 className="text-lg font-semibold text-foreground">
               {isEditing ? 'Edit Custom Button' : 'Custom Button'}
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {isEditing ? 'Update your custom button action' : 'Create a custom button action to trigger your own links'}
-            </p>
+
           </div>
         </div>
       </div>
@@ -244,12 +242,14 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
         </div>
       </div>
 
-      <div className="border-t rounded-b-lg bg-gray-50 border-border p-6 flex items-center justify-end gap-3">
+      <div className="border-t rounded-b-lg border-border p-6 flex items-center justify-end gap-3">
         {
           isEditing && (
             <Button
+              variant="outline"
               onClick={() => deleteActionMutation.mutate()}
-              variant="outline" className="text-sm text-red-500 hover:text-red-300" type="button" >
+              className="text-sm text-red-500 hover:text-red-700 hover:bg-red-200"
+              type="button" >
               {
                 deleteActionMutation.isPending ? (
                   <>
@@ -257,7 +257,7 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
                     Deleting
                   </>
                 ) : (
-                  "Delete"
+                  "Delete action"
                 )
               }
             </Button>

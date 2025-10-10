@@ -51,14 +51,6 @@ export const createDefaultActions = async (chatbotId: string) => {
     },
     {
       chatbotId,
-      name: "Collect leads",
-      toolName: "collect_leads",
-      description: "Capture leads from conversations with customers.",
-      isActive: true,
-      showInQuickMenu: false,
-    },
-    {
-      chatbotId,
       name: "Escalate to human",
       toolName: "escalate_to_human",
       description: "Escalates the conversation to a human agent.",

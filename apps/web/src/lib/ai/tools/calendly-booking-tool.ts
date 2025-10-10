@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { Action } from "@/db/schema";
+import { findBestActionMatch } from "@/lib/utils/action-matching";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
@@ -7,7 +8,7 @@ import z from "zod";
 export const calendlyBookingTool = (chatbotId: string) =>
   tool({
     description:
-      "Allow users to book, schedule, or arrange meetings, calls, demos, or appointments when they express intent to do so.",
+      "Allows users to book, schedule, or arrange meetings, calls, demos, or appointments when they express intent to do so.",
     inputSchema: z.object({
       userIntent: z
         .string()
@@ -51,11 +52,11 @@ export const calendlyBookingTool = (chatbotId: string) =>
           };
         }
 
-        const bestMatch = findBestCalendlyMatch(
+        const bestMatch = findBestActionMatch({
           userIntent,
-          preferredMeetingType,
-          calendlyActions,
-        );
+          preferredType: preferredMeetingType,
+          actions: calendlyActions,
+        });
 
         if (!bestMatch) {
           return {
@@ -116,111 +117,6 @@ export const calendlyBookingTool = (chatbotId: string) =>
     },
   });
 
-// Find the best matching Calendly action based on user intent and meeting type
-function findBestCalendlyMatch(
-  userIntent: string,
-  preferredMeetingType: string | undefined,
-  actions: Array<{
-    id: string;
-    name: string | null;
-    description: string | null;
-    actionProperties: unknown;
-    showInQuickMenu: boolean | null;
-  }>,
-) {
-  const normalizedIntent = normalizeText(userIntent);
-  const normalizedMeetingType = preferredMeetingType
-    ? normalizeText(preferredMeetingType)
-    : "";
-  const intentWords = tokenize(normalizedIntent);
-  const meetingTypeWords = tokenize(normalizedMeetingType);
-  const allIntentWords = new Set([...intentWords, ...meetingTypeWords]);
-
-  let bestMatch = null;
-  let bestScore = 0;
-
-  for (const action of actions) {
-    const description = normalizeText(action.description || "");
-    const name = normalizeText(action.name || "");
-
-    // Skip actions without description or name
-    if (!description && !name) continue;
-
-    let score = 0;
-
-    // 1. Exact phrase match in description (highest priority)
-    if (description && normalizedIntent.includes(description)) {
-      score = 1000 + description.length;
-    } else if (description?.includes(normalizedIntent)) {
-      score = 900 + normalizedIntent.length;
-    }
-    // 2. Exact phrase match in name
-    else if (name && normalizedIntent.includes(name)) {
-      score = 800 + name.length;
-    } else if (name?.includes(normalizedIntent)) {
-      score = 700 + name.length;
-    }
-    // 3. Meeting type specific matching
-    else if (preferredMeetingType) {
-      if (
-        description?.includes(normalizedMeetingType) ||
-        name?.includes(normalizedMeetingType)
-      ) {
-        score = 600 + normalizedMeetingType.length;
-      }
-    }
-    // 4. Word overlap scoring
-    else {
-      const descWords = tokenize(description);
-      const nameWords = tokenize(name);
-      const allActionWords = new Set([...descWords, ...nameWords]);
-
-      // Count matching words
-      let matchCount = 0;
-      let totalMatchLength = 0;
-
-      for (const word of allActionWords) {
-        if (word.length <= 3) continue; // Skip short words
-
-        for (const intentWord of allIntentWords) {
-          if (intentWord.length <= 3) continue;
-
-          // Exact word match
-          if (word === intentWord) {
-            matchCount += 2;
-            totalMatchLength += word.length;
-          }
-          // Partial word match (one contains the other)
-          else if (word.includes(intentWord) || intentWord.includes(word)) {
-            matchCount += 1;
-            totalMatchLength += Math.min(word.length, intentWord.length);
-          }
-        }
-      }
-
-      if (matchCount > 0) {
-        // Score based on match count and length
-        score = matchCount * 10 + totalMatchLength;
-
-        // Bonus for matching more unique words
-        const uniqueMatchRatio =
-          matchCount / Math.max(allActionWords.size, allIntentWords.size);
-        score += uniqueMatchRatio * 50;
-      }
-    }
-
-    // Update best match if this score is higher
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = action;
-    }
-  }
-
-  // Only return match if score meets minimum threshold
-  return bestScore > 0 ? bestMatch : null;
-}
-
-// Extract event type slug from URI or use provided name
 function extractEventTypeSlug(
   eventTypeUri: string,
   eventTypeName?: string,
@@ -234,8 +130,6 @@ function extractEventTypeSlug(
       .trim();
   }
 
-  // Extract from URI if no name provided
-  // URI format: https://api.calendly.com/event_types/XXXXXXXX
   const match = eventTypeUri.match(/\/event_types\/([^\/]+)$/);
   if (match) {
     return match[1];
@@ -249,73 +143,9 @@ function generateCalendlyUrl(
   eventTypeUri: string,
   eventTypeSlug: string,
 ): string {
-  // Extract user identifier from the event type URI
-  // This would need to be adapted based on your actual Calendly API response structure
-  // For now, we'll create a generic URL that should work with most Calendly setups
-
-  // The URI typically contains the user's calendly username/organization
-  // We need to construct the public booking URL
   const match = eventTypeUri.match(/\/event_types\/(.+)/);
   if (match) {
-    // This is a simplified approach - you might need to store the actual booking URL
-    // or retrieve it from your Calendly integration
     return `https://calendly.com/book/${eventTypeSlug}`;
   }
-
   return `https://calendly.com/book/${eventTypeSlug}`;
-}
-
-// Normalize text for comparison
-function normalizeText(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s]/g, " ") // Replace punctuation with spaces
-    .replace(/\s+/g, " "); // Normalize whitespace
-}
-
-// Tokenize text into words, filtering out stop words
-function tokenize(text: string): string[] {
-  const stopWords = new Set([
-    "a",
-    "an",
-    "and",
-    "are",
-    "as",
-    "at",
-    "be",
-    "by",
-    "for",
-    "from",
-    "has",
-    "he",
-    "in",
-    "is",
-    "it",
-    "its",
-    "of",
-    "on",
-    "that",
-    "the",
-    "to",
-    "was",
-    "will",
-    "with",
-    "i",
-    "want",
-    "need",
-    "would",
-    "like",
-    "can",
-    "could",
-    "should",
-    "book",
-    "schedule",
-    "meeting",
-    "appointment",
-  ]);
-
-  return text
-    .split(/\s+/)
-    .filter((word) => word.length > 0 && !stopWords.has(word));
 }

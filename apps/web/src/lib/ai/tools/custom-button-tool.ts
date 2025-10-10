@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { Action } from "@/db/schema";
+import { findBestActionMatch } from "@/lib/utils/action-matching";
 import { tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
@@ -43,7 +44,10 @@ export const customButtonTool = (chatbotId: string) =>
           };
         }
 
-        const bestMatch = findBestMatch(userIntent, customButtonActions);
+        const bestMatch = findBestActionMatch({
+          userIntent,
+          actions: customButtonActions,
+        });
 
         if (!bestMatch) {
           return {
@@ -87,136 +91,3 @@ export const customButtonTool = (chatbotId: string) =>
       }
     },
   });
-
-// Improved matching algorithm
-function findBestMatch(
-  userIntent: string,
-  actions: Array<{
-    id: string;
-    name: string | null;
-    description: string | null;
-    actionProperties: unknown;
-    showInQuickMenu: boolean | null;
-  }>,
-) {
-  const normalizedIntent = normalizeText(userIntent);
-  const intentWords = tokenize(normalizedIntent);
-  const intentWordSet = new Set(intentWords);
-
-  let bestMatch = null;
-  let bestScore = 0;
-
-  for (const action of actions) {
-    const description = normalizeText(action.description || "");
-    const name = normalizeText(action.name || "");
-
-    // Skip actions without description or name
-    if (!description && !name) continue;
-
-    let score = 0;
-
-    // 1. Exact phrase match in description (highest priority)
-    if (description && normalizedIntent.includes(description)) {
-      score = 1000 + description.length; // Longer matches rank higher
-    } else if (description?.includes(normalizedIntent)) {
-      score = 900 + normalizedIntent.length;
-    }
-    // 2. Exact phrase match in name
-    else if (name && normalizedIntent.includes(name)) {
-      score = 800 + name.length;
-    } else if (name?.includes(normalizedIntent)) {
-      score = 700 + name.length;
-    }
-    // 3. Word overlap scoring
-    else {
-      const descWords = tokenize(description);
-      const nameWords = tokenize(name);
-      const allActionWords = new Set([...descWords, ...nameWords]);
-
-      // Count matching words
-      let matchCount = 0;
-      let totalMatchLength = 0;
-
-      for (const word of allActionWords) {
-        if (word.length <= 3) continue; // Skip short words
-
-        for (const intentWord of intentWords) {
-          if (intentWord.length <= 3) continue;
-
-          // Exact word match
-          if (word === intentWord) {
-            matchCount += 2;
-            totalMatchLength += word.length;
-          }
-          // Partial word match (one contains the other)
-          else if (word.includes(intentWord) || intentWord.includes(word)) {
-            matchCount += 1;
-            totalMatchLength += Math.min(word.length, intentWord.length);
-          }
-        }
-      }
-
-      if (matchCount > 0) {
-        // Score based on match count and length
-        score = matchCount * 10 + totalMatchLength;
-
-        // Bonus for matching more unique words
-        const uniqueMatchRatio =
-          matchCount / Math.max(allActionWords.size, intentWords.length);
-        score += uniqueMatchRatio * 50;
-      }
-    }
-
-    // Update best match if this score is higher
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = action;
-    }
-  }
-
-  // Only return match if score meets minimum threshold
-  return bestScore > 0 ? bestMatch : null;
-}
-
-// Normalize text for comparison
-function normalizeText(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s]/g, " ") // Replace punctuation with spaces
-    .replace(/\s+/g, " "); // Normalize whitespace
-}
-
-// Tokenize text into words, filtering out stop words
-function tokenize(text: string): string[] {
-  const stopWords = new Set([
-    "a",
-    "an",
-    "and",
-    "are",
-    "as",
-    "at",
-    "be",
-    "by",
-    "for",
-    "from",
-    "has",
-    "he",
-    "in",
-    "is",
-    "it",
-    "its",
-    "of",
-    "on",
-    "that",
-    "the",
-    "to",
-    "was",
-    "will",
-    "with",
-  ]);
-
-  return text
-    .split(/\s+/)
-    .filter((word) => word.length > 0 && !stopWords.has(word));
-}

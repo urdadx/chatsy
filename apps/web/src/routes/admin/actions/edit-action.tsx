@@ -1,5 +1,7 @@
 import { CalendlyForm } from '@/components/agents/forms/calendly-form'
 import { CustomButtonForm } from '@/components/agents/forms/custom-btn-form'
+import { FeedbackForm } from '@/components/agents/forms/feedback-form'
+import { ChatPreview } from '@/components/chat/chat-preview'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import z from 'zod'
 
@@ -24,9 +26,9 @@ function RouteComponent() {
       case 'calendly_booking':
       case 'book_meeting':
         return <CalendlyForm actionId={actionId} />
-
+      case 'feedback_form':
+        return <FeedbackForm actionId={actionId} />
       default:
-
         return (
           <div className="w-full max-w-3xl bg-card rounded-lg border border-border shadow-xs p-6">
             <div className="text-center">
@@ -43,9 +45,15 @@ function RouteComponent() {
   }
 
   return (
-    <div className="flex flex-col justify-center p-4">
-      <div className="flex justify-center">
+    <div className="flex flex-row h-full">
+      <div className="flex-[2] flex h-full justify-center p-6 pr-8">
         {getFormComponent()}
+      </div>
+
+      <div className="flex-1 border-l hidden bg-gray-50 p-4 sm:flex justify-center items-center ">
+        <div className="w-[400px]">
+          <ChatPreview />
+        </div>
       </div>
     </div>
   )

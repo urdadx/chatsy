@@ -251,7 +251,7 @@ export function ChatbotSwitcher() {
                           }
                         >
                           {chatbot.image ? (
-                            <Avatar className="h-6 w-6 rounded-full border-2 border-primary">
+                            <Avatar className="h-8 w-8 rounded-full border-2 border-primary">
                               <AvatarImage src={chatbot?.image} alt={chatbot?.name} />
                               <AvatarFallback>
                                 <User className="h-5 w-5 text-gray-600" />

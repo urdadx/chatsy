@@ -196,12 +196,12 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
     )
   }
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-3xl bg-card rounded-lg border border-border shadow-xs">
-      <div className="border-b border-border p-6">
-        <div className="flex items-start justify-between gap-4">
+    <form onSubmit={handleSubmit} className="w-full h-fit max-w-3xl bg-card rounded-lg border border-border shadow-xs">
+      <div className="border-b border-border p-4">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            className="text-sm gap-2 px-2"
+            className="text-sm"
             type="button"
             aria-label="Go back"
             onClick={() => router.history.back()}
@@ -212,9 +212,7 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
             <h1 className="text-lg font-semibold text-foreground">
               {isEditing ? 'Edit Calendly Meeting' : 'Book Calendly meetings'}
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Allow AI agent to automatically book meetings, call or demos with your customers
-            </p>
+
           </div>
         </div>
       </div>
@@ -330,12 +328,12 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
         </div>
       </div>
 
-      <div className="border-t rounded-b-lg  bg-gray-50 border-border p-6 flex items-center justify-end gap-3">
+      <div className="border-t rounded-b-lg  border-border p-6 flex items-center justify-end gap-3">
         {isEditing && (
           <Button
             onClick={() => deleteActionMutation.mutate()}
             variant="outline"
-            className="text-sm text-red-500 hover:text-red-300"
+            className="text-sm text-red-500 hover:text-red-700 hover:bg-red-200"
             type="button"
             disabled={deleteActionMutation.isPending}
           >
@@ -345,7 +343,7 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
                 Deleting
               </>
             ) : (
-              "Delete"
+              "Delete action"
             )}
           </Button>
         )}
