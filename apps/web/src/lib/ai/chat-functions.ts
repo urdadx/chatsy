@@ -67,6 +67,23 @@ export const getCalendlyBookingActions = async (chatbotId: string) => {
     );
 };
 
+// GET COLLECT LEADS ACTIONS
+export const getCollectLeadsActions = async (chatbotId: string) => {
+  return await db
+    .select({
+      name: Action.name,
+      description: Action.description,
+    })
+    .from(Action)
+    .where(
+      and(
+        eq(Action.toolName, "collect_leads"),
+        eq(Action.isActive, true),
+        eq(Action.chatbotId, chatbotId),
+      ),
+    );
+};
+
 // FUNCTION TO GET CHATBOT DATA BY EMBED TOKEN
 export async function getChatbotDataByPlatformIdentifier(
   platformIdentifier: string,

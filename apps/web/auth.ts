@@ -49,14 +49,6 @@ export const createDefaultActions = async (chatbotId: string) => {
       isActive: true,
       showInQuickMenu: true,
     },
-    {
-      chatbotId,
-      name: "Escalate to human",
-      toolName: "escalate_to_human",
-      description: "Escalates the conversation to a human agent.",
-      isActive: true,
-      showInQuickMenu: false,
-    },
   ];
 
   try {

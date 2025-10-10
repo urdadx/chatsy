@@ -121,7 +121,7 @@ const columns: ColumnDef<Item>[] = [
     enableHiding: false,
   },
   {
-    header: "Email",
+    header: "Contact",
     accessorKey: "email",
     size: 200,
     cell: ({ row }) => {

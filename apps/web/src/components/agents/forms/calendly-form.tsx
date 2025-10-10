@@ -115,7 +115,7 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
       return response.data
     },
     onSuccess: () => {
-      toast.success(isEditing ? "Calendly action updated successfully" : "Calendly action created successfully")
+      toast.success(isEditing ? "Calendly action updated" : "Calendly action created")
       queryClient.invalidateQueries({ queryKey: ["actions"] })
       if (isEditing) {
         queryClient.invalidateQueries({ queryKey: ["action", actionId] })
@@ -333,7 +333,7 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
           <Button
             onClick={() => deleteActionMutation.mutate()}
             variant="outline"
-            className="text-sm text-red-500 hover:text-red-700 hover:bg-red-200"
+            className="text-sm text-red-500 hover:bg-red-50 hover:text-red-400"
             type="button"
             disabled={deleteActionMutation.isPending}
           >

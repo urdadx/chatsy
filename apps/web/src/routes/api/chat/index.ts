@@ -5,6 +5,7 @@ import {
   deleteChatById,
   getCalendlyBookingActions,
   getChatById,
+  getCollectLeadsActions,
   getCustomButtonActions,
   getMessagesByChatId,
   saveChat,
@@ -148,6 +149,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
           const organizationId = chatbotData.organizationId;
           const customButtonActions = await getCustomButtonActions(chatbotId);
           const calendlyActions = await getCalendlyBookingActions(chatbotId);
+          const collectLeadsActions = await getCollectLeadsActions(chatbotId);
 
           const stream = createUIMessageStream({
             execute: ({ writer: dataStream }) => {
@@ -159,6 +161,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                   chatbotPersonality,
                   customButtonActions,
                   calendlyActions,
+                  collectLeadsActions,
                 ),
                 messages: convertToModelMessages(uiMessages, {
                   ignoreIncompleteToolCalls: true,
@@ -169,7 +172,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                 tools: {
                   knowledge_base: knowledgeSearchTool(chatbotId),
                   collect_feedback: collectFeedbackTool,
-                  collect_leads: collectLeadsTool,
+                  collect_leads: collectLeadsTool(chatbotId),
                   custom_button: customButtonTool(chatbotId),
                   calendly_booking: calendlyBookingTool(chatbotId),
                   escalate_to_human: escalateToHumanTool({

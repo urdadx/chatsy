@@ -12,11 +12,11 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { FormSkeleton } from "./form-skeleton"
 
-interface CustomButtonFormProps {
+interface LeadsFormProps {
   actionId?: string
 }
 
-export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
+export function LeadsForm({ actionId }: LeadsFormProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
   const isEditing = !!actionId
@@ -33,8 +33,6 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
-  const [buttonText, setButtonText] = useState("")
-  const [destinationUrl, setDestinationUrl] = useState("")
   const [showInQuickMenu, setShowInQuickMenu] = useState(false)
 
   useEffect(() => {
@@ -42,12 +40,6 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
       setName(existingAction.name || "")
       setDescription(existingAction.description || "")
       setShowInQuickMenu(existingAction.showInQuickMenu || false)
-
-      const props = existingAction.actionProperties
-      if (props) {
-        setButtonText(props.buttonText || "")
-        setDestinationUrl(props.buttonUrl || "")
-      }
     }
   }, [existingAction])
 
@@ -57,10 +49,7 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
       description: string
       toolName: string
       showInQuickMenu: boolean
-      actionProperties: {
-        buttonText: string
-        buttonUrl: string
-      }
+      actionProperties?: Record<string, unknown>
     }) => {
       if (isEditing) {
         const response = await api.put(`/agent-actions/${actionId}`, actionData)
@@ -98,25 +87,12 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
       return
     }
 
-    if (!buttonText.trim()) {
-      toast.warning("Please enter button text")
-      return
-    }
-
-    if (!destinationUrl.trim()) {
-      toast.warning("Please enter a destination URL")
-      return
-    }
-
     createActionMutation.mutate({
       name: name.trim(),
       description: description.trim(),
-      toolName: "custom_button",
+      toolName: "collect_leads",
       showInQuickMenu,
-      actionProperties: {
-        buttonText: buttonText.trim(),
-        buttonUrl: destinationUrl.trim()
-      }
+      actionProperties: {}
     })
   }
 
@@ -158,7 +134,7 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
           </Button>
           <div className="flex-1">
             <h1 className="text-lg font-semibold text-foreground">
-              {isEditing ? 'Edit Custom Button' : 'Custom Button'}
+              {isEditing ? 'Edit Lead Collection' : 'Collect leads'}
             </h1>
 
           </div>
@@ -189,42 +165,10 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
           <Textarea
             autoComplete="false"
             id="description"
-            placeholder="Example: Use this action when the user wants to visit my website..."
+            placeholder="Example: Always execute this action at the beginning of the conversation immediately after the user's first message to show the form to collect user information..."
             className="w-full"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="button-text" className="text-sm font-medium">
-            Button text
-          </Label>
-          <Input
-            autoComplete="false"
-            id="button-text"
-            type="text"
-            placeholder="Enter text displayed on button"
-            className="w-full"
-            value={buttonText}
-            onChange={(e) => setButtonText(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="url" className="text-sm font-medium">
-            Destination URL
-          </Label>
-          <Input
-            autoComplete="false"
-            id="url"
-            type="url"
-            placeholder="Enter the URL to open when button is clicked"
-            className="w-full"
-            value={destinationUrl}
-            onChange={(e) => setDestinationUrl(e.target.value)}
             required
           />
         </div>

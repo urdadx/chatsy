@@ -47,7 +47,6 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
             return error.toResponse();
           }
 
-          // Get all actions
           const actions = await db
             .select()
             .from(Action)
@@ -175,9 +174,7 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
             return error.toResponse();
           }
 
-          const updateData: any = {
-            updatedAt: new Date(),
-          };
+          const updateData: any = {};
 
           if (typeof isActive === "boolean") {
             updateData.isActive = isActive;
@@ -220,7 +217,6 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
             { status: 200 },
           );
         } catch (error) {
-          console.error("Error updating action:", error);
           return new Response("Internal Server Error", { status: 500 });
         }
       }),
@@ -282,7 +278,6 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
             return error.toResponse();
           }
 
-          // Delete the action
           await db.delete(Action).where(eq(Action.id, actionId));
 
           return json(

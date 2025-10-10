@@ -1,13 +1,14 @@
 import { CalendlyForm } from '@/components/agents/forms/calendly-form'
 import { CustomButtonForm } from '@/components/agents/forms/custom-btn-form'
 import { FeedbackForm } from '@/components/agents/forms/feedback-form'
+import { LeadsForm } from '@/components/agents/forms/leads-form'
 import { ChatPreview } from '@/components/chat/chat-preview'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import z from 'zod'
 
 
 const actionTypeSchema = z.object({
-  actionType: z.enum(['calendly', 'custom-button', "feedback_form"]),
+  actionType: z.enum(['calendly', 'custom-button', "feedback_form", "collect_leads"]).optional(),
 })
 
 export const Route = createFileRoute('/admin/actions/new-action')({
@@ -26,6 +27,8 @@ function RouteComponent() {
         return <CustomButtonForm />
       case 'feedback_form':
         return <FeedbackForm />
+      case 'collect_leads':
+        return <LeadsForm />
       default:
         return (
           <div className="text-center text-gray-500">

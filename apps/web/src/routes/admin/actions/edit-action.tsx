@@ -1,6 +1,7 @@
 import { CalendlyForm } from '@/components/agents/forms/calendly-form'
 import { CustomButtonForm } from '@/components/agents/forms/custom-btn-form'
 import { FeedbackForm } from '@/components/agents/forms/feedback-form'
+import { LeadsForm } from '@/components/agents/forms/leads-form'
 import { ChatPreview } from '@/components/chat/chat-preview'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import z from 'zod'
@@ -28,6 +29,8 @@ function RouteComponent() {
         return <CalendlyForm actionId={actionId} />
       case 'feedback_form':
         return <FeedbackForm actionId={actionId} />
+      case 'collect_leads':
+        return <LeadsForm actionId={actionId} />
       default:
         return (
           <div className="w-full max-w-3xl bg-card rounded-lg border border-border shadow-xs p-6">

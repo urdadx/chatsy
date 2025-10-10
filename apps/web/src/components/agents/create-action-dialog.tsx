@@ -80,7 +80,7 @@ export const CreateActionDialog = () => {
       description: "Allow customers to book meetings via Calendly"
     },
     {
-      href: "/admin/actions/new-action",
+      href: "#",
       icon: <SolarBoltBoldDuotone color="#8b5cf6" className="w-6 h-6" />,
       title: "Custom workflow",
       description: "Add an action to trigger workflows or external integrations"
@@ -92,13 +92,13 @@ export const CreateActionDialog = () => {
       description: "Add a custom button action to trigger workflows or external integrations"
     },
     {
-      href: "/admin/actions/new-action",
+      href: "/admin/actions/new-action?actionType=collect_leads",
       icon: <SolarMagniferBoldDuotone color="#ec1313" className="w-6 h-6" />,
       title: "Collect leads",
       description: "Create a lead generation form to capture potential customer information"
     },
     {
-      href: "/admin/actions/new-action",
+      href: "#",
       icon: <SolarClipboardBoldDuotone color="#00ad69" className="w-6 h-6" />,
       title: "Custom form",
       description: "Create a custom form to collect information from customers with validation"

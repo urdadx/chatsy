@@ -4,6 +4,7 @@ import { chat, member, message } from "@/db/schema";
 import {
   getCalendlyBookingActions,
   getChatbotDataByPlatformIdentifier,
+  getCollectLeadsActions,
   getCustomButtonActions,
   getMessagesByChatId,
   saveMessages,
@@ -162,6 +163,7 @@ export const ServerRoute = createServerFileRoute(
       const chatbotPersonality = chatbotData.personality || "support";
       const customButtonActions = await getCustomButtonActions(chatbotData.id);
       const calendlyActions = await getCalendlyBookingActions(chatbotData.id);
+      const collectLeadsActions = await getCollectLeadsActions(chatbotData.id);
 
       const stream = createUIMessageStream({
         execute: ({ writer: dataStream }) => {
@@ -173,6 +175,7 @@ export const ServerRoute = createServerFileRoute(
               chatbotPersonality,
               customButtonActions,
               calendlyActions,
+              collectLeadsActions,
             ),
             messages: convertToModelMessages(uiMessages, {
               ignoreIncompleteToolCalls: true,
@@ -183,7 +186,7 @@ export const ServerRoute = createServerFileRoute(
             tools: {
               knowledge_base: knowledgeSearchTool(chatbotData.id),
               collect_feedback: collectFeedbackTool,
-              collect_leads: collectLeadsTool,
+              collect_leads: collectLeadsTool(chatbotData.id),
               custom_button: customButtonTool(chatbotData.id),
               calendly_booking: calendlyBookingTool(chatbotData.id),
               escalate_to_human: escalateToHumanTool({

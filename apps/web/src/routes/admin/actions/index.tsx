@@ -35,7 +35,7 @@ function RouteComponent() {
   }
 
   const {
-    data: actionsResponse,
+    data: actionData,
     isLoading,
     isError,
     error,
@@ -144,13 +144,12 @@ function RouteComponent() {
     deleteMutation.mutate(actionId);
   };
 
-  const actions: ActionType[] = actionsResponse?.actions || [];
+  const actions: ActionType[] = actionData?.actions || [];
 
   const filteredActions = actions.filter(
     (action) =>
       action.toolName !== "knowledge_base" &&
-      action.toolName !== "escalate_to_human" &&
-      action.toolName !== "collect_leads"
+      action.toolName !== "escalate_to_human"
   );
 
   if (isLoading) {

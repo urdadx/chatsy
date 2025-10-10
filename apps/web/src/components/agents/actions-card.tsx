@@ -3,11 +3,10 @@ import { SolarAtomBoldDuotone } from "@/assets/icons/atom-icon";
 import { SolarBoxMinimalisticBoldDuotone } from "@/assets/icons/box-icon";
 import { SolarChatRoundUnreadBoldDuotone } from "@/assets/icons/chat-doutone";
 import { SolarClipboardBoldDuotone } from "@/assets/icons/clipboard-icon";
+import { SolarMagniferBoldDuotone } from "@/assets/icons/glass-search-icon";
 import { SolarHeadphonesRoundBoldDuotone } from "@/assets/icons/support-duotone";
-import { SolarUsersGroupRoundedBoldDuotone } from "@/assets/icons/users-duotone";
 import type { ActionType } from "@/db/schema";
 import { useRouter } from "@tanstack/react-router";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import { ActionIcon } from "./action-icon";
@@ -30,7 +29,7 @@ const getIconForToolName = (toolName: string) => {
     ),
     collect_leads: (
       <ActionIcon>
-        <SolarUsersGroupRoundedBoldDuotone color="#2563eb" className="w-6 h-6 sm:w-8 sm:h-8 " />
+        <SolarMagniferBoldDuotone color="#ec1313" className="w-6 h-6 sm:w-8 sm:h-8 " />
       </ActionIcon>
     ),
     escalate_to_human: (

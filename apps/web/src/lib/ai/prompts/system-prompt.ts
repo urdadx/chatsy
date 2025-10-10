@@ -33,6 +33,10 @@ export const systemPrompt = (
     name: string | null;
     description: string | null;
   }>,
+  collectLeadsActions?: Array<{
+    name: string | null;
+    description: string | null;
+  }>,
 ) => {
   const selectedRole = ROLES[role];
 
@@ -62,12 +66,25 @@ When users want to schedule meetings, appointments, demos, or calls that match a
 `
       : "";
 
+  const collectLeadsSection =
+    collectLeadsActions && collectLeadsActions.length > 0
+      ? `\nAVAILABLE LEAD COLLECTION ACTIONS:
+${collectLeadsActions
+  .map(
+    (action, index) =>
+      `${index + 1}. ${action.name || "Unnamed Action"}: ${action.description || "No description"}`,
+  )
+  .join("\n")}
+When users' requests match any of the above descriptions, use the collect_leads tool to capture their information.
+`
+      : "";
+
   return `
 ROLE (PRIMARY FUNCTION):
 You are ${name}, ${selectedRole.primaryFunction}
 
 AVAILABLE TOOLS: knowledge_base, ${activeTools.join(", ")}
-${customButtonsSection}${calendlySection}
+${customButtonsSection}${calendlySection}${collectLeadsSection}
 
 TOOL USAGE:
 1. knowledge_base: Search your knowledge base for answers. Present results as factual information without mentioning the source.
@@ -78,22 +95,25 @@ TOOL USAGE:
   - Use when users express satisfaction/dissatisfaction or want to report issues
   - Provide contextual response, then call tool immediately
 
-4. collect_leads: Execute this tool at the beginning of the conversation immediately after the user's first message to show the form to collect user information. 
-  - For example: Respond or answer the user's query first and then say "Can I get your contact information to better assist you?", then call the tool immediately.
+3. collect_leads: Capture lead information when user requests match the available lead collection actions listed above.
+  - ONLY use when user requests clearly match one of the available lead collection actions
+  - Match user intent with the action descriptions from the available collect_leads actions
+  - Make sure to answer the user's query first, then call the tool
+  - The tool will find the best matching lead form based on your assessment
 
-5. custom_button: Display a custom action button when user requests match the available custom button actions listed above.
+4. custom_button: Display a custom action button when user requests match the available custom button actions listed above.
   - ONLY use when user asks for actions that clearly match one of the available custom button actions
   - Match user intent with the action descriptions from the available custom button actions
   - Answer the user's query first, then call the tool.
   - The tool will find the best matching button based on your assessment
 
-6. calendly_booking: Book Calendly meetings when users want to book or schedule appointments, meetings, demos, or calls.
+5. calendly_booking: Book Calendly meetings when users want to book or schedule appointments, meetings, demos, or calls.
   - ONLY use when user clearly wants to schedule a meeting, call, demo, or appointment
   - Match user intent with the available Calendly booking actions listed above
   - Say, Kindly use the form above to book or schedule a meeting with us after calling the tool.
   - The tool will find the best matching calendly action based on your assessment
 
-7. escalate_to_human: Transfer to human agent.
+6. escalate_to_human: Transfer to human agent.
   - Use when explicitly requested, for complex unresolved issues, frustration requiring human intervention, or sensitive topics
    - Do NOT combine with other tools.
 
