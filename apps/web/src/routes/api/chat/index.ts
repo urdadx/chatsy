@@ -14,6 +14,7 @@ import {
 import { getActiveTools } from "@/lib/ai/get-active-tools";
 import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
 import { google } from "@/lib/ai/providers";
+import { cache } from "@/lib/ai/tool-cache";
 import { calendlyBookingTool } from "@/lib/ai/tools/calendly-booking-tool";
 import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback-tool";
 import { collectLeadsTool } from "@/lib/ai/tools/collect-leads-tool";
@@ -35,8 +36,8 @@ import {
   stepCountIs,
   streamText,
 } from "ai";
-import { auth, polarClient } from "auth";
 import { eq } from "drizzle-orm";
+import { auth, polarClient } from "../../../../auth";
 
 export const ServerRoute = createServerFileRoute("/api/chat/").methods(
   (api) => ({
@@ -170,16 +171,18 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                 stopWhen: stepCountIs(5),
                 experimental_transform: smoothStream({ chunking: "word" }),
                 tools: {
-                  knowledge_base: knowledgeSearchTool(chatbotId),
-                  collect_feedback: collectFeedbackTool,
-                  collect_leads: collectLeadsTool(chatbotId),
-                  custom_button: customButtonTool(chatbotId),
-                  calendly_booking: calendlyBookingTool(chatbotId),
-                  escalate_to_human: escalateToHumanTool({
-                    chatId: id,
-                    chatbotId,
-                    organizationId,
-                  }),
+                  knowledge_base: cache(knowledgeSearchTool(chatbotId)),
+                  collect_feedback: cache(collectFeedbackTool),
+                  collect_leads: cache(collectLeadsTool(chatbotId)),
+                  custom_button: cache(customButtonTool(chatbotId)),
+                  calendly_booking: cache(calendlyBookingTool(chatbotId)),
+                  escalate_to_human: cache(
+                    escalateToHumanTool({
+                      chatId: id,
+                      chatbotId,
+                      organizationId,
+                    }),
+                  ),
                 },
                 onFinish: async ({ usage }) => {
                   await polarClient.events.ingest({

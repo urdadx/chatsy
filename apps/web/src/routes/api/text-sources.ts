@@ -3,9 +3,9 @@ import { textSource } from "@/db/schema";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const createTextSourceSchema = z.object({
   title: z.string().min(1),
@@ -13,7 +13,7 @@ const createTextSourceSchema = z.object({
 });
 
 const updateTextSourceSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   title: z.string().optional(),
   content: z.string().optional(),
 });

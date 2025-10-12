@@ -1,6 +1,6 @@
 import { authClient } from "@/lib/auth-client";
 import { getHeaders } from "@tanstack/react-start/server";
-import { auth } from "auth";
+import { auth } from "../../../auth";
 
 export interface SubscriptionTier {
   name: string;

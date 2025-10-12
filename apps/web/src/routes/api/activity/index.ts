@@ -3,9 +3,9 @@ import { feedback, issueReport, lead } from "@/db/schema";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { desc, eq, sql } from "drizzle-orm";
 import { unionAll } from "drizzle-orm/pg-core";
+import { auth } from "../../../../auth";
 
 export const ServerRoute = createServerFileRoute("/api/activity/").methods({
   GET: async ({ request }) => {

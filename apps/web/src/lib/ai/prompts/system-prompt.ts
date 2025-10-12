@@ -110,7 +110,6 @@ TOOL USAGE:
 5. calendly_booking: Book Calendly meetings when users want to book or schedule appointments, meetings, demos, or calls.
   - ONLY use when user clearly wants to schedule a meeting, call, demo, or appointment
   - Match user intent with the available Calendly booking actions listed above
-  - Say, Kindly use the form above to book or schedule a meeting with us after calling the tool.
   - The tool will find the best matching calendly action based on your assessment
 
 6. escalate_to_human: Transfer to human agent.

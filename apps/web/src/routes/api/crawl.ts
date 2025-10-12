@@ -2,12 +2,11 @@ import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const crawlRequestSchema = z.object({
   url: z.string().min(1),
-  // chatbotId is optional since we get it from session
   chatbotId: z.string().min(1).optional(),
 });
 
@@ -39,8 +38,6 @@ export const ServerRoute = createServerFileRoute("/api/crawl").methods({
     }
 
     const { url, chatbotId: requestChatbotId } = parsed.data;
-
-    // Use chatbotId from request if provided, otherwise use active chatbot from session
     const chatbotId = requestChatbotId || activeChatbotId;
 
     if (!chatbotId) {
@@ -52,14 +49,11 @@ export const ServerRoute = createServerFileRoute("/api/crawl").methods({
       });
       const fullUrl = url.startsWith("http") ? url : `https://${url}`;
 
-      // Get the webhook URL - use WEBHOOK_BASE_URL if set (for ngrok), otherwise construct from request
       const requestUrl = new URL(request.url);
       const baseUrl =
         `${requestUrl.protocol}//${requestUrl.host}` ||
         process.env.WEBHOOK_BASE_URL!;
       const webhookUrl = `${baseUrl}/api/firecrawl-webhook`;
-
-      console.log("Using webhook URL:", webhookUrl);
 
       const response = (await client.asyncCrawlUrl(fullUrl, {
         limit: 100,
@@ -78,7 +72,6 @@ export const ServerRoute = createServerFileRoute("/api/crawl").methods({
 
       console.log("Async crawl response:", response);
 
-      // Return the job ID for tracking
       return json({
         success: true,
         jobId: response.id,

@@ -4,16 +4,16 @@ import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const scrapeRequestSchema = z.object({
   url: z.string().min(1),
 });
 
 const deleteRequestSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
 });
 
 export const ServerRoute = createServerFileRoute("/api/scrape").methods({

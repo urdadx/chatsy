@@ -3,8 +3,8 @@ import { visitorAnalytics } from "@/db/schema";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { and, count, desc, eq, gte, isNotNull } from "drizzle-orm";
+import { auth } from "../../../auth";
 
 interface AnalyticsData {
   totalVisits: number;

@@ -1,6 +1,6 @@
 import type { Subscription } from "@polar-sh/sdk/models/components/subscription.js";
 import { getHeaders } from "@tanstack/react-start/server";
-import { auth } from "auth";
+import { auth } from "../../../auth";
 
 // get the external customer ID from the active subscription
 export const getCustomerExternalId = async () => {

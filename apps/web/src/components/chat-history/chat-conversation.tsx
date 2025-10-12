@@ -59,6 +59,7 @@ export const ChatConversation = () => {
                       isLoading={false}
                       vote={undefined}
                       showActions={false}
+                      showToolDetails={true}
                     />
                   </div>
                 ))}

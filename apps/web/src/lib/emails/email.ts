@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import OrganizationInvitationEmail from "./invitation-template";
+import ResetPasswordEmail from "./reset-password-template";
 import VerificationEmail from "./verification-email-template";
 
 export const resendClient = new Resend(process.env.RESEND_API_KEY!);
@@ -16,6 +17,12 @@ interface VerificationEmailData {
   email: string;
   username: string;
   verificationLink: string;
+}
+
+interface ResetPasswordEmailData {
+  email: string;
+  username: string;
+  resetLink: string;
 }
 
 export async function sendOrganizationInvitations(
@@ -55,7 +62,6 @@ export async function sendOrganizationInvitation(
   return sendOrganizationInvitations([data]);
 }
 
-
 export async function sendVerificationEmail(data: VerificationEmailData) {
   try {
     const { data: result, error } = await resendClient.emails.send({
@@ -81,4 +87,27 @@ export async function sendVerificationEmail(data: VerificationEmailData) {
   }
 }
 
+export async function sendResetPasswordEmail(data: ResetPasswordEmailData) {
+  try {
+    const { data: result, error } = await resendClient.emails.send({
+      from: "Padyna <reset@padyna.com>",
+      to: [data.email],
+      subject: "Reset your password",
+      react: ResetPasswordEmail({
+        username: data.username,
+        resetLink: data.resetLink,
+      }),
+    });
 
+    if (error) {
+      console.error("Error sending password reset email:", error);
+      throw new Error("Failed to send password reset email");
+    }
+
+    console.log("Password reset email sent successfully:", result);
+    return result;
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    throw error;
+  }
+}

@@ -76,8 +76,8 @@ export const ChatLogItem = ({
       <div
         onClick={onClick}
         className={cn(
-          "flex cursor-pointer items-start w-full sm:w-[350px] space-x-3 p-4 hover:bg-gray-50 border-b border-gray-100 group",
-          isSelected && "bg-gray-50 ",
+          "flex cursor-pointer mb-2 rounded-md items-start w-full space-x-3 p-4 hover:bg-gray-50  border-gray-100 group",
+          isSelected && "bg-gray-50 rounded-md shadow-xs",
         )}
       >
         <div className="flex-shrink-0 border-2 rounded-full border-primary">

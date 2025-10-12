@@ -30,8 +30,8 @@ import {
   stepCountIs,
   streamText,
 } from "ai";
-import { polarClient } from "auth";
 import { and, eq } from "drizzle-orm";
+import { polarClient } from "../../../../../auth";
 
 export const ServerRoute = createServerFileRoute(
   "/api/embed/chat/$platformIdentifier",
@@ -116,15 +116,11 @@ export const ServerRoute = createServerFileRoute(
         let channel: "web" | "widget" = "widget";
 
         if (referer.includes("/talk/")) {
-          // Bio page / link-in-bio
-          channel = "web";
         } else if (referer.includes("/bubble/")) {
-          // Embedded chat widget (bubble)
           channel = "widget";
         } else {
           channel = "widget";
         }
-
         await db
           .insert(chat)
           .values({

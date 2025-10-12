@@ -3,6 +3,7 @@ import * as schema from "@/db/schema";
 import { Action, chatbot, session, user } from "@/db/schema";
 import {
   sendOrganizationInvitation,
+  sendResetPasswordEmail,
   sendVerificationEmail,
 } from "@/lib/emails/email";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
@@ -82,6 +83,17 @@ export const auth = betterAuth({
     },
   },
 
+  emailAndPassword: {
+    enabled: true,
+    sendResetPassword: async ({ user, url }: { user: any; url: string }) => {
+      await sendResetPasswordEmail({
+        email: user.email,
+        username: user.name,
+        resetLink: url,
+      });
+    },
+  },
+
   account: {
     accountLinking: {
       enabled: true,
@@ -128,9 +140,6 @@ export const auth = betterAuth({
     "http://192.168.181.95:3001/",
   ],
   appName: "padyna",
-  emailAndPassword: {
-    enabled: true,
-  },
   advanced: {
     database: {
       generateId: () => uuidv4(),

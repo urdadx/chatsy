@@ -2,7 +2,6 @@ import { db } from "@/db";
 import { Action, chat, chatbot, member, message, vote } from "@/db/schema";
 import type { Chat, DBMessage } from "@/db/schema";
 import type { CustomerSubscription } from "@polar-sh/sdk/models/components/customersubscription.js";
-import { auth } from "auth";
 import {
   type SQL,
   and,
@@ -15,6 +14,7 @@ import {
   inArray,
   lt,
 } from "drizzle-orm";
+import { auth } from "../../../auth";
 import { ChatSDKError } from "../errors";
 import type { VisibilityType } from "../types";
 

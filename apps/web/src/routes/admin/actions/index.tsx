@@ -1,7 +1,7 @@
 import { ActionCard } from "@/components/agents/actions-card";
 import { CreateActionDialog } from "@/components/agents/create-action-dialog";
-import { CalIntegrationCard } from "@/components/integrations/cal-card";
 import { CalendlyIntegrationCard } from "@/components/integrations/calendly-card";
+import { SlackCard } from "@/components/integrations/slack-card";
 import { WhatsappIntegrationCard } from "@/components/integrations/whatsapp-card";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
@@ -231,7 +231,7 @@ function RouteComponent() {
             </div>
             <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <CalendlyIntegrationCard />
-              <CalIntegrationCard />
+              <SlackCard />
               <WhatsappIntegrationCard />
             </div>
           </TabsContent>

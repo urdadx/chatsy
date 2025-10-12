@@ -1,18 +1,11 @@
-import { Button } from "@/components/ui/button";
-import Spinner from "@/components/ui/spinner";
-import { useChatHistory } from "@/hooks/use-chat-history";
-import {
-  createFileRoute,
-  useNavigate,
-  useSearch,
-} from "@tanstack/react-router";
-import { RefreshCw } from "lucide-react";
-import { useEffect } from "react";
-
 import { SolarRoundedMagniferZoomInBoldDuotone } from "@/assets/icons/search-icon";
+import { AssignAgentDialog } from "@/components/chat-history/assign-agent-dialog";
 import { ChatConversation } from "@/components/chat-history/chat-conversation";
+import { ChatDetailsDialog } from "@/components/chat-history/chat-details-dialog";
+import { ChatFilterDialog } from "@/components/chat-history/chat-filter-dialog";
 import { ChatLogItem } from "@/components/chat-history/chat-log-item";
 import { ChatLogItemSkeleton } from "@/components/chat-history/chat-log-item-skeleton";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
@@ -20,14 +13,16 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import Spinner from "@/components/ui/spinner";
+import { useChatHistory } from "@/hooks/use-chat-history";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  createFileRoute,
+  useNavigate,
+  useSearch,
+} from "@tanstack/react-router";
+import { Info, RotateCcw } from "lucide-react";
+import { useEffect } from "react";
 import { useState } from "react";
 import z from "zod";
 
@@ -83,62 +78,45 @@ function RouteComponent() {
     });
   };
 
-  const handleFilterChange = (value: string) => {
+  const handleApplyFilters = (
+    newFilter: "24h" | "7d" | "30d" | "90d" | "all",
+    newStatus: "all" | "unresolved" | "resolved" | "escalated"
+  ) => {
     navigate({
       search: {
-        filter: value as "24h" | "7d" | "30d" | "90d",
+        filter: newFilter,
+        status: newStatus,
         chatId: undefined,
-        status,
       },
     });
   };
 
-  const handleStatusChange = (value: string) => {
-    navigate({
-      search: {
-        status: value as "all" | "unresolved" | "resolved" | "escalated",
-        filter,
-        chatId: undefined,
-      },
-    });
-  };
+  if (isLoading) {
+    return (
+      <div className="w-full min-h-screen mx-auto p-1 sm:p-4 flex items-center justify-center">
+        <Spinner size={28} className="text-primary" />
+      </div>
+    )
+  }
 
   if (!isLoading && !isError && chats.length === 0) {
     return (
-      <div className="max-w-5xl lg:max-w-6xl w-full h-[90vh] mx-auto p-1 sm:p-4">
+      <div className=" w-full h-[90vh] mx-auto p-1 sm:p-4">
         <div className="bg-white border rounded-xl py-2 h-full flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white rounded-t-3xl">
-            <h1 className="text-xl font-semibold hidden sm:flex">Chat History</h1>
+            <h1 className="text-xl font-semibold hidden sm:flex">Chat Logs</h1>
             <div className="flex items-center space-x-3">
-              <Select value={filter} onValueChange={handleFilterChange}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="24h">Last 24 hours</SelectItem>
-                  <SelectItem value="7d">Last 7 days</SelectItem>
-                  <SelectItem value="30d">Last month</SelectItem>
-                  <SelectItem value="90d">Last 3 months</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={status} onValueChange={handleStatusChange}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="unresolved">Unresolved</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                  <SelectItem value="escalated">Escalated</SelectItem>
-                </SelectContent>
-              </Select>
+              <ChatFilterDialog
+                currentFilter={filter}
+                currentStatus={status}
+                onApplyFilters={handleApplyFilters}
+              />
               <Button
                 variant="outline"
                 className="text-gray-600"
                 onClick={() => refetch()}
               >
-                <RefreshCw className="h-4 w-4" />
+                <RotateCcw className="h-4 w-4" />
                 Refresh
               </Button>
             </div>
@@ -158,97 +136,89 @@ function RouteComponent() {
 
   return (
     <>
-      <div className="max-w-5xl lg:max-w-6xl w-full h-[90vh] mx-auto p-1 sm:p-6">
-        <div className="bg-white border rounded-xl py-2 h-full flex flex-col overflow-hidden">
-          {/* Chat Header */}
-          <div className="w-full flex items-center gap-2 justify-between px-4 pt-1 pb-2 border-b bg-white rounded-t-3xl">
-            <div className="flex items-center space-x-3 relative">
-              <h1 className="text-xl font-semibold">Chat History</h1>
-            </div>{" "}
-            <div className="flex items-center space-x-3">
-              <Select value={status} onValueChange={handleStatusChange}>
-                <SelectTrigger className="w-full sm:w-[160px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="unresolved">Unresolved</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                  <SelectItem value="escalated">Escalated</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className="relative">
-                <Select value={filter} onValueChange={handleFilterChange}>
-                  <SelectTrigger className="w-full sm:w-[200px]">
-                    <SelectValue placeholder="Filter" />
-                  </SelectTrigger>
+      <div className=" w-full h-[90vh] mx-auto ">
 
-                  <SelectContent>
-                    <SelectItem value="24h">Last 24 hours</SelectItem>
-                    <SelectItem value="7d">Last 7 days</SelectItem>
-                    <SelectItem value="30d">Last month</SelectItem>
-                    <SelectItem value="90d">Last 3 months</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
+        <div className="bg-white h-full flex flex-col overflow-hidden">
+
           <div className="flex flex-row flex-1 min-h-0">
             {/* Sidebar */}
-            <div className={`${isMobile ? "w-full" : "w-96"} bg-white`}>
-              <ScrollArea
-                className="h-full p-1"
-                onScroll={(e) => {
-                  const el = e.currentTarget;
-                  const nearBottom =
-                    el.scrollTop + el.clientHeight >= el.scrollHeight - 100;
-
-                  if (nearBottom && hasNextPage && !isFetchingNextPage) {
-                    fetchNextPage();
-                  }
-                }}
-              >
-                {isLoading && chats.length === 0 && <ChatLogItemSkeleton />}
-
-                {isError && (
-                  <div className="flex flex-col justify-center items-center h-full space-y-2">
-                    <p className="text-center text-red-500 py-4">
-                      Failed to load logs.
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => refetch()}
-                    >
-                      Try Again
-                    </Button>
-                  </div>
-                )}
-
-                {chats?.map((chat) => (
-                  <ChatLogItem
-                    key={chat.id}
-                    id={chat.id}
-                    status={chat.status}
-                    userId={chat.userId}
-                    onClick={() => handleChatIdChange(chat.id)}
-                    title={chat.title || "Untitled Chat"}
-                    isSelected={chatId === chat.id}
-                    description={`${new Date(chat.createdAt).toLocaleDateString()}`}
+            <div className=" flex flex-col gap-2 p-2 py-4">
+              <div className="flex items-center mb-2 justify-between">
+                <h1 className="text-xl font-semibold hidden sm:flex">Chat Logs</h1>
+                <div className="flex items-center space-x-2 ">
+                  <Button
+                    variant="outline"
+                    className="text-gray-600"
+                    onClick={() => refetch()}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                  </Button>
+                  <ChatFilterDialog
+                    currentFilter={filter}
+                    currentStatus={status}
+                    onApplyFilters={handleApplyFilters}
                   />
-                ))}
+                </div>
+              </div>
+              <div className={`${isMobile ? "w-[96vw]" : "w-96"} bg-white`}>
+                <ScrollArea
+                  className="h-full "
+                  onScroll={(e) => {
+                    const el = e.currentTarget;
+                    const nearBottom =
+                      el.scrollTop + el.clientHeight >= el.scrollHeight - 100;
 
-                {isFetchingNextPage && (
-                  <div className="flex justify-center py-4">
-                    <Spinner className="text-primary" />
-                  </div>
-                )}
-              </ScrollArea>
+                    if (nearBottom && hasNextPage && !isFetchingNextPage) {
+                      fetchNextPage();
+                    }
+                  }}
+                >
+                  {isLoading && chats.length === 0 && <ChatLogItemSkeleton />}
+
+                  {isError && (
+                    <div className="flex flex-col justify-center items-center h-full space-y-2">
+                      <p className="text-center text-red-500 py-4">
+                        Failed to load logs.
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => refetch()}
+                      >
+                        Try Again
+                      </Button>
+                    </div>
+                  )}
+
+                  {chats?.map((chat) => (
+                    <ChatLogItem
+                      key={chat.id}
+                      id={chat.id}
+                      status={chat.status}
+                      userId={chat.userId}
+                      onClick={() => handleChatIdChange(chat.id)}
+                      title={chat.title || "Untitled Chat"}
+                      isSelected={chatId === chat.id}
+                      description={`${new Date(chat.createdAt).toLocaleDateString()}`}
+                    />
+                  ))}
+
+                  {isFetchingNextPage && (
+                    <div className="flex justify-center py-4">
+                      <Spinner className="text-primary" />
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
             </div>
 
             {/* Main conversation area - hidden on mobile */}
             {!isMobile && (
               <div className="flex w-full border-l flex-col relative overflow-hidden">
+                <div className="flex border-b justify-end items-center space-x-3 p-2">
+                  <AssignAgentDialog />
+                  <ChatDetailsDialog chatId={chatId} />
+                </div>
                 {chatId ? (
                   <ChatConversation />
                 ) : (

@@ -5,9 +5,9 @@ import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { subscriptionMiddleware } from "@/middlewares";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { eq } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../../auth";
 
 const createActionSchema = z.object({
   name: z.string().min(1, "Name is required"),

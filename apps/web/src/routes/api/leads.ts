@@ -2,9 +2,9 @@ import { db } from "@/db";
 import { chatbot, lead } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { eq } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const leadSchema = z.object({
   name: z.string().min(1),

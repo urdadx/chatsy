@@ -2,9 +2,9 @@ import { db } from "@/db";
 import { chatbot, issueReport } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { eq } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const issueReportSchema = z.object({
   title: z.string().optional().nullable(),

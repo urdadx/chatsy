@@ -5,15 +5,15 @@ import { deleteFileFromStorage } from "@/lib/hooks/delete-from-storage";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const createDocumentSourceSchema = z.object({
   name: z.string().min(1),
   type: z.string().min(1),
   size: z.number().min(1),
-  url: z.string().url(),
+  url: z.string(),
 });
 
 const deleteDocumentSourceSchema = z.object({

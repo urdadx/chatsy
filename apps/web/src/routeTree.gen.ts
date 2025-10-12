@@ -30,8 +30,10 @@ import { Route as AdminKnowledgeBaseRouteImport } from './routes/admin/knowledge
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as authVerifyEmailRouteImport } from './routes/(auth)/verify-email'
 import { Route as authSetupRouteImport } from './routes/(auth)/setup'
+import { Route as authResetPasswordRouteImport } from './routes/(auth)/reset-password'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
+import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as AdminChatHistoryIndexRouteImport } from './routes/admin/chat-history/index'
 import { Route as AdminActivityIndexRouteImport } from './routes/admin/activity/index'
 import { Route as AdminActionsIndexRouteImport } from './routes/admin/actions/index'
@@ -180,6 +182,11 @@ const authSetupRoute = authSetupRouteImport.update({
   path: '/setup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const authResetPasswordRoute = authResetPasswordRouteImport.update({
+  id: '/(auth)/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const authRegisterRoute = authRegisterRouteImport.update({
   id: '/(auth)/register',
   path: '/register',
@@ -188,6 +195,11 @@ const authRegisterRoute = authRegisterRouteImport.update({
 const authLoginRoute = authLoginRouteImport.update({
   id: '/(auth)/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
+  id: '/(auth)/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminChatHistoryIndexRoute = AdminChatHistoryIndexRouteImport.update({
@@ -467,8 +479,10 @@ export interface FileRoutesByFullPath {
   '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
   '/test': typeof TestRoute
+  '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/reset-password': typeof authResetPasswordRoute
   '/setup': typeof authSetupRoute
   '/verify-email': typeof authVerifyEmailRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -495,8 +509,10 @@ export interface FileRoutesByTo {
   '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
   '/test': typeof TestRoute
+  '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/reset-password': typeof authResetPasswordRoute
   '/setup': typeof authSetupRoute
   '/verify-email': typeof authVerifyEmailRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -524,8 +540,10 @@ export interface FileRoutesById {
   '/choose-plan': typeof ChoosePlanRoute
   '/success': typeof SuccessRoute
   '/test': typeof TestRoute
+  '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
+  '/(auth)/reset-password': typeof authResetPasswordRoute
   '/(auth)/setup': typeof authSetupRoute
   '/(auth)/verify-email': typeof authVerifyEmailRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -554,8 +572,10 @@ export interface FileRouteTypes {
     | '/choose-plan'
     | '/success'
     | '/test'
+    | '/forgot-password'
     | '/login'
     | '/register'
+    | '/reset-password'
     | '/setup'
     | '/verify-email'
     | '/admin/analytics'
@@ -582,8 +602,10 @@ export interface FileRouteTypes {
     | '/choose-plan'
     | '/success'
     | '/test'
+    | '/forgot-password'
     | '/login'
     | '/register'
+    | '/reset-password'
     | '/setup'
     | '/verify-email'
     | '/admin/analytics'
@@ -610,8 +632,10 @@ export interface FileRouteTypes {
     | '/choose-plan'
     | '/success'
     | '/test'
+    | '/(auth)/forgot-password'
     | '/(auth)/login'
     | '/(auth)/register'
+    | '/(auth)/reset-password'
     | '/(auth)/setup'
     | '/(auth)/verify-email'
     | '/admin/analytics'
@@ -639,8 +663,10 @@ export interface RootRouteChildren {
   ChoosePlanRoute: typeof ChoosePlanRoute
   SuccessRoute: typeof SuccessRoute
   TestRoute: typeof TestRoute
+  authForgotPasswordRoute: typeof authForgotPasswordRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
+  authResetPasswordRoute: typeof authResetPasswordRoute
   authSetupRoute: typeof authSetupRoute
   authVerifyEmailRoute: typeof authVerifyEmailRoute
   BubbleWidgetIdRoute: typeof BubbleWidgetIdRoute
@@ -1118,6 +1144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(auth)/reset-password': {
+      id: '/(auth)/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof authResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)/register': {
       id: '/(auth)/register'
       path: '/register'
@@ -1130,6 +1163,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof authLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/forgot-password': {
+      id: '/(auth)/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof authForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/chat-history/': {
@@ -1528,8 +1568,10 @@ const rootRouteChildren: RootRouteChildren = {
   ChoosePlanRoute: ChoosePlanRoute,
   SuccessRoute: SuccessRoute,
   TestRoute: TestRoute,
+  authForgotPasswordRoute: authForgotPasswordRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
+  authResetPasswordRoute: authResetPasswordRoute,
   authSetupRoute: authSetupRoute,
   authVerifyEmailRoute: authVerifyEmailRoute,
   BubbleWidgetIdRoute: BubbleWidgetIdRoute,

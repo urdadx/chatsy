@@ -4,9 +4,9 @@ import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { checkMemberInvitationLimits } from "@/lib/subscription/subscription-utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { count, eq } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const inviteMemberSchema = z.object({
   email: z.email("Invalid email address"),

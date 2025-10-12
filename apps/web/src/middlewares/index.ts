@@ -2,7 +2,7 @@ import { getCustomerExternalId } from "@/lib/subscription/subscription-functions
 import type { CustomerSubscription } from "@polar-sh/sdk/models/components/customersubscription.js";
 import { createMiddleware } from "@tanstack/react-start";
 import { getHeaders } from "@tanstack/react-start/server";
-import { auth, polarClient } from "auth";
+import { auth, polarClient } from "../../auth";
 
 interface SubscriptionContext {
   subscription: CustomerSubscription | undefined;

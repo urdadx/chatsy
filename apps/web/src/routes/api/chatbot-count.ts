@@ -3,8 +3,8 @@ import { chatbot } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { count, eq } from "drizzle-orm";
+import { auth } from "../../../auth";
 
 export const ServerRoute = createServerFileRoute("/api/chatbot-count").methods({
   GET: async ({ request }) => {

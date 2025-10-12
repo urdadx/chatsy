@@ -20,8 +20,8 @@ import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { subscriptionMiddleware } from "@/middlewares";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { and, eq, gt, or } from "drizzle-orm";
+import { auth } from "../../../auth";
 
 export const ServerRoute = createServerFileRoute("/api/train-agent").methods(
   (api) => ({

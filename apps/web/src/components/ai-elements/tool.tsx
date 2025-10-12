@@ -7,9 +7,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import { RiCheckboxCircleFill } from "@remixicon/react";
 import type { ToolUIPart } from "ai";
 import {
-  CheckCircleIcon,
   ChevronDownIcon,
   CircleIcon,
   ClockIcon,
@@ -44,7 +44,7 @@ const getStatusBadge = (status: ToolUIPart["state"]) => {
   const icons = {
     "input-streaming": <CircleIcon className="size-4" />,
     "input-available": <ClockIcon className="size-4 animate-pulse" />,
-    "output-available": <CheckCircleIcon className="size-4 text-green-600" />,
+    "output-available": <RiCheckboxCircleFill className="size-4 text-green-600" />,
     "output-error": <XCircleIcon className="size-4 text-red-600" />,
   } as const;
 
@@ -70,7 +70,7 @@ export const ToolHeader = ({
     {...props}
   >
     <div className="flex items-center gap-2">
-      <span className="font-medium text-sm">{type === "tool-escalate_to_human" ? "Connecting to human agent" : type}</span>
+      <span className="font-medium text-sm">{type === "tool-escalate_to_human" ? "Connected to human agent" : type}</span>
       {getStatusBadge(state)}
     </div>
     <ChevronDownIcon className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
@@ -82,7 +82,7 @@ export type ToolContentProps = ComponentProps<typeof CollapsibleContent>;
 export const ToolContent = ({ className, ...props }: ToolContentProps) => (
   <CollapsibleContent
     className={cn(
-      "data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in",
+      "w-full sm:w-[500px] data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in",
       className
     )}
     {...props}

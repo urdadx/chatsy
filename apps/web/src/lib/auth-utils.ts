@@ -1,7 +1,7 @@
 import type { Subscription } from "@polar-sh/sdk/models/components/subscription.js";
 import { createServerFn } from "@tanstack/react-start";
 import { getHeaders } from "@tanstack/react-start/server";
-import { auth, polarClient } from "auth";
+import { auth, polarClient } from "../../auth";
 import { getCustomerExternalId } from "./subscription/subscription-functions";
 
 export const getSession = createServerFn().handler(async () => {

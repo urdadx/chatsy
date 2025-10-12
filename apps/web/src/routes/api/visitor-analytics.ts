@@ -3,9 +3,9 @@ import { visitorAnalytics } from "@/db/schema";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const analyticsSchema = z.object({
   chatbotId: z.string().min(1),

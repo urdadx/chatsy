@@ -19,7 +19,7 @@ interface LoginFormData {
   password: string;
 }
 
-export function LoginForm({ 
+export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -36,7 +36,7 @@ export function LoginForm({
   useEffect(() => {
     const lastLoginInfo = getLastLoginMethod();
     setLastLogin(lastLoginInfo);
-    
+
     // Pre-fill email if user last signed in with email
     if (lastLoginInfo?.method === 'email' && lastLoginInfo.email) {
       setValue('email', lastLoginInfo.email);
@@ -157,7 +157,7 @@ export function LoginForm({
                   <div className="flex items-center">
                     <Label htmlFor="password">Password</Label>
                     <Link
-                      to="/"
+                      to="/forgot-password"
                       className="ml-auto text-sm text-muted-foreground underline-offset-4 hover:underline"
                     >
                       Forgot your password?
@@ -209,7 +209,7 @@ export function LoginForm({
                       </>
                     )}
                   </Button>
-                 
+
                 </motion.div>
               </div>
               <div className="text-center text-sm">

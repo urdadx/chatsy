@@ -1,8 +1,8 @@
-import CalLogo from "@/assets/cal.avif"
+import SlackIcon from "@/assets/slack.png"
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 
-export const CalIntegrationCard = () => {
+export const SlackCard = () => {
 
   return (
     <>
@@ -10,7 +10,7 @@ export const CalIntegrationCard = () => {
         <div className="flex flex-col gap-3 sm:gap-4 h-full">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <img className="size-9" src={CalLogo} alt="integration-icon" />
+              <img className="size-9" src={SlackIcon} alt="integration-icon" />
             </div>
             {/* show this when connected */}
             {/* <div className="flex items-center gap-2">
@@ -23,9 +23,9 @@ export const CalIntegrationCard = () => {
             </div> */}
 
           </div>
-          <h3 className="font-medium text-sm sm:text-md">Cal.com</h3>
+          <h3 className="font-medium text-sm sm:text-md">Slack</h3>
           <p className="text-gray-600 text-xs sm:text-sm flex-grow">
-            Connect your bot to Cal.com to manage bookings and meetings.
+            Send notifications to your Slack channel about important events and updates.
           </p>
           <Button className="w-fit rounded-sm" variant="outline">
             Connect

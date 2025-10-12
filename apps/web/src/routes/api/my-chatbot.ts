@@ -10,10 +10,10 @@ import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { checkSubscriptionLimits } from "@/lib/subscription/subscription-utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth, createDefaultActions } from "auth";
 import { count, eq, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
+import { auth, createDefaultActions } from "../../../auth";
 
 const createChatbotSchema = z.object({
   name: z.string().min(1, "Name is required"),

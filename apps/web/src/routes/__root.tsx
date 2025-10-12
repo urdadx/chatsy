@@ -82,6 +82,7 @@ function RootDocument() {
           <Toaster richColors theme="light" />
         </RetrainingBannerProvider>
         <Scripts />
+
         {isDevelopment && <ReactQueryDevtools position="left" initialIsOpen={false} />}
       </body>
     </html>

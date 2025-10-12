@@ -4,6 +4,7 @@ import {
   MessageContent,
 } from "@/components/ai-elements/message";
 import { Response } from '@/components/ai-elements/response';
+import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
 import type { Vote } from "@/db/schema";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { CalendlyBooking } from "@/lib/ai/tools-ui/calendly-booking";
@@ -27,6 +28,7 @@ export const PreviewMessage = ({
   vote,
   chatbot,
   showActions = true,
+  showToolDetails = false,
 }: {
   chatId: string;
   message: UIMessage;
@@ -36,6 +38,7 @@ export const PreviewMessage = ({
   chatbot?: any;
   requiresScrollPadding?: boolean;
   showActions?: boolean;
+  showToolDetails?: boolean;
 }) => {
   const { data: fallbackChatbot } = useChatbot();
   const activeChatbot = chatbot || fallbackChatbot;
@@ -89,36 +92,38 @@ export const PreviewMessage = ({
               }
 
               if (type === "tool-collect_feedback") {
-                const { toolCallId, state } = part;
+                const { toolCallId, state, input, output } = part as any;
 
-                if (state === "input-available") {
+                if (showToolDetails) {
                   return (
-                    <div className="px-2" key={toolCallId}>
-                      <CollectFeedbackForm
-                        color={activeChatbot?.primaryColor}
-                      />
-                    </div>
+                    <Tool key={toolCallId}>
+                      <ToolHeader type={type} state={state} />
+                      <ToolContent>
+                        {input && <ToolInput input={input} />}
+                        {state === "output-available" && (
+                          <>
+                            <ToolOutput output={output} errorText={(part as any).errorText} />
+                            <div className="px-4 pb-4">
+                              <CollectFeedbackForm
+                                color={activeChatbot?.primaryColor}
+                              />
+                            </div>
+                          </>
+                        )}
+                        {state === "input-available" && (
+                          <div className="px-4 pb-4">
+                            <CollectFeedbackForm
+                              color={activeChatbot?.primaryColor}
+                            />
+                          </div>
+                        )}
+                      </ToolContent>
+                    </Tool>
                   );
                 }
 
-                if (state === "output-available") {
-                  const { output } = part;
-
-                  if (
-                    output &&
-                    typeof output === "object" &&
-                    "error" in output
-                  ) {
-                    return (
-                      <div
-                        key={toolCallId}
-                        className="text-red-500 p-2 border rounded"
-                      >
-                        Error: {String(output.error)}
-                      </div>
-                    );
-                  }
-
+                // Original behavior for live chat
+                if (state === "input-available" || state === "output-available") {
                   return (
                     <div className="px-2" key={toolCallId}>
                       <CollectFeedbackForm
@@ -130,37 +135,29 @@ export const PreviewMessage = ({
               }
 
               if (type === "tool-collect_leads") {
-                const { toolCallId, state } = part;
+                const { toolCallId, state, input, output } = part as any;
 
-                if (state === "input-available") {
+                if (showToolDetails) {
                   return (
-                    <div className="px-2" key={toolCallId}>
-                      <CollectLeadsForm color={activeChatbot?.primaryColor} />
+                    <div className="px-2">
+                      <Tool key={toolCallId}>
+                        <ToolHeader type={type} state={state} />
+                        <ToolContent>
+                          {input && <ToolInput input={input} />}
+                          {state === "output-available" && (
+                            <ToolOutput output={output} errorText={(part as any).errorText} />
+                          )}
+
+                        </ToolContent>
+                      </Tool>
                     </div>
                   );
                 }
 
-                if (state === "output-available") {
-                  const { output } = part;
-
-                  if (
-                    output &&
-                    typeof output === "object" &&
-                    "error" in output
-                  ) {
-                    return (
-                      <div
-                        key={toolCallId}
-                        className="text-red-500 p-2 border rounded"
-                      >
-                        Error: {String(output.error)}
-                      </div>
-                    );
-                  }
-
+                if (state === "input-available" || state === "output-available") {
                   return (
-                    <div key={toolCallId}>
-                      <CollectLeadsForm />
+                    <div className="px-2" key={toolCallId}>
+                      <CollectLeadsForm color={activeChatbot?.primaryColor} />
                     </div>
                   );
                 }
@@ -205,38 +202,36 @@ export const PreviewMessage = ({
               }
 
               if (type === "tool-escalate_to_human") {
-                const { toolCallId, state } = part;
+                const { toolCallId, state, input, output } = part as any;
+
+                if (showToolDetails) {
+                  return (
+                    <div className="px-2">
+                      <Tool key={toolCallId}>
+                        <ToolHeader type={type} state={state} />
+                        <ToolContent>
+                          {input && <ToolInput input={input} />}
+                          {state === "output-available" && (
+                            <ToolOutput output={output} errorText={(part as any).errorText} />
+                          )}
+                        </ToolContent>
+                      </Tool>
+                    </div>
+                  );
+                }
 
                 if (state === "output-available") {
-                  const { output } = part;
-
-                  if (
-                    output &&
-                    typeof output === "object" &&
-                    "error" in output
-                  ) {
-                    return (
-                      <div
-                        key={toolCallId}
-                        className="text-red-500 p-2 border rounded"
-                      >
-                        We encountered an issue connecting you to a human
-                      </div>
-                    );
-                  }
-
-                  const reason = (output as any)?.reason || "complex-issue";
-                  const message = (output as any)?.message || undefined;
-                  const success = (output as any)?.success !== false;
-                  const error = (output as any)?.error;
-
                   return (
-                    <div key={toolCallId}>
+                    <div className="space-y-2 px-2" key={toolCallId}>
+                      <p>
+                        I have escalated your issue to a human agent. They will be
+                        with you shortly to assist with your request.
+                      </p>
                       <EscalateToHumanNotification
-                        reason={reason}
-                        message={message}
-                        success={success}
-                        error={error}
+                        reason={(output as any)?.reason || "complex-issue"}
+                        message={(output as any)?.message || undefined}
+                        success={(output as any)?.success !== false}
+                        error={(output as any)?.error}
                       />
                     </div>
                   );
@@ -259,7 +254,23 @@ export const PreviewMessage = ({
               }
 
               if (type === "tool-custom_button") {
-                const { toolCallId, state } = part;
+                const { toolCallId, state, input, output } = part as any;
+
+                if (showToolDetails) {
+                  return (
+                    <div className="px-2">
+                      <Tool key={toolCallId}>
+                        <ToolHeader type={type} state={state} />
+                        <ToolContent>
+                          {input && <ToolInput input={input} />}
+                          {state === "output-available" && (
+                            <ToolOutput output={output} errorText={(part as any).errorText} />
+                          )}
+                        </ToolContent>
+                      </Tool>
+                    </div>
+                  );
+                }
 
                 if (state === "input-available") {
                   return (
@@ -277,50 +288,47 @@ export const PreviewMessage = ({
                 }
 
                 if (state === "output-available") {
-                  const { output } = part;
-
-                  if (
-                    output &&
-                    typeof output === "object" &&
-                    "error" in output
-                  ) {
-                    return (
-                      <div
-                        key={toolCallId}
-                        className="text-red-500 p-2 border rounded"
-                      >
-                        Error: {String(output.error)}
-                      </div>
-                    );
-                  }
-
                   if (
                     output &&
                     typeof output === "object" &&
                     "success" in output &&
                     output.success
                   ) {
-                    const outputData = output as any;
                     return (
                       <div key={toolCallId}>
                         <CustomButton
-                          buttonText={outputData.buttonText}
-                          buttonUrl={outputData.buttonUrl}
-                          name={outputData.name}
-                          description={outputData.description}
-                          context={outputData.context}
+                          buttonText={(output as any).buttonText}
+                          buttonUrl={(output as any).buttonUrl}
+                          name={(output as any).name}
+                          description={(output as any).description}
+                          context={(output as any).context}
                           color={activeChatbot?.primaryColor}
                         />
                       </div>
                     );
                   }
-
-                  return null;
                 }
               }
 
               if (type === "tool-calendly_booking") {
-                const { toolCallId, state } = part;
+                const { toolCallId, state, input, output } = part as any;
+
+                if (showToolDetails) {
+                  return (
+                    <div className="px-2">
+
+                      <Tool key={toolCallId}>
+                        <ToolHeader type={type} state={state} />
+                        <ToolContent>
+                          {input && <ToolInput input={input} />}
+                          {state === "output-available" && (
+                            <ToolOutput output={output} errorText={(part as any).errorText} />
+                          )}
+                        </ToolContent>
+                      </Tool>
+                    </div>
+                  );
+                }
 
                 if (state === "input-available") {
                   return (
@@ -338,45 +346,26 @@ export const PreviewMessage = ({
                 }
 
                 if (state === "output-available") {
-                  const { output } = part;
-
-                  // if (
-                  //   output &&
-                  //   typeof output === "object" &&
-                  //   "error" in output
-                  // ) {
-                  //   return (
-                  //     <div
-                  //       key={toolCallId}
-                  //       className=" "
-                  //     >
-                  //       Sorry, I can't help you with that right now.
-                  //     </div>
-                  //   );
-                  // }
-
                   if (
                     output &&
                     typeof output === "object" &&
                     "success" in output &&
                     output.success
                   ) {
-                    const outputData = output as any;
                     return (
-                      <div className="px-2" key={toolCallId}>
+                      <div className="px-2 space-y-2" key={toolCallId}>
+                        <p>If you're interested in talking with us, kindly schedule a call using the form below🙂</p>
                         <CalendlyBooking
-                          eventTypeUri={outputData.eventTypeUri}
-                          eventTypeName={outputData.eventTypeName}
-                          userEmail={outputData.userEmail}
-                          name={outputData.name}
-                          description={outputData.description}
+                          eventTypeUri={(output as any).eventTypeUri}
+                          eventTypeName={(output as any).eventTypeName}
+                          userEmail={(output as any).userEmail}
+                          name={(output as any).name}
+                          description={(output as any).description}
                           color={activeChatbot?.primaryColor}
                         />
                       </div>
                     );
                   }
-
-                  return null;
                 }
               }
 

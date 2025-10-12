@@ -2,7 +2,7 @@ import { getTotalVotes } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
+import { auth } from "../../../auth";
 
 export const ServerRoute = createServerFileRoute("/api/vote-count").methods({
   GET: async ({ request }) => {
