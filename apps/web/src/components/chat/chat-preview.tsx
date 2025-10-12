@@ -83,11 +83,12 @@ export function ChatPreview() {
 
   const handleResetChat = useCallback(() => {
     resetChat();
+    setMessages([]);
     setInput("");
     toast.success("Chat reset successfully");
     queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
     queryClient.invalidateQueries({ queryKey: ["messages"] });
-  }, [resetChat, setInput, queryClient]);
+  }, [resetChat, setMessages, setInput, queryClient]);
 
   const handleGoToMain = useCallback(() => {
     localStorage.setItem("chat-preview-interface", "chat");

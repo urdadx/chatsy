@@ -263,8 +263,7 @@ export function useSendVisitorAnalytics({
       // Prevent duplicate logs within a short time window (deduplication)
       const now = Date.now();
       const event = logExtra?.event || "unknown";
-      const requestKey = `${chatbotId}-${event}-${Math.floor(now / 5000)}`; // 5-second window
-
+      const requestKey = `${chatbotId}-${event}-${Math.floor(now / 5000)}`;
       if (pendingRequestsRef.current.has(requestKey)) {
         console.debug(`Skipping duplicate analytics log for ${event}`);
         return;

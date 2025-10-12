@@ -2,7 +2,7 @@ import { useChat } from "@/hooks/use-chat";
 import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useMessages } from "@/hooks/use-db-messages";
 import { useSearch } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { convertToUIMessages } from "../chat/convert-to-ui-message";
 import { PreviewMessage } from "../chat/preview-message";
 import { TypingIndicator } from "../chat/typing-indicator";
@@ -15,6 +15,8 @@ import {
 import { Input } from "../ui/input";
 import { ScrollButton } from "../ui/scroll-button";
 import Spinner from "../ui/spinner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { ChatStatusHeader } from "./chat-status-header";
 
 export const ChatConversation = () => {
   const { chatId } = useSearch({ from: "/admin/chat-history/" });
@@ -32,29 +34,22 @@ export const ChatConversation = () => {
   const [draft, setDraft] = useState("");
   const [hasJoined, setHasJoined] = useState(false);
 
-  const { status, isTyping, sendMessage, sendTyping, isConnected, connect } = useChatWebSocket({
+  const { status, isTyping, sendMessage, sendTyping, isConnected, connect, disconnect } = useChatWebSocket({
     chatId: chatId || "",
     role: "agent",
     onError: (err) => console.error("WebSocket error:", err),
   });
 
-  // Reset hasJoined when chatId changes
-  useEffect(() => {
-    setHasJoined(false);
-    setDraft("");
-  }, [chatId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // If not joined yet, initiate websocket connection and mark as joined
     if (!hasJoined) {
       connect();
       setHasJoined(true);
       return;
     }
 
-    // Send message
     if (!draft.trim() || !isConnected) return;
     const text = draft;
     setDraft("");
@@ -71,6 +66,12 @@ export const ChatConversation = () => {
     }
   }, [sendTyping, hasJoined]);
 
+  const handleEndSession = useCallback(() => {
+    disconnect();
+    setHasJoined(false);
+    setDraft("");
+  }, [disconnect]);
+
   return (
     <div className="relative flex-1 h-full flex flex-col min-h-0">
       {/* Show message if chat is not escalated */}
@@ -85,15 +86,15 @@ export const ChatConversation = () => {
       )}
 
       {/* Status Header */}
-      {hasJoined && isConnected && isEscalated && (
-        <div className="border-b bg-green-50 dark:bg-green-950 px-4 py-2">
-          <div className="flex items-center gap-2 text-sm">
-            <div className="size-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="font-medium text-green-700 dark:text-green-300">
-              You are now live with the user
-            </span>
-          </div>
-        </div>
+      {isEscalated && (
+        <ChatStatusHeader
+          status={status}
+          hasJoined={hasJoined}
+          isConnected={isConnected}
+          onConnect={connect}
+          onJoin={() => setHasJoined(true)}
+          onEndSession={handleEndSession}
+        />
       )}
 
       <ChatContainerRoot optimize className="flex-1 smooth-div relative">
@@ -147,43 +148,32 @@ export const ChatConversation = () => {
         className="border-t bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3 flex gap-2 items-center"
       >
         {!hasJoined && isEscalated ? (
-          <div className="flex-1 flex flex-col gap-2">
-            <div className="text-sm text-muted-foreground">
-              This chat has been escalated. Click "Join" to start assisting the user.
+          <>
+            <div className="flex-1 flex items-center gap-2">
+              <Input
+                placeholder="Click Join to start messaging..."
+                value=""
+                disabled={true}
+                className="flex-1"
+              />
             </div>
             <Button
               type="submit"
-              className="w-full"
               disabled={status === "connecting"}
             >
               {status === "connected"
-                ? "Join Chat"
+                ? "Join the conversation"
                 : status === "connecting"
                   ? "Joining..."
                   : status === "error"
                     ? "Join (Retry)"
-                    : "Join Chat"}
+                    : "Join the conversation"}
             </Button>
-          </div>
+          </>
         ) : isEscalated ? (
           <>
             <div className="flex-1 flex items-center gap-2">
-              {status !== "connected" && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  {status === "connecting" && (
-                    <>
-                      <Spinner className="size-3" />
-                      <span>Connecting...</span>
-                    </>
-                  )}
-                  {status === "error" && (
-                    <span className="text-red-500">Connection error</span>
-                  )}
-                  {status === "disconnected" && (
-                    <span className="text-yellow-600">Disconnected</span>
-                  )}
-                </div>
-              )}
+
               <Input
                 placeholder={hasJoined ? (isConnected ? "Type a message..." : "Connecting...") : "Click Join to start"}
                 value={draft}
@@ -197,8 +187,32 @@ export const ChatConversation = () => {
             </Button>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm py-2">
-            This chat is not escalated
+          <div className="flex-1 flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex-1">
+                  <Input
+                    placeholder="Type a message..."
+                    value=""
+                    disabled={true}
+                    className="flex-1"
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                You can escalate the chat from the chat settings to join in.
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button type="submit" disabled={true}>
+                  Send
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                You can escalate the chat from the chat settings to join in.
+              </TooltipContent>
+            </Tooltip>
           </div>
         )}
       </form>

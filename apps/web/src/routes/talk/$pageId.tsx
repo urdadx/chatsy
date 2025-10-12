@@ -144,6 +144,7 @@ const useChatHandlers = (
   wsSendTyping?: (typing: boolean) => void,
   queryClient?: any,
   chatId?: string,
+  resetChat?: () => void,
 ) => {
   const handleSubmit = useCallback(
     (event?: React.FormEvent) => {
@@ -176,10 +177,13 @@ const useChatHandlers = (
   );
 
   const handleResetChat = useCallback(() => {
+    resetChat?.();
     setMessages([]);
     dispatchUiState({ type: "RESET" });
     logVisitorAnalytics({ event: ANALYTICS_EVENTS.BIO_PAGE_CHAT_RESET });
-  }, [setMessages, dispatchUiState, logVisitorAnalytics]);
+    queryClient?.invalidateQueries({ queryKey: ["messages"] });
+    queryClient?.invalidateQueries({ queryKey: ["chat-logs"] });
+  }, [resetChat, setMessages, dispatchUiState, logVisitorAnalytics, queryClient]);
 
   const handleGoToMain = useCallback(() => {
     localStorage.setItem(`talk-${pageId}-interface`, "chat");
@@ -210,8 +214,6 @@ const useChatHandlers = (
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       dispatchUiState({ type: "SET_INPUT", payload: event.target.value });
-
-      // Send typing indicator when escalated and connected
       if (isEscalated && wsIsConnected && wsSendTyping) {
         if (event.target.value.trim()) {
           wsSendTyping(true);
@@ -236,7 +238,7 @@ const useChatHandlers = (
 
 function RouteComponent(): JSX.Element {
   const { pageId } = Route.useParams();
-  const { chatId } = useChatWithResetEmbed();
+  const { chatId, resetChat } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
   const { data: chatData } = useChatData(chatId);
   const { retry } = useRetry();
@@ -264,7 +266,6 @@ function RouteComponent(): JSX.Element {
 
   const isEscalated = chatData?.status === "escalated";
 
-  // Initialize WebSocket for escalated chats
   const {
     status: wsStatus,
     isTyping: wsIsTyping,
@@ -276,14 +277,10 @@ function RouteComponent(): JSX.Element {
   } = useChatWebSocket({
     chatId: chatId,
     role: "user",
-    onError: (err) => {
-      console.error("WebSocket error:", err);
-      toast.error(`Connection error: ${err}`);
+    onError: () => {
+      toast.error("Connection error");
     },
     onMessage: (message) => {
-      console.log("Received WebSocket message:", message);
-
-      // Convert WebSocket message to UI message format
       const uiMessage = {
         id: message.id,
         role: (message.role === "human" ? "assistant" : message.role) as "user" | "assistant" | "system",
@@ -294,9 +291,7 @@ function RouteComponent(): JSX.Element {
         },
       };
 
-      // Add message to the UI immediately for real-time experience
       setMessages((prevMessages) => {
-        // Check if message already exists to avoid duplicates
         const messageExists = prevMessages.some(msg => msg.id === uiMessage.id);
         if (messageExists) return prevMessages;
 
@@ -388,6 +383,7 @@ function RouteComponent(): JSX.Element {
     wsSendTyping,
     queryClient,
     chatId,
+    resetChat,
   );
 
   const suggestions = useMemo(

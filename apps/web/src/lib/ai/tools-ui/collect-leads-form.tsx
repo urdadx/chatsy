@@ -27,7 +27,6 @@ export function CollectLeadsForm({ color }: { color?: string }) {
     }));
   };
 
-  // Memoize the embed token calculation
   const embedToken = useMemo(() => {
     if (embedTokenFromContext) {
       return embedTokenFromContext;

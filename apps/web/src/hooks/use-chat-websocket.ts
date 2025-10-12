@@ -25,6 +25,8 @@ export function useChatWebSocket({
   const wsRef = useRef<WebSocket | null>(null);
   const activeChatIdRef = useRef<string>(chatId);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectAttemptsRef = useRef<number>(0);
+  const maxReconnectAttempts = 5;
   const onMessageRef = useRef(onMessage);
   const onTypingRef = useRef(onTyping);
   const onErrorRef = useRef(onError);
@@ -32,14 +34,12 @@ export function useChatWebSocket({
   const [isTyping, setIsTyping] = useState(false);
   const queryClient = useQueryClient();
 
-  // Update refs when callbacks change
   useEffect(() => {
     onMessageRef.current = onMessage;
     onTypingRef.current = onTyping;
     onErrorRef.current = onError;
   }, [onMessage, onTyping, onError]);
 
-  // Update the active chat ID ref when chatId changes
   useEffect(() => {
     activeChatIdRef.current = chatId;
   }, [chatId]);
@@ -53,16 +53,12 @@ export function useChatWebSocket({
   }, []);
 
   const getWebSocketUrl = useCallback(() => {
-    // Check for environment variable first
     const wsUrl = (import.meta as any).env?.VITE_WS_URL;
     if (wsUrl) return wsUrl;
 
     if (typeof window !== "undefined") {
       const protocol = location.protocol === "https:" ? "wss:" : "ws:";
       const host = location.hostname;
-
-      // In development, assume WebSocket server is on port 3000
-      // In production, assume it's on the same host and port
       const port =
         location.port || (location.protocol === "https:" ? "443" : "80");
       const wsPort = process.env.NODE_ENV === "development" ? "3000" : port;
@@ -79,7 +75,6 @@ export function useChatWebSocket({
       return;
     }
 
-    // Avoid reconnect if already open or connecting
     if (
       wsRef.current &&
       (wsRef.current.readyState === WebSocket.OPEN ||
@@ -95,7 +90,6 @@ export function useChatWebSocket({
       return;
     }
 
-    console.log("Connecting to WebSocket:", wsUrl);
     setStatus("connecting");
 
     try {
@@ -103,8 +97,8 @@ export function useChatWebSocket({
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log("WebSocket connected, joining chat:", chatId);
         setStatus("connected");
+        reconnectAttemptsRef.current = 0;
         try {
           ws.send(JSON.stringify({ type: "join", chatId, role }));
         } catch (err) {
@@ -117,11 +111,9 @@ export function useChatWebSocket({
       ws.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
-          console.log("WebSocket message received:", payload);
 
           switch (payload.type) {
             case "joined":
-              console.log("Successfully joined chat:", payload.chatId);
               break;
             case "message":
               if (payload.chatId === activeChatIdRef.current) {
@@ -138,7 +130,6 @@ export function useChatWebSocket({
               }
               break;
             case "error":
-              console.error("WebSocket error:", payload.error);
               setStatus("error");
               onErrorRef.current?.(payload.error);
               break;
@@ -149,21 +140,39 @@ export function useChatWebSocket({
         }
       };
 
-      ws.onerror = (error) => {
-        console.error("WebSocket connection error:", error);
+      ws.onerror = () => {
         setStatus("error");
         onErrorRef.current?.("WebSocket connection failed");
       };
 
       ws.onclose = (event) => {
-        console.log("WebSocket connection closed:", event.code, event.reason);
-        setStatus("disconnected");
         wsRef.current = null;
 
-        // Don't auto-reconnect, let the component decide
+        if (!event.wasClean && activeChatIdRef.current) {
+          if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+            const delay = Math.min(
+              1000 * 2 ** reconnectAttemptsRef.current,
+              30000,
+            );
+            reconnectAttemptsRef.current += 1;
+
+            console.log(
+              `Attempting to reconnect (${reconnectAttemptsRef.current}/${maxReconnectAttempts}) in ${delay}ms...`,
+            );
+
+            reconnectTimeoutRef.current = setTimeout(() => {
+              connect();
+            }, delay);
+          } else {
+            setStatus("error");
+            onErrorRef.current?.(
+              "Connection lost and max reconnection attempts reached",
+            );
+          }
+        }
       };
     } catch (err) {
-      console.error("Failed to create WebSocket connection:", err);
+      console.error("WebSocket connection error:", err);
       setStatus("error");
       onErrorRef.current?.("Failed to create WebSocket connection");
     }
@@ -183,12 +192,13 @@ export function useChatWebSocket({
       reconnectTimeoutRef.current = null;
     }
 
+    reconnectAttemptsRef.current = 0;
+
     const ws = wsRef.current;
     const currentChatId = activeChatIdRef.current;
 
     if (ws && ws.readyState === WebSocket.OPEN && currentChatId) {
       try {
-        console.log("Leaving chat:", currentChatId);
         ws.send(JSON.stringify({ type: "leave", chatId: currentChatId }));
       } catch (err) {
         console.error("Failed to send leave message:", err);
@@ -204,7 +214,6 @@ export function useChatWebSocket({
     setIsTyping(false);
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       disconnect();
@@ -236,7 +245,7 @@ export function useChatWebSocket({
         return true;
       } catch (err) {
         console.error("Failed to send message:", err);
-        onErrorRef.current?.("Failed to send message");
+        onError?.("Failed to send message");
         return false;
       }
     },

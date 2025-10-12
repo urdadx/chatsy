@@ -10,8 +10,6 @@ export function useMessages(chatId: string) {
     enabled: !!chatId,
   });
 
-  // WebSocket live updates when escalated - passive listener only
-  // The main useChatWebSocket hook handles active connection management
   const wsRef = useRef<WebSocket | null>(null);
   const activeChatIdRef = useRef<string>(chatId);
 
@@ -34,14 +32,12 @@ export function useMessages(chatId: string) {
     wsRef.current = ws;
 
     ws.onopen = () => {
-      // Join as passive observer for this chat
       ws.send(JSON.stringify({ type: "join", chatId, role: "agent" }));
     };
 
     ws.onmessage = (ev) => {
       try {
         const data = JSON.parse(ev.data);
-        // Only invalidate if message is for the currently active chat
         if (
           data?.type === "message" &&
           data.chatId === activeChatIdRef.current

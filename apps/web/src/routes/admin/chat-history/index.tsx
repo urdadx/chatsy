@@ -16,12 +16,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Spinner from "@/components/ui/spinner";
 import { useChatHistory } from "@/hooks/use-chat-history";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   createFileRoute,
   useNavigate,
   useSearch,
 } from "@tanstack/react-router";
-import { Info, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { useEffect } from "react";
 import { useState } from "react";
 import z from "zod";
@@ -57,6 +58,12 @@ function RouteComponent() {
   } = useChatHistory(filter, status);
 
   const chats = data?.pages.flatMap((page) => page.chats) ?? [];
+  const queryClient = useQueryClient();
+
+  const handleRefresh = () => {
+    refetch();
+    queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
+  }
 
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
@@ -114,7 +121,7 @@ function RouteComponent() {
               <Button
                 variant="outline"
                 className="text-gray-600"
-                onClick={() => refetch()}
+                onClick={handleRefresh}
               >
                 <RotateCcw className="h-4 w-4" />
                 Refresh
@@ -149,7 +156,10 @@ function RouteComponent() {
                   <Button
                     variant="outline"
                     className="text-gray-600"
-                    onClick={() => refetch()}
+                    onClick={() => {
+                      refetch();
+
+                    }}
                   >
                     <RotateCcw className="h-4 w-4" />
                   </Button>
@@ -183,7 +193,7 @@ function RouteComponent() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => refetch()}
+                        onClick={handleRefresh}
                       >
                         Try Again
                       </Button>

@@ -382,7 +382,9 @@ function RouteComponent() {
     resetChat();
     setMessages([]);
     dispatchUiState({ type: "RESET" });
-  }, [resetChat, setMessages]);
+    queryClient.invalidateQueries({ queryKey: ["messages"] });
+    queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+  }, [resetChat, setMessages, queryClient]);
 
   const handleGoToMain = useCallback(() => {
     localStorage.setItem(`bubble-${widgetId}-interface`, "chat");
