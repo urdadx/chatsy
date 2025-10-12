@@ -26,6 +26,7 @@ export type ChatTools = {
 
 export const messageMetadataSchema = z.object({
   createdAt: z.string(),
+  originalRole: z.string().optional(),
 });
 
 export type MessageMetadata = z.infer<typeof messageMetadataSchema>;

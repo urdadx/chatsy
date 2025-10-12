@@ -6,7 +6,9 @@ import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useSendVisitorAnalytics } from "@/hooks/log-visitor-analytics";
+import { useChat as useChatData } from "@/hooks/use-chat";
 import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
+import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
@@ -177,6 +179,7 @@ function RouteComponent() {
   const { widgetId } = Route.useParams();
   const { chatId, resetChat } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
+  const { data: chatData } = useChatData(chatId);
   const { retry } = useRetry();
 
   const [uiState, dispatchUiState] = useReducer(uiStateReducer, {
@@ -206,6 +209,60 @@ function RouteComponent() {
     logVisitorAnalytics,
     mountTimestampRef,
   );
+
+  const isEscalated = chatData?.status === "escalated";
+
+  // Initialize WebSocket for escalated chats
+  const {
+    status: wsStatus,
+    isTyping: wsIsTyping,
+    sendMessage: wsSendMessage,
+    sendTyping: wsSendTyping,
+    connect: wsConnect,
+    disconnect: wsDisconnect,
+    isConnected: wsIsConnected,
+  } = useChatWebSocket({
+    chatId: chatId,
+    role: "user",
+    onError: (err) => {
+      console.error("WebSocket error:", err);
+      toast.error(`Connection error: ${err}`);
+    },
+    onMessage: (message) => {
+      console.log("Received WebSocket message:", message);
+
+      // Convert WebSocket message to UI message format
+      const uiMessage = {
+        id: message.id,
+        role: (message.role === "human" ? "assistant" : message.role) as "user" | "assistant" | "system",
+        parts: message.parts || [{ type: "text", text: message.parts?.[0]?.text || "" }],
+        metadata: {
+          createdAt: new Date(message.createdAt).toISOString(),
+          originalRole: message.role,
+        },
+      };
+
+      // Add message to the UI immediately for real-time experience
+      setMessages((prevMessages) => {
+        // Check if message already exists to avoid duplicates
+        const messageExists = prevMessages.some(msg => msg.id === uiMessage.id);
+        if (messageExists) return prevMessages;
+
+        return [...prevMessages, uiMessage];
+      });
+    },
+  });
+
+  // Auto-connect WebSocket when chat becomes escalated
+  useEffect(() => {
+    if (isEscalated && !wsIsConnected && wsStatus === "disconnected") {
+      console.log("Chat escalated, connecting to WebSocket...");
+      wsConnect();
+    } else if (!isEscalated && wsIsConnected) {
+      console.log("Chat no longer escalated, disconnecting WebSocket...");
+      wsDisconnect();
+    }
+  }, [isEscalated, wsIsConnected, wsStatus, wsConnect, wsDisconnect]);
 
   const {
     messages,
@@ -270,10 +327,25 @@ function RouteComponent() {
       event?.preventDefault();
       if (!uiState.input.trim()) return;
 
-      sendMessage({ text: uiState.input });
-      dispatchUiState({ type: "SET_INPUT", payload: "" });
+      if (isEscalated && wsIsConnected && wsSendMessage) {
+        console.log("Sending WebSocket message:", uiState.input);
+
+        const success = wsSendMessage(uiState.input);
+        if (success) {
+          dispatchUiState({ type: "SET_INPUT", payload: "" });
+          wsSendTyping?.(false);
+          queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
+        } else {
+          toast.error("Failed to send message. Please try again.");
+        }
+      } else if (!isEscalated) {
+        sendMessage({ text: uiState.input });
+        dispatchUiState({ type: "SET_INPUT", payload: "" });
+      } else {
+        toast.error("Connection not ready. Please wait...");
+      }
     },
-    [uiState.input, sendMessage],
+    [uiState.input, sendMessage, isEscalated, wsIsConnected, wsSendMessage, wsSendTyping],
   );
 
   const handleCloseWidget = useCallback(() => {
@@ -295,7 +367,16 @@ function RouteComponent() {
 
   const handleInputChange = useCallback((event: any) => {
     dispatchUiState({ type: "SET_INPUT", payload: event.target.value });
-  }, []);
+
+    // Send typing indicator when escalated and connected
+    if (isEscalated && wsIsConnected && wsSendTyping) {
+      if (event.target.value.trim()) {
+        wsSendTyping(true);
+      } else {
+        wsSendTyping(false);
+      }
+    }
+  }, [isEscalated, wsIsConnected, wsSendTyping]);
 
   const handleResetChat = useCallback(() => {
     resetChat();
@@ -378,6 +459,8 @@ function RouteComponent() {
             regenerate={regenerate}
             chatbot={chatbot}
             className="w-full"
+            chatStatus={chatData?.status}
+            wsIsTyping={isEscalated && wsIsConnected ? wsIsTyping : undefined}
           />
 
           {!uiState.isDeactivated && (
@@ -385,13 +468,19 @@ function RouteComponent() {
               input={uiState.input}
               onInputChange={handleInputChange}
               onSubmit={handleSubmit}
-              status={status}
+              status={isEscalated ? (wsIsConnected ? status : "submitted") : status}
               suggestions={suggestions}
               onSuggestionClick={handleSuggestionClick}
               showSuggestions={suggestions.length > 0}
               showPoweredBy={showPoweredBy}
               chatbot={chatbot}
-              placeholder="Type a message..."
+              placeholder={
+                isEscalated
+                  ? wsIsConnected
+                    ? "Type a message to the agent..."
+                    : "Connecting to agent..."
+                  : "Type a message..."
+              }
             />
           )}
         </>

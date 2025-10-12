@@ -149,7 +149,9 @@ export const message = pgTable("Message", {
   chatId: uuid("chatId")
     .notNull()
     .references(() => chat.id),
-  role: varchar("role").notNull(),
+  role: varchar("role", {
+    enum: ["system", "assistant", "user", "human"],
+  }).notNull(),
   parts: json("parts").notNull(),
   createdAt: timestamp("createdAt")
     .notNull()

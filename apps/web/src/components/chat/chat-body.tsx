@@ -12,10 +12,12 @@ import { RiBardFill } from "@remixicon/react";
 import type { useQueryClient } from "@tanstack/react-query";
 import type { ChatRequestOptions, ChatStatus } from "ai";
 import type { ReactNode } from "react";
+import { memo } from "react";
 
 import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
 import { GreetingMessage } from "./greeting-message";
 import { PreviewMessage, ThinkingMessage } from "./preview-message";
+import { TypingIndicator } from "./typing-indicator";
 
 interface ChatBodyProps {
   isLoading?: boolean;
@@ -34,14 +36,18 @@ interface ChatBodyProps {
   ) => Promise<void>;
   chatbot?: {
     initialMessage?: string | null;
+    image?: string | null;
+    name?: string | null;
     [key: string]: any;
   };
   queryClient?: ReturnType<typeof useQueryClient>;
   className?: string;
   children?: ReactNode;
+  chatStatus?: "unresolved" | "resolved" | "escalated";
+  wsIsTyping?: boolean;
 }
 
-export function ChatBody({
+const ChatBodyComponent = ({
   isLoading,
   error,
   isDeactivated,
@@ -55,11 +61,12 @@ export function ChatBody({
   queryClient,
   className,
   children,
-}: ChatBodyProps) {
+  chatStatus,
+  wsIsTyping,
+}: ChatBodyProps) => {
   const greetingMessage = chatbot?.initialMessage || "";
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
-
 
   if (isDeactivated) {
     return (
@@ -153,7 +160,17 @@ export function ChatBody({
 
                 {status === 'submitted' &&
                   messages.length > 0 &&
-                  messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
+                  messages[messages.length - 1].role === 'user' &&
+                  chatStatus !== 'escalated' &&
+                  chatStatus !== 'resolved' && <ThinkingMessage />}
+
+                {wsIsTyping && chatStatus === 'escalated' && (
+                  <TypingIndicator
+                    label="Agent is typing..."
+                    name={chatbot?.name || "Agent"}
+                    avatarSrc={chatbot?.image || "/placeholder-avatar.png"}
+                  />
+                )}
 
                 <div
                   ref={messagesEndRef}
@@ -174,4 +191,23 @@ export function ChatBody({
 
     </div>
   );
+};
+
+function areEqual(prev: ChatBodyProps, next: ChatBodyProps) {
+  return (
+    prev.isLoading === next.isLoading &&
+    prev.error === next.error &&
+    prev.isDeactivated === next.isDeactivated &&
+    prev.messages === next.messages &&
+    prev.status === next.status &&
+    prev.chatError === next.chatError &&
+    prev.chatId === next.chatId &&
+    prev.votes === next.votes &&
+    prev.chatbot?.initialMessage === next.chatbot?.initialMessage &&
+    prev.className === next.className &&
+    prev.chatStatus === next.chatStatus &&
+    prev.wsIsTyping === next.wsIsTyping
+  );
 }
+
+export const ChatBody = memo(ChatBodyComponent, areEqual);

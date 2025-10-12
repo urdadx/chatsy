@@ -1,4 +1,5 @@
 import type { Vote } from "@/db/schema";
+import { useChat as useChatData } from "@/hooks/use-chat";
 import { useChatWithReset } from "@/hooks/use-chat-reset";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { useMessages } from "@/hooks/use-db-messages";
@@ -19,6 +20,7 @@ import { convertToUIMessages } from "./convert-to-ui-message";
 export function ChatPreview() {
   const { chatId, resetChat } = useChatWithReset();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
+  const { data: chatData } = useChatData(chatId);
   const [input, setInput] = useState("");
   const [showLanding, setShowLanding] = useState(() => {
     return localStorage.getItem("chat-preview-interface") === "landing";
@@ -128,6 +130,7 @@ export function ChatPreview() {
     );
   }
 
+
   return (
     <div className="flex flex-col w-full h-full max-h-[80vh] md:h-[550px] shadow-sm md:rounded-2xl overflow-hidden">
       <ChatHeader
@@ -152,6 +155,7 @@ export function ChatPreview() {
         regenerate={regenerate}
         chatbot={chatbot}
         queryClient={queryClient}
+        chatStatus={chatData?.status}
       />
 
       <ChatFooter

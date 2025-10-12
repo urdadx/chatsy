@@ -8,8 +8,10 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import Spinner from "@/components/ui/spinner";
+import { useChatbot } from "@/hooks/use-chatbot";
 import { createFileRoute } from "@tanstack/react-router";
-import { Eye } from "lucide-react";
+import { Eye, X } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/admin/playground")({
@@ -18,7 +20,35 @@ export const Route = createFileRoute("/admin/playground")({
 
 function RouteComponent() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { data: chatbot, error, refetch, isLoading } = useChatbot();
 
+  if (isLoading) {
+    return (
+      <div className="w-full h-64 flex items-center justify-center">
+        <Spinner className="text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full mx-auto px-2 sm:px-0">
+        <div className="flex flex-col items-center justify-center py-16 space-y-4">
+          <div className="rounded-full bg-red-50 p-3">
+            <X className="h-6 w-6 text-red-500" />
+          </div>
+          <div className="text-center space-y-2">
+            <h3 className="text-lg font-semibold text-gray-700">
+              Unable to load chatbot information
+            </h3>
+          </div>
+          <Button variant="outline" onClick={() => refetch()} className="mt-4">
+            Try again
+          </Button>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="relative h-screen w-full hide-scrollbar">
       {/* Main content */}
@@ -31,7 +61,9 @@ function RouteComponent() {
             </p>
           </div>
 
-          <ChatbotSettings />
+          <ChatbotSettings
+            chatbot={chatbot}
+          />
         </div>
       </div>
 

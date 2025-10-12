@@ -36,8 +36,8 @@ import {
   stepCountIs,
   streamText,
 } from "ai";
+import { auth, polarClient } from "auth";
 import { eq } from "drizzle-orm";
-import { auth, polarClient } from "../../../../auth";
 
 export const ServerRoute = createServerFileRoute("/api/chat/").methods(
   (api) => ({
@@ -98,7 +98,10 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
           }
 
           const externalCustomerId = (await getCustomerExternalId()) || "";
-          const chat = await getChatById(id);
+          const chat = await getChatById({ id });
+
+          const shouldAIRespond =
+            chat?.status !== "escalated" && chat?.status !== "resolved";
 
           const userMessage = messages[messages.length - 1];
 
@@ -141,6 +144,17 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             } catch (error) {
               console.error("Error saving user message:", error);
             }
+          }
+
+          // If chat is escalated or resolved, don't generate AI response
+          if (!shouldAIRespond) {
+            return json(
+              {
+                message:
+                  "Chat is escalated or resolved. AI responses are disabled.",
+              },
+              { status: 200 },
+            );
           }
 
           // Get chatbot details

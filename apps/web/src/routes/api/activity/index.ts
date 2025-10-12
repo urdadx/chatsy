@@ -18,7 +18,6 @@ export const ServerRoute = createServerFileRoute("/api/activity/").methods({
       session?.session?.activeChatbotId ||
       (await getActiveChatbotId(session.user.id));
 
-    // Create the union as a subquery with proper aliases
     const unionQuery = unionAll(
       db
         .select({

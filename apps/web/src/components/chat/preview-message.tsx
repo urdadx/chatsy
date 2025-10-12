@@ -42,7 +42,6 @@ export const PreviewMessage = ({
 }) => {
   const { data: fallbackChatbot } = useChatbot();
   const activeChatbot = chatbot || fallbackChatbot;
-
   return (
     <AnimatePresence>
       <motion.div
@@ -68,6 +67,7 @@ export const PreviewMessage = ({
                   : undefined,
             }}
           >
+
             {message.parts?.map((part, index) => {
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
@@ -122,7 +122,6 @@ export const PreviewMessage = ({
                   );
                 }
 
-                // Original behavior for live chat
                 if (state === "input-available" || state === "output-available") {
                   return (
                     <div className="px-2" key={toolCallId}>
@@ -386,6 +385,8 @@ export const PreviewMessage = ({
     </AnimatePresence>
   );
 };
+
+
 
 
 export const ThinkingMessage = () => {

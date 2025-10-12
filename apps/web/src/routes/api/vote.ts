@@ -24,7 +24,7 @@ export const ServerRoute = createServerFileRoute("/api/vote").methods({
     const parsed = voteSchema.safeParse(body);
 
     if (!parsed.success) {
-      return json({ error: parsed.error.format() }, { status: 400 });
+      return json({ error: z.treeifyError(parsed.error) }, { status: 400 });
     }
 
     const { chatId, messageId, type } = parsed.data;

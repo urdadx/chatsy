@@ -18,22 +18,24 @@
     "db:down": "docker compose down"
   },
   "dependencies": {
-    "dotenv": "^17.2.1",
-    "zod": "^4.0.2",
-    "express": "^5.1.0",
+    "better-auth": "^1.3.7",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.2",
+    "express": "^5.1.0",
     "pg": "^8.14.1",
-    "better-auth": "^1.3.7"
+    "ws": "^8.18.3",
+    "zod": "^4.0.2"
   },
   "devDependencies": {
-    "tsdown": "^0.14.1",
-    "typescript": "^5.8.2",
-    "@types/express": "^5.0.1",
     "@types/cors": "^2.8.17",
-    "tsx": "^4.19.2",
+    "@types/express": "^5.0.1",
     "@types/node": "^22.13.11",
+    "@types/pg": "^8.11.11",
+    "@types/ws": "^8.18.1",
     "drizzle-kit": "^0.31.2",
-    "@types/pg": "^8.11.11"
+    "tsdown": "^0.14.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.2"
   }
 }

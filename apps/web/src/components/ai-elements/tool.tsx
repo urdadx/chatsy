@@ -70,7 +70,17 @@ export const ToolHeader = ({
     {...props}
   >
     <div className="flex items-center gap-2">
-      <span className="font-medium text-sm">{type === "tool-escalate_to_human" ? "Connected to human agent" : type}</span>
+      <span className="font-medium text-sm">
+        {type === "tool-escalate_to_human"
+          ? "Connected to a human agent"
+          : type === "tool-calendly_booking"
+            ? "Initiated a calendly meeting"
+            : type === "tool-custom_button"
+              ? "Showed a custom button"
+              : type === "tool-collect_lead"
+                ? "Showed a leads form"
+                : type}
+      </span>
       {getStatusBadge(state)}
     </div>
     <ChevronDownIcon className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />

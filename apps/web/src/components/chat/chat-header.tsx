@@ -7,6 +7,7 @@ import {
 import { RiBardFill } from "@remixicon/react";
 import { ArrowLeft, RotateCcw, X } from "lucide-react";
 import type { ReactNode } from "react";
+import { memo } from "react";
 
 interface ChatHeaderProps {
   chatbot?: {
@@ -25,7 +26,7 @@ interface ChatHeaderProps {
   children?: ReactNode;
 }
 
-export function ChatHeader({
+function ChatHeaderComponent({
   chatbot,
   onReset,
   onClose,
@@ -113,3 +114,5 @@ export function ChatHeader({
     </div>
   );
 }
+
+export const ChatHeader = memo(ChatHeaderComponent);

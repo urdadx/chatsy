@@ -1,13 +1,14 @@
 import "dotenv/config";
-import { toNodeHandler } from "better-auth/node";
+import { createServer } from "node:http";
 import cors from "cors";
 import express from "express";
+import { createWebSocketServer } from "./lib/websocket";
 
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "",
+    origin: process.env.CORS_ORIGIN || "*",
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -20,7 +21,14 @@ app.get("/", (_req, res) => {
   res.status(200).send("We're live baby!");
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.get("/ws/health", (_req, res) => {
+  res.json({ ok: true });
+});
+
+const server = createServer(app);
+createWebSocketServer(server);
+
+const port = Number(process.env.PORT || 3000);
+server.listen(port, () => {
+  console.log(`Server is running on port ${port} (ws path: /ws)`);
 });

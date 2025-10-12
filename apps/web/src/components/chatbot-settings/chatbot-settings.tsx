@@ -23,8 +23,14 @@ import { PersonalitySelector } from "./personality-selector";
 import { PickColor } from "./pick-color";
 import { WidgetSettings } from "./widget-settings";
 
-export function ChatbotSettings() {
-  const { data: chatbot, error, refetch, isLoading } = useChatbot();
+interface ChatbotSettingsProps {
+  chatbot: any;
+
+}
+
+export function ChatbotSettings(
+  { chatbot }: ChatbotSettingsProps,
+) {
   const updateChatbotMutation = useUpdateChatbot();
   const { data: session } = useSession();
 
@@ -65,9 +71,7 @@ export function ChatbotSettings() {
 
   const handleHidePoweredByChange = async (checked: boolean) => {
     if (checked) {
-      // Check if user has remove-branding subscription
       const organizationId = session?.session?.activeOrganizationId;
-
       if (!organizationId) {
         toast.error("No active organization found");
         return;
@@ -144,33 +148,8 @@ export function ChatbotSettings() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-64 flex items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
 
-  if (error) {
-    return (
-      <div className="w-full mx-auto px-2 sm:px-0">
-        <div className="flex flex-col items-center justify-center py-16 space-y-4">
-          <div className="rounded-full bg-red-50 p-3">
-            <X className="h-6 w-6 text-red-500" />
-          </div>
-          <div className="text-center space-y-2">
-            <h3 className="text-lg font-semibold text-gray-700">
-              Unable to load chatbot settings
-            </h3>
-          </div>
-          <Button variant="outline" onClick={() => refetch()} className="mt-4">
-            Try again
-          </Button>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="w-full mx-auto px-2 sm:px-0">
