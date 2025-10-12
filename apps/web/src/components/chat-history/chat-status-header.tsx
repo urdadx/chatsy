@@ -26,10 +26,12 @@ export const ChatStatusHeader = ({
     } if (status === "connecting") {
       return "bg-blue-50 dark:bg-blue-950";
     } if (status === "disconnected" || status === "error") {
-      return "bg-red-50 dark:bg-red-950";
+      return "bg-yellow-50 dark:bg-yellow-950";
     }
     return "bg-gray-50 dark:bg-gray-950";
   };
+
+
 
   const handleRetryConnection = () => {
     onConnect();
@@ -57,16 +59,16 @@ export const ChatStatusHeader = ({
           </>
         ) : status === "disconnected" ? (
           <>
-            <div className="size-2 rounded-full bg-red-500" />
-            <span className="font-medium text-red-700 dark:text-red-300">
-              Not connected
+            <div className="size-2 rounded-full bg-yellow-500" />
+            <span className="font-medium text-yellow-700 dark:text-yellow-300">
+              You are not connected.
             </span>
           </>
         ) : status === "error" ? (
           <>
-            <div className="size-2 rounded-full bg-red-500" />
-            <span className="font-medium text-red-700 dark:text-red-300">
-              Connection error
+            <div className="size-2 rounded-full bg-yellow-500" />
+            <span className="font-medium text-yellow-700 dark:text-yellow-300">
+              Couldn't connect. The user likely left the chat.
             </span>
           </>
         ) : (
@@ -84,9 +86,9 @@ export const ChatStatusHeader = ({
             onClick={handleRetryConnection}
             variant="outline"
             size="sm"
-            className="text-red-70 hover:text-red-700 hover:bg-red-50 dark:text-red-300 dark:hover:text-red-300 dark:hover:bg-red-950"
+            className="text-yellow-700 hover:text-yellow-700 hover:bg-yellow-50 dark:text-yellow-300 dark:hover:text-yellow-300 dark:hover:bg-yellow-950"
           >
-            Join chat
+            {status === "error" ? "Try again" : "Join chat"}
           </Button>
         )}
         {hasJoined && isConnected && onEndSession && (

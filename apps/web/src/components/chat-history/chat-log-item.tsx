@@ -54,6 +54,7 @@ export const ChatLogItem = ({
     onSuccess: (data) => {
       toast.success(`Chat status updated to ${data.chat.status}`);
       queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+      queryClient.invalidateQueries({ queryKey: ["chat", id] });
     },
     onError: (error: any) => {
       toast.error(

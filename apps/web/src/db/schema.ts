@@ -140,8 +140,9 @@ export const chat = pgTable("Chat", {
   status: varchar("status", { enum: ["unresolved", "resolved", "escalated"] })
     .notNull()
     .default("unresolved"),
-  externalUserId: text("external_user_id"),
-  externalUserName: text("external_user_name"),
+  agentAssigned: text("agent_assigned").references(() => member.id, {
+    onDelete: "set null",
+  }),
 });
 
 export const message = pgTable("Message", {

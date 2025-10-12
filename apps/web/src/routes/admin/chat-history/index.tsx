@@ -63,6 +63,7 @@ function RouteComponent() {
   const handleRefresh = () => {
     refetch();
     queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
+    queryClient.invalidateQueries({ queryKey: ["chat-history"] });
   }
 
   useEffect(() => {
@@ -226,7 +227,9 @@ function RouteComponent() {
             {!isMobile && (
               <div className="flex w-full border-l flex-col relative overflow-hidden">
                 <div className="flex border-b justify-end items-center space-x-3 p-2">
-                  <AssignAgentDialog />
+                  <AssignAgentDialog
+                    chatId={chatId || ""}
+                  />
                   <ChatDetailsDialog chatId={chatId} />
                 </div>
                 {chatId ? (

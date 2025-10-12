@@ -74,6 +74,7 @@ import { ServerRoute as ApiWebhookPolarServerRouteImport } from './routes/api/we
 import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/sources/count'
 import { ServerRoute as ApiEmbedGenerateTokenServerRouteImport } from './routes/api/embed/generate-token'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
+import { ServerRoute as ApiChatAssignAgentServerRouteImport } from './routes/api/chat/assign-agent'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 import { ServerRoute as ApiAgentActionsActionIdServerRouteImport } from './routes/api/agent-actions/$actionId'
 import { ServerRoute as ApiActivityActivityIdServerRouteImport } from './routes/api/activity/$activityId'
@@ -412,6 +413,12 @@ const ApiChatHistoryServerRoute = ApiChatHistoryServerRouteImport.update({
   path: '/api/chat/history',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiChatAssignAgentServerRoute =
+  ApiChatAssignAgentServerRouteImport.update({
+    id: '/api/chat/assign-agent',
+    path: '/api/chat/assign-agent',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -707,6 +714,7 @@ export interface FileServerRoutesByFullPath {
   '/api/activity/$activityId': typeof ApiActivityActivityIdServerRoute
   '/api/agent-actions/$actionId': typeof ApiAgentActionsActionIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat/assign-agent': typeof ApiChatAssignAgentServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
@@ -754,6 +762,7 @@ export interface FileServerRoutesByTo {
   '/api/activity/$activityId': typeof ApiActivityActivityIdServerRoute
   '/api/agent-actions/$actionId': typeof ApiAgentActionsActionIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat/assign-agent': typeof ApiChatAssignAgentServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
@@ -802,6 +811,7 @@ export interface FileServerRoutesById {
   '/api/activity/$activityId': typeof ApiActivityActivityIdServerRoute
   '/api/agent-actions/$actionId': typeof ApiAgentActionsActionIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat/assign-agent': typeof ApiChatAssignAgentServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
@@ -851,6 +861,7 @@ export interface FileServerRouteTypes {
     | '/api/activity/$activityId'
     | '/api/agent-actions/$actionId'
     | '/api/auth/$'
+    | '/api/chat/assign-agent'
     | '/api/chat/history'
     | '/api/embed/generate-token'
     | '/api/sources/count'
@@ -898,6 +909,7 @@ export interface FileServerRouteTypes {
     | '/api/activity/$activityId'
     | '/api/agent-actions/$actionId'
     | '/api/auth/$'
+    | '/api/chat/assign-agent'
     | '/api/chat/history'
     | '/api/embed/generate-token'
     | '/api/sources/count'
@@ -945,6 +957,7 @@ export interface FileServerRouteTypes {
     | '/api/activity/$activityId'
     | '/api/agent-actions/$actionId'
     | '/api/auth/$'
+    | '/api/chat/assign-agent'
     | '/api/chat/history'
     | '/api/embed/generate-token'
     | '/api/sources/count'
@@ -993,6 +1006,7 @@ export interface RootServerRouteChildren {
   ApiActivityActivityIdServerRoute: typeof ApiActivityActivityIdServerRoute
   ApiAgentActionsActionIdServerRoute: typeof ApiAgentActionsActionIdServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
+  ApiChatAssignAgentServerRoute: typeof ApiChatAssignAgentServerRoute
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
   ApiEmbedGenerateTokenServerRoute: typeof ApiEmbedGenerateTokenServerRoute
   ApiSourcesCountServerRoute: typeof ApiSourcesCountServerRoute
@@ -1456,6 +1470,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiChatHistoryServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/chat/assign-agent': {
+      id: '/api/chat/assign-agent'
+      path: '/api/chat/assign-agent'
+      fullPath: '/api/chat/assign-agent'
+      preLoaderRoute: typeof ApiChatAssignAgentServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -1616,6 +1637,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiActivityActivityIdServerRoute: ApiActivityActivityIdServerRoute,
   ApiAgentActionsActionIdServerRoute: ApiAgentActionsActionIdServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiChatAssignAgentServerRoute: ApiChatAssignAgentServerRoute,
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
   ApiEmbedGenerateTokenServerRoute: ApiEmbedGenerateTokenServerRoute,
   ApiSourcesCountServerRoute: ApiSourcesCountServerRoute,

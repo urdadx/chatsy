@@ -240,7 +240,6 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
 
       await createDefaultActions(newChatbot.id);
 
-      // Fetch actions after seeding defaults
       const actions = await db
         .select()
         .from(Action)

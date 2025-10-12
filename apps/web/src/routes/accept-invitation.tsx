@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import Spinner from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -7,7 +8,7 @@ import {
   useNavigate,
   useSearch,
 } from "@tanstack/react-router";
-import { Loader2, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import z from "zod";
@@ -75,7 +76,7 @@ function RouteComponent() {
                   >
                     {acceptInvitationMutation.isPending ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Spinner className="text-white" />
                         Accepting...
                       </>
                     ) : (

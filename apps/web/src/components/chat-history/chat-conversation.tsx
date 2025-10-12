@@ -74,16 +74,6 @@ export const ChatConversation = () => {
 
   return (
     <div className="relative flex-1 h-full flex flex-col min-h-0">
-      {/* Show message if chat is not escalated */}
-      {!isEscalated && (
-        <div className="border-b bg-yellow-50 dark:bg-yellow-950 px-4 py-2">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="font-medium text-yellow-700 dark:text-yellow-300">
-              This chat is not escalated. Only escalated chats support live agent communication.
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Status Header */}
       {isEscalated && (
@@ -162,12 +152,12 @@ export const ChatConversation = () => {
               disabled={status === "connecting"}
             >
               {status === "connected"
-                ? "Join the conversation"
+                ? "Join chat"
                 : status === "connecting"
                   ? "Joining..."
                   : status === "error"
                     ? "Join (Retry)"
-                    : "Join the conversation"}
+                    : "Join chat"}
             </Button>
           </>
         ) : isEscalated ? (
