@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { chatbot, question } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { deleteCachedData, withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { and, eq, sql } from "drizzle-orm";
@@ -49,12 +50,18 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       return new Response("Forbidden", { status: 403 });
     }
 
-    const results = await db
-      .select()
-      .from(question)
-      .where(
-        and(eq(question.userId, userId), eq(question.chatbotId, chatbotId)),
-      );
+    const results = await withCache(
+      `questions:${chatbotId}`,
+      async () => {
+        return await db
+          .select()
+          .from(question)
+          .where(
+            and(eq(question.userId, userId), eq(question.chatbotId, chatbotId)),
+          );
+      },
+      { ttl: 60 },
+    );
 
     return json(results);
   },
@@ -98,6 +105,9 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
           sourcesCount: sql`${chatbot.sourcesCount} + 1`,
         })
         .where(eq(chatbot.id, chatbotId));
+
+      // Invalidate cache
+      await deleteCachedData(`questions:${chatbotId}`);
     }
 
     return json(newQuestion);
@@ -154,6 +164,9 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
           sourcesCount: sql`greatest(0, ${chatbot.sourcesCount} - 1)`,
         })
         .where(eq(chatbot.id, chatbotId));
+
+      // Invalidate cache
+      await deleteCachedData(`questions:${chatbotId}`);
     }
 
     return json(deletedQuestion);
@@ -210,6 +223,9 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
         { status: 404 },
       );
     }
+
+    // Invalidate cache
+    await deleteCachedData(`questions:${chatbotId}`);
 
     return json(updatedQuestion);
   },

@@ -16,11 +16,9 @@ const leadSchema = z.object({
 export const ServerRoute = createServerFileRoute("/api/leads").methods({
   POST: async ({ request }) => {
     try {
-      // Extract location from Cloudflare headers
       const cfCountry = request.headers.get("CF-IPCountry");
       const cfCity = request.headers.get("CF-IPCity");
 
-      // Build location string from Cloudflare headers
       let detectedLocation: string | undefined;
       if (cfCity && cfCountry) {
         detectedLocation = `${cfCity}, ${cfCountry}`;
@@ -58,7 +56,6 @@ export const ServerRoute = createServerFileRoute("/api/leads").methods({
         }
         chatbotId = chatbotData.chatbotId;
       } else {
-        // Chat preview scenario - use session to get organization
         const session = await auth.api.getSession({ headers: request.headers });
         if (!session?.user?.id) {
           return json({ error: "Unauthorized" }, { status: 401 });
@@ -76,7 +73,7 @@ export const ServerRoute = createServerFileRoute("/api/leads").methods({
         name: parsed.data.name,
         contact: parsed.data.contact,
         message: parsed.data.message,
-        location: detectedLocation, // Use Cloudflare-detected location
+        location: detectedLocation,
       });
       return json({ success: true, message: "Lead collected successfully" });
     } catch (error) {

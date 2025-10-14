@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { visitorAnalytics } from "@/db/schema";
 import { getLocationFromCloudflare } from "@/lib/cloudflare-headers";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { deleteCachedData, withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { and, desc, eq } from "drizzle-orm";
@@ -23,33 +24,6 @@ const analyticsSchema = z.object({
   durationMs: z.number().optional(),
   extra: z.record(z.string(), z.any()).optional(),
 });
-
-// ============================================================================
-// Cache (Simple in-memory cache for GET requests)
-// ============================================================================
-const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL = 5000;
-
-const getCachedData = (key: string) => {
-  const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
-  }
-  cache.delete(key);
-  return null;
-};
-
-const setCachedData = (key: string, data: any) => {
-  cache.set(key, { data, timestamp: Date.now() });
-  if (cache.size > 100) {
-    const firstKey = cache.keys().next().value;
-    if (firstKey) cache.delete(firstKey);
-  }
-};
-
-// ============================================================================
-// Routes
-// ============================================================================
 
 export const ServerRoute = createServerFileRoute(
   "/api/visitor-analytics",
@@ -87,7 +61,7 @@ export const ServerRoute = createServerFileRoute(
         extra: data.extra,
       });
 
-      cache.delete(`analytics:${data.chatbotId}`);
+      await deleteCachedData(`analytics:${data.chatbotId}`);
 
       return json({ success: true });
     } catch (error) {
@@ -114,22 +88,20 @@ export const ServerRoute = createServerFileRoute(
         return json({ error: "No active chatbot" }, { status: 401 });
       }
 
-      const cacheKey = `analytics:${chatbotId}`;
-      const cached = getCachedData(cacheKey);
-      if (cached) {
-        return json(cached, { status: 200 });
-      }
-
-      const records = await db.query.visitorAnalytics.findMany({
-        where: and(
-          eq(visitorAnalytics.chatbotId, chatbotId),
-          eq(visitorAnalytics.event, "page_visit"),
-        ),
-        orderBy: desc(visitorAnalytics.createdAt),
-        limit: 500,
-      });
-
-      setCachedData(cacheKey, records);
+      const records = await withCache(
+        `analytics:${chatbotId}`,
+        async () => {
+          return await db.query.visitorAnalytics.findMany({
+            where: and(
+              eq(visitorAnalytics.chatbotId, chatbotId),
+              eq(visitorAnalytics.event, "page_visit"),
+            ),
+            orderBy: desc(visitorAnalytics.createdAt),
+            limit: 500,
+          });
+        },
+        { ttl: 60 },
+      );
 
       return json(records, { status: 200 });
     } catch (error) {

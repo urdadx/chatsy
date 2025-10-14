@@ -104,7 +104,7 @@ export const ServerRoute = createServerFileRoute(
         .update(chat)
         .set({
           agentAssigned: memberId,
-          status: "escalated", // auto escalate
+          status: "escalated",
         })
         .where(eq(chat.id, chatId))
         .returning();

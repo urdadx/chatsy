@@ -88,3 +88,10 @@ export const tokenUsageMiddleware = createMiddleware({
     });
   }
 });
+
+// Export rate limit middlewares
+export {
+  rateLimitMiddleware,
+  chatRateLimitMiddleware,
+  embedChatRateLimitMiddleware,
+} from "./rate-limit";

@@ -429,14 +429,33 @@ export const timeAgo = (
 
   const diff = Date.now() - date.getTime();
 
+  // Handle future timestamps
+  if (diff < 0) return "Just now";
+
+  // Less than 1 minute
   if (diff < 60000) {
-    // less than 1 minute
     return "Just now";
   }
 
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  if (years > 0) {
+    return `${years} year${years > 1 ? "s" : ""} ago`;
+  }
+
+  if (months > 0) {
+    return `${months} month${months > 1 ? "s" : ""} ago`;
+  }
+
+  if (weeks > 0) {
+    return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+  }
 
   if (days > 0) {
     return `${days} day${days > 1 ? "s" : ""} ago`;

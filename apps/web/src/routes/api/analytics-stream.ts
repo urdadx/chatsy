@@ -1,14 +1,11 @@
 import { db } from "@/db";
 import { visitorAnalytics } from "@/db/schema";
+import { cacheKeys, withCache } from "@/lib/cache";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { and, count, desc, eq, gte, isNotNull } from "drizzle-orm";
 import { auth } from "../../../auth";
-
-// ============================================================================
-// Types
-// ============================================================================
 
 interface AnalyticsData {
   totalVisits: number;
@@ -27,185 +24,152 @@ interface AnalyticsData {
 }
 
 // ============================================================================
-// Cache Layer
-// ============================================================================
-
-const analyticsCache = new Map<
-  string,
-  { data: AnalyticsData; timestamp: number }
->();
-const CACHE_TTL = 3000; // 3 seconds
-
-const getCachedAnalytics = (chatbotId: string): AnalyticsData | null => {
-  const cached = analyticsCache.get(chatbotId);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
-  }
-  analyticsCache.delete(chatbotId);
-  return null;
-};
-
-const setCachedAnalytics = (chatbotId: string, data: AnalyticsData) => {
-  analyticsCache.set(chatbotId, { data, timestamp: Date.now() });
-  // Clean old cache entries
-  if (analyticsCache.size > 50) {
-    const firstKey = analyticsCache.keys().next().value;
-    if (firstKey) analyticsCache.delete(firstKey);
-  }
-};
-
-// ============================================================================
 // Analytics Data Fetcher
 // ============================================================================
 
 async function getAnalyticsData(chatbotId: string): Promise<AnalyticsData> {
-  // Check cache first
-  const cached = getCachedAnalytics(chatbotId);
-  if (cached) return cached;
+  return withCache(
+    cacheKeys.analytics.data(chatbotId),
+    async () => {
+      try {
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+        const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-  try {
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const [
+          totalVisitsResult,
+          recentActivity,
+          sessionRecords,
+          last24HoursVisits,
+        ] = await Promise.all([
+          db
+            .select({ count: count() })
+            .from(visitorAnalytics)
+            .where(
+              and(
+                eq(visitorAnalytics.chatbotId, chatbotId),
+                eq(visitorAnalytics.event, "page_visit"),
+              ),
+            ),
+          db.query.visitorAnalytics.findMany({
+            where: and(
+              eq(visitorAnalytics.chatbotId, chatbotId),
+              gte(visitorAnalytics.createdAt, fiveMinutesAgo),
+            ),
+            columns: {
+              visitorId: true,
+              event: true,
+              createdAt: true,
+            },
+            orderBy: desc(visitorAnalytics.createdAt),
+          }),
+          // Session duration data
+          db.query.visitorAnalytics.findMany({
+            where: and(
+              eq(visitorAnalytics.chatbotId, chatbotId),
+              isNotNull(visitorAnalytics.durationMs),
+            ),
+            columns: {
+              durationMs: true,
+              event: true,
+              extra: true,
+            },
+          }),
+          // Last 24 hours visits
+          db.query.visitorAnalytics.findMany({
+            where: and(
+              eq(visitorAnalytics.chatbotId, chatbotId),
+              eq(visitorAnalytics.event, "page_visit"),
+              gte(visitorAnalytics.createdAt, last24Hours),
+            ),
+            columns: {
+              createdAt: true,
+            },
+          }),
+        ]);
 
-    // Parallel queries for better performance
-    const [
-      totalVisitsResult,
-      recentActivity,
-      sessionRecords,
-      last24HoursVisits,
-    ] = await Promise.all([
-      // Total visits
-      db
-        .select({ count: count() })
-        .from(visitorAnalytics)
-        .where(
-          and(
-            eq(visitorAnalytics.chatbotId, chatbotId),
-            eq(visitorAnalytics.event, "page_visit"),
-          ),
-        ),
-      // Recent activity for active visitors
-      db.query.visitorAnalytics.findMany({
-        where: and(
-          eq(visitorAnalytics.chatbotId, chatbotId),
-          gte(visitorAnalytics.createdAt, fiveMinutesAgo),
-        ),
-        columns: {
-          visitorId: true,
-          event: true,
-          createdAt: true,
-        },
-        orderBy: desc(visitorAnalytics.createdAt),
-      }),
-      // Session duration data
-      db.query.visitorAnalytics.findMany({
-        where: and(
-          eq(visitorAnalytics.chatbotId, chatbotId),
-          isNotNull(visitorAnalytics.durationMs),
-        ),
-        columns: {
-          durationMs: true,
-          event: true,
-          extra: true,
-        },
-      }),
-      // Last 24 hours visits
-      db.query.visitorAnalytics.findMany({
-        where: and(
-          eq(visitorAnalytics.chatbotId, chatbotId),
-          eq(visitorAnalytics.event, "page_visit"),
-          gte(visitorAnalytics.createdAt, last24Hours),
-        ),
-        columns: {
-          createdAt: true,
-        },
-      }),
-    ]);
+        // Calculate active visitors
+        const visitorLastEvent = new Map<
+          string,
+          { event: string; timestamp: Date }
+        >();
+        recentActivity.forEach((activity) => {
+          const existing = visitorLastEvent.get(activity.visitorId);
+          const activityTime = new Date(activity.createdAt);
 
-    // Calculate active visitors
-    const visitorLastEvent = new Map<
-      string,
-      { event: string; timestamp: Date }
-    >();
-    recentActivity.forEach((activity) => {
-      const existing = visitorLastEvent.get(activity.visitorId);
-      const activityTime = new Date(activity.createdAt);
-
-      if (!existing || activityTime > existing.timestamp) {
-        visitorLastEvent.set(activity.visitorId, {
-          event: activity.event || "",
-          timestamp: activityTime,
+          if (!existing || activityTime > existing.timestamp) {
+            visitorLastEvent.set(activity.visitorId, {
+              event: activity.event || "",
+              timestamp: activityTime,
+            });
+          }
         });
+
+        const activeVisitors = Array.from(visitorLastEvent.values()).filter(
+          (lastEvent) =>
+            !lastEvent.event.includes("unload") &&
+            !lastEvent.event.includes("closed"),
+        ).length;
+
+        // Calculate session averages
+        const calculateAverage = (sessions: typeof sessionRecords) => {
+          if (sessions.length === 0) return 0;
+          const totalDuration = sessions.reduce(
+            (sum, session) => sum + (session.durationMs || 0),
+            0,
+          );
+          return Math.round(totalDuration / sessions.length);
+        };
+
+        const bioPageSessions = sessionRecords.filter(
+          (record) =>
+            (record.extra as any)?.page_type === "bio_page" ||
+            record.event === "page_unload",
+        );
+
+        const widgetSessions = sessionRecords.filter(
+          (record) =>
+            (record.extra as any)?.widget_type === "chat_widget" ||
+            record.event === "widget_closed" ||
+            record.event === "widget_page_unload",
+        );
+
+        // Group last 24 hours by hour
+        const hourlyActivity = [];
+        for (let i = 23; i >= 0; i--) {
+          const hourStart = new Date(Date.now() - i * 60 * 60 * 1000);
+          hourStart.setMinutes(0, 0, 0);
+          const hourEnd = new Date(hourStart.getTime() + 60 * 60 * 1000);
+
+          const visitsInHour = last24HoursVisits.filter((visit) => {
+            const visitTime = new Date(visit.createdAt);
+            return visitTime >= hourStart && visitTime < hourEnd;
+          }).length;
+
+          hourlyActivity.push({
+            timestamp: hourStart.toISOString(),
+            visits: visitsInHour,
+            chats: 0,
+          });
+        }
+
+        return {
+          totalVisits: totalVisitsResult[0]?.count || 0,
+          activeVisitors,
+          averageSessionTime: calculateAverage(sessionRecords),
+          totalSessions: sessionRecords.length,
+          bioPageSessions: bioPageSessions.length,
+          widgetSessions: widgetSessions.length,
+          bioPageAverage: calculateAverage(bioPageSessions),
+          widgetAverage: calculateAverage(widgetSessions),
+          recentActivity: hourlyActivity,
+        };
+      } catch (error) {
+        console.error("Error fetching analytics data:", error);
+        throw error;
       }
-    });
-
-    const activeVisitors = Array.from(visitorLastEvent.values()).filter(
-      (lastEvent) =>
-        !lastEvent.event.includes("unload") &&
-        !lastEvent.event.includes("closed"),
-    ).length;
-
-    // Calculate session averages
-    const calculateAverage = (sessions: typeof sessionRecords) => {
-      if (sessions.length === 0) return 0;
-      const totalDuration = sessions.reduce(
-        (sum, session) => sum + (session.durationMs || 0),
-        0,
-      );
-      return Math.round(totalDuration / sessions.length);
-    };
-
-    const bioPageSessions = sessionRecords.filter(
-      (record) =>
-        (record.extra as any)?.page_type === "bio_page" ||
-        record.event === "page_unload",
-    );
-
-    const widgetSessions = sessionRecords.filter(
-      (record) =>
-        (record.extra as any)?.widget_type === "chat_widget" ||
-        record.event === "widget_closed" ||
-        record.event === "widget_page_unload",
-    );
-
-    // Group last 24 hours by hour
-    const hourlyActivity = [];
-    for (let i = 23; i >= 0; i--) {
-      const hourStart = new Date(Date.now() - i * 60 * 60 * 1000);
-      hourStart.setMinutes(0, 0, 0);
-      const hourEnd = new Date(hourStart.getTime() + 60 * 60 * 1000);
-
-      const visitsInHour = last24HoursVisits.filter((visit) => {
-        const visitTime = new Date(visit.createdAt);
-        return visitTime >= hourStart && visitTime < hourEnd;
-      }).length;
-
-      hourlyActivity.push({
-        timestamp: hourStart.toISOString(),
-        visits: visitsInHour,
-        chats: 0,
-      });
-    }
-
-    const result: AnalyticsData = {
-      totalVisits: totalVisitsResult[0]?.count || 0,
-      activeVisitors,
-      averageSessionTime: calculateAverage(sessionRecords),
-      totalSessions: sessionRecords.length,
-      bioPageSessions: bioPageSessions.length,
-      widgetSessions: widgetSessions.length,
-      bioPageAverage: calculateAverage(bioPageSessions),
-      widgetAverage: calculateAverage(widgetSessions),
-      recentActivity: hourlyActivity,
-    };
-
-    // Cache the result
-    setCachedAnalytics(chatbotId, result);
-    return result;
-  } catch (error) {
-    console.error("Error fetching analytics data:", error);
-    throw error;
-  }
+    },
+    { ttl: 3000 },
+  );
 }
 
 // ============================================================================

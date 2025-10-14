@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { calendlyIntegration, chatbot } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { ensureCalendlyAccessToken } from "@/lib/integrations/calendly";
+import { withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -87,87 +88,97 @@ export const ServerRoute = createServerFileRoute(
     }
 
     try {
-      const [bot] = await db
-        .select({ id: chatbot.id, organizationId: chatbot.organizationId })
-        .from(chatbot)
-        .where(
-          and(
-            eq(chatbot.id, params.chatbotId),
-            eq(chatbot.organizationId, organizationId),
-          ),
-        );
-      if (!bot) {
-        return json({ error: "Chatbot not found" }, { status: 404 });
-      }
+      const settingsData = await withCache(
+        `calendly-settings:${params.chatbotId}`,
+        async () => {
+          const [bot] = await db
+            .select({ id: chatbot.id, organizationId: chatbot.organizationId })
+            .from(chatbot)
+            .where(
+              and(
+                eq(chatbot.id, params.chatbotId),
+                eq(chatbot.organizationId, organizationId),
+              ),
+            );
+          if (!bot) {
+            throw new Error("Chatbot not found");
+          }
 
-      const { integration: integrationData } = await ensureCalendlyAccessToken(
-        params.chatbotId,
+          const { integration: integrationData } =
+            await ensureCalendlyAccessToken(params.chatbotId);
+
+          let calendlyAccount: any = null;
+          if (integrationData) {
+            let userEmail: string | undefined;
+            if (integrationData.userUri) {
+              try {
+                const userResponse = await fetch(
+                  `https://api.calendly.com/users/${integrationData.userUri.split("/").pop()}`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${integrationData.accessToken}`,
+                      "Content-Type": "application/json",
+                    },
+                  },
+                );
+
+                if (userResponse.ok) {
+                  const userData = await userResponse.json();
+                  userEmail = userData.resource?.email;
+                }
+              } catch (e) {
+                console.warn("Failed to fetch Calendly user email:", e);
+              }
+            }
+
+            const eventTypes =
+              Array.isArray(integrationData.eventTypes) &&
+              integrationData.eventTypes.length > 0
+                ? integrationData.eventTypes
+                : await fetchEventTypes(
+                    integrationData.organizationUri,
+                    integrationData.accessToken,
+                    integrationData.userUri,
+                  );
+
+            // Persist fetched event types if we had none stored previously
+            if (
+              (!integrationData.eventTypes ||
+                (Array.isArray(integrationData.eventTypes) &&
+                  integrationData.eventTypes.length === 0)) &&
+              eventTypes.length > 0
+            ) {
+              try {
+                await db
+                  .update(calendlyIntegration)
+                  .set({ eventTypes, updatedAt: new Date() })
+                  .where(eq(calendlyIntegration.id, integrationData.id));
+              } catch (e) {
+                console.warn("Failed to persist Calendly event types", e);
+              }
+            }
+
+            calendlyAccount = {
+              connected: true,
+              organizationUri: integrationData.organizationUri,
+              userUri: integrationData.userUri,
+              userEmail,
+              eventTypes,
+              accessTokenExpiresAt: integrationData.accessTokenExpiresAt,
+            };
+          }
+
+          return { chatbotId: bot.id, calendlyAccount };
+        },
+        { ttl: 300 }, // 5 minutes TTL for integration settings
       );
 
-      let calendlyAccount: any = null;
-      if (integrationData) {
-        let userEmail: string | undefined;
-        if (integrationData.userUri) {
-          try {
-            const userResponse = await fetch(
-              `https://api.calendly.com/users/${integrationData.userUri.split("/").pop()}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${integrationData.accessToken}`,
-                  "Content-Type": "application/json",
-                },
-              },
-            );
-
-            if (userResponse.ok) {
-              const userData = await userResponse.json();
-              userEmail = userData.resource?.email;
-            }
-          } catch (e) {
-            console.warn("Failed to fetch Calendly user email:", e);
-          }
-        }
-
-        const eventTypes =
-          Array.isArray(integrationData.eventTypes) &&
-          integrationData.eventTypes.length > 0
-            ? integrationData.eventTypes
-            : await fetchEventTypes(
-                integrationData.organizationUri,
-                integrationData.accessToken,
-                integrationData.userUri,
-              );
-
-        // Persist fetched event types if we had none stored previously
-        if (
-          (!integrationData.eventTypes ||
-            (Array.isArray(integrationData.eventTypes) &&
-              integrationData.eventTypes.length === 0)) &&
-          eventTypes.length > 0
-        ) {
-          try {
-            await db
-              .update(calendlyIntegration)
-              .set({ eventTypes, updatedAt: new Date() })
-              .where(eq(calendlyIntegration.id, integrationData.id));
-          } catch (e) {
-            console.warn("Failed to persist Calendly event types", e);
-          }
-        }
-
-        calendlyAccount = {
-          connected: true,
-          organizationUri: integrationData.organizationUri,
-          userUri: integrationData.userUri,
-          userEmail,
-          eventTypes,
-          accessTokenExpiresAt: integrationData.accessTokenExpiresAt,
-        };
-      }
-
-      return json({ chatbotId: bot.id, calendlyAccount });
+      return json(settingsData);
     } catch (error) {
       console.error("Get Calendly settings error:", error);
+      if (error instanceof Error && error.message === "Chatbot not found") {
+        return json({ error: "Chatbot not found" }, { status: 404 });
+      }
       return json({ error: "Failed to fetch settings" }, { status: 500 });
     }
   },

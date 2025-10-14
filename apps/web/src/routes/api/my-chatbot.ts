@@ -7,6 +7,7 @@ import {
 } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { deleteCachedData, withCache } from "@/lib/redis/cache";
 import { checkSubscriptionLimits } from "@/lib/subscription/subscription-utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -30,7 +31,7 @@ const createChatbotSchema = z.object({
 });
 
 const deleteChatbotSchema = z.object({
-  chatbotId: z.string().uuid("Invalid chatbot ID format"),
+  chatbotId: z.string("Invalid chatbot ID format"),
 });
 
 export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
@@ -49,23 +50,34 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       return new Response("No active chatbot found", { status: 404 });
     }
 
-    const [userChatbot] = await db.query.chatbot.findMany({
-      where: (fields, { eq }) => eq(fields.id, activeChatbotId),
-    });
+    const chatbotData = await withCache(
+      `chatbot:${activeChatbotId}:full`,
+      async () => {
+        const [userChatbot] = await db.query.chatbot.findMany({
+          where: (fields, { eq }) => eq(fields.id, activeChatbotId),
+        });
 
-    if (!userChatbot) {
+        if (!userChatbot) {
+          return null;
+        }
+
+        const actions = await db
+          .select()
+          .from(Action)
+          .where(eq(Action.chatbotId, activeChatbotId));
+
+        return { ...userChatbot, actions };
+      },
+      { ttl: 60 },
+    );
+
+    if (!chatbotData) {
       return new Response("Could not retrieve active chatbot data", {
         status: 404,
       });
     }
 
-    // Fetch related actions (quick menu actions) for the chatbot
-    const actions = await db
-      .select()
-      .from(Action)
-      .where(eq(Action.chatbotId, activeChatbotId));
-
-    return json({ ...userChatbot, actions });
+    return json(chatbotData);
   },
   PATCH: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
@@ -120,6 +132,9 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         if (!updated) {
           return new Response("Chatbot not found", { status: 404 });
         }
+
+        // Invalidate the cache after updating
+        await deleteCachedData(`chatbot:${activeChatbotId}:full`);
 
         const actions = await db
           .select()

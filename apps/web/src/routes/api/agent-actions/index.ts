@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { Action } from "@/db/schema";
 import { ChatSDKError } from "@/lib/errors";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { deleteCachedData, withCache } from "@/lib/redis/cache";
 import { subscriptionMiddleware } from "@/middlewares";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -47,10 +48,16 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
             return error.toResponse();
           }
 
-          const actions = await db
-            .select()
-            .from(Action)
-            .where(eq(Action.chatbotId, chatbotId));
+          const actions = await withCache(
+            `actions:${chatbotId}`,
+            async () => {
+              return await db
+                .select()
+                .from(Action)
+                .where(eq(Action.chatbotId, chatbotId));
+            },
+            { ttl: 60 },
+          );
 
           return json({ actions }, { status: 200 });
         } catch (error) {
@@ -120,6 +127,9 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
               isActive: true,
             })
             .returning();
+
+          // Invalidate cache
+          await deleteCachedData(`actions:${chatbotId}`);
 
           return json(
             {
@@ -212,6 +222,9 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
             return error.toResponse();
           }
 
+          // Invalidate cache
+          await deleteCachedData(`actions:${chatbotId}`);
+
           return json(
             { success: true, action: updatedAction },
             { status: 200 },
@@ -279,6 +292,9 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
           }
 
           await db.delete(Action).where(eq(Action.id, actionId));
+
+          // Invalidate cache
+          await deleteCachedData(`actions:${chatbotId}`);
 
           return json(
             { success: true, message: "Action deleted successfully" },

@@ -8,10 +8,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
+import { useUpdateChatbot } from "@/hooks/use-chatbot";
 import { authClient, useSession } from "@/lib/auth-client";
-import { InfoIcon, Plus, Trash2, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { InfoIcon, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { AddOnsDialog } from "../add-ons-dialog";
 import { AvatarUpload } from "../avatar-upload";
@@ -34,21 +34,14 @@ export function ChatbotSettings(
   const updateChatbotMutation = useUpdateChatbot();
   const { data: session } = useSession();
 
-  const [name, setName] = useState("");
+  const [name, setName] = useState(chatbot?.name || "");
   const [hidePoweredBy, setHidePoweredBy] = useState(
     chatbot?.hidePoweredBy || false,
   );
-  const [initialMessage, setInitialMessage] = useState("");
-  const [suggestedMessages, setSuggestedMessages] = useState<string[]>([]);
+  const [initialMessage, setInitialMessage] = useState(chatbot?.initialMessage || "");
+  const [suggestedMessages, setSuggestedMessages] = useState<string[]>(chatbot?.suggestedMessages || []);
   const [showSuggestedInput, setShowSuggestedInput] = useState(false);
   const [addonsDialogOpen, setAddonsDialogOpen] = useState(false);
-
-  useEffect(() => {
-    setName(chatbot?.name || "");
-    setHidePoweredBy(chatbot?.hidePoweredBy || false);
-    setInitialMessage(chatbot?.initialMessage || "");
-    setSuggestedMessages(chatbot?.suggestedMessages || []);
-  }, [chatbot]);
 
   const updateChatbot = async (updates: Partial<typeof chatbot>) => {
     if (!chatbot) return;

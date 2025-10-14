@@ -61,9 +61,7 @@ function RouteComponent() {
             </p>
           </div>
 
-          <ChatbotSettings
-            chatbot={chatbot}
-          />
+          <ChatbotSettings key={chatbot?.id} chatbot={chatbot} />
         </div>
       </div>
 

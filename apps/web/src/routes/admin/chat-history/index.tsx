@@ -29,7 +29,7 @@ import z from "zod";
 
 export const chatHistorySearchSchema = z.object({
   chatId: z.string().optional(),
-  filter: z.enum(["24h", "7d", "30d", "90d", "all"]).default("7d"),
+  filter: z.enum(["24h", "7d", "30d", "90d", "all"]).default("24h"),
   status: z.enum(["all", "unresolved", "resolved", "escalated"]).default("all"),
 });
 
@@ -209,7 +209,7 @@ function RouteComponent() {
                       onClick={() => handleChatIdChange(chat.id)}
                       title={chat.title || "Untitled Chat"}
                       isSelected={chatId === chat.id}
-                      description={`${new Date(chat.createdAt).toLocaleDateString()}`}
+                      description={chat.createdAt}
                     />
                   ))}
 

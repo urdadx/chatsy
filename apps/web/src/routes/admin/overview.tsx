@@ -12,7 +12,6 @@ export const Route = createFileRoute("/admin/overview")({
 });
 
 function RouteComponent() {
-  // Use the custom hook that handles all data fetching and loading states
   const {
     trainingData,
     sourcesCount,

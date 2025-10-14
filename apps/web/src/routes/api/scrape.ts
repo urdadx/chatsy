@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { chatbot, websiteSource } from "@/db/schema";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { deleteCachedData, withCache } from "@/lib/redis/cache";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -37,10 +38,16 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
     }
 
     try {
-      const scrapedData = await db
-        .select()
-        .from(websiteSource)
-        .where(eq(websiteSource.chatbotId, chatbotId));
+      const scrapedData = await withCache(
+        `scraped-data:${chatbotId}`,
+        async () => {
+          return await db
+            .select()
+            .from(websiteSource)
+            .where(eq(websiteSource.chatbotId, chatbotId));
+        },
+        { ttl: 60 },
+      );
 
       return json({ success: true, data: scrapedData });
     } catch (error) {
@@ -81,7 +88,7 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
     const parsed = scrapeRequestSchema.safeParse(body);
 
     if (!parsed.success) {
-      return json({ error: parsed.error.format() }, { status: 400 });
+      return json({ error: z.treeifyError(parsed.error) }, { status: 400 });
     }
 
     const { url } = parsed.data;
@@ -121,6 +128,9 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
               sourcesCount: sql`${chatbot.sourcesCount} + 1`,
             })
             .where(eq(chatbot.id, chatbotId));
+
+          // Invalidate cache
+          await deleteCachedData(`scraped-data:${chatbotId}`);
         }
 
         return json({ success: true, data: inserted });
@@ -200,6 +210,9 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
           sourcesCount: sql`greatest(0, ${chatbot.sourcesCount} - 1)`,
         })
         .where(eq(chatbot.id, chatbotId));
+
+      // Invalidate cache
+      await deleteCachedData(`scraped-data:${chatbotId}`);
 
       return json({ success: true });
     } catch (error) {

@@ -18,7 +18,7 @@ export const getChatById = createServerFn({ method: "GET" })
           channel: chat.channel,
           status: chat.status,
           agentAssigned: chat.agentAssigned,
-          chatMetaData: chat.chatMetaData,
+          chatMetaData: chat.chatMetaData as {},
           assignedUser: {
             id: user.id,
             name: user.name,

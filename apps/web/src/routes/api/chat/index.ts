@@ -25,7 +25,11 @@ import { ChatSDKError } from "@/lib/errors";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getCustomerExternalId } from "@/lib/subscription/subscription-functions";
 import { detectDeviceFromUserAgent, generateUUID } from "@/lib/utils";
-import { subscriptionMiddleware, tokenUsageMiddleware } from "@/middlewares";
+import {
+  chatRateLimitMiddleware,
+  subscriptionMiddleware,
+  tokenUsageMiddleware,
+} from "@/middlewares";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import {
@@ -42,7 +46,11 @@ import { eq } from "drizzle-orm";
 export const ServerRoute = createServerFileRoute("/api/chat/").methods(
   (api) => ({
     POST: api
-      .middleware([subscriptionMiddleware, tokenUsageMiddleware])
+      .middleware([
+        subscriptionMiddleware,
+        tokenUsageMiddleware,
+        chatRateLimitMiddleware,
+      ])
       .handler(async ({ request, context }) => {
         try {
           const { id, messages } = await request.json();

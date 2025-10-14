@@ -74,3 +74,44 @@ export type ChatbotDetails = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type DeviceInfo = {
+  type: "mobile" | "tablet" | "desktop" | "unknown";
+  os: string;
+  browser: string;
+  isIOS: boolean;
+  isAndroid: boolean;
+  isMac: boolean;
+  isWindows: boolean;
+  isLinux: boolean;
+  isSafari: boolean;
+  isChrome: boolean;
+  isFirefox: boolean;
+  isEdge: boolean;
+  model?: string;
+};
+
+export type ChatMetaData = {
+  country?: string;
+  city?: string;
+  timezone?: string;
+  device?: DeviceInfo;
+};
+
+export type ChatData = {
+  id: string;
+  createdAt: Date;
+  title: string;
+  userId: string | null;
+  chatbotId: string;
+  visibility: string;
+  channel: string;
+  status: string;
+  agentAssigned: string | null;
+  chatMetaData: unknown;
+  assignedUser: {
+    id: string;
+    name: string | null;
+    email: string;
+  } | null;
+};

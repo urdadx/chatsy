@@ -3,6 +3,7 @@ import { chatbot, documentSource } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { deleteFileFromStorage } from "@/lib/hooks/delete-from-storage";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { deleteCachedData, withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { and, eq, sql } from "drizzle-orm";
@@ -17,7 +18,7 @@ const createDocumentSourceSchema = z.object({
 });
 
 const deleteDocumentSourceSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
 });
 
 export const ServerRoute = createServerFileRoute(
@@ -54,15 +55,21 @@ export const ServerRoute = createServerFileRoute(
       return new Response("Forbidden", { status: 403 });
     }
 
-    const results = await db
-      .select()
-      .from(documentSource)
-      .where(
-        and(
-          eq(documentSource.userId, userId),
-          eq(documentSource.chatbotId, chatbotId),
-        ),
-      );
+    const results = await withCache(
+      `document-sources:${chatbotId}`,
+      async () => {
+        return await db
+          .select()
+          .from(documentSource)
+          .where(
+            and(
+              eq(documentSource.userId, userId),
+              eq(documentSource.chatbotId, chatbotId),
+            ),
+          );
+      },
+      { ttl: 60 },
+    );
 
     return json(results);
   },
@@ -110,6 +117,9 @@ export const ServerRoute = createServerFileRoute(
           sourcesCount: sql`${chatbot.sourcesCount} + 1`,
         })
         .where(eq(chatbot.id, chatbotId));
+
+      // Invalidate cache
+      await deleteCachedData(`document-sources:${chatbotId}`);
     }
 
     return json(newDocumentSource);
@@ -189,6 +199,9 @@ export const ServerRoute = createServerFileRoute(
       } catch (error) {
         console.error("Failed to delete file from storage:", error);
       }
+
+      // Invalidate cache
+      await deleteCachedData(`document-sources:${chatbotId}`);
     }
 
     return json({ message: "Document source deleted", deleted });

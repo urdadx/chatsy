@@ -29,7 +29,7 @@ export const ChatConversation = () => {
   const { data: chatData } = useChat(chatId || "");
 
   const messages = messagesFromDb ? convertToUIMessages(messagesFromDb) : [];
-  const isEscalated = chatData?.status === "escalated";
+  const isEscalated = (chatData as any)?.status === "escalated";
 
   const [draft, setDraft] = useState("");
   const [hasJoined, setHasJoined] = useState(false);

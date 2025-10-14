@@ -1,4 +1,5 @@
 import { getChatById } from "@/lib/server-functions/chat-queries"
+import type { ChatData, ChatMetaData } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { useQuery } from "@tanstack/react-query"
 import { format } from "date-fns"
@@ -6,47 +7,6 @@ import { Info } from "lucide-react"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
-
-type DeviceInfo = {
-  type: "mobile" | "tablet" | "desktop" | "unknown"
-  os: string
-  browser: string
-  isIOS: boolean
-  isAndroid: boolean
-  isMac: boolean
-  isWindows: boolean
-  isLinux: boolean
-  isSafari: boolean
-  isChrome: boolean
-  isFirefox: boolean
-  isEdge: boolean
-  model?: string
-}
-
-type ChatMetaData = {
-  country?: string
-  city?: string
-  timezone?: string
-  device?: DeviceInfo
-}
-
-type ChatData = {
-  id: string
-  createdAt: Date
-  title: string
-  userId: string | null
-  chatbotId: string
-  visibility: string
-  channel: string
-  status: string
-  agentAssigned: string | null
-  chatMetaData: unknown
-  assignedUser: {
-    id: string
-    name: string | null
-    email: string
-  } | null
-}
 
 export const ChatDetailsDialog = ({ chatId }: { chatId?: string }) => {
   const { data: chat, isLoading } = useQuery({
@@ -117,7 +77,6 @@ export const ChatDetailsDialog = ({ chatId }: { chatId?: string }) => {
 
               {metadata && (
                 <>
-
                   {(metadata.country || metadata.city) && (
                     <div className="flex items-center justify-between">
                       <span className="text-base font-medium text-muted-foreground">Location</span>

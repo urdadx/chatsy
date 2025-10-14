@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { Action } from "@/db/schema";
+import { cacheKeys, withCache } from "@/lib/cache";
 import { ChatSDKError } from "@/lib/errors";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { subscriptionMiddleware } from "@/middlewares";
@@ -50,11 +51,20 @@ export const ServerRoute = createServerFileRoute(
           return error.toResponse();
         }
 
-        // Get the specific action
-        const [action] = await db
-          .select()
-          .from(Action)
-          .where(and(eq(Action.id, actionId), eq(Action.chatbotId, chatbotId)));
+        // Get the specific action with cache (1 minute TTL)
+        const action = await withCache(
+          cacheKeys.action.get(actionId, chatbotId),
+          async () => {
+            const [result] = await db
+              .select()
+              .from(Action)
+              .where(
+                and(eq(Action.id, actionId), eq(Action.chatbotId, chatbotId)),
+              );
+            return result || null;
+          },
+          { ttl: 60000 },
+        );
 
         if (!action) {
           const error = new ChatSDKError("not_found:api", "Action not found");
@@ -132,6 +142,9 @@ export const ServerRoute = createServerFileRoute(
           .where(eq(Action.id, actionId))
           .returning();
 
+        // Invalidate cache for this action
+        cacheKeys.action.invalidate(actionId, chatbotId);
+
         return json(
           {
             success: true,
@@ -188,6 +201,9 @@ export const ServerRoute = createServerFileRoute(
 
         // Delete the action
         await db.delete(Action).where(eq(Action.id, actionId));
+
+        // Invalidate cache for this action
+        cacheKeys.action.invalidate(actionId, chatbotId);
 
         return json(
           { success: true, message: "Action deleted successfully" },
