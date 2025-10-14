@@ -19,7 +19,7 @@ import { customButtonTool } from "@/lib/ai/tools/custom-button-tool";
 import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
 import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search-tool";
 import { ChatSDKError } from "@/lib/errors";
-import { generateUUID } from "@/lib/utils";
+import { detectDeviceFromUserAgent, generateUUID } from "@/lib/utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import {
@@ -121,6 +121,24 @@ export const ServerRoute = createServerFileRoute(
         } else {
           channel = "widget";
         }
+
+        // Capture user metadata
+        const userAgent = request.headers.get("user-agent") || "";
+        const timezone =
+          request.headers.get("x-timezone") ||
+          Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        const country = request.headers.get("cf-ipcountry") || "GH";
+        const city = request.headers.get("cf-ipcity") || "Accra";
+        const deviceInfo = detectDeviceFromUserAgent(userAgent);
+
+        const chatMetaData = {
+          country,
+          city,
+          timezone,
+          device: deviceInfo,
+        };
+
         await db
           .insert(chat)
           .values({
@@ -131,6 +149,7 @@ export const ServerRoute = createServerFileRoute(
             title,
             visibility: "public",
             channel,
+            chatMetaData,
           })
           .onConflictDoNothing();
       }

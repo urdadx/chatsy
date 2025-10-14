@@ -5,7 +5,6 @@ import Spinner from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useEmbedToken } from "@/lib/contexts/embed-token-context";
-import { getClientLocation } from "@/lib/utils/client-location";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -44,10 +43,8 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
 
   const mutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const location = await getClientLocation();
       const requestData = {
         ...data,
-        location,
         ...(embedToken && { embedToken }),
       };
 

@@ -5,7 +5,6 @@ import { ChatLanding } from "@/components/chat/chat-landing";
 import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
-import { useSendVisitorAnalytics } from "@/hooks/log-visitor-analytics";
 import { useChat as useChatData } from "@/hooks/use-chat";
 import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
 import { useChatWebSocket } from "@/hooks/use-chat-websocket";
@@ -19,6 +18,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { toast } from "sonner";
+
+import { useWidgetAnalytics } from "@/hooks/use-widget-analytics";
 
 export const Route = createFileRoute("/bubble/$widgetId")({
   component: RouteComponent,
@@ -58,24 +59,16 @@ const uiStateReducer = (state: any, action: any) => {
 
 // Custom hook for logging analytics
 const useAnalytics = (widgetId: string, chatbotId: string) => {
-  const analyticsExtra = useMemo(
-    () => ({
-      page_type: "bubble_chat",
-      embed_token: widgetId,
-    }),
-    [widgetId],
-  );
-
-  return useSendVisitorAnalytics({
-    chatbotId: chatbotId || "placeholder",
-    extra: analyticsExtra,
-    triggerOnMount: false,
-    triggerOnUnmount: false,
+  return useWidgetAnalytics({
+    widgetId,
+    chatbotId,
+    pageType: "bubble_chat",
   });
 };
 
 const useParentMessaging = (
-  logVisitorAnalytics: any,
+  logEvent: (event: string, extra?: Record<string, any>) => void,
+  logDuration: (event: string, extra?: Record<string, any>) => void,
   mountTimestampRef: any,
 ) => {
   const notifyParent = useCallback((type: any, data = {}) => {
@@ -84,20 +77,6 @@ const useParentMessaging = (
     }
   }, []);
 
-  const logDurationEvent = useCallback(
-    (event: any) => {
-      if (mountTimestampRef.current) {
-        const durationMs = Date.now() - mountTimestampRef.current;
-        logVisitorAnalytics({
-          durationMs,
-          event,
-          widget_type: "chat_widget",
-        });
-      }
-    },
-    [logVisitorAnalytics, mountTimestampRef],
-  );
-
   useEffect(() => {
     const handleMessage = (event: any) => {
       const { type } = event.data || {};
@@ -105,37 +84,31 @@ const useParentMessaging = (
       switch (type) {
         case MESSAGE_TYPES.WIDGET_USER_OPENED:
           mountTimestampRef.current = Date.now();
-          logVisitorAnalytics({
-            event: ANALYTICS_EVENTS.PAGE_VISIT,
-            widget_type: "chat_widget",
-          });
-          logVisitorAnalytics({
-            event: ANALYTICS_EVENTS.WIDGET_OPENED,
-            widget_type: "chat_widget",
-          });
+          logEvent(ANALYTICS_EVENTS.PAGE_VISIT);
+          logEvent(ANALYTICS_EVENTS.WIDGET_OPENED);
           break;
 
         case MESSAGE_TYPES.PARENT_PAGE_UNLOAD:
-          logDurationEvent(ANALYTICS_EVENTS.WIDGET_PAGE_UNLOAD);
+          logDuration(ANALYTICS_EVENTS.WIDGET_PAGE_UNLOAD);
           break;
       }
     };
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [logVisitorAnalytics, logDurationEvent, mountTimestampRef]);
+  }, [logEvent, logDuration, mountTimestampRef]);
 
   // Handle page unload
   useEffect(() => {
     const handleBeforeUnload = () => {
-      logDurationEvent(ANALYTICS_EVENTS.WIDGET_PAGE_UNLOAD);
+      logDuration(ANALYTICS_EVENTS.WIDGET_PAGE_UNLOAD);
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [logDurationEvent]);
+  }, [logDuration]);
 
-  return { notifyParent, logDurationEvent };
+  return { notifyParent };
 };
 
 const useRetry = () => {
@@ -201,12 +174,13 @@ function RouteComponent() {
     error: chatbotError,
   } = useChatWidget(widgetId);
 
-  const { logVisitorAnalytics, mountTimestampRef } = useAnalytics(
+  const { logEvent, logDurationEvent, mountTimestampRef } = useAnalytics(
     widgetId,
     chatbot?.id || "",
   );
-  const { notifyParent, logDurationEvent } = useParentMessaging(
-    logVisitorAnalytics,
+  const { notifyParent } = useParentMessaging(
+    logEvent,
+    logDurationEvent,
     mountTimestampRef,
   );
 

@@ -137,6 +137,7 @@ export async function saveChat({
   visibility,
   chatbotId,
   channel = "web",
+  chatMetaData,
 }: {
   id?: string;
   userId: string;
@@ -144,6 +145,7 @@ export async function saveChat({
   visibility: VisibilityType;
   chatbotId: string;
   channel?: "web" | "widget" | "whatsapp" | "telegram";
+  chatMetaData?: any;
 }) {
   try {
     return await db
@@ -156,6 +158,7 @@ export async function saveChat({
         visibility,
         chatbotId,
         channel,
+        chatMetaData,
       })
       .onConflictDoNothing();
   } catch (error) {

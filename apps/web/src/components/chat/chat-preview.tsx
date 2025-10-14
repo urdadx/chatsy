@@ -155,7 +155,6 @@ export function ChatPreview() {
         votes={votes}
         regenerate={regenerate}
         chatbot={chatbot}
-        queryClient={queryClient}
         chatStatus={chatData?.status}
       />
 

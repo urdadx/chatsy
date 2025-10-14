@@ -55,6 +55,7 @@ import { ServerRoute as ApiReportIssueServerRouteImport } from './routes/api/rep
 import { ServerRoute as ApiQuestionsServerRouteImport } from './routes/api/questions'
 import { ServerRoute as ApiOgServerRouteImport } from './routes/api/og'
 import { ServerRoute as ApiMyChatbotServerRouteImport } from './routes/api/my-chatbot'
+import { ServerRoute as ApiLocationServerRouteImport } from './routes/api/location'
 import { ServerRoute as ApiLeadsServerRouteImport } from './routes/api/leads'
 import { ServerRoute as ApiInviteMemberServerRouteImport } from './routes/api/invite-member'
 import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
@@ -311,6 +312,11 @@ const ApiOgServerRoute = ApiOgServerRouteImport.update({
 const ApiMyChatbotServerRoute = ApiMyChatbotServerRouteImport.update({
   id: '/api/my-chatbot',
   path: '/api/my-chatbot',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiLocationServerRoute = ApiLocationServerRouteImport.update({
+  id: '/api/location',
+  path: '/api/location',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiLeadsServerRoute = ApiLeadsServerRouteImport.update({
@@ -694,6 +700,7 @@ export interface FileServerRoutesByFullPath {
   '/api/hello': typeof ApiHelloServerRoute
   '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
+  '/api/location': typeof ApiLocationServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/og': typeof ApiOgServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -742,6 +749,7 @@ export interface FileServerRoutesByTo {
   '/api/hello': typeof ApiHelloServerRoute
   '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
+  '/api/location': typeof ApiLocationServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/og': typeof ApiOgServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -791,6 +799,7 @@ export interface FileServerRoutesById {
   '/api/hello': typeof ApiHelloServerRoute
   '/api/invite-member': typeof ApiInviteMemberServerRoute
   '/api/leads': typeof ApiLeadsServerRoute
+  '/api/location': typeof ApiLocationServerRoute
   '/api/my-chatbot': typeof ApiMyChatbotServerRoute
   '/api/og': typeof ApiOgServerRoute
   '/api/questions': typeof ApiQuestionsServerRoute
@@ -841,6 +850,7 @@ export interface FileServerRouteTypes {
     | '/api/hello'
     | '/api/invite-member'
     | '/api/leads'
+    | '/api/location'
     | '/api/my-chatbot'
     | '/api/og'
     | '/api/questions'
@@ -889,6 +899,7 @@ export interface FileServerRouteTypes {
     | '/api/hello'
     | '/api/invite-member'
     | '/api/leads'
+    | '/api/location'
     | '/api/my-chatbot'
     | '/api/og'
     | '/api/questions'
@@ -937,6 +948,7 @@ export interface FileServerRouteTypes {
     | '/api/hello'
     | '/api/invite-member'
     | '/api/leads'
+    | '/api/location'
     | '/api/my-chatbot'
     | '/api/og'
     | '/api/questions'
@@ -986,6 +998,7 @@ export interface RootServerRouteChildren {
   ApiHelloServerRoute: typeof ApiHelloServerRoute
   ApiInviteMemberServerRoute: typeof ApiInviteMemberServerRoute
   ApiLeadsServerRoute: typeof ApiLeadsServerRoute
+  ApiLocationServerRoute: typeof ApiLocationServerRoute
   ApiMyChatbotServerRoute: typeof ApiMyChatbotServerRoute
   ApiOgServerRoute: typeof ApiOgServerRoute
   ApiQuestionsServerRoute: typeof ApiQuestionsServerRoute
@@ -1337,6 +1350,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiMyChatbotServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/location': {
+      id: '/api/location'
+      path: '/api/location'
+      fullPath: '/api/location'
+      preLoaderRoute: typeof ApiLocationServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/leads': {
       id: '/api/leads'
       path: '/api/leads'
@@ -1616,6 +1636,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiHelloServerRoute: ApiHelloServerRoute,
   ApiInviteMemberServerRoute: ApiInviteMemberServerRoute,
   ApiLeadsServerRoute: ApiLeadsServerRoute,
+  ApiLocationServerRoute: ApiLocationServerRoute,
   ApiMyChatbotServerRoute: ApiMyChatbotServerRoute,
   ApiOgServerRoute: ApiOgServerRoute,
   ApiQuestionsServerRoute: ApiQuestionsServerRoute,

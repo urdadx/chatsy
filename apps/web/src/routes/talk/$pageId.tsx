@@ -6,12 +6,12 @@ import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import type { Vote } from "@/db/schema";
-import { useSendVisitorAnalytics } from "@/hooks/log-visitor-analytics";
 import { useChat as useChatData } from "@/hooks/use-chat";
 import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
 import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
+import { useWidgetAnalytics } from "@/hooks/use-widget-analytics";
 import { ChatSDKError } from "@/lib/errors";
 import { fetchWithErrorHandlers } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
@@ -69,17 +69,10 @@ const uiStateReducer = (state: UIState, action: UIAction): UIState => {
 };
 
 const useAnalytics = (pageId: string, chatbotId?: string) => {
-  const analyticsExtra = useMemo(
-    () => ({
-      page_type: "bio_page" as const,
-      page_id: pageId,
-    }),
-    [pageId],
-  );
-
-  return useSendVisitorAnalytics({
-    chatbotId: chatbotId || "placeholder",
-    extra: analyticsExtra,
+  return useWidgetAnalytics({
+    widgetId: pageId,
+    chatbotId,
+    pageType: "bio_page",
   });
 };
 
@@ -136,7 +129,7 @@ const useChatHandlers = (
   dispatchUiState: React.Dispatch<UIAction>,
   sendMessage: (options: { text: string }) => void,
   setMessages: (messages: any[]) => void,
-  logVisitorAnalytics: (options: { event: string }) => void,
+  logEvent: (event: string, extraData?: Record<string, any>) => void,
   pageId: string,
   isEscalated: boolean,
   wsIsConnected: boolean,
@@ -180,10 +173,10 @@ const useChatHandlers = (
     resetChat?.();
     setMessages([]);
     dispatchUiState({ type: "RESET" });
-    logVisitorAnalytics({ event: ANALYTICS_EVENTS.BIO_PAGE_CHAT_RESET });
+    logEvent(ANALYTICS_EVENTS.BIO_PAGE_CHAT_RESET);
     queryClient?.invalidateQueries({ queryKey: ["messages"] });
     queryClient?.invalidateQueries({ queryKey: ["chat-logs"] });
-  }, [resetChat, setMessages, dispatchUiState, logVisitorAnalytics, queryClient]);
+  }, [resetChat, setMessages, dispatchUiState, logEvent, queryClient]);
 
   const handleGoToMain = useCallback(() => {
     localStorage.setItem(`talk-${pageId}-interface`, "chat");
@@ -201,8 +194,8 @@ const useChatHandlers = (
     } else {
       window.close();
     }
-    logVisitorAnalytics({ event: ANALYTICS_EVENTS.BIO_PAGE_CHAT_CLOSED });
-  }, [logVisitorAnalytics]);
+    logEvent(ANALYTICS_EVENTS.BIO_PAGE_CHAT_CLOSED);
+  }, [logEvent]);
 
   const handleSuggestionClick = useCallback(
     (suggestion: string) => {
@@ -262,7 +255,7 @@ function RouteComponent(): JSX.Element {
     error: chatbotError,
   } = useChatWidget(pageId);
 
-  const { logVisitorAnalytics } = useAnalytics(pageId, chatbot?.id);
+  const { logEvent } = useAnalytics(pageId, chatbot?.id);
 
   const isEscalated = chatData?.status === "escalated";
 
@@ -375,7 +368,7 @@ function RouteComponent(): JSX.Element {
     dispatchUiState,
     sendMessage,
     setMessages,
-    logVisitorAnalytics,
+    logEvent,
     pageId,
     isEscalated,
     wsIsConnected,

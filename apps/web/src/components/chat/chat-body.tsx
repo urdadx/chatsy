@@ -9,13 +9,12 @@ import Spinner from "@/components/ui/spinner";
 import type { Vote } from "@/db/schema";
 import type { ChatMessage } from "@/lib/types";
 import { RiBardFill } from "@remixicon/react";
-import type { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import type { ChatRequestOptions, ChatStatus } from "ai";
 import type { ReactNode } from "react";
 import { memo } from "react";
 
 import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
-import { GreetingMessage } from "./greeting-message";
 import { PreviewMessage, ThinkingMessage } from "./preview-message";
 import { TypingIndicator } from "./typing-indicator";
 
@@ -40,7 +39,6 @@ interface ChatBodyProps {
     name?: string | null;
     [key: string]: any;
   };
-  queryClient?: ReturnType<typeof useQueryClient>;
   className?: string;
   children?: ReactNode;
   chatStatus?: "unresolved" | "resolved" | "escalated";
@@ -58,7 +56,6 @@ const ChatBodyComponent = ({
   chatId,
   votes,
   chatbot,
-  queryClient,
   className,
   children,
   chatStatus,
@@ -67,6 +64,7 @@ const ChatBodyComponent = ({
   const greetingMessage = chatbot?.initialMessage || "";
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
+  const queryClient = useQueryClient()
 
   if (isDeactivated) {
     return (
@@ -137,8 +135,6 @@ const ChatBodyComponent = ({
           ) : (
             <Conversation className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 md:gap-6">
               <ConversationContent className="flex  flex-col gap-4 px-2 py-4 md:gap-6">
-                {messages.length === 0 && <GreetingMessage />}
-
                 {messages.map((message, index) => (
                   <PreviewMessage
                     key={message.id}

@@ -42,15 +42,19 @@ export const PreviewMessage = ({
 }) => {
   const { data: fallbackChatbot } = useChatbot();
   const activeChatbot = chatbot || fallbackChatbot;
+  const messageRole = message.role;
+  const isUserMessage = messageRole === "user";
+  const isAssistantMessage = messageRole === "assistant";
+
   return (
     <AnimatePresence>
       <motion.div
-        data-testid={`message-${message.role}`}
+        data-testid={`message-${messageRole}`}
         initial={{ y: 5, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
       >
-        <Message from={message.role}>
-          {message.role === "assistant" && (
+        <Message from={messageRole}>
+          {isAssistantMessage && (
             <MessageAvatar
               src={activeChatbot?.image || "/placeholder-avatar.png"}
               name={activeChatbot?.name || "Assistant"}
@@ -58,13 +62,10 @@ export const PreviewMessage = ({
           )}
 
           <MessageContent
-            variant={message.role === "user" ? "contained" : "flat"}
-            className={message.role === "user" ? "bg-primary text-primary-foreground" : ""}
+            variant={isUserMessage ? "contained" : "flat"}
+            className={isUserMessage ? "bg-primary text-primary-foreground" : ""}
             style={{
-              backgroundColor:
-                message.role === "user"
-                  ? activeChatbot?.primaryColor
-                  : undefined,
+              backgroundColor: isUserMessage ? activeChatbot?.primaryColor : undefined,
             }}
           >
 
@@ -85,8 +86,7 @@ export const PreviewMessage = ({
               if (type === "text") {
                 return (
                   <div key={key}>
-
-                    <Response>{sanitizeText(part.text)}</Response>
+                    <Response className={isAssistantMessage ? "bg-gray-50 p-3" : ""}>{sanitizeText(part.text)}</Response>
                   </div>
                 );
               }

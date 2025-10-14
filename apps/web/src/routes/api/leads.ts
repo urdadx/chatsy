@@ -10,13 +10,24 @@ const leadSchema = z.object({
   name: z.string().min(1),
   contact: z.string().min(1),
   message: z.string().optional(),
-  location: z.string().optional(),
   embedToken: z.string().min(1).optional(),
 });
 
 export const ServerRoute = createServerFileRoute("/api/leads").methods({
   POST: async ({ request }) => {
     try {
+      // Extract location from Cloudflare headers
+      const cfCountry = request.headers.get("CF-IPCountry");
+      const cfCity = request.headers.get("CF-IPCity");
+
+      // Build location string from Cloudflare headers
+      let detectedLocation: string | undefined;
+      if (cfCity && cfCountry) {
+        detectedLocation = `${cfCity}, ${cfCountry}`;
+      } else if (cfCountry) {
+        detectedLocation = cfCountry;
+      }
+
       const body = await request.json();
       const parsed = leadSchema.safeParse(body);
 
@@ -65,7 +76,7 @@ export const ServerRoute = createServerFileRoute("/api/leads").methods({
         name: parsed.data.name,
         contact: parsed.data.contact,
         message: parsed.data.message,
-        location: parsed.data.location,
+        location: detectedLocation, // Use Cloudflare-detected location
       });
       return json({ success: true, message: "Lead collected successfully" });
     } catch (error) {

@@ -29,7 +29,7 @@ import z from "zod";
 
 export const chatHistorySearchSchema = z.object({
   chatId: z.string().optional(),
-  filter: z.enum(["24h", "7d", "30d", "90d", "all"]).default("24h"),
+  filter: z.enum(["24h", "7d", "30d", "90d", "all"]).default("7d"),
   status: z.enum(["all", "unresolved", "resolved", "escalated"]).default("all"),
 });
 
@@ -150,16 +150,15 @@ function RouteComponent() {
 
           <div className="flex flex-row flex-1 min-h-0">
             {/* Sidebar */}
-            <div className=" flex flex-col gap-2 p-2 py-4">
-              <div className="flex items-center mb-2 justify-between">
+            <div className="flex flex-col gap-2 p-2 py-4 h-full">
+              <div className="flex items-center mb-2 justify-between flex-shrink-0">
                 <h1 className="text-xl font-semibold hidden sm:flex">Chat Logs</h1>
-                <div className="flex items-center space-x-2 ">
+                <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
                     className="text-gray-600"
                     onClick={() => {
                       refetch();
-
                     }}
                   >
                     <RotateCcw className="h-4 w-4" />
@@ -171,9 +170,9 @@ function RouteComponent() {
                   />
                 </div>
               </div>
-              <div className={`${isMobile ? "w-[96vw]" : "w-96"} bg-white`}>
+              <div className={`${isMobile ? "w-[96vw]" : "w-96"} bg-white flex-1 min-h-0`}>
                 <ScrollArea
-                  className="h-full "
+                  className="h-full"
                   onScroll={(e) => {
                     const el = e.currentTarget;
                     const nearBottom =

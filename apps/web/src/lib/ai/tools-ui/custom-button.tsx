@@ -19,7 +19,7 @@ export function CustomButton({
   };
 
   return (
-    <div className="flex flex-col gap-3 p-4 border rounded-lg bg-gray-50/50 max-w-md">
+    <div className="flex flex-col gap-3 p-2 rounded-lg max-w-md">
 
       <p className="text-sm ">Please click the button below to continue</p>
 

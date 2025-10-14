@@ -181,6 +181,102 @@ export function detectDevice(): DeviceInfo {
   return result;
 }
 
+/**
+ * Server-side device detection that accepts a userAgent string
+ * Use this in server-side code where navigator is not available
+ */
+export function detectDeviceFromUserAgent(userAgent: string): DeviceInfo {
+  const ua = userAgent.toLowerCase();
+
+  // Initialize result with defaults
+  const result: DeviceInfo = {
+    type: "unknown",
+    os: "unknown",
+    browser: "unknown",
+    isIOS: false,
+    isAndroid: false,
+    isMac: false,
+    isWindows: false,
+    isLinux: false,
+    isSafari: false,
+    isChrome: false,
+    isFirefox: false,
+    isEdge: false,
+  };
+
+  // Device type detection
+  if (
+    /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|tablet|(puffin(?!.*(IP|AP|WP))))/.test(
+      ua,
+    )
+  ) {
+    result.type = "tablet";
+  } else if (
+    /(mobi|ipod|phone|blackberry|opera mini|fennec|minimo|symbian|psp|nintendo ds|archos|skyfire|puffin|blazer|bolt|gobrowser|iris|maemo|semc|teashark|uzard)/.test(
+      ua,
+    )
+  ) {
+    result.type = "mobile";
+  } else {
+    result.type = "desktop";
+  }
+
+  // OS detection
+  if (/iphone|ipad|ipod/.test(ua)) {
+    result.os = "iOS";
+    result.isIOS = true;
+  } else if (/android/.test(ua)) {
+    result.os = "Android";
+    result.isAndroid = true;
+  } else if (/macintosh|mac os x/.test(ua)) {
+    result.os = "macOS";
+    result.isMac = true;
+  } else if (/windows|win32|win64|wow64/.test(ua)) {
+    result.os = "Windows";
+    result.isWindows = true;
+  } else if (/linux/.test(ua) && !result.isAndroid) {
+    result.os = "Linux";
+    result.isLinux = true;
+  }
+
+  // Browser detection
+  if (/edg/.test(ua)) {
+    result.browser = "Edge";
+    result.isEdge = true;
+  } else if (/chrome/.test(ua) && !/chromium|edg/.test(ua)) {
+    result.browser = "Chrome";
+    result.isChrome = true;
+  } else if (/firefox/.test(ua)) {
+    result.browser = "Firefox";
+    result.isFirefox = true;
+  } else if (/safari/.test(ua) && !/chrome|chromium|edg/.test(ua)) {
+    result.browser = "Safari";
+    result.isSafari = true;
+  } else if (/msie|trident/.test(ua)) {
+    result.browser = "Internet Explorer";
+  } else if (/opera/.test(ua)) {
+    result.browser = "Opera";
+  }
+
+  // Try to detect models for common devices
+  if (result.isIOS) {
+    const matches =
+      ua.match(/iphone\s+os\s+(\d+)_(\d+)/i) ||
+      ua.match(/ipad;\s+cpu\s+os\s+(\d+)_(\d+)/i);
+    if (matches) {
+      const model = ua.includes("ipad") ? "iPad" : "iPhone";
+      result.model = `${model} (iOS ${matches[1]}.${matches[2]})`;
+    }
+  } else if (result.isAndroid) {
+    const matches = ua.match(/android\s+(\d+)(\.(\d+))?/i);
+    if (matches) {
+      result.model = `Android ${matches[1]}${matches[3] ? `.${matches[3]}` : ""}`;
+    }
+  }
+
+  return result;
+}
+
 export function generateUUID(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;

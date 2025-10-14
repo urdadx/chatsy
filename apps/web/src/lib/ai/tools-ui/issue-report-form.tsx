@@ -6,7 +6,6 @@ import Spinner from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useEmbedToken } from "@/lib/contexts/embed-token-context";
-import { getClientLocation } from "@/lib/utils/client-location";
 import { useMutation } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
@@ -82,8 +81,6 @@ export function IssueReportForm({ color }: { color?: string }) {
 
   const mutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const location = await getClientLocation();
-
       let screenshotUrl = null;
 
       if (data.screenshot) {
@@ -103,7 +100,6 @@ export function IssueReportForm({ color }: { color?: string }) {
         description: data.description,
         email: data.email || null,
         screenshot: screenshotUrl,
-        location,
         ...(embedToken && { embedToken }),
       };
 

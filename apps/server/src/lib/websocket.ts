@@ -43,7 +43,10 @@ function broadcast(chatId: string, data: WSOutbound, except?: WebSocket) {
 
 async function ensureEscalated(chatId: string) {
   const [c] = await db
-    .select()
+    .select({
+      id: schema.chat.id,
+      status: schema.chat.status,
+    })
     .from(schema.chat)
     .where(eq(schema.chat.id, chatId));
   if (!c) throw new Error("Chat not found");

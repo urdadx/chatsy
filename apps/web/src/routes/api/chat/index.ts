@@ -24,7 +24,7 @@ import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search-tool";
 import { ChatSDKError } from "@/lib/errors";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getCustomerExternalId } from "@/lib/subscription/subscription-functions";
-import { generateUUID } from "@/lib/utils";
+import { detectDeviceFromUserAgent, generateUUID } from "@/lib/utils";
 import { subscriptionMiddleware, tokenUsageMiddleware } from "@/middlewares";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -107,6 +107,24 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
 
           if (!chat) {
             const title = userMessage.parts[0].text;
+
+            // Capture user metadata
+            const userAgent = request.headers.get("user-agent") || "";
+            const timezone =
+              request.headers.get("x-timezone") ||
+              Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            const country = request.headers.get("cf-ipcountry") || "GH";
+            const city = request.headers.get("cf-ipcity") || "Accra";
+            const deviceInfo = detectDeviceFromUserAgent(userAgent);
+
+            const chatMetaData = {
+              country,
+              city,
+              timezone,
+              device: deviceInfo,
+            };
+
             await saveChat({
               id,
               userId: session?.user.id,
@@ -114,6 +132,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
               title,
               visibility: "private",
               channel: "web",
+              chatMetaData,
             });
           } else {
             if (chat.chatbotId !== chatbotId) {

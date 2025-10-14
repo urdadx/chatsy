@@ -11,12 +11,23 @@ const issueReportSchema = z.object({
   description: z.string().min(1, "Description is required"),
   screenshot: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
-  location: z.string().optional(),
   embedToken: z.string().min(1).optional(),
 });
 
 export const ServerRoute = createServerFileRoute("/api/report-issue").methods({
   POST: async ({ request }) => {
+    // Extract location from Cloudflare headers
+    const cfCountry = request.headers.get("CF-IPCountry");
+    const cfCity = request.headers.get("CF-IPCity");
+
+    // Build location string from Cloudflare headers
+    let detectedLocation: string | undefined;
+    if (cfCity && cfCountry) {
+      detectedLocation = `${cfCity}, ${cfCountry}`;
+    } else if (cfCountry) {
+      detectedLocation = cfCountry;
+    }
+
     const body = await request.json();
     const parsed = issueReportSchema.safeParse(body);
 
@@ -69,7 +80,7 @@ export const ServerRoute = createServerFileRoute("/api/report-issue").methods({
         description: parsed.data.description,
         screenshot: parsed.data.screenshot,
         email: parsed.data.email,
-        location: parsed.data.location,
+        location: detectedLocation, // Use Cloudflare-detected location
       });
 
       return json({

@@ -185,7 +185,7 @@ export function LeadsForm({ actionId }: LeadsFormProps) {
         </div>
       </div>
 
-      <div className="border-t rounded-b-lg border-border p-6 flex items-center justify-end gap-3">
+      <div className="border-t rounded-b-lg border-border p-4 flex items-center justify-end gap-3">
         {
           isEditing && (
             <Button

@@ -143,6 +143,7 @@ export const chat = pgTable("Chat", {
   agentAssigned: text("agent_assigned").references(() => member.id, {
     onDelete: "set null",
   }),
+  chatMetaData: jsonb("chat_meta_data"),
 });
 
 export const message = pgTable("Message", {
