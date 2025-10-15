@@ -61,12 +61,7 @@ export const ServerRoute = createServerFileRoute(
         return await db
           .select()
           .from(documentSource)
-          .where(
-            and(
-              eq(documentSource.userId, userId),
-              eq(documentSource.chatbotId, chatbotId),
-            ),
-          );
+          .where(eq(documentSource.chatbotId, chatbotId));
       },
       { ttl: 60 },
     );
@@ -173,7 +168,6 @@ export const ServerRoute = createServerFileRoute(
       .where(
         and(
           eq(documentSource.id, parsed.data.id),
-          eq(documentSource.userId, userId),
           eq(documentSource.chatbotId, chatbotId),
         ),
       )

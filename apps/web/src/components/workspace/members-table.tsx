@@ -11,7 +11,7 @@ import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 import { Users } from "lucide-react";
 import { NoDataPlaceholder } from "../no-data-placeholder";
-import Spinner from "../ui/spinner";
+import { TableSkeleton } from "../table-skeleton";
 import { MemberActions } from "./member-actions";
 
 export function MembersTable() {
@@ -23,11 +23,7 @@ export function MembersTable() {
   const members = organization?.data?.members;
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Spinner className="text-primary" />
-      </div>
-    );
+    return <TableSkeleton />;
   }
 
   if (!members || members.length === 0) {

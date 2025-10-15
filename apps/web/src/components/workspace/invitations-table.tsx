@@ -12,7 +12,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 import { NoDataPlaceholder } from "../no-data-placeholder";
-import Spinner from "../ui/spinner";
+import { TableSkeleton } from "../table-skeleton";
 import { InvitationActions } from "./invitation-actions";
 
 export function InvitationsTable() {
@@ -37,11 +37,7 @@ export function InvitationsTable() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Spinner className="text-primary" />
-      </div>
-    );
+    return <TableSkeleton />;
   }
 
   if (!invitations?.data || invitations.data.length === 0) {

@@ -89,7 +89,7 @@ export const CreateActionDialog = () => {
       href: "/admin/actions/new-action?actionType=custom-button",
       icon: <SolarBoxMinimalisticBoldDuotone color="#e500b9" className="w-6 h-6" />,
       title: "Custom button",
-      description: "Add a custom button action to trigger workflows or external integrations"
+      description: "Add a custom button action to open links or trigger events"
     },
     {
       href: "/admin/actions/new-action?actionType=collect_leads",

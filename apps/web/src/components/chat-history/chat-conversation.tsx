@@ -1,6 +1,7 @@
 import { useChat } from "@/hooks/use-chat";
 import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useMessages } from "@/hooks/use-db-messages";
+import { useSession } from "@/lib/auth-client";
 import { useSearch } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
 import { convertToUIMessages } from "../chat/convert-to-ui-message";
@@ -27,9 +28,18 @@ export const ChatConversation = () => {
     refetch,
   } = useMessages(chatId || "");
   const { data: chatData } = useChat(chatId || "");
+  const { data: session } = useSession();
 
   const messages = messagesFromDb ? convertToUIMessages(messagesFromDb) : [];
   const isEscalated = (chatData as any)?.status === "escalated";
+
+  // Check if chat is assigned to someone else
+  const isAssignedToOther = !!(
+    chatData?.assignedUser &&
+    session?.user?.email &&
+    chatData.assignedUser.email !== session.user.email
+  );
+  const assignedUserName = chatData?.assignedUser?.name || "Another agent";
 
   const [draft, setDraft] = useState("");
   const [hasJoined, setHasJoined] = useState(false);
@@ -84,6 +94,8 @@ export const ChatConversation = () => {
           onConnect={connect}
           onJoin={() => setHasJoined(true)}
           onEndSession={handleEndSession}
+          isAssignedToOther={isAssignedToOther}
+          assignedUserName={assignedUserName}
         />
       )}
 
@@ -140,25 +152,45 @@ export const ChatConversation = () => {
         {!hasJoined && isEscalated ? (
           <>
             <div className="flex-1 flex items-center gap-2">
-              <Input
-                placeholder="Click Join to start messaging..."
-                value=""
-                disabled={true}
-                className="flex-1"
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex-1">
+                    <Input
+                      placeholder={isAssignedToOther ? `${assignedUserName} has been assigned to this chat` : "Click Join to start messaging..."}
+                      value=""
+                      disabled={true}
+                      className="flex-1"
+                    />
+                  </div>
+                </TooltipTrigger>
+                {isAssignedToOther && (
+                  <TooltipContent>
+                    {assignedUserName} has been assigned to this chat. You can't engage.
+                  </TooltipContent>
+                )}
+              </Tooltip>
             </div>
-            <Button
-              type="submit"
-              disabled={status === "connecting"}
-            >
-              {status === "connected"
-                ? "Join chat"
-                : status === "connecting"
-                  ? "Joining..."
-                  : status === "error"
-                    ? "Join (Retry)"
-                    : "Join chat"}
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="submit"
+                  disabled={status === "connecting" || isAssignedToOther}
+                >
+                  {status === "connected"
+                    ? "Join chat"
+                    : status === "connecting"
+                      ? "Joining..."
+                      : status === "error"
+                        ? "Join (Retry)"
+                        : "Join chat"}
+                </Button>
+              </TooltipTrigger>
+              {isAssignedToOther && (
+                <TooltipContent>
+                  {assignedUserName} has been assigned to this chat. You can't engage.
+                </TooltipContent>
+              )}
+            </Tooltip>
           </>
         ) : isEscalated ? (
           <>

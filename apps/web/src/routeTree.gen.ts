@@ -13,6 +13,9 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestRouteImport } from './routes/test'
 import { Route as SuccessRouteImport } from './routes/success'
+import { Route as InvitationSuccessRouteImport } from './routes/invitation-success'
+import { Route as InvitationErrorRouteImport } from './routes/invitation-error'
+import { Route as InvitationAlreadyMemberRouteImport } from './routes/invitation-already-member'
 import { Route as ChoosePlanRouteImport } from './routes/choose-plan'
 import { Route as AcceptInvitationRouteImport } from './routes/accept-invitation'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
@@ -27,6 +30,7 @@ import { Route as AdminPlaygroundRouteImport } from './routes/admin/playground'
 import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
 import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
 import { Route as AdminKnowledgeBaseRouteImport } from './routes/admin/knowledge-base'
+import { Route as AdminIntegrationsRouteImport } from './routes/admin/integrations'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as authVerifyEmailRouteImport } from './routes/(auth)/verify-email'
 import { Route as authSetupRouteImport } from './routes/(auth)/setup'
@@ -99,6 +103,21 @@ const SuccessRoute = SuccessRouteImport.update({
   path: '/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvitationSuccessRoute = InvitationSuccessRouteImport.update({
+  id: '/invitation-success',
+  path: '/invitation-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvitationErrorRoute = InvitationErrorRouteImport.update({
+  id: '/invitation-error',
+  path: '/invitation-error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvitationAlreadyMemberRoute = InvitationAlreadyMemberRouteImport.update({
+  id: '/invitation-already-member',
+  path: '/invitation-already-member',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChoosePlanRoute = ChoosePlanRouteImport.update({
   id: '/choose-plan',
   path: '/choose-plan',
@@ -167,6 +186,11 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
 const AdminKnowledgeBaseRoute = AdminKnowledgeBaseRouteImport.update({
   id: '/knowledge-base',
   path: '/knowledge-base',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminIntegrationsRoute = AdminIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
@@ -490,6 +514,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/accept-invitation': typeof AcceptInvitationRoute
   '/choose-plan': typeof ChoosePlanRoute
+  '/invitation-already-member': typeof InvitationAlreadyMemberRoute
+  '/invitation-error': typeof InvitationErrorRoute
+  '/invitation-success': typeof InvitationSuccessRoute
   '/success': typeof SuccessRoute
   '/test': typeof TestRoute
   '/forgot-password': typeof authForgotPasswordRoute
@@ -499,6 +526,7 @@ export interface FileRoutesByFullPath {
   '/setup': typeof authSetupRoute
   '/verify-email': typeof authVerifyEmailRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/overview': typeof AdminOverviewRoute
@@ -520,6 +548,9 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteRouteWithChildren
   '/accept-invitation': typeof AcceptInvitationRoute
   '/choose-plan': typeof ChoosePlanRoute
+  '/invitation-already-member': typeof InvitationAlreadyMemberRoute
+  '/invitation-error': typeof InvitationErrorRoute
+  '/invitation-success': typeof InvitationSuccessRoute
   '/success': typeof SuccessRoute
   '/test': typeof TestRoute
   '/forgot-password': typeof authForgotPasswordRoute
@@ -529,6 +560,7 @@ export interface FileRoutesByTo {
   '/setup': typeof authSetupRoute
   '/verify-email': typeof authVerifyEmailRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/overview': typeof AdminOverviewRoute
@@ -551,6 +583,9 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/accept-invitation': typeof AcceptInvitationRoute
   '/choose-plan': typeof ChoosePlanRoute
+  '/invitation-already-member': typeof InvitationAlreadyMemberRoute
+  '/invitation-error': typeof InvitationErrorRoute
+  '/invitation-success': typeof InvitationSuccessRoute
   '/success': typeof SuccessRoute
   '/test': typeof TestRoute
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
@@ -560,6 +595,7 @@ export interface FileRoutesById {
   '/(auth)/setup': typeof authSetupRoute
   '/(auth)/verify-email': typeof authVerifyEmailRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/overview': typeof AdminOverviewRoute
@@ -583,6 +619,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/accept-invitation'
     | '/choose-plan'
+    | '/invitation-already-member'
+    | '/invitation-error'
+    | '/invitation-success'
     | '/success'
     | '/test'
     | '/forgot-password'
@@ -592,6 +631,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/verify-email'
     | '/admin/analytics'
+    | '/admin/integrations'
     | '/admin/knowledge-base'
     | '/admin/leads'
     | '/admin/overview'
@@ -613,6 +653,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/accept-invitation'
     | '/choose-plan'
+    | '/invitation-already-member'
+    | '/invitation-error'
+    | '/invitation-success'
     | '/success'
     | '/test'
     | '/forgot-password'
@@ -622,6 +665,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/verify-email'
     | '/admin/analytics'
+    | '/admin/integrations'
     | '/admin/knowledge-base'
     | '/admin/leads'
     | '/admin/overview'
@@ -643,6 +687,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/accept-invitation'
     | '/choose-plan'
+    | '/invitation-already-member'
+    | '/invitation-error'
+    | '/invitation-success'
     | '/success'
     | '/test'
     | '/(auth)/forgot-password'
@@ -652,6 +699,7 @@ export interface FileRouteTypes {
     | '/(auth)/setup'
     | '/(auth)/verify-email'
     | '/admin/analytics'
+    | '/admin/integrations'
     | '/admin/knowledge-base'
     | '/admin/leads'
     | '/admin/overview'
@@ -674,6 +722,9 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AcceptInvitationRoute: typeof AcceptInvitationRoute
   ChoosePlanRoute: typeof ChoosePlanRoute
+  InvitationAlreadyMemberRoute: typeof InvitationAlreadyMemberRoute
+  InvitationErrorRoute: typeof InvitationErrorRoute
+  InvitationSuccessRoute: typeof InvitationSuccessRoute
   SuccessRoute: typeof SuccessRoute
   TestRoute: typeof TestRoute
   authForgotPasswordRoute: typeof authForgotPasswordRoute
@@ -1052,6 +1103,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invitation-success': {
+      id: '/invitation-success'
+      path: '/invitation-success'
+      fullPath: '/invitation-success'
+      preLoaderRoute: typeof InvitationSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invitation-error': {
+      id: '/invitation-error'
+      path: '/invitation-error'
+      fullPath: '/invitation-error'
+      preLoaderRoute: typeof InvitationErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invitation-already-member': {
+      id: '/invitation-already-member'
+      path: '/invitation-already-member'
+      fullPath: '/invitation-already-member'
+      preLoaderRoute: typeof InvitationAlreadyMemberRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/choose-plan': {
       id: '/choose-plan'
       path: '/choose-plan'
@@ -1148,6 +1220,13 @@ declare module '@tanstack/react-router' {
       path: '/knowledge-base'
       fullPath: '/admin/knowledge-base'
       preLoaderRoute: typeof AdminKnowledgeBaseRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/integrations': {
+      id: '/admin/integrations'
+      path: '/integrations'
+      fullPath: '/admin/integrations'
+      preLoaderRoute: typeof AdminIntegrationsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/analytics': {
@@ -1572,6 +1651,7 @@ declare module '@tanstack/react-start/server' {
 
 interface AdminRouteRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminIntegrationsRoute: typeof AdminIntegrationsRoute
   AdminKnowledgeBaseRoute: typeof AdminKnowledgeBaseRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminOverviewRoute: typeof AdminOverviewRoute
@@ -1586,6 +1666,7 @@ interface AdminRouteRouteChildren {
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminIntegrationsRoute: AdminIntegrationsRoute,
   AdminKnowledgeBaseRoute: AdminKnowledgeBaseRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminOverviewRoute: AdminOverviewRoute,
@@ -1607,6 +1688,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   AcceptInvitationRoute: AcceptInvitationRoute,
   ChoosePlanRoute: ChoosePlanRoute,
+  InvitationAlreadyMemberRoute: InvitationAlreadyMemberRoute,
+  InvitationErrorRoute: InvitationErrorRoute,
+  InvitationSuccessRoute: InvitationSuccessRoute,
   SuccessRoute: SuccessRoute,
   TestRoute: TestRoute,
   authForgotPasswordRoute: authForgotPasswordRoute,

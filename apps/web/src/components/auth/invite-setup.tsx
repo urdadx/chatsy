@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn, signUp } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
-import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -27,7 +27,6 @@ export function InviteSetup({
     formState: { errors, isSubmitting },
   } = useForm<InviteSetupData>();
 
-  const navigate = useNavigate();
   const { invitationId } = useSearch({
     from: "/(auth)/setup",
   });
@@ -38,17 +37,15 @@ export function InviteSetup({
         email: data.email,
         name: data.name,
         password: data.password,
+        // Skip email verification for invited users since they were invited via email
+        callbackURL: `/api/accept-invitation/${invitationId}`,
       },
       {
         onSuccess: (ctx: any) => {
           console.log("Registration successful", ctx);
           toast.success("Account created successfully");
-          navigate({
-            to: "/accept-invitation",
-            search: {
-              invitationId: invitationId,
-            },
-          });
+          // Redirect to the invitation acceptance API which will handle verification and subscription
+          window.location.href = `/api/accept-invitation/${invitationId}`;
         },
         onError: (ctx: any) => {
           toast.error(
@@ -63,16 +60,12 @@ export function InviteSetup({
     await signIn.social(
       {
         provider: "google",
-        callbackURL: "/accept-invitation",
+        callbackURL: `/api/accept-invitation/${invitationId}`,
       },
       {
         onSuccess: () => {
-          navigate({
-            to: "/accept-invitation",
-            search: {
-              invitationId: invitationId,
-            },
-          });
+          // Redirect will be handled by callbackURL
+          toast.success("Signed in successfully");
         },
         onError: (ctx: any) => {
           toast.error(ctx.error.message);

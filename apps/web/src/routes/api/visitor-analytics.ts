@@ -65,7 +65,6 @@ export const ServerRoute = createServerFileRoute(
 
       return json({ success: true });
     } catch (error) {
-      console.error("Error saving visitor analytics:", error);
       return json({ error: "Failed to save analytics" }, { status: 500 });
     }
   },
@@ -105,7 +104,6 @@ export const ServerRoute = createServerFileRoute(
 
       return json(records, { status: 200 });
     } catch (error) {
-      console.error("Error fetching visitor analytics:", error);
       return json({ error: "Failed to fetch analytics" }, { status: 500 });
     }
   },

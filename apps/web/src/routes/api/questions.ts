@@ -56,9 +56,7 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
         return await db
           .select()
           .from(question)
-          .where(
-            and(eq(question.userId, userId), eq(question.chatbotId, chatbotId)),
-          );
+          .where(eq(question.chatbotId, chatbotId));
       },
       { ttl: 60 },
     );
@@ -144,13 +142,7 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
 
     const [deletedQuestion] = await db
       .delete(question)
-      .where(
-        and(
-          eq(question.id, id),
-          eq(question.userId, userId),
-          eq(question.chatbotId, chatbotId),
-        ),
-      )
+      .where(and(eq(question.id, id), eq(question.chatbotId, chatbotId)))
       .returning();
 
     if (!deletedQuestion) {
@@ -208,13 +200,7 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
         ...(newQuestion !== undefined ? { question: newQuestion } : {}),
         ...(newAnswer !== undefined ? { answer: newAnswer } : {}),
       })
-      .where(
-        and(
-          eq(question.id, id),
-          eq(question.userId, userId),
-          eq(question.chatbotId, chatbotId),
-        ),
-      )
+      .where(and(eq(question.id, id), eq(question.chatbotId, chatbotId)))
       .returning();
 
     if (!updatedQuestion) {

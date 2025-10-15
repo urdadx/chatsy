@@ -1,11 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Spinner from "@/components/ui/spinner";
-import { authClient } from "@/lib/auth-client";
 import { useMutation } from "@tanstack/react-query";
 import {
   createFileRoute,
-  useNavigate,
   useSearch,
 } from "@tanstack/react-router";
 import { Mail } from "lucide-react";
@@ -21,22 +19,15 @@ export const Route = createFileRoute("/accept-invitation")({
 });
 
 function RouteComponent() {
-  const navigate = useNavigate();
   const { invitationId } = useSearch({
     from: "/accept-invitation",
   });
 
   const acceptInvitationMutation = useMutation({
     mutationFn: async () => {
-      const { data } = await authClient.organization.acceptInvitation({
-        invitationId,
-      });
-      return data;
-    },
-    onSuccess: () => {
-      navigate({
-        to: "/admin/overview",
-      });
+      // Redirect to the API endpoint which handles all the logic
+      window.location.href = `/api/accept-invitation/${invitationId}`;
+      return { success: true };
     },
     onError: (error) => {
       toast.error(error.message);

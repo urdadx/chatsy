@@ -1,38 +1,21 @@
 import { ActionCard } from "@/components/agents/actions-card";
 import { CreateActionDialog } from "@/components/agents/create-action-dialog";
-import { CalendlyIntegrationCard } from "@/components/integrations/calendly-card";
-import { SlackCard } from "@/components/integrations/slack-card";
-import { WhatsappIntegrationCard } from "@/components/integrations/whatsapp-card";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ActionType } from "@/db/schema";
 import { api } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import z from "zod";
-
-const agentSearchSchema = z.object({
-  tab: z.enum(["agent-actions", "integrations"]).optional().default("agent-actions"),
-});
 
 export const Route = createFileRoute("/admin/actions/")({
   component: RouteComponent,
-  validateSearch: agentSearchSchema,
 });
 
 function RouteComponent() {
   const [_searchTerm, _setSearchTerm] = useState("");
   const queryClient = useQueryClient();
-
-  const navigate = useNavigate({ from: "/admin/actions" });
-  const { tab } = useSearch({ from: "/admin/actions/" });
-
-  const handleTabChange = (value: string) => {
-    navigate({ search: { tab: value as "agent-actions" | "integrations" } });
-  }
 
   const {
     data: actionData,
@@ -179,64 +162,28 @@ function RouteComponent() {
   return (
     <div className="px-4 sm:px-12 py-6 min-h-screen">
       <div className="w-full min-h-screen">
-
-        <Tabs
-          className="w-full max-w-6xl mx-auto "
-          defaultValue="agent-actions"
-          value={tab}
-          onValueChange={handleTabChange}
-
-        >
-          <TabsList className="w-full justify-start text-foreground h-auto gap-2 rounded-none border-b bg-transparent px-0 ">
-            <TabsTrigger
-              value="agent-actions"
-              className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-            >
-              Actions
-            </TabsTrigger>
-            <TabsTrigger
-              value="integrations"
-              className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-            >
-              Integrations
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="agent-actions" className="mt-4 space-y-4">
-            <div className="flex items-center justify-between">
-              {/* biome-ignore lint/a11y/useHeadingContent: <explanation> */}
-              <h2 className="text-xl font-semibold flex sm:hidden"></h2>
-              <h2 className="text-xl font-semibold hidden sm:flex">Agent Actions</h2>
-              <CreateActionDialog />
+        <div className="w-full max-w-6xl mx-auto space-y-4">
+          <div className="flex items-center justify-between">
+            {/* biome-ignore lint/a11y/useHeadingContent: <explanation> */}
+            <h2 className="text-xl font-semibold flex sm:hidden"></h2>
+            <h2 className="text-xl font-semibold hidden sm:flex">Agent Actions</h2>
+            <CreateActionDialog />
+          </div>
+          {!isLoading && !isError && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {filteredActions.map((action) => (
+                <ActionCard
+                  key={action.id}
+                  action={action}
+                  onToggle={handleToggleAction}
+                  onDescriptionChange={handleDescriptionChange}
+                  onDelete={handleDeleteAction}
+                  isLoading={toggleMutation.isPending || descriptionMutation.isPending || deleteMutation.isPending}
+                />
+              ))}
             </div>
-            {!isLoading && !isError && (
-              <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {filteredActions.map((action) => (
-                  <ActionCard
-                    key={action.id}
-                    action={action}
-                    onToggle={handleToggleAction}
-                    onDescriptionChange={handleDescriptionChange}
-                    onDelete={handleDeleteAction}
-                    isLoading={toggleMutation.isPending || descriptionMutation.isPending || deleteMutation.isPending}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent className="mt-6 space-y-6" value="integrations">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold hidden sm:flex">Platform Integrations</h2>
-              {/* biome-ignore lint/a11y/useHeadingContent: <explanation> */}
-              <h2 className="text-xl font-semibold flex sm:hidden"></h2>
-            </div>
-            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <CalendlyIntegrationCard />
-              <SlackCard />
-              <WhatsappIntegrationCard />
-            </div>
-          </TabsContent>
-        </Tabs>
-
+          )}
+        </div>
       </div>
     </div>
   );

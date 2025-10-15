@@ -53,7 +53,11 @@ export const ChatLogItem = ({
     },
     onSuccess: (data) => {
       toast.success(`Chat status updated to ${data.chat.status}`);
-      queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+      // Invalidate all chat-logs queries (with all filter/status combinations)
+      queryClient.invalidateQueries({
+        queryKey: ["chat-logs"],
+        exact: false
+      });
       queryClient.invalidateQueries({ queryKey: ["chat", id] });
     },
     onError: (error: any) => {
@@ -91,8 +95,8 @@ export const ChatLogItem = ({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2">
-            <h3 className="text-sm font-medium text-gray-900 truncate">
-              {title}
+            <h3 className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+              {title.length > 30 ? `${title.substring(0, 30)}...` : title}
             </h3>
           </div>
           <p className="text-sm text-gray-500 mt-1 truncate">

@@ -33,7 +33,7 @@ export function DeleteMemberDialog({
 
   const deleteMember = useMutation({
     mutationFn: async (memberId: string) => {
-      await authClient.organization.removeMember({ memberId });
+      await authClient.organization.removeMember({ memberIdOrEmail: memberId });
     },
     onSuccess: () => {
       toast.success("Member removed successfully");

@@ -1,5 +1,6 @@
 import { Button } from "../ui/button";
 import Spinner from "../ui/spinner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type ConnectionStatus = "connected" | "connecting" | "disconnected" | "error" | "idle";
 
@@ -10,6 +11,8 @@ interface ChatStatusHeaderProps {
   onConnect: () => void;
   onJoin?: () => void;
   onEndSession?: () => void;
+  isAssignedToOther?: boolean;
+  assignedUserName?: string;
 }
 
 export const ChatStatusHeader = ({
@@ -19,6 +22,8 @@ export const ChatStatusHeader = ({
   onConnect,
   onJoin,
   onEndSession,
+  isAssignedToOther = false,
+  assignedUserName = "Another agent",
 }: ChatStatusHeaderProps) => {
   const getBackgroundColor = () => {
     if (status === "connected" && hasJoined) {
@@ -82,14 +87,24 @@ export const ChatStatusHeader = ({
       </div>
       <div className="flex items-center gap-2">
         {(status === "disconnected" || status === "error") && (
-          <Button
-            onClick={handleRetryConnection}
-            variant="outline"
-            size="sm"
-            className="text-yellow-700 hover:text-yellow-700 hover:bg-yellow-50 dark:text-yellow-300 dark:hover:text-yellow-300 dark:hover:bg-yellow-950"
-          >
-            {status === "error" ? "Try again" : "Join chat"}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleRetryConnection}
+                variant="outline"
+                size="sm"
+                className="text-yellow-700 hover:text-yellow-700 hover:bg-yellow-50 dark:text-yellow-300 dark:hover:text-yellow-300 dark:hover:bg-yellow-950"
+                disabled={isAssignedToOther}
+              >
+                {status === "error" ? "Try again" : "Join chat"}
+              </Button>
+            </TooltipTrigger>
+            {isAssignedToOther && (
+              <TooltipContent>
+                {assignedUserName} has been assigned to this chat. You can't engage.
+              </TooltipContent>
+            )}
+          </Tooltip>
         )}
         {hasJoined && isConnected && onEndSession && (
           <Button

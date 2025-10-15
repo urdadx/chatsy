@@ -69,7 +69,7 @@ export const ChatDetailsDialog = ({ chatId }: { chatId?: string }) => {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-base font-medium text-muted-foreground">Agent Assigned</span>
+                <span className="text-base font-medium text-muted-foreground">Agent assigned</span>
                 <span className="text-sm">
                   {(chat as ChatData).assignedUser?.name || (chat as ChatData).assignedUser?.email || "Not assigned"}
                 </span>
@@ -95,7 +95,7 @@ export const ChatDetailsDialog = ({ chatId }: { chatId?: string }) => {
 
                   {metadata.device && (
                     <div className="flex items-center justify-between">
-                      <span className="text-base font-medium text-muted-foreground">Device Info</span>
+                      <span className="text-base font-medium text-muted-foreground">Device information</span>
                       <div className="flex gap-2">
                         <Badge variant="outline">{metadata.device.type}</Badge>
                         {metadata.device.os !== "unknown" && (

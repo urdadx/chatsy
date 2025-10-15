@@ -82,18 +82,6 @@ export const calendlyBookingTool = (chatbotId: string) =>
           };
         }
 
-        // Extract the event type slug/name from the URI for the booking URL
-        const eventTypeSlug = extractEventTypeSlug(
-          properties.eventTypeUri,
-          properties.eventTypeName,
-        );
-
-        // Generate the Calendly booking URL
-        const calendlyUrl = generateCalendlyUrl(
-          properties.eventTypeUri,
-          eventTypeSlug,
-        );
-
         return {
           success: true,
           actionId: bestMatch.id,
@@ -102,8 +90,7 @@ export const calendlyBookingTool = (chatbotId: string) =>
           eventTypeUri: properties.eventTypeUri,
           eventTypeName: properties.eventTypeName,
           userEmail: properties.userEmail,
-          calendlyUrl,
-          userIntent,
+          userIntent: userIntent,
           context: context || undefined,
           meetingType: preferredMeetingType,
         };
@@ -116,36 +103,3 @@ export const calendlyBookingTool = (chatbotId: string) =>
       }
     },
   });
-
-function extractEventTypeSlug(
-  eventTypeUri: string,
-  eventTypeName?: string,
-): string {
-  if (eventTypeName) {
-    return eventTypeName
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .trim();
-  }
-
-  const match = eventTypeUri.match(/\/event_types\/([^\/]+)$/);
-  if (match) {
-    return match[1];
-  }
-
-  return "meeting";
-}
-
-// Generate Calendly booking URL
-function generateCalendlyUrl(
-  eventTypeUri: string,
-  eventTypeSlug: string,
-): string {
-  const match = eventTypeUri.match(/\/event_types\/(.+)/);
-  if (match) {
-    return `https://calendly.com/book/${eventTypeSlug}`;
-  }
-  return `https://calendly.com/book/${eventTypeSlug}`;
-}

@@ -105,25 +105,25 @@ export const CalendlyIntegrationCard = () => {
 
   return (
     <>
-      <div className="bg-white rounded-2xl p-3 sm:p-4 border border-gray-200 shadow-xs w-full max-w-md mx-auto h-full">
-        <div className="flex flex-col gap-3 sm:gap-4 h-full">
+      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-xs w-full max-w-md mx-auto h-full">
+        <div className="flex flex-col gap-2 sm:gap-2.5 h-full">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <img className="size-9" src={CalendlyLogo} alt="integration-icon" />
+              <img className="size-7 sm:size-8" src={CalendlyLogo} alt="integration-icon" />
             </div>
             {isConnected && (
-              <Badge variant="outline" className="gap-1.5">
+              <Badge variant="outline" className="gap-1 text-xs">
                 <span className="size-2 rounded-full bg-green-500"></span>
                 Connected
               </Badge>
             )}
           </div>
-          <h3 className="font-medium text-sm sm:text-md">Calendly</h3>
-          <p className="text-gray-600 text-xs sm:text-sm flex-grow">
+          <h3 className="font-medium text-sm sm:text-base">Calendly</h3>
+          <p className="text-gray-600 text-sm sm:text-md flex-grow">
             Connect your bot to Calendly to manage bookings and meetings.
           </p>
           <Button
-            className="w-fit rounded-sm"
+            className="w-fit rounded-sm text-sm h-9"
             variant="outline"
             onClick={isConnected ? disconnectCalendly : connectCalendly}
             disabled={isConnecting}

@@ -46,9 +46,7 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
     const results = await db
       .select()
       .from(textSource)
-      .where(
-        and(eq(textSource.userId, userId), eq(textSource.chatbotId, chatbotId)),
-      );
+      .where(eq(textSource.chatbotId, chatbotId));
 
     return json(results);
   },
@@ -122,13 +120,7 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
     const updated = await db
       .update(textSource)
       .set({ ...updates, updatedAt: new Date() })
-      .where(
-        and(
-          eq(textSource.id, id),
-          eq(textSource.userId, userId),
-          eq(textSource.chatbotId, chatbotId),
-        ),
-      )
+      .where(and(eq(textSource.id, id), eq(textSource.chatbotId, chatbotId)))
       .returning();
 
     if (!updated.length) {
@@ -168,7 +160,6 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       .where(
         and(
           eq(textSource.id, parsed.data.id),
-          eq(textSource.userId, userId),
           eq(textSource.chatbotId, chatbotId),
         ),
       )

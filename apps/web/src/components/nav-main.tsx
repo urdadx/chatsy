@@ -24,7 +24,7 @@ export function NavMain({
   });
 
   return (
-    <SidebarGroup>
+    <SidebarGroup className="pt-0 mt-0">
       <SidebarMenu>
         {items.map((item) => {
           const isMainItemActive = pathname === item.url;

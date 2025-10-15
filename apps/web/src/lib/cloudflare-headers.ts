@@ -15,22 +15,12 @@ export function getLocationFromCloudflare(headers: Headers) {
     headers.get("x-real-ip") ||
     null;
 
-  const continentMap: Record<string, string> = {
-    AF: "Africa",
-    AN: "Antarctica",
-    AS: "Asia",
-    EU: "Europe",
-    NA: "North America",
-    OC: "Oceania",
-    SA: "South America",
-  };
-
   return {
     city,
     region,
     country,
     countryCode: country,
-    continent: continentMap[continent] || "Africa",
+    continent: continent,
     ip,
   };
 }
