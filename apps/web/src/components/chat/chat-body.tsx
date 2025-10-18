@@ -13,7 +13,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { ChatRequestOptions, ChatStatus } from "ai";
 import type { ReactNode } from "react";
 import { memo } from "react";
-
 import { PreviewMessage, ThinkingMessage } from "./preview-message";
 import { TypingIndicator } from "./typing-indicator";
 
