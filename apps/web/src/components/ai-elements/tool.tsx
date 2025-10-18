@@ -79,7 +79,7 @@ export const ToolHeader = ({
               ? "Showed a custom button"
               : type === "tool-collect_leads"
                 ? "Showed a leads form"
-                : type}
+                : type === "tool-cal_booking" ? "Initiated a Cal.com meeting" : type}
       </span>
       {getStatusBadge(state)}
     </div>

@@ -4,9 +4,25 @@ export const ServerRoute = createServerFileRoute("/api/cal/booking").methods({
   POST: async ({ request }) => {
     try {
       const body = await request.json();
-      const { eventTypeId, start, attendeeName, attendeeEmail, notes } = body;
 
-      if (!eventTypeId || !start || !attendeeName || !attendeeEmail) {
+      console.log("Received booking request:", body);
+
+      // Extract fields - handle both old and new structure
+      const username = body.username;
+      const eventSlug = body.eventSlug;
+      const start = body.start;
+      const attendeeName = body.attendee?.name || body.attendeeName;
+      const attendeeEmail = body.attendee?.email || body.attendeeEmail;
+      const attendeeTimeZone = body.attendee?.timeZone || "UTC";
+      const notes = body.notes;
+
+      if (
+        !username ||
+        !eventSlug ||
+        !start ||
+        !attendeeName ||
+        !attendeeEmail
+      ) {
         return new Response(
           JSON.stringify({ error: "Missing required fields" }),
           {
@@ -27,31 +43,39 @@ export const ServerRoute = createServerFileRoute("/api/cal/booking").methods({
         );
       }
 
-      // Create booking via Cal.com API
+      // Create booking via Cal.com API V2
+      const bookingPayload = {
+        username,
+        eventTypeSlug: eventSlug, // Changed from eventSlug
+        start,
+        attendee: {
+          name: attendeeName,
+          email: attendeeEmail,
+          timeZone: attendeeTimeZone,
+        },
+        ...(notes && { metadata: { notes } }),
+      };
+
+      console.log("Sending to Cal.com:", bookingPayload);
+
       const response = await fetch("https://api.cal.com/v2/bookings", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${calApiKey}`,
           "Content-Type": "application/json",
+          "cal-api-version": "2024-08-13", // Changed from 2024-09-04
         },
-        body: JSON.stringify({
-          eventTypeId: Number.parseInt(eventTypeId),
-          start,
-          attendee: {
-            name: attendeeName,
-            email: attendeeEmail,
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          },
-          meetingUrl: body.meetingUrl || undefined,
-          metadata: notes ? { notes } : undefined,
-        }),
+        body: JSON.stringify(bookingPayload),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Cal.com booking creation error:", errorText);
         return new Response(
-          JSON.stringify({ error: "Failed to create booking" }),
+          JSON.stringify({
+            error: "Failed to create booking",
+            details: errorText,
+          }),
           {
             status: response.status,
             headers: { "Content-Type": "application/json" },
@@ -60,6 +84,7 @@ export const ServerRoute = createServerFileRoute("/api/cal/booking").methods({
       }
 
       const bookingData = await response.json();
+      console.log("Cal.com booking response:", bookingData);
 
       // If booking requires confirmation, confirm it
       if (bookingData.data?.uid && bookingData.data?.status === "PENDING") {
@@ -70,6 +95,7 @@ export const ServerRoute = createServerFileRoute("/api/cal/booking").methods({
             headers: {
               Authorization: `Bearer ${calApiKey}`,
               "Content-Type": "application/json",
+              "cal-api-version": "2024-08-13", // Changed from 2024-09-04
             },
           },
         );

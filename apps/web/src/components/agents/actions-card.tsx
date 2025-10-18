@@ -53,7 +53,7 @@ const getIconForToolName = (toolName: string) => {
         <img src={CalendlyIcon} alt="Calendly" className="w-6 h-6 sm:w-8 sm:h-8" />
       </ActionIcon>
     ),
-    caldotcom: (
+    cal_booking: (
       <ActionIcon>
         <img src={CalImage} alt="cal" className="w-6 h-6 sm:w-8 sm:h-8" />
       </ActionIcon>

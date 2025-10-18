@@ -32,7 +32,7 @@ function RouteComponent() {
         return <FeedbackForm actionId={actionId} />
       case 'collect_leads':
         return <LeadsForm actionId={actionId} />
-      case 'caldotcom':
+      case 'cal_booking':
         return <CaldotComForm actionId={actionId} />
       default:
         return (

@@ -73,7 +73,6 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
       if (isEditing) {
         queryClient.invalidateQueries({ queryKey: ["action", actionId] })
       }
-      router.history.back()
     },
     onError: () => {
       toast.error(
@@ -100,10 +99,17 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
       return
     }
 
+    // Validate Cal.com URL format
+    const urlPattern = /^https:\/\/cal\.com\/([^\/]+)\/([^\/]+)$/
+    if (!urlPattern.test(eventTypeUrl.trim())) {
+      toast.warning("Please enter a valid Cal.com URL format: https://cal.com/username/event-slug")
+      return
+    }
+
     createActionMutation.mutate({
       name: name.trim(),
       description: description.trim(),
-      toolName: "caldotcom",
+      toolName: "cal_booking",
       showInQuickMenu,
       actionProperties: {
         eventTypeUrl: eventTypeUrl.trim()
@@ -119,7 +125,6 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
     onSuccess: () => {
       toast.success("Action deleted")
       queryClient.invalidateQueries({ queryKey: ["actions"] })
-      router.history.back()
     },
     onError: () => {
       toast.error(
@@ -173,13 +178,13 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
         </div>
         <div className="space-y-2">
           <Label htmlFor="event-type-url" className="text-sm font-medium">
-            Cal.com Event URL
+            Cal.com Event URL <span className="text-red-500">*</span>
           </Label>
           <Input
             autoComplete="false"
             id="event-type-url"
             type="url"
-            placeholder="https://cal.com/username/event-type"
+            placeholder="https://cal.com/urdadx/30min"
             className="w-full"
             value={eventTypeUrl}
             onChange={(e) => setEventTypeUrl(e.target.value)}

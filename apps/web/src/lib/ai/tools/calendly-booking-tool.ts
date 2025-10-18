@@ -47,7 +47,9 @@ export const calendlyBookingTool = (chatbotId: string) =>
 
         if (!calendlyActions.length) {
           return {
-            error: "No Calendly booking actions configured",
+            success: false,
+            error:
+              "I'm sorry, but meeting scheduling is not currently set up for this chatbot. Please contact support",
             userIntent,
           };
         }
@@ -59,8 +61,10 @@ export const calendlyBookingTool = (chatbotId: string) =>
         });
 
         if (!bestMatch) {
+          const availableTypes = calendlyActions.map((a) => a.name).join(", ");
           return {
-            error: "No matching Calendly booking found for this request",
+            success: false,
+            error: `I couldn't find a matching meeting type for your request. Available meeting types: ${availableTypes}. Please try being more specific about which type of meeting you'd like to schedule.`,
             userIntent,
             availableActions: calendlyActions.map((a) => ({
               name: a.name,
@@ -77,7 +81,9 @@ export const calendlyBookingTool = (chatbotId: string) =>
 
         if (!properties || !properties.eventTypeUri) {
           return {
-            error: "Invalid Calendly configuration - missing event type",
+            success: false,
+            error:
+              "There's a configuration issue with this meeting type. Kindly contact support.",
             actionId: bestMatch.id,
           };
         }
@@ -97,7 +103,9 @@ export const calendlyBookingTool = (chatbotId: string) =>
       } catch (error) {
         console.error("Error executing Calendly booking tool:", error);
         return {
-          error: "Failed to process Calendly booking request",
+          success: false,
+          error:
+            "I encountered an error while trying to set up the meeting. Please try again or contact support if the issue persists.",
           userIntent,
         };
       }

@@ -411,6 +411,23 @@ export const PreviewMessage = ({
                   if (
                     output &&
                     typeof output === "object" &&
+                    "error" in output
+                  ) {
+                    return (
+                      <div className="px-2">
+                        <div
+                          key={toolCallId}
+                          className="text-red-500 p-2 border rounded"
+                        >
+                          {String(output.error)}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (
+                    output &&
+                    typeof output === "object" &&
                     "success" in output &&
                     output.success
                   ) {
@@ -418,7 +435,8 @@ export const PreviewMessage = ({
                       <div className="px-2 space-y-2" key={toolCallId}>
                         <p>If you're interested in talking with us, kindly schedule a call using the form below🙂</p>
                         <CalBooking
-                          eventTypeId={(output as any).eventTypeId}
+                          username={(output as any).username}
+                          eventSlug={(output as any).eventSlug}
                           eventTypeName={(output as any).eventTypeName}
                           duration={(output as any).duration}
                           name={(output as any).name}

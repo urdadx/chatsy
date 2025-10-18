@@ -272,7 +272,6 @@ export const ServerRoute = createServerFileRoute("/api/agent-actions/").methods(
             return error.toResponse();
           }
 
-          // First verify the action exists and belongs to the chatbot
           const [existingAction] = await db
             .select()
             .from(Action)

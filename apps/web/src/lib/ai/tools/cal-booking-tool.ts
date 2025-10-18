@@ -47,7 +47,9 @@ export const calBookingTool = (chatbotId: string) =>
 
         if (!calActions.length) {
           return {
-            error: "No Cal.com booking actions configured",
+            success: false,
+            error:
+              "I'm sorry, but meeting scheduling is not currently set up for this chatbot. Please contact support",
             userIntent,
           };
         }
@@ -59,8 +61,10 @@ export const calBookingTool = (chatbotId: string) =>
         });
 
         if (!bestMatch) {
+          const availableTypes = calActions.map((a) => a.name).join(", ");
           return {
-            error: "No matching Cal.com booking found for this request",
+            success: false,
+            error: `I couldn't find a matching meeting type for your request. Available meeting types: ${availableTypes}. Please try being more specific about which type of meeting you'd like to schedule.`,
             userIntent,
             availableActions: calActions.map((a) => ({
               name: a.name,
@@ -70,24 +74,43 @@ export const calBookingTool = (chatbotId: string) =>
         }
 
         const properties = bestMatch.actionProperties as {
-          eventTypeId: number;
+          eventTypeUrl: string;
           eventTypeName?: string;
           duration?: number;
         } | null;
 
-        if (!properties || !properties.eventTypeId) {
+        if (!properties || !properties.eventTypeUrl) {
           return {
-            error: "Invalid Cal.com configuration - missing event type ID",
+            success: false,
+            error:
+              "There's a configuration issue with this meeting type. Please contact support.",
             actionId: bestMatch.id,
           };
         }
+
+        // Parse the Cal.com URL to extract username and event slug
+        // Format: https://cal.com/username/event-slug
+        const urlPattern = /^https:\/\/cal\.com\/([^\/]+)\/([^\/]+)$/;
+        const match = properties.eventTypeUrl.match(urlPattern);
+
+        if (!match) {
+          return {
+            success: false,
+            error: "Please contact support to fix the configuration.",
+            actionId: bestMatch.id,
+          };
+        }
+
+        const [, username, eventSlug] = match;
 
         return {
           success: true,
           actionId: bestMatch.id,
           name: bestMatch.name,
           description: bestMatch.description,
-          eventTypeId: properties.eventTypeId,
+          eventTypeUrl: properties.eventTypeUrl,
+          username,
+          eventSlug,
           eventTypeName: properties.eventTypeName,
           duration: properties.duration,
           userIntent: userIntent,
@@ -97,7 +120,9 @@ export const calBookingTool = (chatbotId: string) =>
       } catch (error) {
         console.error("Error executing Cal.com booking tool:", error);
         return {
-          error: "Failed to process Cal.com booking request",
+          success: false,
+          error:
+            "I encountered an error while trying to set up the meeting. Please try again or contact support if the issue persists.",
           userIntent,
         };
       }

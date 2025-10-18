@@ -9,9 +9,12 @@ import { useQuery } from "@tanstack/react-query"
 import { endOfDay, format, startOfDay } from "date-fns"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import { useMemo, useState } from "react"
+import { toast } from "sonner"
+import Spinner from "./ui/spinner"
 
 interface CalAppointmentPickerProps {
-  eventTypeId?: number
+  username?: string
+  eventSlug?: string
   eventTypeName?: string
   duration?: number
   onConfirm?: (payload: {
@@ -30,7 +33,8 @@ interface TimeSlot {
 }
 
 export function CalAppointmentPicker({
-  eventTypeId,
+  username,
+  eventSlug,
   duration = 30,
   onConfirm,
 }: CalAppointmentPickerProps) {
@@ -39,17 +43,16 @@ export function CalAppointmentPicker({
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [showTimePicker, setShowTimePicker] = useState(false)
   const [showAttendeeForm, setShowAttendeeForm] = useState(false)
-
-  // Form fields
   const [attendeeName, setAttendeeName] = useState("")
   const [attendeeEmail, setAttendeeEmail] = useState("")
   const [notes, setNotes] = useState("")
+  const [isConfirming, setIsConfirming] = useState(false)
+  const [confirmError, setConfirmError] = useState<string | null>(null)
 
-  // Fetch available slots using TanStack Query
   const { data: slotsData, isLoading: loading, error, refetch } = useQuery<{ slots: TimeSlot[] }>({
-    queryKey: ["cal-slots", eventTypeId, date?.toISOString()],
+    queryKey: ["cal-slots", username, eventSlug, date?.toISOString()],
     queryFn: async () => {
-      if (!date || !eventTypeId) {
+      if (!date || !username || !eventSlug) {
         return { slots: [] }
       }
 
@@ -58,7 +61,8 @@ export function CalAppointmentPicker({
 
       const response = await api.get("/cal/slots", {
         params: {
-          eventTypeId,
+          username,
+          eventSlug,
           startTime,
           endTime,
         },
@@ -66,7 +70,7 @@ export function CalAppointmentPicker({
 
       return response.data
     },
-    enabled: !!date && !!eventTypeId,
+    enabled: !!date && !!username && !!eventSlug,
     staleTime: 1000 * 60 * 5,
   })
 
@@ -77,17 +81,28 @@ export function CalAppointmentPicker({
       return
     }
 
-    const selectedDateTime = new Date(selectedSlot)
-    const endDateTime = new Date(selectedDateTime.getTime() + duration * 60000)
+    setIsConfirming(true)
+    setConfirmError(null)
 
-    onConfirm?.({
-      date,
-      start: selectedDateTime.toISOString(),
-      end: endDateTime.toISOString(),
-      attendeeName,
-      attendeeEmail,
-      notes: notes || undefined,
-    })
+    try {
+      const selectedDateTime = new Date(selectedSlot)
+      const endDateTime = new Date(selectedDateTime.getTime() + duration * 60000)
+
+      await onConfirm?.({
+        date,
+        start: selectedDateTime.toISOString(),
+        end: endDateTime.toISOString(),
+        attendeeName,
+        attendeeEmail,
+        notes: notes || undefined,
+      })
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to confirm appointment. Please try again."
+      setConfirmError(errorMessage)
+    } finally {
+      setIsConfirming(false)
+      toast.success("Successful!")
+    }
   }
 
   const isPastSelection = useMemo(() => {
@@ -97,9 +112,9 @@ export function CalAppointmentPicker({
 
   return (
     <div>
-      <div className="rounded-md border w-[320px]">
+      <div className="rounded-md border w-[270px]">
         {showAttendeeForm ? (
-          <div className="p-6">
+          <div className="p-3 w-full">
             <div className="mb-4">
               <Button
                 variant="ghost"
@@ -110,22 +125,15 @@ export function CalAppointmentPicker({
                 }}
                 className="mb-2"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="h-4 w-4" />
                 Back
               </Button>
-              <div className="text-center">
-                <p className="text-sm font-medium">
-                  {date && format(date, "EEE, MMMM d")}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {selectedSlot && format(new Date(selectedSlot), "HH:mm")}
-                </p>
-              </div>
+
             </div>
 
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">Name *</Label>
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
                   value={attendeeName}
@@ -135,8 +143,8 @@ export function CalAppointmentPicker({
                 />
               </div>
 
-              <div>
-                <Label htmlFor="email">Email *</Label>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -147,7 +155,7 @@ export function CalAppointmentPicker({
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="notes">Additional Notes (Optional)</Label>
                 <Textarea
                   id="notes"
@@ -164,13 +172,25 @@ export function CalAppointmentPicker({
                 </p>
               )}
 
+              {confirmError && (
+                <p className="text-xs text-red-600">
+                  {confirmError}
+                </p>
+              )}
+
               <div className="flex gap-2">
                 <Button
                   className="flex-1"
                   onClick={handleConfirm}
-                  disabled={!attendeeName || !attendeeEmail || isPastSelection}
+                  disabled={!attendeeName || !attendeeEmail || isPastSelection || isConfirming}
                 >
-                  Confirm Booking
+                  {
+                    isConfirming ? (
+                      <Spinner className="text-white" />
+                    ) : (
+                      "Confirm"
+                    )
+                  }
                 </Button>
               </div>
             </div>
@@ -192,7 +212,7 @@ export function CalAppointmentPicker({
               className="w-full"
               disabled={[{ before: today }]}
             />
-            {!eventTypeId && (
+            {(!username || !eventSlug) && (
               <p className="px-2 pb-2 text-xs text-muted-foreground">
                 Select an event type to view availability.
               </p>
