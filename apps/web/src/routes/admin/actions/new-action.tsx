@@ -1,3 +1,4 @@
+import { CaldotComForm } from '@/components/agents/forms/caldotcom-form'
 import { CalendlyForm } from '@/components/agents/forms/calendly-form'
 import { CustomButtonForm } from '@/components/agents/forms/custom-btn-form'
 import { FeedbackForm } from '@/components/agents/forms/feedback-form'
@@ -8,7 +9,7 @@ import z from 'zod'
 
 
 const actionTypeSchema = z.object({
-  actionType: z.enum(['calendly', 'custom-button', "feedback_form", "collect_leads"]).optional(),
+  actionType: z.enum(['calendly', 'custom-button', "feedback_form", "collect_leads", "caldotcom"]).optional(),
 })
 
 export const Route = createFileRoute('/admin/actions/new-action')({
@@ -29,6 +30,8 @@ function RouteComponent() {
         return <FeedbackForm />
       case 'collect_leads':
         return <LeadsForm />
+      case 'caldotcom':
+        return <CaldotComForm />
       default:
         return (
           <div className="text-center text-gray-500">

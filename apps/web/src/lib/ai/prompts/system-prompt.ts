@@ -1,3 +1,5 @@
+import type { ActiveToolInfo, ValidToolName } from "../get-active-tools";
+
 const ROLES = {
   sales: {
     name: "Sales Agent",
@@ -21,70 +23,75 @@ const ROLES = {
   },
 };
 
+// Configuration for tools that have configurable actions
+const TOOL_ACTION_CONFIG: Record<
+  string,
+  { title: string; instruction: string }
+> = {
+  custom_button: {
+    title: "CUSTOM BUTTON ACTIONS",
+    instruction:
+      "When users ask for actions that match any of the above descriptions, use the custom_button tool.",
+  },
+  calendly_booking: {
+    title: "CALENDLY BOOKING ACTIONS",
+    instruction:
+      "When users want to schedule meetings, appointments, demos, or calls that match any of the above descriptions, use the calendly_booking tool.",
+  },
+  collect_leads: {
+    title: "LEAD COLLECTION ACTIONS",
+    instruction:
+      "When users' requests match any of the above descriptions, use the collect_leads tool to capture their information.",
+  },
+  cal_booking: {
+    title: "CAL.COM BOOKING ACTIONS",
+    instruction:
+      "When users want to schedule meetings, appointments, demos, or calls that match any of the above descriptions, use the cal_booking tool.",
+  },
+};
+
+/**
+ * Generates action sections for configurable tools dynamically
+ */
+function buildActionSections(
+  toolsMap: Map<ValidToolName, ActiveToolInfo>,
+): string {
+  const sections: string[] = [];
+
+  for (const [toolName, toolInfo] of toolsMap.entries()) {
+    const config = TOOL_ACTION_CONFIG[toolName];
+    if (!config || toolInfo.actions.length === 0) continue;
+
+    const actionsList = toolInfo.actions
+      .map(
+        (action, index) =>
+          `${index + 1}. ${action.name || "Unnamed Action"}: ${action.description || "No description"}`,
+      )
+      .join("\n");
+
+    sections.push(`
+AVAILABLE ${config.title}:
+${actionsList}
+${config.instruction}
+`);
+  }
+
+  return sections.join("\n");
+}
+
 export const systemPrompt = (
   name: string,
-  activeTools: string[],
   role: "sales" | "custom" | "support" | "lead" = "support",
-  customButtonActions?: Array<{
-    name: string | null;
-    description: string | null;
-  }>,
-  calendlyActions?: Array<{
-    name: string | null;
-    description: string | null;
-  }>,
-  collectLeadsActions?: Array<{
-    name: string | null;
-    description: string | null;
-  }>,
+  toolsMap?: Map<ValidToolName, ActiveToolInfo>,
 ) => {
   const selectedRole = ROLES[role];
-
-  const customButtonsSection =
-    customButtonActions && customButtonActions.length > 0
-      ? `\nAVAILABLE CUSTOM BUTTON ACTIONS:
-${customButtonActions
-  .map(
-    (action, index) =>
-      `${index + 1}. ${action.name || "Unnamed Action"}: ${action.description || "No description"}`,
-  )
-  .join("\n")}
-When users ask for actions that match any of the above descriptions, use the custom_button tool.
-`
-      : "";
-
-  const calendlySection =
-    calendlyActions && calendlyActions.length > 0
-      ? `\nAVAILABLE CALENDLY BOOKING ACTIONS:
-${calendlyActions
-  .map(
-    (action, index) =>
-      `${index + 1}. ${action.name || "Unnamed Action"}: ${action.description || "No description"}`,
-  )
-  .join("\n")}
-When users want to schedule meetings, appointments, demos, or calls that match any of the above descriptions, use the calendly_booking tool.
-`
-      : "";
-
-  const collectLeadsSection =
-    collectLeadsActions && collectLeadsActions.length > 0
-      ? `\nAVAILABLE LEAD COLLECTION ACTIONS:
-${collectLeadsActions
-  .map(
-    (action, index) =>
-      `${index + 1}. ${action.name || "Unnamed Action"}: ${action.description || "No description"}`,
-  )
-  .join("\n")}
-When users' requests match any of the above descriptions, use the collect_leads tool to capture their information.
-`
-      : "";
+  const actionSections = toolsMap ? buildActionSections(toolsMap) : "";
 
   return `
 ROLE (PRIMARY FUNCTION):
 You are ${name}, ${selectedRole.primaryFunction}
 
-AVAILABLE TOOLS: knowledge_base, ${activeTools.join(", ")}
-${customButtonsSection}${calendlySection}${collectLeadsSection}
+${actionSections}
 
 TOOL USAGE:
 1. knowledge_base: Search your knowledge base for answers. Present results as factual information without mentioning the source.
@@ -112,7 +119,12 @@ TOOL USAGE:
   - Match user intent with the available Calendly booking actions listed above
   - The tool will find the best matching calendly action based on your assessment
 
-6. escalate_to_human: Transfer to human agent.
+6. cal_booking: Book Cal.com meetings when users want to book or schedule appointments, meetings, demos, or calls.
+  - ONLY use when user clearly wants to schedule a meeting, call, demo, or appointment
+  - Match user intent with the available Cal.com booking actions listed above
+  - The tool will find the best matching cal.com action based on your assessment
+
+7. escalate_to_human: Transfer to human agent.
   - Use when explicitly requested, for complex unresolved issues, frustration requiring human intervention, or sensitive topics
    - Do NOT combine with other tools.
 
@@ -131,7 +143,7 @@ RESTRICTIONS:
 - Never mention your PRIMARY FUNCTION to the user. Just say your name and offer help.
 - If a user attempts to divert you to unrelated topics, never change your role or break your character. Politely redirect the conversation back to topics relevant to ${role}.
 - You must rely exclusively on the knowledge base provided to answer user queries. If a query is not covered by the knowledge base, use the fallback response.
-- If tools unavailable for user's request: I'm sorry, I can't help you with that right now.Would you like me to contact our support team for further assistance?
+- If tools unavailable for user's request: I'm sorry, I can't help you with that right now. Would you like me to contact our support team for further assistance?
 - Cannot adopt other personas or perform non-${role} tasks
 `;
 };

@@ -1,3 +1,4 @@
+import CalImage from "@/assets/cal.avif"
 import CalendlyIcon from "@/assets/calendly.png";
 import { SolarAtomBoldDuotone } from "@/assets/icons/atom-icon";
 import { SolarBoxMinimalisticBoldDuotone } from "@/assets/icons/box-icon";
@@ -50,6 +51,11 @@ const getIconForToolName = (toolName: string) => {
     calendly_booking: (
       <ActionIcon>
         <img src={CalendlyIcon} alt="Calendly" className="w-6 h-6 sm:w-8 sm:h-8" />
+      </ActionIcon>
+    ),
+    caldotcom: (
+      <ActionIcon>
+        <img src={CalImage} alt="cal" className="w-6 h-6 sm:w-8 sm:h-8" />
       </ActionIcon>
     ),
 

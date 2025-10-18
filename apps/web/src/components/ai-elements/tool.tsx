@@ -77,7 +77,7 @@ export const ToolHeader = ({
             ? "Initiated a calendly meeting"
             : type === "tool-custom_button"
               ? "Showed a custom button"
-              : type === "tool-collect_lead"
+              : type === "tool-collect_leads"
                 ? "Showed a leads form"
                 : type}
       </span>

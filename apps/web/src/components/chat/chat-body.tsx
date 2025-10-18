@@ -14,7 +14,6 @@ import type { ChatRequestOptions, ChatStatus } from "ai";
 import type { ReactNode } from "react";
 import { memo } from "react";
 
-import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
 import { PreviewMessage, ThinkingMessage } from "./preview-message";
 import { TypingIndicator } from "./typing-indicator";
 
@@ -62,9 +61,7 @@ const ChatBodyComponent = ({
   wsIsTyping,
 }: ChatBodyProps) => {
   const greetingMessage = chatbot?.initialMessage || "";
-  const [messagesContainerRef, messagesEndRef] =
-    useScrollToBottom<HTMLDivElement>();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   if (isDeactivated) {
     return (
@@ -123,7 +120,7 @@ const ChatBodyComponent = ({
   }
 
   return (
-    <div ref={messagesContainerRef} className={`bg-white relative flex-1 min-h-0 overflow-hidden ${className}`}>
+    <div className={`bg-white relative flex-1 min-h-0 overflow-hidden ${className}`}>
       <Conversation className="h-full overflow-hidden">
         <ConversationContent>
           {messages.length === 0 ? (
@@ -131,49 +128,44 @@ const ChatBodyComponent = ({
               title={greetingMessage}
               description=""
               icon={<RiBardFill size={20} className="text-muted-foreground" />}
+              chatbot={chatbot}
             />
           ) : (
-            <Conversation className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 md:gap-6">
-              <ConversationContent className="flex  flex-col gap-4 px-2 py-4 md:gap-6">
-                {messages.map((message, index) => (
-                  <PreviewMessage
-                    key={message.id}
-                    chatId={chatId}
-                    message={message}
-                    isLoading={
-                      status === 'streaming' && messages.length - 1 === index
-                    }
-                    vote={
-                      votes
-                        ? votes.find((vote) => vote.messageId === message.id)
-                        : undefined
-                    }
-                    setMessages={setMessages}
-                    chatbot={chatbot}
-                    showActions={false}
-                  />
-                ))}
-
-                {status === 'submitted' &&
-                  messages.length > 0 &&
-                  messages[messages.length - 1].role === 'user' &&
-                  chatStatus !== 'escalated' &&
-                  chatStatus !== 'resolved' && <ThinkingMessage />}
-
-                {wsIsTyping && chatStatus === 'escalated' && (
-                  <TypingIndicator
-                    label="Agent is typing..."
-                    name={chatbot?.name || "Agent"}
-                    avatarSrc={chatbot?.image || "/placeholder-avatar.png"}
-                  />
-                )}
-
-                <div
-                  ref={messagesEndRef}
-                  className="shrink-0 min-w-[24px] min-h-[24px]"
+            // Replace nested Conversation with a simple container to keep a single StickToBottom context
+            <div className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 md:gap-6 px-2 py-4">
+              {messages.map((message, index) => (
+                <PreviewMessage
+                  key={message.id}
+                  chatId={chatId}
+                  message={message}
+                  isLoading={
+                    status === 'streaming' && messages.length - 1 === index
+                  }
+                  vote={
+                    votes
+                      ? votes.find((vote) => vote.messageId === message.id)
+                      : undefined
+                  }
+                  setMessages={setMessages}
+                  chatbot={chatbot}
+                  showActions={false}
                 />
-              </ConversationContent>
-            </Conversation>
+              ))}
+
+              {status === 'submitted' &&
+                messages.length > 0 &&
+                messages[messages.length - 1].role === 'user' &&
+                chatStatus !== 'escalated' &&
+                chatStatus !== 'resolved' && <ThinkingMessage />}
+
+              {wsIsTyping && chatStatus === 'escalated' && (
+                <TypingIndicator
+                  label="Agent is typing..."
+                  name={chatbot?.name || "Agent"}
+                  avatarSrc={chatbot?.image || "/placeholder-avatar.png"}
+                />
+              )}
+            </div>
           )}
 
           {status === "error" && chatError && (
@@ -184,7 +176,6 @@ const ChatBodyComponent = ({
 
         <ConversationScrollButton className="shadow-lg" />
       </Conversation>
-
     </div>
   );
 };

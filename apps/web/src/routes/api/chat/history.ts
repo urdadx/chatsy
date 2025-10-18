@@ -2,7 +2,6 @@ import { db } from "@/db";
 import { chat, chatbot } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
-import { withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
@@ -11,7 +10,7 @@ import z from "zod";
 
 const querySchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(20),
-  cursor: z.string().uuid().optional().nullable(),
+  cursor: z.string().optional().nullable(),
   direction: z.enum(["next", "prev"]).default("next"),
   filter: z.enum(["24h", "7d", "30d", "90d", "all"]).default("24h"),
   status: z.enum(["all", "unresolved", "resolved", "escalated"]).default("all"),
@@ -85,45 +84,39 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
     }
 
     try {
-      const chatsData = await withCache(
-        `chat-history:${chatbotId}:${filter}:${status}:${cursor || "initial"}:${limit}`,
-        async () => {
-          const whereConditions = [eq(chat.chatbotId, chatbotId)];
+      const whereConditions = [eq(chat.chatbotId, chatbotId)];
 
-          if (timeFilter) whereConditions.push(timeFilter);
-          if (statusFilter) whereConditions.push(statusFilter);
+      if (timeFilter) whereConditions.push(timeFilter);
+      if (statusFilter) whereConditions.push(statusFilter);
 
-          if (cursor) {
-            const [refChat] = await db
-              .select()
-              .from(chat)
-              .where(and(eq(chat.id, cursor), eq(chat.chatbotId, chatbotId)))
-              .limit(1);
+      if (cursor) {
+        const [refChat] = await db
+          .select()
+          .from(chat)
+          .where(and(eq(chat.id, cursor), eq(chat.chatbotId, chatbotId)))
+          .limit(1);
 
-            if (!refChat) {
-              throw new Error("Chat not found");
-            }
-            whereConditions.push(lt(chat.createdAt, refChat.createdAt));
-          }
+        if (!refChat) {
+          throw new Error("Chat not found");
+        }
+        whereConditions.push(lt(chat.createdAt, refChat.createdAt));
+      }
 
-          const chats = await db
-            .select()
-            .from(chat)
-            .where(and(...whereConditions))
-            .orderBy(desc(chat.createdAt))
-            .limit(limit + 1);
+      const chats = await db
+        .select()
+        .from(chat)
+        .where(and(...whereConditions))
+        .orderBy(desc(chat.createdAt))
+        .limit(limit + 1);
 
-          const hasMore = chats.length > limit;
-          const items = hasMore ? chats.slice(0, limit) : chats;
+      const hasMore = chats.length > limit;
+      const items = hasMore ? chats.slice(0, limit) : chats;
 
-          return {
-            chats: items,
-            hasMore,
-            nextCursor: hasMore ? items[items.length - 1].id : null,
-          };
-        },
-        { ttl: 30 },
-      );
+      const chatsData = {
+        chats: items,
+        hasMore,
+        nextCursor: hasMore ? items[items.length - 1].id : null,
+      };
 
       return json(chatsData);
     } catch (err) {

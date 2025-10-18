@@ -7,6 +7,7 @@ import { Response } from '@/components/ai-elements/response';
 import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
 import type { Vote } from "@/db/schema";
 import { useChatbot } from "@/hooks/use-chatbot";
+import { CalBooking } from "@/lib/ai/tools-ui/cal-booking";
 import { CalendlyBooking } from "@/lib/ai/tools-ui/calendly-booking";
 import { CollectFeedbackForm } from "@/lib/ai/tools-ui/collect-feedback-form";
 import { CollectLeadsForm } from "@/lib/ai/tools-ui/collect-leads-form";
@@ -63,10 +64,14 @@ export const PreviewMessage = ({
 
           <MessageContent
             variant={isUserMessage ? "contained" : "flat"}
-            className={isUserMessage ? "bg-primary text-primary-foreground" : ""}
-            style={{
-              backgroundColor: isUserMessage ? activeChatbot?.primaryColor : undefined,
-            }}
+            style={
+              isUserMessage
+                ? {
+                  backgroundColor: activeChatbot?.primaryColor || "#2563eb",
+                  color: "#ffffff",
+                }
+                : undefined
+            }
           >
 
             {message.parts?.map((part, index) => {
@@ -358,6 +363,64 @@ export const PreviewMessage = ({
                           eventTypeUri={(output as any).eventTypeUri}
                           eventTypeName={(output as any).eventTypeName}
                           userEmail={(output as any).userEmail}
+                          name={(output as any).name}
+                          description={(output as any).description}
+                          color={activeChatbot?.primaryColor}
+                        />
+                      </div>
+                    );
+                  }
+                }
+              }
+
+              if (type === "tool-cal_booking") {
+                const { toolCallId, state, input, output } = part as any;
+
+                if (showToolDetails) {
+                  return (
+                    <div className="px-2">
+                      <Tool key={toolCallId}>
+                        <ToolHeader type={type} state={state} />
+                        <ToolContent>
+                          {input && <ToolInput input={input} />}
+                          {state === "output-available" && (
+                            <ToolOutput output={output} errorText={(part as any).errorText} />
+                          )}
+                        </ToolContent>
+                      </Tool>
+                    </div>
+                  );
+                }
+
+                if (state === "input-available") {
+                  return (
+                    <div
+                      key={toolCallId}
+                      className="flex items-center gap-2 text-muted-foreground text-sm"
+                    >
+                      <Loader
+                        variant="dots"
+                        className="text-muted-foreground"
+                      />
+                      <span>Setting up meeting...</span>
+                    </div>
+                  );
+                }
+
+                if (state === "output-available") {
+                  if (
+                    output &&
+                    typeof output === "object" &&
+                    "success" in output &&
+                    output.success
+                  ) {
+                    return (
+                      <div className="px-2 space-y-2" key={toolCallId}>
+                        <p>If you're interested in talking with us, kindly schedule a call using the form below🙂</p>
+                        <CalBooking
+                          eventTypeId={(output as any).eventTypeId}
+                          eventTypeName={(output as any).eventTypeName}
+                          duration={(output as any).duration}
                           name={(output as any).name}
                           description={(output as any).description}
                           color={activeChatbot?.primaryColor}

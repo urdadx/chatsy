@@ -1,23 +1,15 @@
 import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { db } from "@/db";
 import { chat, member, message } from "@/db/schema";
+import { buildActiveTools } from "@/lib/ai/build-active-tools";
 import {
-  getCalendlyBookingActions,
   getChatbotDataByPlatformIdentifier,
-  getCollectLeadsActions,
-  getCustomButtonActions,
   getMessagesByChatId,
   saveMessages,
 } from "@/lib/ai/chat-functions";
-import { getActiveTools } from "@/lib/ai/get-active-tools";
+import { getActiveToolsWithActions } from "@/lib/ai/get-active-tools";
 import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
 import { google } from "@/lib/ai/providers";
-import { calendlyBookingTool } from "@/lib/ai/tools/calendly-booking-tool";
-import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback-tool";
-import { collectLeadsTool } from "@/lib/ai/tools/collect-leads-tool";
-import { customButtonTool } from "@/lib/ai/tools/custom-button-tool";
-import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
-import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search-tool";
 import { ChatSDKError } from "@/lib/errors";
 import { detectDeviceFromUserAgent, generateUUID } from "@/lib/utils";
 import { embedChatRateLimitMiddleware } from "@/middlewares";
@@ -185,48 +177,32 @@ export const ServerRoute = createServerFileRoute(
           }
         }
 
-        // Get chatbot details
-        const activeTools = await getActiveTools();
+        const { activeToolNames, toolsMap } = await getActiveToolsWithActions(
+          chatbotData.id,
+        );
+
         const chatbotName = chatbotData.name || "AI Assistant";
         const chatbotPersonality = chatbotData.personality || "support";
-        const customButtonActions = await getCustomButtonActions(
-          chatbotData.id,
-        );
-        const calendlyActions = await getCalendlyBookingActions(chatbotData.id);
-        const collectLeadsActions = await getCollectLeadsActions(
-          chatbotData.id,
-        );
+
+        // Build tools object with only active tools
+        const tools = buildActiveTools({
+          activeToolNames,
+          chatbotId: chatbotData.id,
+          chatId: id,
+          organizationId: chatbotData.organizationId,
+        });
 
         const stream = createUIMessageStream({
           execute: ({ writer: dataStream }) => {
             const result = streamText({
               model: google("gemini-2.0-flash"),
-              system: systemPrompt(
-                chatbotName,
-                activeTools,
-                chatbotPersonality,
-                customButtonActions,
-                calendlyActions,
-                collectLeadsActions,
-              ),
+              system: systemPrompt(chatbotName, chatbotPersonality, toolsMap),
               messages: convertToModelMessages(uiMessages, {
                 ignoreIncompleteToolCalls: true,
               }),
               stopWhen: stepCountIs(5),
-              experimental_activeTools: activeTools,
               experimental_transform: smoothStream({ chunking: "word" }),
-              tools: {
-                knowledge_base: knowledgeSearchTool(chatbotData.id),
-                collect_feedback: collectFeedbackTool,
-                collect_leads: collectLeadsTool(chatbotData.id),
-                custom_button: customButtonTool(chatbotData.id),
-                calendly_booking: calendlyBookingTool(chatbotData.id),
-                escalate_to_human: escalateToHumanTool({
-                  chatId: id,
-                  chatbotId: chatbotData.id,
-                  organizationId: chatbotData.organizationId,
-                }),
-              },
+              tools,
               onFinish: async ({ usage }) => {
                 await polarClient.events.ingest({
                   events: [

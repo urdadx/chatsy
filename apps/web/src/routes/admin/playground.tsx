@@ -68,7 +68,7 @@ function RouteComponent() {
       {/* Fixed Sidebar - Hidden on mobile */}
       <aside className="hidden bg-gray-50 sm:flex fixed top-7 right-0 w-[420px] h-full border-l px-4 py-6 z-0">
         <div className="w-full h-full flex items-center justify-center">
-          <ChatPreview />
+          <ChatPreview key={chatbot?.primaryColor} />
         </div>
       </aside>
 
@@ -84,7 +84,7 @@ function RouteComponent() {
           <DrawerHeader>
             <DrawerTitle className="sr-only">Chat Preview</DrawerTitle>
           </DrawerHeader>
-          <ChatPreview />
+          <ChatPreview key={chatbot?.primaryColor} />
         </DrawerContent>
       </Drawer>
     </div>

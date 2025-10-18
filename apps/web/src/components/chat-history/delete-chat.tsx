@@ -28,7 +28,11 @@ export function DeleteChat({ open, id, onOpenChange }: DeleteChatProps) {
     },
     onSuccess: () => {
       toast.success("Chat deleted");
-      queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+      queryClient.invalidateQueries({
+        queryKey: ["chat-logs"],
+        exact: false
+      });
+      queryClient.invalidateQueries({ queryKey: ["chat", id] });
       queryClient.invalidateQueries({ queryKey: ["messages"] });
     },
     onError: () => {

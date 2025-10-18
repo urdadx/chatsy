@@ -3,6 +3,7 @@ import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { DefaultCatchBoundary } from "./components/default-catch-boundary";
 import { DefaultNotFound } from "./components/default-not-found";
+import { GlobalLoader } from "./components/global-loader";
 import { routeTree } from "./routeTree.gen";
 
 export function createRouter() {
@@ -16,6 +17,7 @@ export function createRouter() {
     defaultNotFoundComponent: DefaultNotFound,
     scrollRestoration: true,
     defaultStructuralSharing: true,
+    defaultPendingComponent: GlobalLoader
   });
 
   setupRouterSsrQueryIntegration({

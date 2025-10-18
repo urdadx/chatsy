@@ -69,7 +69,7 @@ export const ChatDetailsDialog = ({ chatId }: { chatId?: string }) => {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-base font-medium text-muted-foreground">Agent assigned</span>
+                <span className="text-base font-medium text-muted-foreground">Assigned to</span>
                 <span className="text-sm">
                   {(chat as ChatData).assignedUser?.name || (chat as ChatData).assignedUser?.email || "Not assigned"}
                 </span>

@@ -63,7 +63,7 @@ function RouteComponent() {
   const handleRefresh = () => {
     refetch();
     queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
-    queryClient.invalidateQueries({ queryKey: ["chat-history"] });
+    queryClient.invalidateQueries({ queryKey: ["chat-logs"], exact: false });
   }
 
   useEffect(() => {
@@ -209,7 +209,7 @@ function RouteComponent() {
                       onClick={() => handleChatIdChange(chat.id)}
                       title={chat.title || "Untitled Chat"}
                       isSelected={chatId === chat.id}
-                      description={chat.createdAt}
+                      date={chat.createdAt}
                     />
                   ))}
 

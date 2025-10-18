@@ -33,13 +33,18 @@ export type ConversationEmptyStateProps = ComponentProps<"div"> & {
   title?: string;
   description?: string;
   icon?: React.ReactNode;
+  chatbot?: {
+    image?: string | null;
+    name?: string | null;
+    [key: string]: any;
+  };
 };
 
 export const ConversationEmptyState = ({
   title = "No messages yet",
-
+  chatbot,
 }: ConversationEmptyStateProps) => (
-  <GreetingMessage title={title} />
+  <GreetingMessage title={title} chatbot={chatbot} />
 );
 
 export type ConversationScrollButtonProps = ComponentProps<typeof Button>;

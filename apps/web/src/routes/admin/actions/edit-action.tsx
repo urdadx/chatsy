@@ -1,3 +1,4 @@
+import { CaldotComForm } from '@/components/agents/forms/caldotcom-form'
 import { CalendlyForm } from '@/components/agents/forms/calendly-form'
 import { CustomButtonForm } from '@/components/agents/forms/custom-btn-form'
 import { FeedbackForm } from '@/components/agents/forms/feedback-form'
@@ -31,6 +32,8 @@ function RouteComponent() {
         return <FeedbackForm actionId={actionId} />
       case 'collect_leads':
         return <LeadsForm actionId={actionId} />
+      case 'caldotcom':
+        return <CaldotComForm actionId={actionId} />
       default:
         return (
           <div className="w-full max-w-3xl bg-card rounded-lg border border-border shadow-xs p-6">

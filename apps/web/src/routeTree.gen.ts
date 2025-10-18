@@ -80,6 +80,8 @@ import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/so
 import { ServerRoute as ApiEmbedGenerateTokenServerRouteImport } from './routes/api/embed/generate-token'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
 import { ServerRoute as ApiChatAssignAgentServerRouteImport } from './routes/api/chat/assign-agent'
+import { ServerRoute as ApiCalSlotsServerRouteImport } from './routes/api/cal/slots'
+import { ServerRoute as ApiCalBookingServerRouteImport } from './routes/api/cal/booking'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 import { ServerRoute as ApiAgentActionsActionIdServerRouteImport } from './routes/api/agent-actions/$actionId'
 import { ServerRoute as ApiActivityActivityIdServerRouteImport } from './routes/api/activity/$activityId'
@@ -449,6 +451,16 @@ const ApiChatAssignAgentServerRoute =
     path: '/api/chat/assign-agent',
     getParentRoute: () => rootServerRouteImport,
   } as any)
+const ApiCalSlotsServerRoute = ApiCalSlotsServerRouteImport.update({
+  id: '/api/cal/slots',
+  path: '/api/cal/slots',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiCalBookingServerRoute = ApiCalBookingServerRouteImport.update({
+  id: '/api/cal/booking',
+  path: '/api/cal/booking',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -772,6 +784,8 @@ export interface FileServerRoutesByFullPath {
   '/api/activity/$activityId': typeof ApiActivityActivityIdServerRoute
   '/api/agent-actions/$actionId': typeof ApiAgentActionsActionIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/cal/booking': typeof ApiCalBookingServerRoute
+  '/api/cal/slots': typeof ApiCalSlotsServerRoute
   '/api/chat/assign-agent': typeof ApiChatAssignAgentServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
@@ -821,6 +835,8 @@ export interface FileServerRoutesByTo {
   '/api/activity/$activityId': typeof ApiActivityActivityIdServerRoute
   '/api/agent-actions/$actionId': typeof ApiAgentActionsActionIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/cal/booking': typeof ApiCalBookingServerRoute
+  '/api/cal/slots': typeof ApiCalSlotsServerRoute
   '/api/chat/assign-agent': typeof ApiChatAssignAgentServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
@@ -871,6 +887,8 @@ export interface FileServerRoutesById {
   '/api/activity/$activityId': typeof ApiActivityActivityIdServerRoute
   '/api/agent-actions/$actionId': typeof ApiAgentActionsActionIdServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/cal/booking': typeof ApiCalBookingServerRoute
+  '/api/cal/slots': typeof ApiCalSlotsServerRoute
   '/api/chat/assign-agent': typeof ApiChatAssignAgentServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
@@ -922,6 +940,8 @@ export interface FileServerRouteTypes {
     | '/api/activity/$activityId'
     | '/api/agent-actions/$actionId'
     | '/api/auth/$'
+    | '/api/cal/booking'
+    | '/api/cal/slots'
     | '/api/chat/assign-agent'
     | '/api/chat/history'
     | '/api/embed/generate-token'
@@ -971,6 +991,8 @@ export interface FileServerRouteTypes {
     | '/api/activity/$activityId'
     | '/api/agent-actions/$actionId'
     | '/api/auth/$'
+    | '/api/cal/booking'
+    | '/api/cal/slots'
     | '/api/chat/assign-agent'
     | '/api/chat/history'
     | '/api/embed/generate-token'
@@ -1020,6 +1042,8 @@ export interface FileServerRouteTypes {
     | '/api/activity/$activityId'
     | '/api/agent-actions/$actionId'
     | '/api/auth/$'
+    | '/api/cal/booking'
+    | '/api/cal/slots'
     | '/api/chat/assign-agent'
     | '/api/chat/history'
     | '/api/embed/generate-token'
@@ -1070,6 +1094,8 @@ export interface RootServerRouteChildren {
   ApiActivityActivityIdServerRoute: typeof ApiActivityActivityIdServerRoute
   ApiAgentActionsActionIdServerRoute: typeof ApiAgentActionsActionIdServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
+  ApiCalBookingServerRoute: typeof ApiCalBookingServerRoute
+  ApiCalSlotsServerRoute: typeof ApiCalSlotsServerRoute
   ApiChatAssignAgentServerRoute: typeof ApiChatAssignAgentServerRoute
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
   ApiEmbedGenerateTokenServerRoute: typeof ApiEmbedGenerateTokenServerRoute
@@ -1576,6 +1602,20 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiChatAssignAgentServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/cal/slots': {
+      id: '/api/cal/slots'
+      path: '/api/cal/slots'
+      fullPath: '/api/cal/slots'
+      preLoaderRoute: typeof ApiCalSlotsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/cal/booking': {
+      id: '/api/cal/booking'
+      path: '/api/cal/booking'
+      fullPath: '/api/cal/booking'
+      preLoaderRoute: typeof ApiCalBookingServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -1742,6 +1782,8 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiActivityActivityIdServerRoute: ApiActivityActivityIdServerRoute,
   ApiAgentActionsActionIdServerRoute: ApiAgentActionsActionIdServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiCalBookingServerRoute: ApiCalBookingServerRoute,
+  ApiCalSlotsServerRoute: ApiCalSlotsServerRoute,
   ApiChatAssignAgentServerRoute: ApiChatAssignAgentServerRoute,
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
   ApiEmbedGenerateTokenServerRoute: ApiEmbedGenerateTokenServerRoute,

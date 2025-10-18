@@ -26,7 +26,7 @@ export function EscalateToHumanNotification({
         ) : (
           <AlertTriangle className="h-5 w-5 text-red-600" />
         )}
-        <h3 className="font-semibold text-gray-900">
+        <h3 className="font-normal text-gray-900">
           {isSuccess ? "Escalated to a Human Agent" : "Escalation Failed"}
         </h3>
       </div>

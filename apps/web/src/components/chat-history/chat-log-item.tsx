@@ -24,7 +24,7 @@ interface ChatLogItemProps {
   id: string;
   status: string;
   title: string;
-  description: string;
+  date: string;
   onClick?: () => void;
   isSelected?: boolean;
   userId?: string | null;
@@ -32,7 +32,7 @@ interface ChatLogItemProps {
 
 export const ChatLogItem = ({
   title,
-  description,
+  date,
   id,
   status,
   onClick,
@@ -95,12 +95,12 @@ export const ChatLogItem = ({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2">
-            <h3 className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+            <h3 className="text-sm font-medium text-gray-900 truncate ">
               {title.length > 30 ? `${title.substring(0, 30)}...` : title}
             </h3>
           </div>
           <p className="text-sm text-gray-500 mt-1 truncate">
-            {timeAgo(description)}
+            {timeAgo(date)}
           </p>
         </div>
 

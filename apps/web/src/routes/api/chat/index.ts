@@ -1,26 +1,17 @@
 import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { db } from "@/db";
 import { chatbot, message } from "@/db/schema";
+import { buildActiveTools } from "@/lib/ai/build-active-tools";
 import {
   deleteChatById,
-  getCalendlyBookingActions,
   getChatById,
-  getCollectLeadsActions,
-  getCustomButtonActions,
   getMessagesByChatId,
   saveChat,
   saveMessages,
 } from "@/lib/ai/chat-functions";
-import { getActiveTools } from "@/lib/ai/get-active-tools";
+import { getActiveToolsWithActions } from "@/lib/ai/get-active-tools";
 import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
 import { google } from "@/lib/ai/providers";
-import { cache } from "@/lib/ai/tool-cache";
-import { calendlyBookingTool } from "@/lib/ai/tools/calendly-booking-tool";
-import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback-tool";
-import { collectLeadsTool } from "@/lib/ai/tools/collect-leads-tool";
-import { customButtonTool } from "@/lib/ai/tools/custom-button-tool";
-import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
-import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search-tool";
 import { ChatSDKError } from "@/lib/errors";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getCustomerExternalId } from "@/lib/subscription/subscription-functions";
@@ -184,47 +175,34 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             );
           }
 
-          // Get chatbot details
-          const activeTools = await getActiveTools();
+          // Get active tools and their actions in a single query
+          const { activeToolNames, toolsMap } =
+            await getActiveToolsWithActions(chatbotId);
+
           const chatbotName = chatbotData.name || "AI Assistant";
           const chatbotPersonality = chatbotData.personality || "support";
           const organizationId = chatbotData.organizationId;
-          const customButtonActions = await getCustomButtonActions(chatbotId);
-          const calendlyActions = await getCalendlyBookingActions(chatbotId);
-          const collectLeadsActions = await getCollectLeadsActions(chatbotId);
+
+     
+          // Build tools object with only active tools
+          const tools = buildActiveTools({
+            activeToolNames,
+            chatbotId,
+            chatId: id,
+            organizationId,
+          });
 
           const stream = createUIMessageStream({
             execute: ({ writer: dataStream }) => {
               const result = streamText({
                 model: google("gemini-2.0-flash"),
-                system: systemPrompt(
-                  chatbotName,
-                  activeTools,
-                  chatbotPersonality,
-                  customButtonActions,
-                  calendlyActions,
-                  collectLeadsActions,
-                ),
+                system: systemPrompt(chatbotName, chatbotPersonality, toolsMap),
                 messages: convertToModelMessages(uiMessages, {
                   ignoreIncompleteToolCalls: true,
                 }),
-                experimental_activeTools: activeTools,
                 stopWhen: stepCountIs(5),
                 experimental_transform: smoothStream({ chunking: "word" }),
-                tools: {
-                  knowledge_base: cache(knowledgeSearchTool(chatbotId)),
-                  collect_feedback: cache(collectFeedbackTool),
-                  collect_leads: cache(collectLeadsTool(chatbotId)),
-                  custom_button: cache(customButtonTool(chatbotId)),
-                  calendly_booking: cache(calendlyBookingTool(chatbotId)),
-                  escalate_to_human: cache(
-                    escalateToHumanTool({
-                      chatId: id,
-                      chatbotId,
-                      organizationId,
-                    }),
-                  ),
-                },
+                tools,
                 onFinish: async ({ usage }) => {
                   await polarClient.events.ingest({
                     events: [

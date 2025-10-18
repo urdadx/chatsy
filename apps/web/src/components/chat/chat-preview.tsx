@@ -19,16 +19,16 @@ import { convertToUIMessages } from "./convert-to-ui-message";
 
 export function ChatPreview() {
   const { chatId, resetChat } = useChatWithReset();
-  const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
+  // Removed database message persistence - messages will be ephemeral
+  // const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
   const { data: chatData } = useChatData(chatId);
   const [input, setInput] = useState("");
   const [showLanding, setShowLanding] = useState(() => {
     return localStorage.getItem("chat-preview-interface") === "landing";
   });
 
-  const initialMessages = messagesFromDb
-    ? convertToUIMessages(messagesFromDb)
-    : [];
+  // Always start with empty messages - no persistence
+  const initialMessages: ChatMessage[] = [];
 
   const queryClient = useQueryClient();
 
@@ -66,11 +66,7 @@ export function ChatPreview() {
     },
   });
 
-  useEffect(() => {
-    if (initialMessages.length > 0 && messages.length === 0) {
-      setMessages(initialMessages);
-    }
-  }, [initialMessages, messages.length, setMessages]);
+  // Removed useEffect that synced messages from DB - keeping chat ephemeral
 
   const handleSubmit = (event?: React.FormEvent) => {
     event?.preventDefault();
@@ -145,8 +141,8 @@ export function ChatPreview() {
       />
 
       <ChatBody
-        isLoading={isLoading}
-        error={error}
+        isLoading={false}
+        error={undefined}
         messages={messages}
         setMessages={setMessages}
         status={status}

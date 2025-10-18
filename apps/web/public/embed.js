@@ -241,8 +241,8 @@
     setupBubbleIframeStyles() {
       Object.assign(this.iframe.style, {
         width: "400px",
-        height: "580px",
-        maxHeight: "90vh",
+        height: "550px",
+        maxHeight: "100vh",
         border: "none",
         borderRadius: "16px",
         boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)",
@@ -286,7 +286,7 @@
     }
 
     positionBubble() {
-      const margin = 15; // Increased margin for better mobile spacing
+      const margin = 15;
 
       switch (this.config.position) {
         case "bottom-right":

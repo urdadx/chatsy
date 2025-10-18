@@ -93,7 +93,6 @@ const LoadingState: React.FC = () => (
   >
     <div className="text-center">
       <Spinner className="text-primary mb-2" />
-      <p className="text-gray-600">Loading chat...</p>
     </div>
   </div>
 );

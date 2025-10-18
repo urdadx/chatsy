@@ -1,3 +1,4 @@
+import CalDotComIcon from "@/assets/cal.avif"
 import CalendlyIcon from "@/assets/calendly.png"
 import { SolarBoltBoldDuotone } from "@/assets/icons/bolt-duotone"
 import { SolarBoxMinimalisticBoldDuotone } from "@/assets/icons/box-icon"
@@ -90,6 +91,12 @@ export const CreateActionDialog = () => {
       icon: <SolarBoxMinimalisticBoldDuotone color="#e500b9" className="w-6 h-6" />,
       title: "Custom button",
       description: "Add a custom button action to open links or trigger events"
+    },
+    {
+      href: "/admin/actions/new-action?actionType=caldotcom",
+      iconSrc: CalDotComIcon,
+      title: "Get Cal.com booking slots",
+      description: "Allow customers to book meetings via Cal.com"
     },
     {
       href: "/admin/actions/new-action?actionType=collect_leads",

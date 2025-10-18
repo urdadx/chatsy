@@ -1,10 +1,11 @@
 import { useChatbot } from "@/hooks/use-chatbot";
-import { SparklesIcon } from "lucide-react";
+import { RiBardFill } from "@remixicon/react";
 import { AnimatePresence, motion } from "motion/react";
 import { ResponseStream } from "./response-stream";
 
-export const GreetingMessage = ({ title }: any) => {
-  const { data: chatbot } = useChatbot();
+export const GreetingMessage = ({ title, chatbot: chatbotProp }: any) => {
+  const { data: hookChatbot } = useChatbot();
+  const chatbot = chatbotProp ?? hookChatbot;
 
   return (
     <>
@@ -23,7 +24,7 @@ export const GreetingMessage = ({ title }: any) => {
                   className="rounded-full"
                 />
               ) : (
-                <SparklesIcon size={14} />
+                <RiBardFill size={14} />
               )}
             </div>
             <div className="flex flex-row gap-2 items-start">
