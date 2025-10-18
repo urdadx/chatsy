@@ -137,7 +137,7 @@ export const EditQuestion = ({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-full sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-md">Edit Q&A</DialogTitle>
+            <DialogTitle className="text-xl">Edit details</DialogTitle>
           </DialogHeader>
           {formContent}
         </DialogContent>
@@ -149,7 +149,7 @@ export const EditQuestion = ({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="h-[50%]">
         <DrawerHeader className="text-left">
-          <DrawerTitle className="text-md">Edit Q&A</DrawerTitle>
+          <DrawerTitle className="text-xl">Edit details</DrawerTitle>
         </DrawerHeader>
         <div className="px-4">{formContent}</div>
       </DrawerContent>

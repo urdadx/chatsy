@@ -53,17 +53,18 @@ function RouteComponent() {
                 Files
               </TabsTrigger>
               <TabsTrigger
-                value="qa"
-                className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-              >
-                Q&A
-              </TabsTrigger>
-              <TabsTrigger
                 value="website"
                 className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
               >
                 Links
               </TabsTrigger>
+              <TabsTrigger
+                value="qa"
+                className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+              >
+                Q&A
+              </TabsTrigger>
+
               <TabsTrigger
                 value="text"
                 className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
@@ -89,10 +90,9 @@ function RouteComponent() {
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex fixed top-0 right-0 h-screen w-[340px] border-l bg-gray-50 p-4 items-center justify-center">
+      <div className="hidden lg:flex fixed top-0 right-0 border-l  w-[340px] h-full bg-gray-50 p-4 items-center justify-center">
         <TrainAgent />
       </div>
-      {/* Mobile Drawer */}
       <div className="lg:hidden fixed bottom-4 right-0 left-0 z-50 flex justify-center">
         <Drawer>
           <DrawerTrigger asChild>

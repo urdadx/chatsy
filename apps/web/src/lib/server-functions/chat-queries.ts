@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chat, message } from "@/db/schema";
+import { chat, member, message, user } from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import { asc, eq } from "drizzle-orm";
 
@@ -8,8 +8,26 @@ export const getChatById = createServerFn({ method: "GET" })
   .handler(async (ctx) => {
     try {
       const [selectedChat] = await db
-        .select()
+        .select({
+          id: chat.id,
+          createdAt: chat.createdAt,
+          title: chat.title,
+          userId: chat.userId,
+          chatbotId: chat.chatbotId,
+          visibility: chat.visibility,
+          channel: chat.channel,
+          status: chat.status,
+          agentAssigned: chat.agentAssigned,
+          chatMetaData: chat.chatMetaData as {},
+          assignedUser: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          },
+        })
         .from(chat)
+        .leftJoin(member, eq(chat.agentAssigned, member.id))
+        .leftJoin(user, eq(member.userId, user.id))
         .where(eq(chat.id, ctx.data));
       if (!selectedChat) {
         throw new Error(`Chat with id "${ctx.data}" not found`);
@@ -33,7 +51,6 @@ export const getMessagesByChatId = createServerFn({ method: "GET" })
       return results.map((result) => ({
         ...result,
         parts: result.parts as {},
-        content: result.content as string,
         role: result.role as "user" | "assistant",
         createdAt: result.createdAt,
       }));

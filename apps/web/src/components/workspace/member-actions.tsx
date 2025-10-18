@@ -55,8 +55,8 @@ export function MemberActions({ member }: { member: any }) {
       >
         <DialogContent className="w-full max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-base">Modify Role</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl">Modify Role</DialogTitle>
+            <DialogDescription className="text-md">
               Change the role of {member.user.name} in the organization.
             </DialogDescription>
           </DialogHeader>

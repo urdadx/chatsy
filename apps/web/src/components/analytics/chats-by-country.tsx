@@ -60,7 +60,6 @@ export function ChatsByCountry({
     };
   }, [analytics]);
 
-  // Replace dummy data with fetched/aggregated data
   const mapCountries = countryStats.map((country) => {
     const countryCode = getCountryCode(country.country) || "unknown";
     const iconSrc = `https://flag.vercel.app/m/${countryCode}.svg`;

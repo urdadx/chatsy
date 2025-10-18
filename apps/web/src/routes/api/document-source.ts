@@ -1,22 +1,24 @@
 import { db } from "@/db";
-import { chatbot, documentSource, member } from "@/db/schema";
+import { chatbot, documentSource, knowledge } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
+import { deleteFileFromStorage } from "@/lib/hooks/delete-from-storage";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { deleteCachedData, withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const createDocumentSourceSchema = z.object({
   name: z.string().min(1),
   type: z.string().min(1),
   size: z.number().min(1),
-  url: z.string().url(),
+  url: z.string(),
 });
 
 const deleteDocumentSourceSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
 });
 
 export const ServerRoute = createServerFileRoute(
@@ -53,15 +55,16 @@ export const ServerRoute = createServerFileRoute(
       return new Response("Forbidden", { status: 403 });
     }
 
-    const results = await db
-      .select()
-      .from(documentSource)
-      .where(
-        and(
-          eq(documentSource.userId, userId),
-          eq(documentSource.chatbotId, chatbotId),
-        ),
-      );
+    const results = await withCache(
+      `document-sources:${chatbotId}`,
+      async () => {
+        return await db
+          .select()
+          .from(documentSource)
+          .where(eq(documentSource.chatbotId, chatbotId));
+      },
+      { ttl: 60 },
+    );
 
     return json(results);
   },
@@ -109,6 +112,9 @@ export const ServerRoute = createServerFileRoute(
           sourcesCount: sql`${chatbot.sourcesCount} + 1`,
         })
         .where(eq(chatbot.id, chatbotId));
+
+      // Invalidate cache
+      await deleteCachedData(`document-sources:${chatbotId}`);
     }
 
     return json(newDocumentSource);
@@ -131,7 +137,6 @@ export const ServerRoute = createServerFileRoute(
       return json({ error: "No active chatbot" }, { status: 400 });
     }
 
-    // Verify chatbot exists and user has access to its organization
     const [chatbotData] = await db
       .select({ organizationId: chatbot.organizationId })
       .from(chatbot)
@@ -142,19 +147,12 @@ export const ServerRoute = createServerFileRoute(
       return json({ error: "Chatbot not found" }, { status: 404 });
     }
 
-    // Verify user is a member of the chatbot's organization
-    const [membership] = await db
-      .select({ id: member.id })
-      .from(member)
-      .where(
-        and(
-          eq(member.organizationId, chatbotData.organizationId),
-          eq(member.userId, userId),
-        ),
-      )
-      .limit(1);
+    const isMember = await isUserMemberOfOrganization(
+      userId,
+      chatbotData.organizationId,
+    );
 
-    if (!membership) {
+    if (!isMember) {
       return json({ error: "Unauthorized: Access denied" }, { status: 403 });
     }
 
@@ -170,7 +168,6 @@ export const ServerRoute = createServerFileRoute(
       .where(
         and(
           eq(documentSource.id, parsed.data.id),
-          eq(documentSource.userId, userId),
           eq(documentSource.chatbotId, chatbotId),
         ),
       )
@@ -184,12 +181,31 @@ export const ServerRoute = createServerFileRoute(
     }
 
     if (deleted) {
+      // Delete associated knowledge entries (embeddings)
+      await db
+        .delete(knowledge)
+        .where(
+          and(
+            eq(knowledge.source, "document"),
+            eq(knowledge.sourceId, deleted.id),
+          ),
+        );
+
       await db
         .update(chatbot)
         .set({
           sourcesCount: sql`greatest(0, ${chatbot.sourcesCount} - 1)`,
         })
         .where(eq(chatbot.id, chatbotId));
+      // Delete the file from firebase storage
+      try {
+        await deleteFileFromStorage(deleted.url);
+      } catch (error) {
+        console.error("Failed to delete file from storage:", error);
+      }
+
+      // Invalidate cache
+      await deleteCachedData(`document-sources:${chatbotId}`);
     }
 
     return json({ message: "Document source deleted", deleted });

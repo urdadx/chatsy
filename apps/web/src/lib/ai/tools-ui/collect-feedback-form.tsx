@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Spinner from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useEmbedToken } from "@/lib/contexts/embed-token-context";
-import { getClientLocation } from "@/lib/utils/client-location";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -27,7 +27,6 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
     }));
   };
 
-  // Memoize the embed token calculation
   const embedToken = useMemo(() => {
     if (embedTokenFromContext) {
       return embedTokenFromContext;
@@ -44,12 +43,8 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
 
   const mutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      // Get user location before sending
-      const location = await getClientLocation();
-
       const requestData = {
         ...data,
-        location,
         ...(embedToken && { embedToken }),
       };
 
@@ -57,12 +52,12 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Feedback sent successfully!");
+      toast.success("Submitted!");
       setFormData({ email: "", subject: "", message: "" });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast.error(
-        error.response?.data?.message || "An unexpected error occurred.",
+        "An unexpected error occurred."
       );
     },
   });
@@ -73,16 +68,16 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
+    <form onSubmit={handleSubmit} className="w-full space-y-6">
+      <div >
+        <Label htmlFor="email" className="block text-sm font-medium mb-2">
           Your Email
-        </label>
+        </Label>
         <Input
           id="email"
           name="email"
           type="email"
-          placeholder="your@example.com"
+          placeholder="jon@example.com"
           value={formData.email}
           onChange={handleChange}
           required
@@ -90,9 +85,9 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
       </div>
 
       <div>
-        <label htmlFor="subject" className="block text-sm font-medium mb-1">
+        <Label htmlFor="subject" className="block text-sm font-medium mb-2">
           Subject (Optional)
-        </label>
+        </Label>
         <Input
           id="subject"
           name="subject"
@@ -103,9 +98,9 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-sm font-medium mb-1">
+        <Label htmlFor="message" className="block text-sm font-medium mb-2">
           Message
-        </label>
+        </Label>
         <Textarea
           id="message"
           name="message"
@@ -123,15 +118,16 @@ export function CollectFeedbackForm({ color }: { color?: string }) {
           color: "#FFFFFF",
         }}
         type="submit"
+        className="w-full"
         disabled={mutation.isPending}
       >
         {mutation.isPending ? (
           <>
             <Spinner className="text-white h-4 w-4 inline-block" />
-            Sending...
+            Submitting
           </>
         ) : (
-          "Send Feedback"
+          "Submit"
         )}
       </Button>
     </form>

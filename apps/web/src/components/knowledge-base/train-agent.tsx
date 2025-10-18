@@ -1,22 +1,27 @@
+import { SolarDocumentTextBoldDuotone } from "@/assets/icons/document-text";
+import { SolarEarthBoldDuotone } from "@/assets/icons/globe-icon";
+import { SolarSledgehammerBoldDuotone } from "@/assets/icons/hammer-duotone";
+import { SolarQuestionCircleBoldDuotone } from "@/assets/icons/question-icon";
+import { SolarFileSendBoldDuotone } from "@/assets/icons/send-file-icon";
 import { formatBytes } from "@/hooks/use-file-upload";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
-import { RiQuestionFill } from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FileText, Globe, Hammer, InfoIcon, Paperclip } from "lucide-react";
+import { InfoIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useRetrainingBanner } from "../retraining-banner";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
+import Spinner from "../ui/spinner";
 
 export const TrainAgent = () => {
   const queryClient = useQueryClient();
   const [lastTrainedAt, setLastTrainedAt] = useState<Date | null>(null);
   const { data: session } = useSession();
   const organizationId = session?.session?.activeOrganizationId;
-  const { show, setBanner } = useRetrainingBanner();
+  const { show, message, setBanner } = useRetrainingBanner();
 
   useEffect(() => {
     const storedTimestamp = localStorage.getItem("lastTrainedAt");
@@ -159,31 +164,30 @@ export const TrainAgent = () => {
 
   return (
     <div className="w-full space-y-3">
-      {isStale ||
-        (show && (
-          <Alert variant="warning">
-            <InfoIcon className="h-4 w-4" />
-            <AlertDescription>Retraining required</AlertDescription>
-          </Alert>
-        ))}
+      {(isStale || show) && (
+        <Alert variant="warning">
+          <InfoIcon className="h-4 w-4" />
+          <AlertDescription>{show ? message : "Retraining required"}</AlertDescription>
+        </Alert>
+      )}
       <h1 className="text-lg font-semibold ">Sources</h1>
       <FileStatCard
-        icon={<Paperclip className="w-5 h-5 text-primary/70" />}
+        icon={<SolarFileSendBoldDuotone color="#8b5cf6" className="w-5 h-5 text-primary/70" />}
         label="Files"
         size={formatBytes(totalDocumentSize)}
       />
       <FileStatCard
-        icon={<Globe className="w-5 h-5 text-primary/70" />}
+        icon={<SolarEarthBoldDuotone color="#8b5cf6" className="w-5 h-5 text-primary/70" />}
         label="Website"
         size={formatBytes(totalWebsiteSize)}
       />
       <FileStatCard
-        icon={<RiQuestionFill className="w-5 h-5 text-primary/70" />}
+        icon={<SolarQuestionCircleBoldDuotone color="#8b5cf6" className="w-5 h-5 text-primary/70" />}
         label="Q&A"
         size={formatBytes(totalQuestionSize)}
       />
       <FileStatCard
-        icon={<FileText className="w-5 h-5 text-primary/70" />}
+        icon={<SolarDocumentTextBoldDuotone color="#8b5cf6" className="w-5 h-5 text-primary/70" />}
         label="Text"
         size={formatBytes(totalTextSize)}
       />
@@ -194,10 +198,13 @@ export const TrainAgent = () => {
           disabled={trainAgentMutation.isPending}
         >
           {trainAgentMutation.isPending ? (
-            "Training..."
+            <>
+              <Spinner className="w-5 h-5" />
+              Training
+            </>
           ) : (
             <>
-              <Hammer className="w-4 h-4 " />
+              <SolarSledgehammerBoldDuotone color="#FFFFFF" className="w-6 h-6" />
               Train agent
             </>
           )}

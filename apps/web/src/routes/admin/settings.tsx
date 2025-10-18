@@ -1,11 +1,12 @@
 import { Billing } from "@/components/settings/billing-page";
+import { ProfileDelete } from "@/components/settings/profile-delete";
+import { UserProfileImageSettings } from "@/components/settings/user-profile-image-settings";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InvitationsTable } from "@/components/workspace/invitations-table";
 import { InviteMembers } from "@/components/workspace/invite-members";
 import { MembersTable } from "@/components/workspace/members-table";
-import { WorkspaceDelete } from "@/components/workspace/workspace-delete";
 import { WorkspaceLogoSettings } from "@/components/workspace/workspace-logo-settings";
 import { WorkspaceNameSettings } from "@/components/workspace/workspace-name-settings";
 import { authClient } from "@/lib/auth-client";
@@ -102,7 +103,8 @@ function RouteComponent() {
             <div className="space-y-6 mt-5">
               <WorkspaceNameSettings />
               <WorkspaceLogoSettings />
-              <WorkspaceDelete />
+              <UserProfileImageSettings />
+              <ProfileDelete />
             </div>
             <div className="h-14" />
           </TabsContent>
@@ -120,7 +122,7 @@ function RouteComponent() {
                 </Button>
               )}
             </div>
-            <div className="w-full border rounded-lg p-4">
+            <div className="w-full border rounded-xl p-4">
               <MembersTable />
             </div>
           </TabsContent>
@@ -134,7 +136,7 @@ function RouteComponent() {
                 </Button>
               )}
             </div>
-            <div className="w-full border rounded-lg p-4">
+            <div className="w-full border rounded-xl p-4">
               <InvitationsTable />
             </div>
           </TabsContent>

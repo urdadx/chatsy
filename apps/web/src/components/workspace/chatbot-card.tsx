@@ -5,11 +5,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useDeleteChatbot } from "@/hooks/use-chatbot";
-import { useSetActiveChatbot } from "@/hooks/use-chatbot-management";
+import { useSetActiveChatbot } from "@/hooks/use-chatbot";
 import { timeAgo } from "@/lib/utils";
 import { ArrowRightLeft, MoreHorizontal, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { DeleteWorkspace } from "./delete-workspace";
 
 interface ChatbotCardProps {
@@ -19,21 +18,6 @@ interface ChatbotCardProps {
   createdAt: Date;
 }
 
-const GRADIENT_PRESETS = [
-  "bg-gradient-to-br from-purple-600 via-purple-500 to-blue-500",
-  "bg-gradient-to-br from-pink-500 via-red-500 to-orange-500",
-  "bg-gradient-to-br from-blue-600 via-indigo-500 to-purple-500",
-  "bg-gradient-to-br from-green-500 via-teal-500 to-blue-500",
-  "bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500",
-  "bg-gradient-to-br from-indigo-600 via-purple-500 to-pink-500",
-  "bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600",
-  "bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500",
-  "bg-gradient-to-br from-rose-500 via-pink-500 to-purple-500",
-  "bg-gradient-to-br from-amber-500 via-yellow-500 to-orange-500",
-  "bg-gradient-to-br from-lime-400 via-green-400 to-emerald-500",
-  "bg-gradient-to-br from-fuchsia-500 via-pink-500 to-rose-500",
-];
-
 export function ChatbotCard({
   chatbotId,
   name,
@@ -41,16 +25,8 @@ export function ChatbotCard({
   createdAt,
 }: ChatbotCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const gradientClass = useMemo(() => {
-    const hash = name.split("").reduce((acc, char) => {
-      return char.charCodeAt(0) + ((acc << 5) - acc);
-    }, 0);
-    const index = Math.abs(hash) % GRADIENT_PRESETS.length;
-    return GRADIENT_PRESETS[index];
-  }, [name]);
 
   const setActiveChatbotMutation = useSetActiveChatbot();
-  const deleteChatbotMutation = useDeleteChatbot();
 
   const handleSwitchChatbot = async () => {
     try {
@@ -63,8 +39,8 @@ export function ChatbotCard({
 
   return (
     <>
-      <div className="w-full max-w-sm mx-auto">
-        <div className="overflow-hidden border rounded-lg">
+      <div className="w-full max-w-sm ">
+        <div className="overflow-hidden border rounded-xl">
           <div className="relative h-24 overflow-hidden">
             {logo ? (
               <img
@@ -73,8 +49,11 @@ export function ChatbotCard({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className={`relative h-24 ${gradientClass} p-6`} />
-            )}
+              <img
+                src={`https://api.dicebear.com/9.x/glass/svg?seed=${name}`}
+                alt={name}
+                className="w-full h-full object-cover"
+              />)}
           </div>
           <div className="p-4 bg-white">
             <div className="flex items-start justify-between">

@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import type { ChatStatus } from "ai";
 import { ArrowUp } from "lucide-react";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
+import { memo, useMemo } from "react";
 
 interface ChatFooterProps {
   input: string;
@@ -22,7 +23,7 @@ interface ChatFooterProps {
   children?: ReactNode;
 }
 
-export function ChatFooter({
+function ChatFooterComponent({
   input,
   onInputChange,
   onSubmit,
@@ -36,19 +37,45 @@ export function ChatFooter({
   className,
   children,
 }: ChatFooterProps) {
+  const inputStyle = useMemo(
+    () => ({
+      "--tw-ring-color": chatbot?.primaryColor || "#2563eb",
+    } as React.CSSProperties),
+    [chatbot?.primaryColor]
+  );
+
+  const buttonStyle = useMemo(
+    () => ({ backgroundColor: chatbot?.primaryColor || "#2563eb" }),
+    [chatbot?.primaryColor]
+  );
+
+  const linkStyle = useMemo(
+    () => ({ color: chatbot?.primaryColor || "#2563eb" }),
+    [chatbot?.primaryColor]
+  );
+
+  const containerClassName = useMemo(
+    () => `border-t bg-gray-50/50 p-3 space-y-3 ${className || ""}`,
+    [className]
+  );
+
+  const suggestionElements = useMemo(
+    () =>
+      suggestions.map((suggestion: string) => (
+        <AISuggestion
+          onClick={onSuggestionClick}
+          key={suggestion}
+          suggestion={suggestion}
+        />
+      )),
+    [suggestions, onSuggestionClick]
+  );
+
   return (
-    <div className={`border-t bg-gray-50/50 p-3 space-y-3 ${className}`}>
+    <div className={containerClassName}>
       {showSuggestions && suggestions.length > 0 && (
         <div className="space-y-2">
-          <AISuggestions>
-            {suggestions.map((suggestion: string) => (
-              <AISuggestion
-                onClick={onSuggestionClick}
-                key={suggestion}
-                suggestion={suggestion}
-              />
-            ))}
-          </AISuggestions>
+          <AISuggestions>{suggestionElements}</AISuggestions>
         </div>
       )}
 
@@ -57,37 +84,34 @@ export function ChatFooter({
       <form onSubmit={onSubmit} className="flex items-center space-x-2">
         <Input
           id="message"
-          placeholder={placeholder}
           className="flex-1 text-sm bg-white sm:text-base"
-          style={
-            {
-              "--tw-ring-color": chatbot?.primaryColor || "#2563eb",
-            } as React.CSSProperties
-          }
           autoComplete="off"
           value={input}
           onChange={onInputChange}
+          placeholder={placeholder}
+          aria-label="Message"
+          style={inputStyle as any}
         />
         <button
           className="rounded-full p-2"
-          style={{ backgroundColor: chatbot?.primaryColor || "#2563eb" }}
           type="submit"
           disabled={status === "streaming" || status === "submitted"}
           aria-label="Send"
+          style={buttonStyle as any}
         >
           <ArrowUp className="h-4 w-4 text-white" />
         </button>
       </form>
 
       {showPoweredBy ? (
-        <div className="flex items-center justify-center text-xs text-muted-foreground">
+        <div className="flex system-font items-center justify-center text-xs text-muted-foreground">
           <span>Powered by </span>
           <a
             href="https://padyna.com"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: chatbot?.primaryColor || "#2563eb" }}
-            className="ml-1 hover:underline font-semibold"
+            style={linkStyle}
+            className="ml-1 hover:underline font-semibold "
           >
             Padyna
           </a>
@@ -98,3 +122,21 @@ export function ChatFooter({
     </div>
   );
 }
+
+function areEqual(prev: ChatFooterProps, next: ChatFooterProps) {
+  return (
+    prev.input === next.input &&
+    prev.status === next.status &&
+    prev.showPoweredBy === next.showPoweredBy &&
+    prev.showSuggestions === next.showSuggestions &&
+    prev.placeholder === next.placeholder &&
+    prev.className === next.className &&
+    prev.chatbot?.primaryColor === next.chatbot?.primaryColor &&
+    prev.suggestions === next.suggestions &&
+    prev.onInputChange === next.onInputChange &&
+    prev.onSuggestionClick === next.onSuggestionClick &&
+    prev.onSubmit === next.onSubmit
+  );
+}
+
+export const ChatFooter = memo(ChatFooterComponent, areEqual);

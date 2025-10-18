@@ -8,10 +8,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useChatbot, useUpdateChatbot } from "@/hooks/use-chatbot";
+import { useUpdateChatbot } from "@/hooks/use-chatbot";
 import { authClient, useSession } from "@/lib/auth-client";
-import { InfoIcon, Plus, Trash2, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { InfoIcon, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { AddOnsDialog } from "../add-ons-dialog";
 import { AvatarUpload } from "../avatar-upload";
@@ -19,29 +19,29 @@ import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import Spinner from "../ui/spinner";
+import { PersonalitySelector } from "./personality-selector";
 import { PickColor } from "./pick-color";
 import { WidgetSettings } from "./widget-settings";
 
-export function ChatbotSettings() {
-  const { data: chatbot, error, refetch, isLoading } = useChatbot();
+interface ChatbotSettingsProps {
+  chatbot: any;
+
+}
+
+export function ChatbotSettings(
+  { chatbot }: ChatbotSettingsProps,
+) {
   const updateChatbotMutation = useUpdateChatbot();
   const { data: session } = useSession();
 
-  const [name, setName] = useState("");
+  const [name, setName] = useState(chatbot?.name || "");
   const [hidePoweredBy, setHidePoweredBy] = useState(
     chatbot?.hidePoweredBy || false,
   );
-  const [initialMessage, setInitialMessage] = useState("");
-  const [suggestedMessages, setSuggestedMessages] = useState<string[]>([]);
+  const [initialMessage, setInitialMessage] = useState(chatbot?.initialMessage || "");
+  const [suggestedMessages, setSuggestedMessages] = useState<string[]>(chatbot?.suggestedMessages || []);
   const [showSuggestedInput, setShowSuggestedInput] = useState(false);
   const [addonsDialogOpen, setAddonsDialogOpen] = useState(false);
-
-  useEffect(() => {
-    setName(chatbot?.name || "");
-    setHidePoweredBy(chatbot?.hidePoweredBy || false);
-    setInitialMessage(chatbot?.initialMessage || "");
-    setSuggestedMessages(chatbot?.suggestedMessages || []);
-  }, [chatbot]);
 
   const updateChatbot = async (updates: Partial<typeof chatbot>) => {
     if (!chatbot) return;
@@ -54,7 +54,6 @@ export function ChatbotSettings() {
       await updateChatbotMutation.mutateAsync(updatedChatbot);
     } catch (error) {
       toast.error("Failed to update");
-      console.error("Error updating branding:", error);
     }
   };
 
@@ -65,9 +64,7 @@ export function ChatbotSettings() {
 
   const handleHidePoweredByChange = async (checked: boolean) => {
     if (checked) {
-      // Check if user has remove-branding subscription
       const organizationId = session?.session?.activeOrganizationId;
-
       if (!organizationId) {
         toast.error("No active organization found");
         return;
@@ -144,35 +141,8 @@ export function ChatbotSettings() {
     }
   };
 
-  // Handle loading state
-  if (isLoading) {
-    return (
-      <div className="w-full h-64 flex items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
 
-  // Handle error state
-  if (error) {
-    return (
-      <div className="w-full mx-auto px-2 sm:px-0">
-        <div className="flex flex-col items-center justify-center py-16 space-y-4">
-          <div className="rounded-full bg-red-50 p-3">
-            <X className="h-6 w-6 text-red-500" />
-          </div>
-          <div className="text-center space-y-2">
-            <h3 className="text-lg font-semibold text-gray-700">
-              Unable to load chatbot settings
-            </h3>
-          </div>
-          <Button variant="outline" onClick={() => refetch()} className="mt-4">
-            Try again
-          </Button>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="w-full mx-auto px-2 sm:px-0">
@@ -232,6 +202,15 @@ export function ChatbotSettings() {
           </div>
         </div>
         <Separator className="my-3" />
+        <div className="flex flex-col items-center sm:flex-row gap-3 justify-between">
+          <div className="flex items-center gap-2">
+            <Label>Chatbot Personality</Label>
+          </div>
+          <div className="relative">
+            <PersonalitySelector personality={chatbot?.personality} />
+          </div>
+        </div>
+        <Separator className="my-3" />
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <div className="flex items-center gap-2">
             <Label>Message suggestions</Label>
@@ -264,7 +243,7 @@ export function ChatbotSettings() {
                     disabled={updateChatbotMutation.isPending}
                   />
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={() => removeSuggestedMessage(index)}
                   >
                     <Trash2 className="h-4 w-4 text-red-500" />
@@ -306,6 +285,8 @@ export function ChatbotSettings() {
               checked={hidePoweredBy}
               onCheckedChange={handleHidePoweredByChange}
               disabled={updateChatbotMutation.isPending}
+              className="data-[state=checked]:bg-green-500"
+
             />
             {updateChatbotMutation.isPending &&
               hidePoweredBy !== chatbot?.hidePoweredBy && (

@@ -1,3 +1,4 @@
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
@@ -13,6 +14,7 @@ export const TextSource = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const queryClient = useQueryClient();
+  const { setBanner } = useRetrainingBanner();
 
   const { mutateAsync: createTextSource, isPending } = useMutation({
     mutationFn: async (textSource: { title: string; content: string }) => {
@@ -23,6 +25,7 @@ export const TextSource = () => {
       queryClient.invalidateQueries({
         queryKey: ["text-sources"],
       });
+      setBanner(true, "Retraining required");
     },
   });
 
@@ -57,7 +60,7 @@ export const TextSource = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-2 rounded-md p-6 border">
+      <div className="flex flex-col gap-2 rounded-xl p-6 border">
         <div className="flex flex-col gap-2 mb-3">
           <h2 className="font-semibold text-lg">Text Source</h2>
           <p className="text-semibold text-base text-muted-foreground">

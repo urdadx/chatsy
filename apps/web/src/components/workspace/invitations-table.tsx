@@ -1,3 +1,4 @@
+import { SolarLetterBoldDuotone } from "@/assets/icons/letter";
 import { Badge } from "@/components/ui/badge";
 import { SafeBoringAvatar } from "@/components/ui/safe-boring-avatar";
 import {
@@ -10,9 +11,8 @@ import {
 } from "@/components/ui/table";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
-import { Mail } from "lucide-react";
 import { NoDataPlaceholder } from "../no-data-placeholder";
-import Spinner from "../ui/spinner";
+import { TableSkeleton } from "../table-skeleton";
 import { InvitationActions } from "./invitation-actions";
 
 export function InvitationsTable() {
@@ -37,17 +37,13 @@ export function InvitationsTable() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Spinner className="text-primary" />
-      </div>
-    );
+    return <TableSkeleton />;
   }
 
   if (!invitations?.data || invitations.data.length === 0) {
     return (
       <NoDataPlaceholder
-        icon={Mail}
+        icon={SolarLetterBoldDuotone}
         title="No Invitations found"
         description="You have not sent any invitations yet."
       />

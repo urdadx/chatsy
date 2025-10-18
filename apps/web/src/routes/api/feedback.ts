@@ -2,20 +2,29 @@ import { db } from "@/db";
 import { chatbot, feedback } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { eq } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const feedbackSchema = z.object({
   email: z.email(),
   subject: z.string().optional(),
   message: z.string().min(1),
-  location: z.string().optional(),
   embedToken: z.string().min(1).optional(),
 });
 
 export const ServerRoute = createServerFileRoute("/api/feedback").methods({
   POST: async ({ request }) => {
+    const cfCountry = request.headers.get("CF-IPCountry");
+    const cfCity = request.headers.get("CF-IPCity");
+
+    let detectedLocation: string | undefined;
+    if (cfCity && cfCountry) {
+      detectedLocation = `${cfCity}, ${cfCountry}`;
+    } else if (cfCountry) {
+      detectedLocation = cfCountry;
+    }
+
     const body = await request.json();
     const parsed = feedbackSchema.safeParse(body);
 
@@ -68,7 +77,7 @@ export const ServerRoute = createServerFileRoute("/api/feedback").methods({
         email: parsed.data.email,
         subject: parsed.data.subject,
         message: parsed.data.message,
-        location: parsed.data.location,
+        location: detectedLocation,
       });
       return json({ success: true, message: "Feedback received" });
     } catch (error) {

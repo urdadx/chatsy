@@ -1,5 +1,6 @@
 import { db } from "@/db";
-import { chat, chatbot, member } from "@/db/schema";
+import { chat, chatbot } from "@/db/schema";
+import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -9,7 +10,7 @@ import z from "zod";
 
 const querySchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(20),
-  cursor: z.string().uuid().optional().nullable(),
+  cursor: z.string().optional().nullable(),
   direction: z.enum(["next", "prev"]).default("next"),
   filter: z.enum(["24h", "7d", "30d", "90d", "all"]).default("24h"),
   status: z.enum(["all", "unresolved", "resolved", "escalated"]).default("all"),
@@ -34,7 +35,6 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
       );
     }
 
-    // Verify the chatbot exists and get its organization
     const [chatbotData] = await db
       .select({
         organizationId: chatbot.organizationId,
@@ -46,16 +46,10 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
       return new Response("Chatbot not found", { status: 404 });
     }
 
-    // Verify user is a member of the chatbot's organization
-    const [membership] = await db
-      .select()
-      .from(member)
-      .where(
-        and(
-          eq(member.userId, session.user.id),
-          eq(member.organizationId, chatbotData.organizationId),
-        ),
-      );
+    const membership = await isUserMemberOfOrganization(
+      session.user.id,
+      chatbotData.organizationId,
+    );
 
     if (!membership) {
       return new Response("Forbidden", { status: 403 });
@@ -90,8 +84,6 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
     }
 
     try {
-      // Modified where conditions to include chatbot scoping
-      // Include both user's personal chats AND embedded chats (userId = null) for the chatbot
       const whereConditions = [eq(chat.chatbotId, chatbotId)];
 
       if (timeFilter) whereConditions.push(timeFilter);
@@ -105,7 +97,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
           .limit(1);
 
         if (!refChat) {
-          return new Response("Chat not found", { status: 404 });
+          throw new Error("Chat not found");
         }
         whereConditions.push(lt(chat.createdAt, refChat.createdAt));
       }
@@ -120,13 +112,18 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
       const hasMore = chats.length > limit;
       const items = hasMore ? chats.slice(0, limit) : chats;
 
-      return json({
+      const chatsData = {
         chats: items,
         hasMore,
         nextCursor: hasMore ? items[items.length - 1].id : null,
-      });
+      };
+
+      return json(chatsData);
     } catch (err) {
       console.error("GET /api/chat/history error:", err);
+      if (err instanceof Error && err.message === "Chat not found") {
+        return new Response("Chat not found", { status: 404 });
+      }
       return new Response("Failed to fetch chats", { status: 500 });
     }
   },

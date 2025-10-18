@@ -4,6 +4,7 @@ import { StickToBottom } from "use-stick-to-bottom";
 export type ChatContainerRootProps = {
   children: React.ReactNode;
   className?: string;
+  optimize?: boolean; // added prop
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export type ChatContainerContentProps = {
@@ -19,15 +20,20 @@ export type ChatContainerScrollAnchorProps = {
 function ChatContainerRoot({
   children,
   className,
+  optimize = true,
   ...props
 }: ChatContainerRootProps) {
   return (
     <StickToBottom
-      className={cn("flex overflow-y-auto", className)}
-      resize="smooth"
+      className={cn(
+        "flex flex-col overflow-y-auto", // ensure vertical layout
+        optimize && "min-h-0 overscroll-contain will-change-transform", // performance helpers
+        className,
+      )}
       initial="instant"
       role="log"
       {...props}
+      style={optimize ? { contain: "layout style paint", ...props.style } : props.style}
     >
       {children}
     </StickToBottom>

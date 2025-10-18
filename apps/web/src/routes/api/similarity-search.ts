@@ -1,7 +1,6 @@
 import { searchKnowledge } from "@/lib/ai/search";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import z from "zod";
 
 const searchSchema = z.object({
@@ -13,10 +12,6 @@ export const ServerRoute = createServerFileRoute(
   "/api/similarity-search",
 ).methods({
   POST: async ({ request }) => {
-    const session = await auth.api.getSession({
-      headers: request.headers || new Headers(),
-    });
-
     const chatbotId = request.headers.get("X-Chatbot-Id");
     if (!chatbotId) {
       return json({ error: "No chatbot ID provided" }, { status: 400 });

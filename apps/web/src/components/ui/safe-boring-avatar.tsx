@@ -36,7 +36,6 @@ export function SafeBoringAvatar({
     );
   }
 
-  // Render DiceBear avatar as an image
   return (
     <img
       src={avatarUrl}

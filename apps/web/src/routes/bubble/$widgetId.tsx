@@ -1,11 +1,13 @@
 import { ChatBody } from "@/components/chat/chat-body";
 import { ChatFooter } from "@/components/chat/chat-footer";
 import { ChatHeader } from "@/components/chat/chat-header";
+import { ChatLanding } from "@/components/chat/chat-landing";
 import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
-import { useSendVisitorAnalytics } from "@/hooks/log-visitor-analytics";
+import { useChat as useChatData } from "@/hooks/use-chat";
 import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
+import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
@@ -16,6 +18,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { toast } from "sonner";
+
+import { useWidgetAnalytics } from "@/hooks/use-widget-analytics";
 
 export const Route = createFileRoute("/bubble/$widgetId")({
   component: RouteComponent,
@@ -44,6 +48,8 @@ const uiStateReducer = (state: any, action: any) => {
       return { ...state, input: action.payload };
     case "SET_DEACTIVATED":
       return { ...state, isDeactivated: action.payload };
+    case "SET_SHOW_LANDING":
+      return { ...state, showLanding: action.payload };
     case "RESET":
       return { ...state, input: "" };
     default:
@@ -53,24 +59,16 @@ const uiStateReducer = (state: any, action: any) => {
 
 // Custom hook for logging analytics
 const useAnalytics = (widgetId: string, chatbotId: string) => {
-  const analyticsExtra = useMemo(
-    () => ({
-      page_type: "bubble_chat",
-      embed_token: widgetId,
-    }),
-    [widgetId],
-  );
-
-  return useSendVisitorAnalytics({
-    chatbotId: chatbotId || "placeholder",
-    extra: analyticsExtra,
-    triggerOnMount: false,
-    triggerOnUnmount: false,
+  return useWidgetAnalytics({
+    widgetId,
+    chatbotId,
+    pageType: "bubble_chat",
   });
 };
 
 const useParentMessaging = (
-  logVisitorAnalytics: any,
+  logEvent: (event: string, extra?: Record<string, any>) => void,
+  logDuration: (event: string, extra?: Record<string, any>) => void,
   mountTimestampRef: any,
 ) => {
   const notifyParent = useCallback((type: any, data = {}) => {
@@ -79,20 +77,6 @@ const useParentMessaging = (
     }
   }, []);
 
-  const logDurationEvent = useCallback(
-    (event: any) => {
-      if (mountTimestampRef.current) {
-        const durationMs = Date.now() - mountTimestampRef.current;
-        logVisitorAnalytics({
-          durationMs,
-          event,
-          widget_type: "chat_widget",
-        });
-      }
-    },
-    [logVisitorAnalytics, mountTimestampRef],
-  );
-
   useEffect(() => {
     const handleMessage = (event: any) => {
       const { type } = event.data || {};
@@ -100,37 +84,31 @@ const useParentMessaging = (
       switch (type) {
         case MESSAGE_TYPES.WIDGET_USER_OPENED:
           mountTimestampRef.current = Date.now();
-          logVisitorAnalytics({
-            event: ANALYTICS_EVENTS.PAGE_VISIT,
-            widget_type: "chat_widget",
-          });
-          logVisitorAnalytics({
-            event: ANALYTICS_EVENTS.WIDGET_OPENED,
-            widget_type: "chat_widget",
-          });
+          logEvent(ANALYTICS_EVENTS.PAGE_VISIT);
+          logEvent(ANALYTICS_EVENTS.WIDGET_OPENED);
           break;
 
         case MESSAGE_TYPES.PARENT_PAGE_UNLOAD:
-          logDurationEvent(ANALYTICS_EVENTS.WIDGET_PAGE_UNLOAD);
+          logDuration(ANALYTICS_EVENTS.WIDGET_PAGE_UNLOAD);
           break;
       }
     };
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [logVisitorAnalytics, logDurationEvent, mountTimestampRef]);
+  }, [logEvent, logDuration, mountTimestampRef]);
 
   // Handle page unload
   useEffect(() => {
     const handleBeforeUnload = () => {
-      logDurationEvent(ANALYTICS_EVENTS.WIDGET_PAGE_UNLOAD);
+      logDuration(ANALYTICS_EVENTS.WIDGET_PAGE_UNLOAD);
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [logDurationEvent]);
+  }, [logDuration]);
 
-  return { notifyParent, logDurationEvent };
+  return { notifyParent };
 };
 
 const useRetry = () => {
@@ -147,7 +125,6 @@ const LoadingState = () => (
   <div className="fixed inset-0 flex items-center justify-center bg-white">
     <div className="text-center">
       <Spinner className="text-primary mb-2" />
-      <p className="text-gray-600">Loading chat...</p>
     </div>
   </div>
 );
@@ -174,11 +151,13 @@ function RouteComponent() {
   const { widgetId } = Route.useParams();
   const { chatId, resetChat } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
+  const { data: chatData } = useChatData(chatId);
   const { retry } = useRetry();
 
   const [uiState, dispatchUiState] = useReducer(uiStateReducer, {
     input: "",
     isDeactivated: false,
+    showLanding: localStorage.getItem(`bubble-${widgetId}-interface`) !== "chat",
   });
 
   const initialMessages = useMemo(
@@ -194,14 +173,69 @@ function RouteComponent() {
     error: chatbotError,
   } = useChatWidget(widgetId);
 
-  const { logVisitorAnalytics, mountTimestampRef } = useAnalytics(
+  const { logEvent, logDurationEvent, mountTimestampRef } = useAnalytics(
     widgetId,
     chatbot?.id || "",
   );
-  const { notifyParent, logDurationEvent } = useParentMessaging(
-    logVisitorAnalytics,
+  const { notifyParent } = useParentMessaging(
+    logEvent,
+    logDurationEvent,
     mountTimestampRef,
   );
+
+  const isEscalated = chatData?.status === "escalated";
+
+  // Initialize WebSocket for escalated chats
+  const {
+    status: wsStatus,
+    isTyping: wsIsTyping,
+    sendMessage: wsSendMessage,
+    sendTyping: wsSendTyping,
+    connect: wsConnect,
+    disconnect: wsDisconnect,
+    isConnected: wsIsConnected,
+  } = useChatWebSocket({
+    chatId: chatId,
+    role: "user",
+    onError: (err) => {
+      console.error("WebSocket error:", err);
+      toast.error(`Connection error: ${err}`);
+    },
+    onMessage: (message) => {
+      console.log("Received WebSocket message:", message);
+
+      // Convert WebSocket message to UI message format
+      const uiMessage = {
+        id: message.id,
+        role: (message.role === "human" ? "assistant" : message.role) as "user" | "assistant" | "system",
+        parts: message.parts || [{ type: "text", text: message.parts?.[0]?.text || "" }],
+        metadata: {
+          createdAt: new Date(message.createdAt).toISOString(),
+          originalRole: message.role,
+        },
+      };
+
+      // Add message to the UI immediately for real-time experience
+      setMessages((prevMessages) => {
+        // Check if message already exists to avoid duplicates
+        const messageExists = prevMessages.some(msg => msg.id === uiMessage.id);
+        if (messageExists) return prevMessages;
+
+        return [...prevMessages, uiMessage];
+      });
+    },
+  });
+
+  // Auto-connect WebSocket when chat becomes escalated
+  useEffect(() => {
+    if (isEscalated && !wsIsConnected && wsStatus === "disconnected") {
+      console.log("Chat escalated, connecting to WebSocket...");
+      wsConnect();
+    } else if (!isEscalated && wsIsConnected) {
+      console.log("Chat no longer escalated, disconnecting WebSocket...");
+      wsDisconnect();
+    }
+  }, [isEscalated, wsIsConnected, wsStatus, wsConnect, wsDisconnect]);
 
   const {
     messages,
@@ -232,7 +266,6 @@ function RouteComponent() {
       api: `/api/embed/chat/${widgetId}`,
     }),
     messages: initialMessages,
-    experimental_throttle: 100,
     onError: (error) => {
       if (!uiState.isDeactivated) {
         if (error instanceof ChatSDKError) {
@@ -267,10 +300,25 @@ function RouteComponent() {
       event?.preventDefault();
       if (!uiState.input.trim()) return;
 
-      sendMessage({ text: uiState.input });
-      dispatchUiState({ type: "SET_INPUT", payload: "" });
+      if (isEscalated && wsIsConnected && wsSendMessage) {
+        console.log("Sending WebSocket message:", uiState.input);
+
+        const success = wsSendMessage(uiState.input);
+        if (success) {
+          dispatchUiState({ type: "SET_INPUT", payload: "" });
+          wsSendTyping?.(false);
+          queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
+        } else {
+          toast.error("Failed to send message. Please try again.");
+        }
+      } else if (!isEscalated) {
+        sendMessage({ text: uiState.input });
+        dispatchUiState({ type: "SET_INPUT", payload: "" });
+      } else {
+        toast.error("Connection not ready. Please wait...");
+      }
     },
-    [uiState.input, sendMessage],
+    [uiState.input, sendMessage, isEscalated, wsIsConnected, wsSendMessage, wsSendTyping],
   );
 
   const handleCloseWidget = useCallback(() => {
@@ -292,13 +340,34 @@ function RouteComponent() {
 
   const handleInputChange = useCallback((event: any) => {
     dispatchUiState({ type: "SET_INPUT", payload: event.target.value });
-  }, []);
+
+    // Send typing indicator when escalated and connected
+    if (isEscalated && wsIsConnected && wsSendTyping) {
+      if (event.target.value.trim()) {
+        wsSendTyping(true);
+      } else {
+        wsSendTyping(false);
+      }
+    }
+  }, [isEscalated, wsIsConnected, wsSendTyping]);
 
   const handleResetChat = useCallback(() => {
     resetChat();
     setMessages([]);
     dispatchUiState({ type: "RESET" });
-  }, [resetChat, setMessages]);
+    queryClient.invalidateQueries({ queryKey: ["messages"] });
+    queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+  }, [resetChat, setMessages, queryClient]);
+
+  const handleGoToMain = useCallback(() => {
+    localStorage.setItem(`bubble-${widgetId}-interface`, "chat");
+    dispatchUiState({ type: "SET_SHOW_LANDING", payload: false });
+  }, [widgetId]);
+
+  const handleBackToLanding = useCallback(() => {
+    localStorage.setItem(`bubble-${widgetId}-interface`, "landing");
+    dispatchUiState({ type: "SET_SHOW_LANDING", payload: true });
+  }, [widgetId]);
 
   const suggestions = useMemo(
     () => chatbot?.suggestedMessages || [],
@@ -333,43 +402,63 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col w-full h-screen md:h-[550px] md:rounded-2xl overflow-hidden">
-      <ChatHeader
-        chatbot={chatbot}
-        onReset={handleResetChat}
-        onClose={handleCloseWidget}
-        showResetButton={messages.length > 0}
-        showCloseButton={true}
-        resetIcon="rotate"
-      />
-
-      <ChatBody
-        isLoading={isLoading}
-        error={error}
-        isDeactivated={uiState.isDeactivated}
-        messages={messages}
-        setMessages={setMessages}
-        status={status}
-        chatError={chatError}
-        chatId={chatId}
-        votes={votes}
-        regenerate={regenerate}
-        chatbot={chatbot}
-        className="w-full"
-      />
-
-      {!uiState.isDeactivated && (
-        <ChatFooter
-          input={uiState.input}
-          onInputChange={handleInputChange}
-          onSubmit={handleSubmit}
-          status={status}
-          suggestions={suggestions}
-          onSuggestionClick={handleSuggestionClick}
-          showSuggestions={suggestions.length > 0}
-          showPoweredBy={showPoweredBy}
+      {uiState.showLanding ? (
+        <ChatLanding
+          onGoToMain={handleGoToMain}
           chatbot={chatbot}
-          placeholder="Type a message..."
+          className="h-full rounded-2xl"
         />
+      ) : (
+        <>
+          <ChatHeader
+            chatbot={chatbot}
+            onReset={handleResetChat}
+            onClose={handleCloseWidget}
+            onBack={handleBackToLanding}
+            showResetButton={messages.length > 0}
+            showCloseButton={true}
+            showBackButton={true}
+            resetIcon="rotate"
+          />
+
+          <ChatBody
+            isLoading={isLoading}
+            error={error}
+            isDeactivated={uiState.isDeactivated}
+            messages={messages}
+            setMessages={setMessages}
+            status={status}
+            chatError={chatError}
+            chatId={chatId}
+            votes={votes}
+            regenerate={regenerate}
+            chatbot={chatbot}
+            className="w-full"
+            chatStatus={chatData?.status}
+            wsIsTyping={isEscalated && wsIsConnected ? wsIsTyping : undefined}
+          />
+
+          {!uiState.isDeactivated && (
+            <ChatFooter
+              input={uiState.input}
+              onInputChange={handleInputChange}
+              onSubmit={handleSubmit}
+              status={isEscalated ? (wsIsConnected ? status : "submitted") : status}
+              suggestions={suggestions}
+              onSuggestionClick={handleSuggestionClick}
+              showSuggestions={suggestions.length > 0}
+              showPoweredBy={showPoweredBy}
+              chatbot={chatbot}
+              placeholder={
+                isEscalated
+                  ? wsIsConnected
+                    ? "Type a message to the agent..."
+                    : "Connecting to agent..."
+                  : "Type a message..."
+              }
+            />
+          )}
+        </>
       )}
     </div>
   );

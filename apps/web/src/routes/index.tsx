@@ -1,5 +1,4 @@
 import FAQs from "@/components/faqs";
-// import { AddOns } from "@/components/landing-page/add-ons";
 import { CTASession } from "@/components/landing-page/cta-session";
 import Features from "@/components/landing-page/feature-section";
 import { FooterSection } from "@/components/landing-page/footer";
@@ -12,6 +11,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
+  ssr: false,
 });
 
 function HomeComponent() {
@@ -41,7 +41,6 @@ function HomeComponent() {
         <div className="pt-10">
           <Pricing />
         </div>
-        {/* <AddOns /> */}
         <FAQs />
         <FooterSection />
       </div>

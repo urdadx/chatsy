@@ -1,7 +1,6 @@
 import type { InferSelectModel } from "drizzle-orm";
 import {
   boolean,
-  foreignKey,
   integer,
   json,
   jsonb,
@@ -10,7 +9,6 @@ import {
   primaryKey,
   text,
   timestamp,
-  unique,
   uuid,
   varchar,
   vector,
@@ -142,8 +140,10 @@ export const chat = pgTable("Chat", {
   status: varchar("status", { enum: ["unresolved", "resolved", "escalated"] })
     .notNull()
     .default("unresolved"),
-  externalUserId: text("external_user_id"),
-  externalUserName: text("external_user_name"),
+  agentAssigned: text("agent_assigned").references(() => member.id, {
+    onDelete: "set null",
+  }),
+  chatMetaData: jsonb("chat_meta_data"),
 });
 
 export const message = pgTable("Message", {
@@ -151,7 +151,9 @@ export const message = pgTable("Message", {
   chatId: uuid("chatId")
     .notNull()
     .references(() => chat.id),
-  role: varchar("role").notNull(),
+  role: varchar("role", {
+    enum: ["system", "assistant", "user", "human"],
+  }).notNull(),
   parts: json("parts").notNull(),
   createdAt: timestamp("createdAt")
     .notNull()
@@ -201,27 +203,23 @@ export const chatbot = pgTable("chatbot", {
   primaryColor: text("primary_color").notNull().default("#9333ea"),
   theme: text("theme").notNull().default("light"),
   hidePoweredBy: boolean("hide_powered_by").notNull().default(false),
+  personality: varchar("personality", {
+    enum: ["support", "sales", "lead", "custom"],
+  })
+    .notNull()
+    .default("support"),
   initialMessage: text("initial_message")
     .notNull()
-    .default("Hello there👋, how can i help you today?"),
+    .default("Hello there👋, how can I help you today?"),
   suggestedMessages: text("suggested_messages").array(),
 
-  // Training and sources fields moved from organization
   trainingStatus: text("training_status").default("idle"),
   lastTrainedAt: timestamp("last_trained_at"),
   sourcesCount: integer("sources_count").default(0).notNull(),
 
-  // Embedding configuration
   isEmbeddingEnabled: boolean("is_embedding_enabled").notNull().default(true),
   embedToken: text("embed_token").unique(),
   allowedDomains: text("allowed_domains").array(),
-
-  // WhatsApp integration fields
-  whatsappEnabled: boolean("whatsapp_enabled").notNull().default(false),
-  whatsappPhoneNumberId: text("whatsapp_phone_number_id"),
-  whatsappBusinessAccountId: text("whatsapp_business_account_id"),
-  whatsappWelcomeMessage: text("whatsapp_welcome_message"),
-  whatsappSettings: jsonb("whatsapp_settings"),
 
   createdAt: timestamp("created_at")
     .notNull()
@@ -345,6 +343,20 @@ export const feedback = pgTable("feedback", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const issueReport = pgTable("issue_report", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  chatbotId: uuid("chatbot_id")
+    .notNull()
+    .references(() => chatbot.id, { onDelete: "cascade" }),
+  title: text("title"),
+  description: text("description").notNull(),
+  screenshot: text("screenshot"),
+  email: text("email"),
+  location: text("location"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const visitorAnalytics = pgTable("visitor_analytics", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   chatbotId: uuid("chatbot_id")
@@ -406,20 +418,7 @@ export const creditsUsage = pgTable("credits_usage", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-// WhatsApp message metadata (extends existing message table)
-export const whatsappMessageMetadata = pgTable("whatsapp_message_metadata", {
-  id: uuid("id").primaryKey().notNull().defaultRandom(),
-  messageId: uuid("message_id")
-    .notNull()
-    .references(() => message.id, { onDelete: "cascade" }),
-  whatsappMessageId: text("whatsapp_message_id").unique(),
-  status: varchar("status").notNull().default("sent"),
-  timestamp: timestamp("timestamp").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-// WhatsApp Business integration table
-export const whatsappIntegration = pgTable("whatsapp_integration", {
+export const calendlyIntegration = pgTable("calendly_integration", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
@@ -427,51 +426,37 @@ export const whatsappIntegration = pgTable("whatsapp_integration", {
   chatbotId: uuid("chatbot_id")
     .notNull()
     .references(() => chatbot.id, { onDelete: "cascade" }),
-  businessAccountId: text("business_account_id").notNull(),
   accessToken: text("access_token").notNull(),
   refreshToken: text("refresh_token"),
   accessTokenExpiresAt: timestamp("access_token_expires_at"),
   scope: text("scope"),
-  phoneNumbers: jsonb("phone_numbers"),
-  primaryPhoneNumberId: text("primary_phone_number_id"),
+  organizationUri: text("organization_uri").notNull(),
+  userUri: text("user_uri").notNull(),
+  eventTypes: jsonb("event_types"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const stream = pgTable(
-  "stream",
-  {
-    id: uuid("id").notNull().defaultRandom(),
-    chatId: uuid("chatId").notNull(),
-    createdAt: timestamp("createdAt").notNull(),
-  },
-  (t) => [
-    primaryKey({ columns: [t.id] }),
-    foreignKey({ columns: [t.chatId], foreignColumns: [chat.id] }),
-  ],
-);
-
-export const Action = pgTable(
-  "action",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    chatbotId: uuid("chatbot_id")
-      .notNull()
-      .references(() => chatbot.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
-    toolName: text("tool_name").notNull(),
-    isActive: boolean("is_active").notNull().default(true),
-    description: text("description"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  },
-  (table) => [unique().on(table.chatbotId, table.toolName)],
-);
+export const Action = pgTable("action", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  chatbotId: uuid("chatbot_id")
+    .notNull()
+    .references(() => chatbot.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  toolName: text("tool_name").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  showInQuickMenu: boolean("show_in_quick_menu").notNull().default(false),
+  description: text("description"),
+  actionProperties: jsonb("action_properties"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
 // TYPES
 export type VisitorAnalytics = InferSelectModel<typeof visitorAnalytics>;
 export type Feedback = InferSelectModel<typeof feedback>;
+export type IssueReport = InferSelectModel<typeof issueReport>;
 export type Knowledge = InferSelectModel<typeof knowledge>;
 export type WebsiteSource = InferSelectModel<typeof websiteSource>;
 export type DocumentSource = InferSelectModel<typeof documentSource>;
@@ -492,9 +477,5 @@ export type CreditsUsage = InferSelectModel<typeof creditsUsage>;
 export type Chatbot = InferSelectModel<typeof chatbot> & {
   name: string;
 };
-export type WhatsappMessageMetadata = InferSelectModel<
-  typeof whatsappMessageMetadata
->;
-export type WhatsappIntegration = InferSelectModel<typeof whatsappIntegration>;
-export type Stream = InferSelectModel<typeof stream>;
+export type CalendlyIntegration = InferSelectModel<typeof calendlyIntegration>;
 export type ActionType = InferSelectModel<typeof Action>;

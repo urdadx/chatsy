@@ -76,7 +76,7 @@ export const ProfileDelete = () => {
     <div className="mx-auto">
       <div className="bg-white rounded-xl shadow-sm border border-red-300 overflow-hidden">
         <div className="p-6">
-          <h2 className="text-base font-semibold mb-2">Delete Account</h2>
+          <h2 className="text-md font-semibold mb-2">Delete Account</h2>
           <p className="text-gray-600 text-sm">
             Permanently remove your account and all of its contents. This action
             is not reversible, so please continue with caution.
@@ -90,16 +90,16 @@ export const ProfileDelete = () => {
                   Delete Account
                 </Button>
               </DialogTrigger>
-              <DialogContent className="w-[95%] max-w-[450px] px-4 py-4 sm:px-6 sm:py-6">
+              <DialogContent className="w-[95%] max-w-[500px] px-4 py-4 sm:px-6 sm:py-4">
                 <DialogHeader>
-                  <DialogTitle className="text-lg flex items-center gap-2">
+                  <DialogTitle className="text-xl flex items-center gap-2">
                     <div
-                      className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border"
+                      className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border"
                       aria-hidden="true"
                     >
                       <CircleAlert
                         className="opacity-80"
-                        size={16}
+                        size={20}
                         strokeWidth={2}
                       />
                     </div>
@@ -121,7 +121,7 @@ export const ProfileDelete = () => {
                   </DialogClose>
                   <Button
                     variant="destructive"
-                    className="transition-all text-xs sm:text-sm py-1.5 sm:py-2"
+                    className="transition-all text-white text-xs sm:text-sm py-1.5 sm:py-2"
                   >
                     Yes, delete
                   </Button>

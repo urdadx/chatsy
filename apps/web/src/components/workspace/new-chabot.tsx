@@ -12,11 +12,11 @@ import {
   useChatbots,
   useCreateChatbot,
   useSetActiveChatbot,
-} from "@/hooks/use-chatbot-management";
+} from "@/hooks/use-chatbot";
 import { useSubscriptionLimits } from "@/hooks/use-subscription-limits";
 import { cn } from "@/lib/utils";
 import { RiCheckboxCircleFill } from "@remixicon/react";
-import { ArrowRight, Bot, Plus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -120,16 +120,11 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
   return (
     <>
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="w-full sm:max-w-md">
+        <DialogContent className="w-full sm:max-w-lg">
           <div className="flex flex-col items-center gap-2">
-            <div
-              className="flex size-11 shrink-0 items-center justify-center rounded-full border"
-              aria-hidden="true"
-            >
-              <Bot className="size-5 stroke-zinc-800 dark:stroke-zinc-100" />
-            </div>
+
             <DialogHeader>
-              <DialogTitle className="sm:text-center">
+              <DialogTitle className="sm:text-center text-xl">
                 {view === "list" ? "Manage Chatbots" : "Create New Chatbot"}
               </DialogTitle>
               <DialogDescription className="sm:text-center underline-offset-4">
@@ -207,10 +202,8 @@ export const ChatbotManager = ({ open, setOpen }: any) => {
               >
                 <Button
                   onClick={handleCreateNewClick}
-                  variant="outline"
                   className="w-full"
                 >
-                  <Plus className="w-4 h-4" />
                   Create New Chatbot
                 </Button>
               </motion.div>

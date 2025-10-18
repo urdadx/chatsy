@@ -1,12 +1,13 @@
 import { db } from "@/db";
-import { chatbot, question } from "@/db/schema";
+import { chatbot, knowledge, question } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { deleteCachedData, withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const createQuestionSchema = z.object({
   question: z.string().min(1),
@@ -49,12 +50,16 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
       return new Response("Forbidden", { status: 403 });
     }
 
-    const results = await db
-      .select()
-      .from(question)
-      .where(
-        and(eq(question.userId, userId), eq(question.chatbotId, chatbotId)),
-      );
+    const results = await withCache(
+      `questions:${chatbotId}`,
+      async () => {
+        return await db
+          .select()
+          .from(question)
+          .where(eq(question.chatbotId, chatbotId));
+      },
+      { ttl: 60 },
+    );
 
     return json(results);
   },
@@ -98,6 +103,9 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
           sourcesCount: sql`${chatbot.sourcesCount} + 1`,
         })
         .where(eq(chatbot.id, chatbotId));
+
+      // Invalidate cache
+      await deleteCachedData(`questions:${chatbotId}`);
     }
 
     return json(newQuestion);
@@ -134,13 +142,7 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
 
     const [deletedQuestion] = await db
       .delete(question)
-      .where(
-        and(
-          eq(question.id, id),
-          eq(question.userId, userId),
-          eq(question.chatbotId, chatbotId),
-        ),
-      )
+      .where(and(eq(question.id, id), eq(question.chatbotId, chatbotId)))
       .returning();
 
     if (!deletedQuestion) {
@@ -148,12 +150,20 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
     }
 
     if (deletedQuestion) {
+      // Delete associated knowledge entries (embeddings)
+      await db
+        .delete(knowledge)
+        .where(and(eq(knowledge.source, "qna"), eq(knowledge.sourceId, id)));
+
       await db
         .update(chatbot)
         .set({
           sourcesCount: sql`greatest(0, ${chatbot.sourcesCount} - 1)`,
         })
         .where(eq(chatbot.id, chatbotId));
+
+      // Invalidate cache
+      await deleteCachedData(`questions:${chatbotId}`);
     }
 
     return json(deletedQuestion);
@@ -195,13 +205,7 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
         ...(newQuestion !== undefined ? { question: newQuestion } : {}),
         ...(newAnswer !== undefined ? { answer: newAnswer } : {}),
       })
-      .where(
-        and(
-          eq(question.id, id),
-          eq(question.userId, userId),
-          eq(question.chatbotId, chatbotId),
-        ),
-      )
+      .where(and(eq(question.id, id), eq(question.chatbotId, chatbotId)))
       .returning();
 
     if (!updatedQuestion) {
@@ -210,6 +214,9 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
         { status: 404 },
       );
     }
+
+    // Invalidate cache
+    await deleteCachedData(`questions:${chatbotId}`);
 
     return json(updatedQuestion);
   },

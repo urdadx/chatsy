@@ -7,11 +7,11 @@ export const InProgressStatus = () => {
     <div className="flex flex-col gap-4">
       <p className="text-lg font-semibold text-gray-800">Training status</p>
 
-      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl shadow-xs">
-        <div className="flex items-start gap-3">
-          <RiCheckboxCircleFill className="h-6 w-6 text-yellow-600 mt-0.5" />
+      <div className="group relative overflow-hidden rounded-xl border border-foreground/10 bg-gradient-to-bl from-yellow-50 via-yellow-25 to-background p-2.5 shadow-xs transition-transform hover:scale-[1.02] dark:shadow-none dark:from-yellow-950/20 dark:via-yellow-900/10">
+        <div className="flex items-start gap-3 p-1.5">
           <div>
-            <p className="text-base font-medium text-yellow-700">
+            <p className="text-base flex items-center gap-2 font-medium text-yellow-700">
+              <RiCheckboxCircleFill className="h-6 w-6 text-yellow-600 mt-0.5" />
               Training in progress
             </p>
             <p className="text-sm text-yellow-600 mt-1 leading-relaxed max-w-2xl">

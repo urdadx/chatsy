@@ -52,8 +52,8 @@ export const DeleteWebsiteSource = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-xl">Are you sure?</AlertDialogTitle>
+          <AlertDialogDescription className="text-md">
             This action cannot be undone. This will permanently delete the
             website source and its content.
           </AlertDialogDescription>
@@ -65,7 +65,7 @@ export const DeleteWebsiteSource = ({
             disabled={isPending}
             className="bg-red-600 hover:bg-red-700"
           >
-            {isPending ? "Deleting..." : "Delete"}
+            {isPending ? "Deleting..." : "Yes, delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

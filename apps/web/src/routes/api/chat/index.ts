@@ -1,27 +1,26 @@
 import { convertToUIMessages } from "@/components/chat/convert-to-ui-message";
 import { db } from "@/db";
 import { chatbot, message } from "@/db/schema";
+import { buildActiveTools } from "@/lib/ai/build-active-tools";
 import {
-  createStreamId,
   deleteChatById,
   getChatById,
   getMessagesByChatId,
   saveChat,
   saveMessages,
 } from "@/lib/ai/chat-functions";
-import { generateTitleFromUserMessage } from "@/lib/ai/generate-titles";
-import { getActiveTools } from "@/lib/ai/get-active-tools";
+import { getActiveToolsWithActions } from "@/lib/ai/get-active-tools";
+import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
 import { google } from "@/lib/ai/providers";
-import { systemPrompt } from "@/lib/ai/system-prompt";
-import { collectFeedbackTool } from "@/lib/ai/tools/collect-feedback";
-import { collectLeadsTool } from "@/lib/ai/tools/collect-leads";
-import { escalateToHumanTool } from "@/lib/ai/tools/escalate-to-human-tool";
-import { knowledgeSearchTool } from "@/lib/ai/tools/knowledge-search";
 import { ChatSDKError } from "@/lib/errors";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getCustomerExternalId } from "@/lib/subscription/subscription-functions";
-import { generateUUID } from "@/lib/utils";
-import { subscriptionMiddleware, tokenUsageMiddleware } from "@/middlewares";
+import { detectDeviceFromUserAgent, generateUUID } from "@/lib/utils";
+import {
+  chatRateLimitMiddleware,
+  subscriptionMiddleware,
+  tokenUsageMiddleware,
+} from "@/middlewares";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import {
@@ -38,7 +37,11 @@ import { eq } from "drizzle-orm";
 export const ServerRoute = createServerFileRoute("/api/chat/").methods(
   (api) => ({
     POST: api
-      .middleware([subscriptionMiddleware, tokenUsageMiddleware])
+      .middleware([
+        subscriptionMiddleware,
+        tokenUsageMiddleware,
+        chatRateLimitMiddleware,
+      ])
       .handler(async ({ request, context }) => {
         try {
           const { id, messages } = await request.json();
@@ -80,6 +83,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             .select({
               organizationId: chatbot.organizationId,
               name: chatbot.name,
+              personality: chatbot.personality,
             })
             .from(chatbot)
             .where(eq(chatbot.id, chatbotId));
@@ -93,21 +97,41 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
           }
 
           const externalCustomerId = (await getCustomerExternalId()) || "";
-          const chat = await getChatById(id);
+          const chat = await getChatById({ id });
+
+          const shouldAIRespond =
+            chat?.status !== "escalated" && chat?.status !== "resolved";
 
           const userMessage = messages[messages.length - 1];
 
           if (!chat) {
-            const title = await generateTitleFromUserMessage({
-              message: userMessage,
-            });
+            const title = userMessage.parts[0].text;
+
+            // Capture user metadata
+            const userAgent = request.headers.get("user-agent") || "";
+            const timezone =
+              request.headers.get("x-timezone") ||
+              Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            const country = request.headers.get("cf-ipcountry") || "GH";
+            const city = request.headers.get("cf-ipcity") || "Accra";
+            const deviceInfo = detectDeviceFromUserAgent(userAgent);
+
+            const chatMetaData = {
+              country,
+              city,
+              timezone,
+              device: deviceInfo,
+            };
+
             await saveChat({
               id,
               userId: session?.user.id,
               chatbotId,
               title,
               visibility: "private",
-              channel: "web", // Regular web chat from dashboard
+              channel: "web",
+              chatMetaData,
             });
           } else {
             if (chat.chatbotId !== chatbotId) {
@@ -140,36 +164,45 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             }
           }
 
-          const streamId = generateUUID();
-          await createStreamId({ streamId, chatId: id });
+          // If chat is escalated or resolved, don't generate AI response
+          if (!shouldAIRespond) {
+            return json(
+              {
+                message:
+                  "Chat is escalated or resolved. AI responses are disabled.",
+              },
+              { status: 200 },
+            );
+          }
 
-          // Get active tools from database
-          const activeTools = await getActiveTools();
+          // Get active tools and their actions in a single query
+          const { activeToolNames, toolsMap } =
+            await getActiveToolsWithActions(chatbotId);
+
+          const chatbotName = chatbotData.name || "AI Assistant";
+          const chatbotPersonality = chatbotData.personality || "support";
+          const organizationId = chatbotData.organizationId;
+
+     
+          // Build tools object with only active tools
+          const tools = buildActiveTools({
+            activeToolNames,
+            chatbotId,
+            chatId: id,
+            organizationId,
+          });
 
           const stream = createUIMessageStream({
             execute: ({ writer: dataStream }) => {
               const result = streamText({
                 model: google("gemini-2.0-flash"),
-                system: systemPrompt(
-                  chatbotData.name ?? "Assistant",
-                  activeTools,
-                ),
+                system: systemPrompt(chatbotName, chatbotPersonality, toolsMap),
                 messages: convertToModelMessages(uiMessages, {
                   ignoreIncompleteToolCalls: true,
                 }),
-                experimental_activeTools: activeTools,
                 stopWhen: stepCountIs(5),
                 experimental_transform: smoothStream({ chunking: "word" }),
-                tools: {
-                  knowledge_base: knowledgeSearchTool(chatbotId),
-                  collect_feedback: collectFeedbackTool,
-                  collect_leads: collectLeadsTool,
-                  escalate_to_human: escalateToHumanTool({
-                    chatId: id,
-                    chatbotId,
-                    organizationId: chatbotData.organizationId,
-                  }),
-                },
+                tools,
                 onFinish: async ({ usage }) => {
                   await polarClient.events.ingest({
                     events: [
@@ -190,13 +223,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
                 },
               });
 
-              result.consumeStream();
-
-              dataStream.merge(
-                result.toUIMessageStream({
-                  sendReasoning: false,
-                }),
-              );
+              dataStream.merge(result.toUIMessageStream());
             },
             generateId: generateUUID,
             onFinish: async ({ messages }) => {
@@ -216,11 +243,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
             stream.pipeThrough(new JsonToSseTransformStream()),
           );
 
-          // Add custom headers including chat ID
           const headers = new Headers(response.headers);
-          headers.set("X-Chat-Id", id);
-          headers.set("Cache-Control", "no-cache");
-          headers.set("Connection", "keep-alive");
           headers.set("Content-Type", "text/event-stream");
 
           return new Response(response.body, {
@@ -236,59 +259,53 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
         }
       }),
 
-    DELETE: api
-      .middleware([subscriptionMiddleware])
-      .handler(async ({ request }) => {
-        const { searchParams } = new URL(request.url);
-        const id = searchParams.get("id");
+    DELETE: api.handler(async ({ request }) => {
+      const { searchParams } = new URL(request.url);
+      const id = searchParams.get("id");
 
-        if (!id) {
+      if (!id) {
+        const error = new ChatSDKError("not_found:chat", "Chat ID is required");
+        return error.toResponse();
+      }
+
+      const session = await auth.api.getSession({ headers: request.headers });
+      if (!session) {
+        const error = new ChatSDKError("unauthorized:chat");
+        return error.toResponse();
+      }
+      const userId = session?.user.id || "";
+
+      const chatbotId =
+        session?.session?.activeChatbotId || (await getActiveChatbotId(userId));
+      if (!chatbotId) {
+        const error = new ChatSDKError(
+          "bad_request:api",
+          "No active chatbot selected",
+        );
+        return error.toResponse();
+      }
+
+      try {
+        const chat = await getChatById({ id });
+
+        if (!chat || chat.chatbotId !== chatbotId) {
           const error = new ChatSDKError(
-            "not_found:chat",
-            "Chat ID is required",
+            "forbidden:chat",
+            "Chat not found or access denied",
           );
           return error.toResponse();
         }
 
-        const session = await auth.api.getSession({ headers: request.headers });
-        if (!session) {
-          const error = new ChatSDKError("unauthorized:chat");
-          return error.toResponse();
-        }
-        const userId = session?.user.id || "";
-
-        const chatbotId =
-          session?.session?.activeChatbotId ||
-          (await getActiveChatbotId(userId));
-        if (!chatbotId) {
-          const error = new ChatSDKError(
-            "bad_request:api",
-            "No active chatbot selected",
-          );
-          return error.toResponse();
-        }
-
-        try {
-          const chat = await getChatById({ id });
-
-          if (!chat || chat.chatbotId !== chatbotId) {
-            const error = new ChatSDKError(
-              "forbidden:chat",
-              "Chat not found or access denied",
-            );
-            return error.toResponse();
-          }
-
-          const deletedChat = await deleteChatById({ id });
-          return json(deletedChat, { status: 200 });
-        } catch (error) {
-          console.error(error);
-          const chatError = new ChatSDKError(
-            "bad_request:api",
-            "An error occurred while processing your request",
-          );
-          return chatError.toResponse();
-        }
-      }),
+        const deletedChat = await deleteChatById({ id });
+        return json(deletedChat, { status: 200 });
+      } catch (error) {
+        console.error(error);
+        const chatError = new ChatSDKError(
+          "bad_request:api",
+          "An error occurred while processing your request",
+        );
+        return chatError.toResponse();
+      }
+    }),
   }),
 );

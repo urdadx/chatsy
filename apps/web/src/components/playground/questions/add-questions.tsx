@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,6 +31,7 @@ export const AddQuestions = () => {
   const [isSuggested, setIsSuggested] = useState(false);
 
   const queryClient = useQueryClient();
+  const { setBanner } = useRetrainingBanner();
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -41,6 +43,7 @@ export const AddQuestions = () => {
     },
     onSuccess: () => {
       toast.success("Question added!");
+      setBanner(true, "Retraining required");
       setQuestion("");
       setAnswer("");
       setIsSuggested(true);

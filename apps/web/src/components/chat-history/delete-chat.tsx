@@ -28,7 +28,11 @@ export function DeleteChat({ open, id, onOpenChange }: DeleteChatProps) {
     },
     onSuccess: () => {
       toast.success("Chat deleted");
-      queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+      queryClient.invalidateQueries({
+        queryKey: ["chat-logs"],
+        exact: false
+      });
+      queryClient.invalidateQueries({ queryKey: ["chat", id] });
       queryClient.invalidateQueries({ queryKey: ["messages"] });
     },
     onError: () => {
@@ -51,7 +55,7 @@ export function DeleteChat({ open, id, onOpenChange }: DeleteChatProps) {
             <CircleAlertIcon className="opacity-80" size={16} />
           </div>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl">Are you sure?</AlertDialogTitle>
             <AlertDialogDescription className="text-md">
               This chat will be permanently deleted
             </AlertDialogDescription>

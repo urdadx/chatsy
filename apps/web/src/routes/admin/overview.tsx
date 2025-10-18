@@ -12,7 +12,6 @@ export const Route = createFileRoute("/admin/overview")({
 });
 
 function RouteComponent() {
-  // Use the custom hook that handles all data fetching and loading states
   const {
     trainingData,
     sourcesCount,
@@ -39,7 +38,7 @@ function RouteComponent() {
 
   if (isLoading) {
     return (
-      <div className="relative p-6 w-full md:max-w-5xl xl:max-w-6xl mx-auto">
+      <div className="relative p-6 w-full md:max-w-7xl xl:max-w-6xl mx-auto">
         <div className="flex items-center justify-center h-96">
           <Spinner size={24} className="text-primary" />
         </div>
@@ -49,7 +48,7 @@ function RouteComponent() {
 
   return (
     <>
-      <div className="relative p-6 w-full md:max-w-5xl xl:max-w-6xl mx-auto space-y-10">
+      <div className="relative p-6 w-full md:max-w-6xl mx-auto space-y-10">
         <DashboardMetrics
           sourcesCount={sourcesCount}
           conversationsCount={conversationsCount}

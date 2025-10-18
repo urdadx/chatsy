@@ -1,8 +1,9 @@
 import { getTotalVotes } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
+import { auth } from "../../../auth";
 
 export const ServerRoute = createServerFileRoute("/api/vote-count").methods({
   GET: async ({ request }) => {
@@ -25,8 +26,14 @@ export const ServerRoute = createServerFileRoute("/api/vote-count").methods({
       );
     }
     try {
-      const { upvotes, downvotes } = await getTotalVotes({ chatbotId });
-      return json({ upvotes, downvotes }, { status: 200 });
+      const voteData = await withCache(
+        `vote-count:${chatbotId}`,
+        async () => {
+          return await getTotalVotes({ chatbotId });
+        },
+        { ttl: 60 },
+      );
+      return json(voteData, { status: 200 });
     } catch (error) {
       console.error("Error getting total votes:", error);
       return json({ error: "Failed to get total votes" }, { status: 500 });

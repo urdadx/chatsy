@@ -1,11 +1,11 @@
 import { useChatbot } from "@/hooks/use-chatbot";
-import { sanitizeText } from "@/lib/utils";
-import { SparklesIcon } from "lucide-react";
+import { RiBardFill } from "@remixicon/react";
 import { AnimatePresence, motion } from "motion/react";
 import { ResponseStream } from "./response-stream";
 
-export const GreetingMessage = ({ title }: any) => {
-  const { data: chatbot } = useChatbot();
+export const GreetingMessage = ({ title, chatbot: chatbotProp }: any) => {
+  const { data: hookChatbot } = useChatbot();
+  const chatbot = chatbotProp ?? hookChatbot;
 
   return (
     <>
@@ -24,7 +24,7 @@ export const GreetingMessage = ({ title }: any) => {
                   className="rounded-full"
                 />
               ) : (
-                <SparklesIcon size={14} />
+                <RiBardFill size={14} />
               )}
             </div>
             <div className="flex flex-row gap-2 items-start">
@@ -33,10 +33,10 @@ export const GreetingMessage = ({ title }: any) => {
                 className="flex flex-col gap-4 text-foreground bg-gray-50 prose px-3 py-2 rounded-md break-words whitespace-normal"
               >
                 <ResponseStream
-                  textStream={sanitizeText(title)}
+                  textStream={title}
                   mode="typewriter"
                   speed={25}
-                  className="text-md"
+                  className="text-sm  "
                 />{" "}
               </div>
             </div>

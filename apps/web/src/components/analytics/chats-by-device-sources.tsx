@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {} from "@/components/ui/chart";
+import { } from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { osCodes } from "@/constants/os";
 import { detectDevice } from "@/lib/utils";
@@ -82,67 +82,67 @@ export function ChatsByDeviceSources({
 
   const allDevices = metrics
     ? metrics.devices.map((device: any) => {
-        const deviceIcon = {
-          Mobile: <MobilePhone className="w-4" />,
-          Desktop: <Monitor className="w-4" />,
-          Tablet: <TabletSmartphone className="w-4" />,
-          Bot: <Bot className="w-4" />,
-          other: <TabletSmartphone className="w-4" />,
-        };
-        const icon = deviceIcon[device.deviceType as keyof typeof deviceIcon];
+      const deviceIcon = {
+        Mobile: <MobilePhone className="w-4" />,
+        Desktop: <Monitor className="w-4" />,
+        Tablet: <TabletSmartphone className="w-4" />,
+        Bot: <Bot className="w-4" />,
+        other: <TabletSmartphone className="w-4" />,
+      };
+      const icon = deviceIcon[device.deviceType as keyof typeof deviceIcon];
 
-        return {
-          icon,
-          title:
-            device.deviceType === "other" || device.deviceType == null
-              ? "Unknown"
-              : device.deviceType,
-          href: "",
-          value: device.totalCount,
-          linkId: "",
-        };
-      })
+      return {
+        icon,
+        title:
+          device.deviceType === "other" || device.deviceType == null
+            ? "Unknown"
+            : device.deviceType,
+        href: "",
+        value: device.totalCount,
+        linkId: "",
+      };
+    })
     : [];
 
   const allOperatingSystems = metrics
     ? metrics.operatingsystems.map((os: any) => {
-        const osCode =
-          osCodes[os.osName as keyof typeof osCodes] ?? osCodes["GNU/Linux"];
-        const iconSrc = `../../../public/os/${osCode}.png`;
-        const icon = (
-          <img key={os.osName} alt="staticon" src={iconSrc} className="w-5" />
-        );
+      const osCode =
+        osCodes[os.osName as keyof typeof osCodes] ?? osCodes["GNU/Linux"];
+      const iconSrc = `../../../public/os/${osCode}.png`;
+      const icon = (
+        <img key={os.osName} alt="staticon" src={iconSrc} className="w-5" />
+      );
 
-        return {
-          icon,
-          title: os.osName,
-          href: "",
-          value: os.totalCount,
-          linkId: "",
-        };
-      })
+      return {
+        icon,
+        title: os.osName,
+        href: "",
+        value: os.totalCount,
+        linkId: "",
+      };
+    })
     : [];
 
   const allBrowsers = metrics
     ? metrics.browsers.map((browser: any) => {
-        const iconSrc = `../../../public/browser/${browser.browserName.toLowerCase()}.png`;
-        const icon = (
-          <img
-            key={browser.browserName}
-            alt={browser.browserName}
-            src={iconSrc}
-            className="w-4"
-          />
-        );
+      const iconSrc = `../../../public/browser/${browser.browserName.toLowerCase()}.png`;
+      const icon = (
+        <img
+          key={browser.browserName}
+          alt={browser.browserName}
+          src={iconSrc}
+          className="w-4"
+        />
+      );
 
-        return {
-          icon,
-          title: browser.browserName,
-          href: "",
-          value: browser.totalCount,
-          linkId: "",
-        };
-      })
+      return {
+        icon,
+        title: browser.browserName,
+        href: "",
+        value: browser.totalCount,
+        linkId: "",
+      };
+    })
     : [];
 
   const topDevices = allDevices.slice(0, 5);

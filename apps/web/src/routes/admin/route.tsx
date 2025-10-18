@@ -10,12 +10,14 @@ export const Route = createFileRoute("/admin")({
     if (!session) {
       throw redirect({ to: "/login", search: location.search });
     }
-    // maybe they haven't created an organization or verified their email after signing up
+
+    // Check if they haven't created an organization or verified their email after signing up
     if (!session.session.activeOrganizationId || !session.user.emailVerified) {
       throw redirect({ to: "/onboarding", search: location.search });
     }
 
-    // is the user is not subscribed, redirect to choose plan
+    // Check if the user is subscribed (either personally or through organization membership)
+    // Invited users inherit subscription status from the organization
     if (!session.user.isSubscribed) {
       throw redirect({ to: "/choose-plan", search: location.search });
     }

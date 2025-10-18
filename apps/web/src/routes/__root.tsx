@@ -55,11 +55,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
     scripts: isDevelopment
       ? []
       : [
-          {
-            src: "https://analytics.padyna.com/script.js",
-            "data-website-id": "920f52b8-678e-4f8c-9317-0407d2376480",
-          },
-        ],
+        {
+          src: "https://analytics.padyna.com/script.js",
+          "data-website-id": "920f52b8-678e-4f8c-9317-0407d2376480",
+        },
+      ],
   }),
 
   component: RootDocument,
@@ -69,6 +69,7 @@ function RootDocument() {
   return (
     <html lang="en">
       <head>
+
         <HeadContent />
       </head>
       <body suppressHydrationWarning>
@@ -81,7 +82,8 @@ function RootDocument() {
           <Toaster richColors theme="light" />
         </RetrainingBannerProvider>
         <Scripts />
-        {isDevelopment && <ReactQueryDevtools initialIsOpen={false} />}
+
+        {isDevelopment && <ReactQueryDevtools position="left" initialIsOpen={false} />}
       </body>
     </html>
   );

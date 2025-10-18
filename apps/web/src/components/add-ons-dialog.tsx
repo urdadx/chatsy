@@ -1,12 +1,15 @@
-"use client";
 
+import { SolarBoltBoldDuotone } from "@/assets/icons/bolt-duotone";
+import { SolarChatUnreadBoldDuotone } from "@/assets/icons/chat-unread-icon";
+import { SolarUserRoundedBoldDuotone } from "@/assets/icons/user-icon";
 import { authClient, useSession } from "@/lib/auth-client";
 import { ADDON_PRODUCT_IDS } from "@/lib/plan-slugs";
 import { cn } from "@/lib/utils";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { RiRobot2Fill } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Bot, MessageCircle, User, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -93,7 +96,7 @@ export const AddOnsDialog = ({
     } catch (error) {
       console.error("Checkout error:", error);
       toast.error("An error occurred during checkout. Please try again.");
-      setIsCheckingOut(false); // Only reset loading on error
+      setIsCheckingOut(false);
     }
 
     if (onOpenChange) {
@@ -122,7 +125,7 @@ export const AddOnsDialog = ({
       {/* Extra 5k Messages Addon */}
       <Card
         className={cn(
-          "shadow-xs cursor-pointer transition-colors",
+          "shadow-xs rounded-md cursor-pointer transition-colors",
           isSelected("messages")
             ? "ring-2 ring-purple-500 bg-purple-50"
             : "hover:bg-gray-50",
@@ -133,7 +136,7 @@ export const AddOnsDialog = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-purple-600" />
+                <SolarChatUnreadBoldDuotone color="#8b5cf6" className="w-6 h-6 " />
               </div>
               <div>
                 <h3 className="text-base text-gray-900">Extra 1000 credits</h3>
@@ -152,7 +155,7 @@ export const AddOnsDialog = ({
       {/* Extra chabot */}
       <Card
         className={cn(
-          "shadow-xs cursor-pointer transition-colors",
+          "shadow-xs rounded-md cursor-pointer transition-colors",
           isSelected("chatbot")
             ? "ring-2 ring-purple-500 bg-purple-50"
             : "hover:bg-gray-50",
@@ -163,7 +166,7 @@ export const AddOnsDialog = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Bot className="w-6 h-6 text-purple-600" />
+                <RiRobot2Fill color="#a78bfa" className="w-6 h-6 " />
               </div>
               <div>
                 <h3 className="text-base text-gray-900">Extra AI chatbot</h3>
@@ -180,7 +183,7 @@ export const AddOnsDialog = ({
       </Card>
       <Card
         className={cn(
-          "shadow-xs cursor-pointer transition-colors",
+          "shadow-xs rounded-md cursor-pointer transition-colors",
           isSelected("member")
             ? "ring-2 ring-purple-500 bg-purple-50"
             : "hover:bg-gray-50",
@@ -191,7 +194,7 @@ export const AddOnsDialog = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <User className="w-6 h-6 text-purple-600" />
+                <SolarUserRoundedBoldDuotone color="#8b5cf6" className="w-6 h-6 " />
               </div>
               <div>
                 <h3 className="text-base text-gray-900">Extra team member</h3>
@@ -209,7 +212,7 @@ export const AddOnsDialog = ({
       {/* Remove Padyna Branding Addon  */}
       <Card
         className={cn(
-          "shadow-xs cursor-pointer transition-colors",
+          "shadow-xs rounded-md cursor-pointer transition-colors",
           isSelected("branding")
             ? "ring-2 ring-purple-500 bg-purple-50"
             : "hover:bg-gray-50",
@@ -220,7 +223,7 @@ export const AddOnsDialog = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Zap className="w-6 h-6 text-purple-600" />
+                <SolarBoltBoldDuotone color="#8b5cf6" className="w-6 h-6 " />
               </div>
               <div>
                 <h3 className="text-base text-gray-900">
@@ -274,8 +277,8 @@ export const AddOnsDialog = ({
     return (
       <DialogContent className="w-full max-w-lg">
         <div className="space-y-1">
-          <DialogTitle className="text-lg font-semibold">Add-ons</DialogTitle>
-          <p className="text-sm text-gray-600">Get more with add-ons</p>
+          <DialogTitle className="text-xl font-semibold">Add-ons</DialogTitle>
+          <p className="text-base text-gray-600">Unlock more features with add-ons</p>
         </div>
         {addonsContent}
       </DialogContent>
@@ -285,8 +288,8 @@ export const AddOnsDialog = ({
   return (
     <DrawerContent>
       <DrawerHeader className="text-left">
-        <DrawerTitle className="text-lg font-semibold">Add-ons</DrawerTitle>
-        <p className="text-sm text-gray-600">Get more with add-ons</p>
+        <DrawerTitle className="text-xl font-semibold">Add-ons</DrawerTitle>
+        <p className="text-base text-gray-600">Unlock more features with add-ons</p>
       </DrawerHeader>
       <div className="px-4 space-y-4">{addonsContent}</div>
       <DrawerFooter className="pt-2">

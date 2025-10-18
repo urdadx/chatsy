@@ -4,16 +4,14 @@ import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { eq } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const updateChatStatusSchema = z.object({
-  chatId: z.string().uuid("Invalid chat ID format"),
+  chatId: z.string("Invalid chat ID format"),
   status: z.enum(["unresolved", "resolved", "escalated"], {
-    errorMap: () => ({
-      message: "Status must be unresolved, resolved, or escalated",
-    }),
+    message: "Status must be unresolved, resolved, or escalated",
   }),
 });
 
@@ -33,7 +31,7 @@ export const ServerRoute = createServerFileRoute(
       const parsed = updateChatStatusSchema.safeParse(body);
 
       if (!parsed.success) {
-        return json({ error: parsed.error.format() }, { status: 400 });
+        return json({ error: z.treeifyError(parsed.error) }, { status: 400 });
       }
 
       const { chatId, status } = parsed.data;

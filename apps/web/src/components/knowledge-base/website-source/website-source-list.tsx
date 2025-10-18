@@ -29,7 +29,6 @@ export const WebsiteSourceList = () => {
 
   const sources = queryData?.data || [];
 
-  // Handle crawl completion logic
   useCrawlCompletion(sources);
 
   const handleDeleteClick = (id: string) => {
@@ -48,7 +47,7 @@ export const WebsiteSourceList = () => {
   const filteredSources = filterSources(sources, searchTerm);
 
   return (
-    <div className="my-5 border  rounded-md p-6">
+    <div className="my-5 border  rounded-xl p-6">
       <SourcesHeader searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
       {filteredSources.length > 0 ? (

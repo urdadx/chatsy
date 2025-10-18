@@ -1,6 +1,6 @@
 import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { useChatHistory } from "@/hooks/use-chat-history";
-import { useChatbots } from "@/hooks/use-chatbot-management";
+import { useChatbots } from "@/hooks/use-chatbot";
 import { useActiveMeters } from "@/hooks/use-usage-meters";
 import { api } from "@/lib/api";
 import { useQueries } from "@tanstack/react-query";
@@ -10,7 +10,6 @@ import { useQueries } from "@tanstack/react-query";
  * Provides a unified loading state and properly typed data
  */
 export function useOverviewData() {
-  // Use custom hooks for complex queries that have their own logic
   const { data: chatHistoryData, isLoading: historyLoading } =
     useChatHistory("90d");
   const { data: meter, isLoading: metersLoading } = useActiveMeters();
@@ -18,7 +17,6 @@ export function useOverviewData() {
     useRealTimeVisitorHistory("90d");
   const { data: chatbotsData, isLoading: chatbotsLoading } = useChatbots();
 
-  // Use useQueries with combine for cleaner data handling of simple API calls
   const apiData = useQueries({
     queries: [
       {
@@ -57,13 +55,11 @@ export function useOverviewData() {
     }),
   });
 
-  // Calculate derived data
   const conversationsCount = chatHistoryData?.pages.reduce(
     (acc, page) => acc + page.chats.length,
     0,
   );
 
-  // Unified loading state
   const isLoading =
     apiData.isLoading ||
     historyLoading ||
@@ -71,11 +67,9 @@ export function useOverviewData() {
     visitorsLoading ||
     chatbotsLoading;
 
-  // Unified error state
   const isError = apiData.isError;
 
   return {
-    // Data
     trainingData: apiData.trainingData,
     sourcesCount: apiData.sourcesCount,
     voteCounts: apiData.voteCounts,
@@ -83,8 +77,6 @@ export function useOverviewData() {
     meter,
     visitorData,
     chatbotsData,
-
-    // States
     isLoading,
     isError,
     errors: apiData.errors,

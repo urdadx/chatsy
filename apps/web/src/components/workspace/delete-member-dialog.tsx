@@ -33,7 +33,7 @@ export function DeleteMemberDialog({
 
   const deleteMember = useMutation({
     mutationFn: async (memberId: string) => {
-      await authClient.organization.removeMember({ memberId });
+      await authClient.organization.removeMember({ memberIdOrEmail: memberId });
     },
     onSuccess: () => {
       toast.success("Member removed successfully");
@@ -52,7 +52,7 @@ export function DeleteMemberDialog({
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
-        <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">
+        <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-3">
           <div
             className="flex size-9 shrink-0 items-center justify-center rounded-full border"
             aria-hidden="true"
@@ -60,7 +60,7 @@ export function DeleteMemberDialog({
             <CircleAlertIcon className="opacity-80" size={16} />
           </div>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl">Are you sure?</AlertDialogTitle>
             <AlertDialogDescription className="text-md">
               {`This will permanently remove ${member.user.name} from the organization.`}
             </AlertDialogDescription>

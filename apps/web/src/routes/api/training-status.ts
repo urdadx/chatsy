@@ -1,10 +1,11 @@
 import { db } from "@/db";
 import { chatbot } from "@/db/schema";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { eq } from "drizzle-orm";
+import { auth } from "../../../auth";
 
 export const ServerRoute = createServerFileRoute(
   "/api/training-status",
@@ -30,10 +31,16 @@ export const ServerRoute = createServerFileRoute(
     }
 
     try {
-      const result = await db
-        .select({ trainingStatus: chatbot.trainingStatus })
-        .from(chatbot)
-        .where(eq(chatbot.id, chatbotId));
+      const result = await withCache(
+        `training-status:${chatbotId}`,
+        async () => {
+          return await db
+            .select({ trainingStatus: chatbot.trainingStatus })
+            .from(chatbot)
+            .where(eq(chatbot.id, chatbotId));
+        },
+        { ttl: 10 },
+      );
 
       if (result.length === 0) {
         return json({ status: "idle" });

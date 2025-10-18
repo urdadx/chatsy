@@ -181,6 +181,102 @@ export function detectDevice(): DeviceInfo {
   return result;
 }
 
+/**
+ * Server-side device detection that accepts a userAgent string
+ * Use this in server-side code where navigator is not available
+ */
+export function detectDeviceFromUserAgent(userAgent: string): DeviceInfo {
+  const ua = userAgent.toLowerCase();
+
+  // Initialize result with defaults
+  const result: DeviceInfo = {
+    type: "unknown",
+    os: "unknown",
+    browser: "unknown",
+    isIOS: false,
+    isAndroid: false,
+    isMac: false,
+    isWindows: false,
+    isLinux: false,
+    isSafari: false,
+    isChrome: false,
+    isFirefox: false,
+    isEdge: false,
+  };
+
+  // Device type detection
+  if (
+    /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|tablet|(puffin(?!.*(IP|AP|WP))))/.test(
+      ua,
+    )
+  ) {
+    result.type = "tablet";
+  } else if (
+    /(mobi|ipod|phone|blackberry|opera mini|fennec|minimo|symbian|psp|nintendo ds|archos|skyfire|puffin|blazer|bolt|gobrowser|iris|maemo|semc|teashark|uzard)/.test(
+      ua,
+    )
+  ) {
+    result.type = "mobile";
+  } else {
+    result.type = "desktop";
+  }
+
+  // OS detection
+  if (/iphone|ipad|ipod/.test(ua)) {
+    result.os = "iOS";
+    result.isIOS = true;
+  } else if (/android/.test(ua)) {
+    result.os = "Android";
+    result.isAndroid = true;
+  } else if (/macintosh|mac os x/.test(ua)) {
+    result.os = "macOS";
+    result.isMac = true;
+  } else if (/windows|win32|win64|wow64/.test(ua)) {
+    result.os = "Windows";
+    result.isWindows = true;
+  } else if (/linux/.test(ua) && !result.isAndroid) {
+    result.os = "Linux";
+    result.isLinux = true;
+  }
+
+  // Browser detection
+  if (/edg/.test(ua)) {
+    result.browser = "Edge";
+    result.isEdge = true;
+  } else if (/chrome/.test(ua) && !/chromium|edg/.test(ua)) {
+    result.browser = "Chrome";
+    result.isChrome = true;
+  } else if (/firefox/.test(ua)) {
+    result.browser = "Firefox";
+    result.isFirefox = true;
+  } else if (/safari/.test(ua) && !/chrome|chromium|edg/.test(ua)) {
+    result.browser = "Safari";
+    result.isSafari = true;
+  } else if (/msie|trident/.test(ua)) {
+    result.browser = "Internet Explorer";
+  } else if (/opera/.test(ua)) {
+    result.browser = "Opera";
+  }
+
+  // Try to detect models for common devices
+  if (result.isIOS) {
+    const matches =
+      ua.match(/iphone\s+os\s+(\d+)_(\d+)/i) ||
+      ua.match(/ipad;\s+cpu\s+os\s+(\d+)_(\d+)/i);
+    if (matches) {
+      const model = ua.includes("ipad") ? "iPad" : "iPhone";
+      result.model = `${model} (iOS ${matches[1]}.${matches[2]})`;
+    }
+  } else if (result.isAndroid) {
+    const matches = ua.match(/android\s+(\d+)(\.(\d+))?/i);
+    if (matches) {
+      result.model = `Android ${matches[1]}${matches[3] ? `.${matches[3]}` : ""}`;
+    }
+  }
+
+  return result;
+}
+
 export function generateUUID(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
@@ -323,18 +419,43 @@ export const signalIframe = () => {
   }
 };
 
-export const timeAgo = (timestamp: any) => {
+export const timeAgo = (
+  timestamp: string | number | Date | null | undefined,
+) => {
   if (!timestamp) return "Just now";
-  const diff = Date.now() - new Date(timestamp).getTime();
 
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return "Just now";
+
+  const diff = Date.now() - date.getTime();
+
+  // Handle future timestamps
+  if (diff < 0) return "Just now";
+
+  // Less than 1 minute
   if (diff < 60000) {
-    // less than 1 minute
     return "Just now";
   }
 
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  if (years > 0) {
+    return `${years} year${years > 1 ? "s" : ""} ago`;
+  }
+
+  if (months > 0) {
+    return `${months} month${months > 1 ? "s" : ""} ago`;
+  }
+
+  if (weeks > 0) {
+    return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+  }
 
   if (days > 0) {
     return `${days} day${days > 1 ? "s" : ""} ago`;

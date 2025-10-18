@@ -5,8 +5,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { RiBardFill } from "@remixicon/react";
-import { RotateCcw, X } from "lucide-react";
+import { ArrowLeft, RotateCcw, X } from "lucide-react";
 import type { ReactNode } from "react";
+import { memo } from "react";
 
 interface ChatHeaderProps {
   chatbot?: {
@@ -16,28 +17,50 @@ interface ChatHeaderProps {
   };
   onReset?: () => void;
   onClose?: () => void;
+  onBack?: () => void;
   showResetButton?: boolean;
   showCloseButton?: boolean;
+  showBackButton?: boolean;
   resetIcon?: "refresh" | "rotate";
   className?: string;
   children?: ReactNode;
 }
 
-export function ChatHeader({
+function ChatHeaderComponent({
   chatbot,
   onReset,
   onClose,
+  onBack,
   showResetButton = true,
   showCloseButton = false,
+  showBackButton = false,
   className,
   children,
 }: ChatHeaderProps) {
   return (
     <div
-      className={`flex items-center justify-between p-4 text-white border-b ${className}`}
+      className={`system-font flex items-center justify-between p-4 text-white border-b ${className}`}
       style={{ backgroundColor: chatbot?.primaryColor || "#2563eb" }}
     >
-      <div className="flex items-center gap-3 min-w-0 flex-1">
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        {showBackButton && onBack && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                onClick={onBack}
+                className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                aria-label="Go back"
+                variant="ghost"
+              >
+                <ArrowLeft className="text-white" size={16} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-white shadow-sm" side="top">
+              <p className="text-black">Go back</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
         {chatbot?.image ? (
           <img
             src={chatbot.image}
@@ -49,7 +72,7 @@ export function ChatHeader({
             <RiBardFill size={20} className="text-white rounded-full" />
           </div>
         )}
-        <p className="font-normal text-base truncate">
+        <p className="font-normal system-font text-base truncate">
           {chatbot?.name || "AI Assistant"}
         </p>
       </div>
@@ -91,3 +114,5 @@ export function ChatHeader({
     </div>
   );
 }
+
+export const ChatHeader = memo(ChatHeaderComponent);

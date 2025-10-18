@@ -1,10 +1,11 @@
 import { db } from "@/db";
 import { chatbot } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
+import { withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { count, eq } from "drizzle-orm";
+import { auth } from "../../../auth";
 
 export const ServerRoute = createServerFileRoute("/api/chatbot-count").methods({
   GET: async ({ request }) => {
@@ -23,10 +24,17 @@ export const ServerRoute = createServerFileRoute("/api/chatbot-count").methods({
 
     try {
       // Get current chatbot count for organization
-      const [result] = await db
-        .select({ count: count(chatbot.id) })
-        .from(chatbot)
-        .where(eq(chatbot.organizationId, organizationId));
+      const result = await withCache(
+        `chatbot-count:org:${organizationId}`,
+        async () => {
+          const [data] = await db
+            .select({ count: count(chatbot.id) })
+            .from(chatbot)
+            .where(eq(chatbot.organizationId, organizationId));
+          return data;
+        },
+        { ttl: 60 },
+      );
 
       return json({
         count: result?.count || 0,

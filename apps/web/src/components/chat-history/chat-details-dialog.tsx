@@ -1,0 +1,127 @@
+import { getChatById } from "@/lib/server-functions/chat-queries"
+import type { ChatData, ChatMetaData } from "@/lib/types"
+import { cn } from "@/lib/utils"
+import { useQuery } from "@tanstack/react-query"
+import { format } from "date-fns"
+import { Info } from "lucide-react"
+import { Badge } from "../ui/badge"
+import { Button } from "../ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
+
+export const ChatDetailsDialog = ({ chatId }: { chatId?: string }) => {
+  const { data: chat, isLoading } = useQuery({
+    queryKey: ["chat", chatId],
+    queryFn: () => getChatById({ data: chatId || "" }),
+    enabled: !!chatId,
+  })
+
+  const metadata = (chat as ChatData)?.chatMetaData as ChatMetaData | undefined
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          <Info color="#915bf5" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle className="text-xl">Chat details</DialogTitle>
+        </DialogHeader>
+
+        {isLoading ? (
+          <div className="py-4 text-center text-sm text-muted-foreground">Loading...</div>
+        ) : chat ? (
+          <div className="space-y-4 py-4">
+            <div className="grid gap-3 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-base font-medium text-muted-foreground">Date created</span>
+                <span className="text-sm">{format(new Date((chat as ChatData).createdAt), "PPpp")}</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-base font-medium text-muted-foreground">Status</span>
+
+                <span
+                  className={cn(
+                    "px-2 py-1 rounded-xl text-xs capitalize flex items-center gap-1",
+                    (chat as ChatData).status === "resolved"
+                      ? "bg-green-100 text-green-800"
+                      : (chat as ChatData).status === "unresolved"
+                        ? "bg-blue-100 text-blue-800"
+                        : (chat as ChatData).status === "escalated"
+                          ? "bg-orange-100 text-orange-800"
+                          : "bg-gray-100 text-gray-800",
+                  )}
+                >
+                  {(chat as ChatData).status}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-base font-medium text-muted-foreground">Channel</span>
+                <span className="text-sm capitalize">{(chat as ChatData).channel}</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-base font-medium text-muted-foreground">Visibility</span>
+                <span className="text-sm capitalize">{(chat as ChatData).visibility}</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-base font-medium text-muted-foreground">Assigned to</span>
+                <span className="text-sm">
+                  {(chat as ChatData).assignedUser?.name || (chat as ChatData).assignedUser?.email || "Not assigned"}
+                </span>
+              </div>
+
+              {metadata && (
+                <>
+                  {(metadata.country || metadata.city) && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-base font-medium text-muted-foreground">Location</span>
+                      <span className="text-sm">
+                        {[metadata.city, metadata.country].filter(Boolean).join(", ") || "Unknown"}
+                      </span>
+                    </div>
+                  )}
+
+                  {metadata.timezone && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-base font-medium text-muted-foreground">Timezone</span>
+                      <span className="text-sm">{metadata.timezone}</span>
+                    </div>
+                  )}
+
+                  {metadata.device && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-base font-medium text-muted-foreground">Device information</span>
+                      <div className="flex gap-2">
+                        <Badge variant="outline">{metadata.device.type}</Badge>
+                        {metadata.device.os !== "unknown" && (
+                          <Badge variant="outline">{metadata.device.os}</Badge>
+                        )}
+                        {metadata.device.browser !== "unknown" && (
+                          <Badge variant="outline">{metadata.device.browser}</Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {metadata.device?.model && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-base font-medium text-muted-foreground">Model</span>
+                      <span className="text-sm">{metadata.device.model}</span>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="py-4 text-center text-sm text-muted-foreground">Chat not found</div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}

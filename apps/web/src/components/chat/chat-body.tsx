@@ -1,19 +1,20 @@
-import { Button } from "@/components/ui/button";
 import {
-  ChatContainerContent,
-  ChatContainerRoot,
-  ChatContainerScrollAnchor,
-} from "@/components/ui/chat-container";
-import { ScrollButton } from "@/components/ui/scroll-button";
+  Conversation,
+  ConversationContent,
+  ConversationEmptyState,
+  ConversationScrollButton,
+} from "@/components/ai-elements/conversation";
+import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import type { Vote } from "@/db/schema";
 import type { ChatMessage } from "@/lib/types";
 import { RiBardFill } from "@remixicon/react";
-import type { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import type { ChatRequestOptions, ChatStatus } from "ai";
 import type { ReactNode } from "react";
-import { GreetingMessage } from "./greeting-message";
-import { Messages } from "./messages";
+import { memo } from "react";
+import { PreviewMessage, ThinkingMessage } from "./preview-message";
+import { TypingIndicator } from "./typing-indicator";
 
 interface ChatBodyProps {
   isLoading?: boolean;
@@ -32,14 +33,18 @@ interface ChatBodyProps {
   ) => Promise<void>;
   chatbot?: {
     initialMessage?: string | null;
+    image?: string | null;
+    name?: string | null;
     [key: string]: any;
   };
-  queryClient?: ReturnType<typeof useQueryClient>;
   className?: string;
   children?: ReactNode;
+  chatStatus?: "unresolved" | "resolved" | "escalated";
+  wsIsTyping?: boolean;
+  showActions?: boolean;
 }
 
-export function ChatBody({
+const ChatBodyComponent = ({
   isLoading,
   error,
   isDeactivated,
@@ -49,17 +54,19 @@ export function ChatBody({
   chatError,
   chatId,
   votes,
-  regenerate,
   chatbot,
-  queryClient,
   className,
   children,
-}: ChatBodyProps) {
+  chatStatus,
+  wsIsTyping,
+  showActions = true,
+}: ChatBodyProps) => {
   const greetingMessage = chatbot?.initialMessage || "";
+  const queryClient = useQueryClient();
 
   if (isDeactivated) {
     return (
-      <div className={`relative flex-1 min-h-0 overflow-hidden ${className}`}>
+      <div className={`relative bg-white flex-1 min-h-0 overflow-hidden ${className}`}>
         <div className="flex items-center justify-center h-full">
           <div className="text-center p-6 max-w-sm">
             <div className="mb-4">
@@ -82,7 +89,7 @@ export function ChatBody({
 
   if (isLoading) {
     return (
-      <div className={`relative flex-1 min-h-0 overflow-hidden ${className}`}>
+      <div className={`relative bg-white flex-1 min-h-0 overflow-hidden ${className}`}>
         <div className="flex items-center justify-center h-full">
           <Spinner className="text-primary" />
         </div>
@@ -92,7 +99,7 @@ export function ChatBody({
 
   if (error) {
     return (
-      <div className={`relative flex-1 min-h-0 overflow-hidden ${className}`}>
+      <div className={`relative bg-white flex-1 min-h-0 overflow-hidden ${className}`}>
         <div className="flex items-center justify-center h-full text-red-500">
           <div className="text-center">
             <p className="text-sm">Error loading messages</p>
@@ -114,38 +121,82 @@ export function ChatBody({
   }
 
   return (
-    <div className={`relative flex-1 min-h-0 overflow-hidden ${className}`}>
-      <ChatContainerRoot className="h-full smooth-div">
-        <ChatContainerContent className="p-4">
-          <div className="space-y-4">
-            {messages.length === 0 ? (
-              <GreetingMessage title={greetingMessage} />
-            ) : (
-              <Messages
-                chatId={chatId}
-                status={status}
-                votes={votes}
-                messages={messages}
-                setMessages={setMessages}
-                reload={regenerate}
-                chatbot={chatbot}
-              />
-            )}
+    <div className={`bg-white relative flex-1 min-h-0 overflow-hidden ${className}`}>
+      <Conversation className="h-full overflow-hidden">
+        <ConversationContent>
+          {messages.length === 0 ? (
+            <ConversationEmptyState
+              title={greetingMessage}
+              description=""
+              icon={<RiBardFill size={20} className="text-muted-foreground" />}
+              chatbot={chatbot}
+            />
+          ) : (
+            // Replace nested Conversation with a simple container to keep a single StickToBottom context
+            <div className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 md:gap-6 px-2 py-4">
+              {messages.map((message, index) => (
+                <PreviewMessage
+                  key={message.id}
+                  chatId={chatId}
+                  message={message}
+                  isLoading={
+                    status === 'streaming' && messages.length - 1 === index
+                  }
+                  vote={
+                    votes
+                      ? votes.find((vote) => vote.messageId === message.id)
+                      : undefined
+                  }
+                  setMessages={setMessages}
+                  chatbot={chatbot}
+                  showActions={showActions}
+                />
+              ))}
 
-            {status === "error" && chatError && (
-              <div className="text-red-500 p-4">Error: {chatError.message}</div>
-            )}
+              {status === 'submitted' &&
+                messages.length > 0 &&
+                messages[messages.length - 1].role === 'user' &&
+                chatStatus !== 'escalated' &&
+                chatStatus !== 'resolved' && <ThinkingMessage />}
 
-            {children}
+              {wsIsTyping && chatStatus === 'escalated' && (
+                <TypingIndicator
+                  label="Agent is typing..."
+                  name={chatbot?.name || "Agent"}
+                  avatarSrc={chatbot?.image || "/placeholder-avatar.png"}
+                />
+              )}
+            </div>
+          )}
 
-            <ChatContainerScrollAnchor />
-          </div>
-        </ChatContainerContent>
+          {status === "error" && chatError && (
+            <div className="text-red-500 p-4">Error: {chatError.message}</div>
+          )}
+          {children}
+        </ConversationContent>
 
-        <div className="absolute bottom-2 right-2 z-10">
-          <ScrollButton className="shadow-lg" />
-        </div>
-      </ChatContainerRoot>
+        <ConversationScrollButton className="shadow-lg" />
+      </Conversation>
     </div>
   );
+};
+
+function areEqual(prev: ChatBodyProps, next: ChatBodyProps) {
+  return (
+    prev.isLoading === next.isLoading &&
+    prev.error === next.error &&
+    prev.isDeactivated === next.isDeactivated &&
+    prev.messages === next.messages &&
+    prev.status === next.status &&
+    prev.chatError === next.chatError &&
+    prev.chatId === next.chatId &&
+    prev.votes === next.votes &&
+    prev.chatbot?.initialMessage === next.chatbot?.initialMessage &&
+    prev.className === next.className &&
+    prev.chatStatus === next.chatStatus &&
+    prev.wsIsTyping === next.wsIsTyping &&
+    prev.showActions === next.showActions
+  );
 }
+
+export const ChatBody = memo(ChatBodyComponent, areEqual);

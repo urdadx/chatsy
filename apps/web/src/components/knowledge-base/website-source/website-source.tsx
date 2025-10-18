@@ -22,13 +22,12 @@ export const WebsiteSource = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-2 rounded-md p-6 border bg-white">
+      <div className="flex flex-col gap-2 rounded-xl p-6 border bg-white">
         <div className="flex justify-between items-center mb-3">
           <div className="flex flex-col gap-2">
-            <h2 className="font-semibold text-lg">Website</h2>
+            <h2 className="font-semibold text-lg">Links</h2>
             <p className="text-semibold text-base text-muted-foreground">
-              Extract content from web pages to keep your AI knowledge up to
-              date.
+              Extract content from web pages, youtube videos and many more.
             </p>
           </div>
         </div>

@@ -1,8 +1,10 @@
+import { SolarUploadBoldDuotone } from "@/assets/icons/upload";
+import { useRetrainingBanner } from "@/components/retraining-banner";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AlertCircleIcon, FileUpIcon } from "lucide-react";
+import { AlertCircleIcon } from "lucide-react";
 import { toast } from "sonner";
 import { DocumentList } from "./document-list";
 
@@ -10,6 +12,7 @@ export function DocumentSource() {
   const maxSize = 100 * 1024 * 1024;
   const maxFiles = 10;
   const queryClient = useQueryClient();
+  const { setBanner } = useRetrainingBanner();
 
   const { mutateAsync: uploadAndCreateDocument, isPending: isUploading } =
     useMutation({
@@ -34,6 +37,7 @@ export function DocumentSource() {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["document-sources"] });
+        setBanner(true, "Retraining required");
       },
     });
 
@@ -82,10 +86,10 @@ export function DocumentSource() {
 
   return (
     <>
-      <div className="flex flex-col gap-2 rounded-md p-5 border">
+      <div className="flex flex-col gap-2 rounded-xl p-5 border">
         <div className="flex justify-between items-center mb-2">
           <div className="flex flex-col gap-2">
-            <h2 className="font-semibold text-lg">Files</h2>
+            <h2 className="font-semibold text-lg tracking-tight ">Files</h2>
             <p className=" text-semibold text-base text-muted-foreground">
               Upload and manage various documents to train your AI agent
             </p>
@@ -104,7 +108,7 @@ export function DocumentSource() {
             onDrop={handleDrop}
             data-dragging={isDragging || undefined}
             className={cn(
-              "border-input border-2 bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 flex min-h-52 flex-col items-center justify-center rounded-xl border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px] hover:border-primary",
+              "border-input border-2 bg-gray-50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 flex min-h-52 flex-col items-center justify-center rounded-xl border-dashed p-6 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px] hover:border-primary",
               isDragging && "border-primary",
             )}
           >
@@ -121,7 +125,7 @@ export function DocumentSource() {
                 className="bg-white mb-2 flex size-16 shrink-0 items-center justify-center rounded-full border"
                 aria-hidden="true"
               >
-                <FileUpIcon className="size-6 opacity-60" />
+                <SolarUploadBoldDuotone className="size-8" />
               </div>
               <p className="mb-1.5 text-base font-medium">Upload files</p>
               <p className="text-muted-foreground mb-2 text-sm">

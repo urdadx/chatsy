@@ -2,10 +2,11 @@ import { db } from "@/db";
 import { chatbot } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { withCache } from "@/lib/redis/cache";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { eq } from "drizzle-orm";
+import { auth } from "../../../auth";
 
 export const ServerRoute = createServerFileRoute("/api/chatbots").methods({
   GET: async ({ request }) => {
@@ -33,17 +34,22 @@ export const ServerRoute = createServerFileRoute("/api/chatbots").methods({
       return json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Get all chatbots for this organization
-    const chatbots = await db
-      .select({
-        id: chatbot.id,
-        name: chatbot.name,
-        image: chatbot.image,
-        primaryColor: chatbot.primaryColor,
-        createdAt: chatbot.createdAt,
-      })
-      .from(chatbot)
-      .where(eq(chatbot.organizationId, organizationId));
+    const chatbots = await withCache(
+      `chatbots:org:${organizationId}`,
+      async () => {
+        return await db
+          .select({
+            id: chatbot.id,
+            name: chatbot.name,
+            image: chatbot.image,
+            primaryColor: chatbot.primaryColor,
+            createdAt: chatbot.createdAt,
+          })
+          .from(chatbot)
+          .where(eq(chatbot.organizationId, organizationId));
+      },
+      { ttl: 60 },
+    );
 
     return json({
       chatbots,

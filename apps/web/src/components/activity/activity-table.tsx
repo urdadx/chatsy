@@ -121,17 +121,20 @@ const columns: ColumnDef<Item>[] = [
     enableHiding: false,
   },
   {
-    header: "Email",
+    header: "Contact",
     accessorKey: "email",
     size: 200,
-    cell: ({ row }) => (
-      <div
-        className="font-medium truncate max-w-[180px]"
-        title={row.getValue("email") as string}
-      >
-        {row.getValue("email")}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const email = row.getValue("email") as string;
+      return (
+        <div
+          className="font-medium truncate max-w-[180px]"
+          title={email || "Not available"}
+        >
+          {email || "Not available"}
+        </div>
+      );
+    },
   },
   {
     header: "Location",
@@ -148,7 +151,9 @@ const columns: ColumnDef<Item>[] = [
             ? "bg-orange-100 text-orange-800"
             : row.getValue("type") === "lead"
               ? "bg-green-100 text-green-800"
-              : "bg-muted-foreground/60 text-primary-foreground",
+              : row.getValue("type") === "issue"
+                ? "bg-red-100 text-red-800"
+                : "bg-muted-foreground/60 text-primary-foreground",
         )}
       >
         {row.getValue("type")}
@@ -392,7 +397,7 @@ export default function Component() {
       </div>
 
       {/* Table */}
-      <div className="bg-background overflow-hidden rounded-md border">
+      <div className="bg-background overflow-hidden rounded-xl border">
         <Table className="table-fixed">
           <TableHeader className="bg-purple-50 ">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -408,7 +413,7 @@ export default function Component() {
                         <div
                           className={cn(
                             header.column.getCanSort() &&
-                              "flex h-full cursor-pointer items-center justify-between gap-2 select-none",
+                            "flex h-full cursor-pointer items-center justify-between gap-2 select-none",
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                           onKeyDown={(e) => {
@@ -527,8 +532,8 @@ export default function Component() {
               {Math.min(
                 Math.max(
                   table.getState().pagination.pageIndex *
-                    table.getState().pagination.pageSize +
-                    table.getState().pagination.pageSize,
+                  table.getState().pagination.pageSize +
+                  table.getState().pagination.pageSize,
                   0,
                 ),
                 table.getRowCount(),

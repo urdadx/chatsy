@@ -1,3 +1,4 @@
+import { SolarUsersGroupRoundedBoldDuotone } from "@/assets/icons/users-duotone";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, Users } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -88,20 +89,20 @@ export const InviteMembers = ({ open, setOpen }: any) => {
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="w-full sm:max-w-md ">
+        <DialogContent className="w-full sm:max-w-lg ">
           <div className="flex flex-col items-center gap-2">
             <div
               className="flex size-11 shrink-0 items-center justify-center rounded-full border"
               aria-hidden="true"
             >
-              <Users className="size-5 stroke-zinc-800 dark:stroke-zinc-100" />
+              <SolarUsersGroupRoundedBoldDuotone className="size-5 stroke-zinc-800 dark:stroke-zinc-100" />
             </div>
             <DialogHeader>
-              <DialogTitle className="sm:text-center">
-                Invite Teammates
+              <DialogTitle className="sm:text-center text-xl">
+                Invite your team
               </DialogTitle>
-              <DialogDescription className="sm:text-center underline-offset-4">
-                Invite member with different roles to your workspace
+              <DialogDescription className="sm:text-center text-base underline-offset-4">
+                Invite members with different roles to your organization.
               </DialogDescription>
             </DialogHeader>
           </div>

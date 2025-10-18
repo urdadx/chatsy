@@ -1,10 +1,11 @@
 import { db } from "@/db";
 import { documentSource, textSource, websiteSource } from "@/db/schema";
+import { cacheKeys, withCache } from "@/lib/cache";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { auth } from "auth";
-import { and, count, eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 
 export const ServerRoute = createServerFileRoute("/api/sources/count").methods({
   GET: async ({ request }) => {
@@ -27,37 +28,32 @@ export const ServerRoute = createServerFileRoute("/api/sources/count").methods({
       );
     }
 
-    const textSourcesCount = await db
-      .select({ value: count() })
-      .from(textSource)
-      .where(
-        and(eq(textSource.userId, userId), eq(textSource.chatbotId, chatbotId)),
-      );
+    const totalCount = await withCache(
+      cacheKeys.sources.count(userId, chatbotId),
+      async () => {
+        const textSourcesCount = await db
+          .select({ value: count() })
+          .from(textSource)
+          .where(eq(textSource.chatbotId, chatbotId));
 
-    const documentSourcesCount = await db
-      .select({ value: count() })
-      .from(documentSource)
-      .where(
-        and(
-          eq(documentSource.userId, userId),
-          eq(documentSource.chatbotId, chatbotId),
-        ),
-      );
+        const documentSourcesCount = await db
+          .select({ value: count() })
+          .from(documentSource)
+          .where(eq(documentSource.chatbotId, chatbotId));
 
-    const websiteSourcesCount = await db
-      .select({ value: count() })
-      .from(websiteSource)
-      .where(
-        and(
-          eq(websiteSource.userId, userId),
-          eq(websiteSource.chatbotId, chatbotId),
-        ),
-      );
+        const websiteSourcesCount = await db
+          .select({ value: count() })
+          .from(websiteSource)
+          .where(eq(websiteSource.chatbotId, chatbotId));
 
-    const totalCount =
-      (textSourcesCount[0]?.value || 0) +
-      (documentSourcesCount[0]?.value || 0) +
-      (websiteSourcesCount[0]?.value || 0);
+        return (
+          (textSourcesCount[0]?.value || 0) +
+          (documentSourcesCount[0]?.value || 0) +
+          (websiteSourcesCount[0]?.value || 0)
+        );
+      },
+      { ttl: 60000 },
+    );
 
     return json({ count: totalCount });
   },

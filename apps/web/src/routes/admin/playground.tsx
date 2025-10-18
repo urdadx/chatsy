@@ -8,8 +8,10 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import Spinner from "@/components/ui/spinner";
+import { useChatbot } from "@/hooks/use-chatbot";
 import { createFileRoute } from "@tanstack/react-router";
-import { Eye } from "lucide-react";
+import { Eye, X } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/admin/playground")({
@@ -18,9 +20,37 @@ export const Route = createFileRoute("/admin/playground")({
 
 function RouteComponent() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { data: chatbot, error, refetch, isLoading } = useChatbot();
 
+  if (isLoading) {
+    return (
+      <div className="w-full h-64 flex items-center justify-center">
+        <Spinner className="text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full mx-auto px-2 sm:px-0">
+        <div className="flex flex-col items-center justify-center py-16 space-y-4">
+          <div className="rounded-full bg-red-50 p-3">
+            <X className="h-6 w-6 text-red-500" />
+          </div>
+          <div className="text-center space-y-2">
+            <h3 className="text-lg font-semibold text-gray-700">
+              Unable to load chatbot information
+            </h3>
+          </div>
+          <Button variant="outline" onClick={() => refetch()} className="mt-4">
+            Try again
+          </Button>
+        </div>
+      </div>
+    );
+  }
   return (
-    <div className="relative h-screen w-full  hide-scrollbar">
+    <div className="relative h-screen w-full hide-scrollbar">
       {/* Main content */}
       <div className="md:pr-[420px] ">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
@@ -31,14 +61,14 @@ function RouteComponent() {
             </p>
           </div>
 
-          <ChatbotSettings />
+          <ChatbotSettings key={chatbot?.id} chatbot={chatbot} />
         </div>
       </div>
 
       {/* Fixed Sidebar - Hidden on mobile */}
-      <aside className="hidden sm:flex fixed top-7 right-0 w-[420px] h-full border-l px-4 py-6 z-0">
+      <aside className="hidden bg-gray-50 sm:flex fixed top-7 right-0 w-[420px] h-full border-l px-4 py-6 z-0">
         <div className="w-full h-full flex items-center justify-center">
-          <ChatPreview />
+          <ChatPreview key={chatbot?.primaryColor} />
         </div>
       </aside>
 
@@ -54,7 +84,7 @@ function RouteComponent() {
           <DrawerHeader>
             <DrawerTitle className="sr-only">Chat Preview</DrawerTitle>
           </DrawerHeader>
-          <ChatPreview />
+          <ChatPreview key={chatbot?.primaryColor} />
         </DrawerContent>
       </Drawer>
     </div>

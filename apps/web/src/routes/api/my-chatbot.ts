@@ -1,31 +1,37 @@
 import { db } from "@/db";
-import { chatbot, organization, session as sessionTable } from "@/db/schema";
+import {
+  Action,
+  chatbot,
+  organization,
+  session as sessionTable,
+} from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { checkSubscriptionLimits } from "@/lib/subscription/subscription-utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth, createDefaultActions } from "auth";
 import { count, eq, sql } from "drizzle-orm";
+import { nanoid } from "nanoid";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
+import { auth } from "../../../auth";
 
 const createChatbotSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  image: z.string().url().optional(),
+  image: z.string().optional(),
   primaryColor: z.string().default("#9333ea"),
   theme: z.enum(["light", "dark"]).default("light"),
   hidePoweredBy: z.boolean().default(false),
   initialMessage: z
     .string()
-    .default("Hello there👋, how can i help you today?"),
+    .default("Hello there👋, how can I help you today?"),
   suggestedMessages: z.array(z.string()).optional(),
   isEmbeddingEnabled: z.boolean().default(true),
   allowedDomains: z.array(z.string()).optional(),
 });
 
 const deleteChatbotSchema = z.object({
-  chatbotId: z.string().uuid("Invalid chatbot ID format"),
+  chatbotId: z.string("Invalid chatbot ID format"),
 });
 
 export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
@@ -54,7 +60,12 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       });
     }
 
-    return json(userChatbot);
+    const actions = await db
+      .select()
+      .from(Action)
+      .where(eq(Action.chatbotId, activeChatbotId));
+
+    return json({ ...userChatbot, actions });
   },
   PATCH: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
@@ -83,6 +94,7 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         "allowedDomains",
         "suggestedMessages",
         "initialMessage",
+        "personality",
       ];
 
       allowedFields.forEach((field) => {
@@ -109,7 +121,12 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
           return new Response("Chatbot not found", { status: 404 });
         }
 
-        return json(updated);
+        const actions = await db
+          .select()
+          .from(Action)
+          .where(eq(Action.chatbotId, activeChatbotId));
+
+        return json({ ...updated, actions });
       }
 
       const [current] = await db
@@ -117,9 +134,14 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         .from(chatbot)
         .where(eq(chatbot.id, activeChatbotId));
 
-      return current
-        ? json(current)
-        : new Response("Chatbot not found", { status: 404 });
+      if (!current) return new Response("Chatbot not found", { status: 404 });
+
+      const actions = await db
+        .select()
+        .from(Action)
+        .where(eq(Action.chatbotId, activeChatbotId));
+
+      return json({ ...current, actions });
     } catch (err) {
       console.error("PATCH /api/my-chatbot error:", err);
       return new Response("Failed to update chatbot", { status: 500 });
@@ -168,11 +190,11 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       const parsed = createChatbotSchema.safeParse(body);
 
       if (!parsed.success) {
-        return json({ error: parsed.error.format() }, { status: 400 });
+        return json({ error: z.treeifyError(parsed.error) }, { status: 400 });
       }
 
       // Generate a unique embed token
-      const embedToken = `embed_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+      const embedToken = `embed_${nanoid(4)}`;
 
       const [newChatbot] = await db
         .insert(chatbot)
@@ -216,9 +238,12 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         );
       }
 
-      await createDefaultActions(newChatbot.id);
+      const actions = await db
+        .select()
+        .from(Action)
+        .where(eq(Action.chatbotId, newChatbot.id));
 
-      return json(newChatbot, { status: 201 });
+      return json({ ...newChatbot, actions }, { status: 201 });
     } catch (err) {
       console.error("POST /api/my-chatbot error:", err);
       return new Response("Failed to create chatbot", { status: 500 });
@@ -248,7 +273,6 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
 
       const { chatbotId } = parsed.data;
 
-      // Verify the chatbot exists and belongs to the user's organization
       const [existingChatbot] = await db
         .select()
         .from(chatbot)
@@ -259,7 +283,10 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       }
 
       if (existingChatbot.organizationId !== organizationId) {
-        return json({ error: "Forbidden: You don't own this chatbot" }, { status: 403 });
+        return json(
+          { error: "Forbidden: You don't own this chatbot" },
+          { status: 403 },
+        );
       }
 
       // Check if this is the last chatbot in the organization
@@ -269,9 +296,12 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         .where(eq(chatbot.organizationId, organizationId));
 
       if (chatbotCount?.count <= 1) {
-        return json({ 
-          error: "Cannot delete the last chatbot in an organization" 
-        }, { status: 400 });
+        return json(
+          {
+            error: "Cannot delete the last chatbot in an organization",
+          },
+          { status: 400 },
+        );
       }
 
       // Delete the chatbot (cascade deletes will handle related records)
@@ -288,7 +318,6 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       // If this was the active chatbot, update sessions to use another chatbot
       const isActiveChatbot = session?.session?.activeChatbotId === chatbotId;
       if (isActiveChatbot) {
-        // Find another chatbot in the organization to set as active
         const [newActiveChatbot] = await db
           .select({ id: chatbot.id })
           .from(chatbot)
@@ -296,23 +325,24 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
           .limit(1);
 
         if (newActiveChatbot) {
-          // Update all sessions for this user to use the new active chatbot
           await db
             .update(sessionTable)
-            .set({ 
+            .set({
               activeChatbotId: newActiveChatbot.id,
-              updatedAt: new Date()
+              updatedAt: new Date(),
             })
             .where(eq(sessionTable.userId, userId));
         }
       }
 
-      return json({ 
-        message: "Chatbot deleted successfully",
-        deletedChatbotId: chatbotId,
-        wasActive: isActiveChatbot
-      }, { status: 200 });
-
+      return json(
+        {
+          message: "Chatbot deleted successfully",
+          deletedChatbotId: chatbotId,
+          wasActive: isActiveChatbot,
+        },
+        { status: 200 },
+      );
     } catch (err) {
       console.error("DELETE /api/my-chatbot error:", err);
       return new Response("Failed to delete chatbot", { status: 500 });

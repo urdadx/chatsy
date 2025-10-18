@@ -2,21 +2,30 @@ import { db } from "@/db";
 import { chatbot, lead } from "@/db/schema";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { eq } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const leadSchema = z.object({
   name: z.string().min(1),
   contact: z.string().min(1),
   message: z.string().optional(),
-  location: z.string().optional(),
   embedToken: z.string().min(1).optional(),
 });
 
 export const ServerRoute = createServerFileRoute("/api/leads").methods({
   POST: async ({ request }) => {
     try {
+      const cfCountry = request.headers.get("CF-IPCountry");
+      const cfCity = request.headers.get("CF-IPCity");
+
+      let detectedLocation: string | undefined;
+      if (cfCity && cfCountry) {
+        detectedLocation = `${cfCity}, ${cfCountry}`;
+      } else if (cfCountry) {
+        detectedLocation = cfCountry;
+      }
+
       const body = await request.json();
       const parsed = leadSchema.safeParse(body);
 
@@ -47,7 +56,6 @@ export const ServerRoute = createServerFileRoute("/api/leads").methods({
         }
         chatbotId = chatbotData.chatbotId;
       } else {
-        // Chat preview scenario - use session to get organization
         const session = await auth.api.getSession({ headers: request.headers });
         if (!session?.user?.id) {
           return json({ error: "Unauthorized" }, { status: 401 });
@@ -65,7 +73,7 @@ export const ServerRoute = createServerFileRoute("/api/leads").methods({
         name: parsed.data.name,
         contact: parsed.data.contact,
         message: parsed.data.message,
-        location: parsed.data.location,
+        location: detectedLocation,
       });
       return json({ success: true, message: "Lead collected successfully" });
     } catch (error) {

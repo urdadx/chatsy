@@ -1,11 +1,11 @@
 import { db } from "@/db";
-import { textSource } from "@/db/schema";
+import { knowledge, textSource } from "@/db/schema";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { auth } from "auth";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const createTextSourceSchema = z.object({
   title: z.string().min(1),
@@ -13,7 +13,7 @@ const createTextSourceSchema = z.object({
 });
 
 const updateTextSourceSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   title: z.string().optional(),
   content: z.string().optional(),
 });
@@ -46,9 +46,7 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
     const results = await db
       .select()
       .from(textSource)
-      .where(
-        and(eq(textSource.userId, userId), eq(textSource.chatbotId, chatbotId)),
-      );
+      .where(eq(textSource.chatbotId, chatbotId));
 
     return json(results);
   },
@@ -122,13 +120,7 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
     const updated = await db
       .update(textSource)
       .set({ ...updates, updatedAt: new Date() })
-      .where(
-        and(
-          eq(textSource.id, id),
-          eq(textSource.userId, userId),
-          eq(textSource.chatbotId, chatbotId),
-        ),
-      )
+      .where(and(eq(textSource.id, id), eq(textSource.chatbotId, chatbotId)))
       .returning();
 
     if (!updated.length) {
@@ -168,7 +160,6 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
       .where(
         and(
           eq(textSource.id, parsed.data.id),
-          eq(textSource.userId, userId),
           eq(textSource.chatbotId, chatbotId),
         ),
       )
@@ -180,6 +171,16 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
         { status: 404 },
       );
     }
+
+    // Delete associated knowledge entries (embeddings)
+    await db
+      .delete(knowledge)
+      .where(
+        and(
+          eq(knowledge.source, "text"),
+          eq(knowledge.sourceId, parsed.data.id),
+        ),
+      );
 
     return json({ message: "Text source deleted", deleted });
   },

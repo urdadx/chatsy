@@ -1,13 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { authClient } from "@/lib/auth-client";
+import Spinner from "@/components/ui/spinner";
 import { useMutation } from "@tanstack/react-query";
 import {
   createFileRoute,
-  useNavigate,
   useSearch,
 } from "@tanstack/react-router";
-import { Loader2, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import z from "zod";
@@ -20,22 +19,15 @@ export const Route = createFileRoute("/accept-invitation")({
 });
 
 function RouteComponent() {
-  const navigate = useNavigate();
   const { invitationId } = useSearch({
     from: "/accept-invitation",
   });
 
   const acceptInvitationMutation = useMutation({
     mutationFn: async () => {
-      const { data } = await authClient.organization.acceptInvitation({
-        invitationId,
-      });
-      return data;
-    },
-    onSuccess: () => {
-      navigate({
-        to: "/admin/overview",
-      });
+      // Redirect to the API endpoint which handles all the logic
+      window.location.href = `/api/accept-invitation/${invitationId}`;
+      return { success: true };
     },
     onError: (error) => {
       toast.error(error.message);
@@ -75,7 +67,7 @@ function RouteComponent() {
                   >
                     {acceptInvitationMutation.isPending ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Spinner className="text-white" />
                         Accepting...
                       </>
                     ) : (

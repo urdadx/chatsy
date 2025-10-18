@@ -88,10 +88,6 @@
       this.container.style.zIndex = this.config.zIndex.toString();
       this.container.style.fontFamily =
         'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-
-      // Remove the problematic mobile container styles
-      // The container should maintain its position for the bubble
-      // Only the iframe needs mobile-specific positioning
     }
     createBubble() {
       // Create bubble trigger
@@ -157,9 +153,7 @@
       chatIcon.className = "padyna-chat-icon";
       chatIcon.style.transition = "opacity 0.2s ease-in-out";
       chatIcon.innerHTML = `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="#FFFFFF" fill-rule="evenodd" d="M22 12c0 5.523-4.477 10-10 10c-1.6 0-3.112-.376-4.452-1.044a1.63 1.63 0 0 0-1.149-.133l-2.226.596a1.3 1.3 0 0 1-1.591-1.592l.595-2.226a1.63 1.63 0 0 0-.134-1.148A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10M12 7.25a.75.75 0 0 1 .75.75v8a.75.75 0 0 1-1.5 0V8a.75.75 0 0 1 .75-.75M8.75 10a.75.75 0 0 0-1.5 0v4a.75.75 0 0 0 1.5 0zM16 9.25a.75.75 0 0 1 .75.75v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/></svg>
       `;
 
       // Chevron down icon (opened state)
@@ -168,9 +162,7 @@
       chevronIcon.style.display = "none";
       chevronIcon.style.transition = "opacity 0.2s ease-in-out";
       chevronIcon.innerHTML = `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE --><path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg>
       `;
 
       content.appendChild(chatIcon);
@@ -248,16 +240,16 @@
 
     setupBubbleIframeStyles() {
       Object.assign(this.iframe.style, {
-        width: "450px",
+        width: "400px",
         height: "550px",
-        maxHeight: "90vh",
+        maxHeight: "100vh",
         border: "none",
         borderRadius: "16px",
         boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)",
         background: "white",
         position: "absolute",
         overflow: "hidden",
-        bottom: "80px",
+        bottom: "75px",
         right: "0",
         transform: "scale(0.8) translateY(20px)",
         opacity: "0",
@@ -294,7 +286,7 @@
     }
 
     positionBubble() {
-      const margin = 15; // Increased margin for better mobile spacing
+      const margin = 15;
 
       switch (this.config.position) {
         case "bottom-right":
