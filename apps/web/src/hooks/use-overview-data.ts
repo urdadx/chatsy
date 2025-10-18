@@ -1,6 +1,6 @@
 import { useRealTimeVisitorHistory } from "@/hooks/log-visitor-analytics";
 import { useChatHistory } from "@/hooks/use-chat-history";
-import { useChatbots } from "@/hooks/use-chatbot-management";
+import { useChatbots } from "@/hooks/use-chatbot";
 import { useActiveMeters } from "@/hooks/use-usage-meters";
 import { api } from "@/lib/api";
 import { useQueries } from "@tanstack/react-query";

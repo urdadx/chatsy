@@ -152,6 +152,7 @@ export function ChatPreview() {
         regenerate={regenerate}
         chatbot={chatbot}
         chatStatus={chatData?.status}
+        showActions={false}
       />
 
       <ChatFooter

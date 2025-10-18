@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chatbot, question } from "@/db/schema";
+import { chatbot, knowledge, question } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { deleteCachedData, withCache } from "@/lib/redis/cache";
@@ -150,6 +150,11 @@ export const ServerRoute = createServerFileRoute("/api/questions").methods({
     }
 
     if (deletedQuestion) {
+      // Delete associated knowledge entries (embeddings)
+      await db
+        .delete(knowledge)
+        .where(and(eq(knowledge.source, "qna"), eq(knowledge.sourceId, id)));
+
       await db
         .update(chatbot)
         .set({

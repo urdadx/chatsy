@@ -76,7 +76,6 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
       if (isEditing) {
         queryClient.invalidateQueries({ queryKey: ["action", actionId] })
       }
-      router.history.back()
     },
     onError: () => {
       toast.error(

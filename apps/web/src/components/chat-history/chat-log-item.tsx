@@ -17,7 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { DeleteChat } from "./delete-chat";
 
 interface ChatLogItemProps {
@@ -39,6 +38,7 @@ export const ChatLogItem = ({
   isSelected,
 }: ChatLogItemProps) => {
   const queryClient = useQueryClient();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   const updateChatStatus = useMutation({
     mutationFn: async ({
@@ -53,16 +53,15 @@ export const ChatLogItem = ({
     },
     onSuccess: (data) => {
       toast.success(`Chat status updated to ${data.chat.status}`);
-      // Invalidate all chat-logs queries (with all filter/status combinations)
       queryClient.invalidateQueries({
         queryKey: ["chat-logs"],
-        exact: false
+        exact: false,
       });
       queryClient.invalidateQueries({ queryKey: ["chat", id] });
     },
     onError: (error: any) => {
       toast.error(
-        error?.response?.data?.error || "Failed to update chat status",
+        error?.response?.data?.error || "Failed to update chat status"
       );
     },
   });
@@ -71,7 +70,6 @@ export const ChatLogItem = ({
     updateChatStatus.mutate({ chatId: id, status: newStatus });
   };
 
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const handleDelete = () => {
     setOpenDeleteDialog(true);
   };
@@ -81,59 +79,43 @@ export const ChatLogItem = ({
       <div
         onClick={onClick}
         className={cn(
-          "flex cursor-pointer mb-2 rounded-md items-start w-full space-x-3 p-4 hover:bg-gray-50  border-gray-100 group",
-          isSelected && "bg-gray-50 rounded-md shadow-xs",
+          "flex cursor-pointer mb-2 rounded-md items-start w-full space-x-3 p-4 hover:bg-gray-50 border-gray-100 group",
+          isSelected && "bg-gray-50 rounded-md shadow-xs"
         )}
       >
+        {/* Avatar */}
         <div className="flex-shrink-0 border-2 rounded-full border-primary">
           <img
             src={`https://api.dicebear.com/7.x/open-peeps/svg?seed=${id}`}
             alt="Avatar"
-            className="w-8 h-8 rounded-full "
+            className="w-8 h-8 rounded-full"
           />
         </div>
 
+        {/* Title and Date */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center space-x-2">
-            <h3 className="text-sm font-medium text-gray-900 truncate ">
-              {title.length > 30 ? `${title.substring(0, 30)}...` : title}
-            </h3>
-          </div>
-          <p className="text-sm text-gray-500 mt-1 truncate">
-            {timeAgo(date)}
-          </p>
+          <h3 className="text-sm font-medium text-gray-900 line-clamp-1">
+            {title || "Untitled Chat"}
+          </h3>
+          <p className="text-sm text-gray-500 mt-1">{timeAgo(date)}</p>
         </div>
 
-        <div className="flex items-center space-x-3">
-          <Tooltip>
-            <TooltipTrigger>
-              <span
-                className={cn(
-                  "px-2 py-1 rounded-xl text-xs capitalize flex items-center gap-1",
-                  status === "resolved"
-                    ? "bg-green-100 text-green-800"
-                    : status === "unresolved"
-                      ? "bg-blue-100 text-blue-800"
-                      : status === "escalated"
-                        ? "bg-orange-100 text-orange-800"
-                        : "bg-gray-100 text-gray-800",
-                )}
-              >
-                {status}
-              </span>
-            </TooltipTrigger>
-            <TooltipContent className="bg-white shadow-sm">
-              <p className="text-black">
-                {status === "resolved"
-                  ? "This chat has been resolved"
-                  : status === "unresolved"
-                    ? "This chat is unresolved"
-                    : status === "escalated"
-                      ? "This chat has been escalated to a human agent"
-                      : "Unknown status"}
-              </p>
-            </TooltipContent>
-          </Tooltip>
+        {/* Status Badge and Menu */}
+        <div className="flex items-center space-x-2 flex-shrink-0">
+          <span
+            className={cn(
+              "px-2 py-1 rounded-xl text-xs capitalize",
+              status === "resolved"
+                ? "bg-green-100 text-green-800"
+                : status === "unresolved"
+                  ? "bg-blue-100 text-blue-800"
+                  : status === "escalated"
+                    ? "bg-orange-100 text-orange-800"
+                    : "bg-gray-100 text-gray-800"
+            )}
+          >
+            {status}
+          </span>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -187,7 +169,10 @@ export const ChatLogItem = ({
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem
-                onClick={handleDelete}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete();
+                }}
                 disabled={updateChatStatus.isPending}
                 className="flex items-center gap-2"
               >

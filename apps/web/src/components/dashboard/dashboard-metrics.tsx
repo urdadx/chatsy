@@ -67,7 +67,7 @@ export function DashboardMetrics({
 
       <DashboardCard
         icon={ThumbsUp}
-        title="Positive sentiments"
+        title="Upvotes"
         value={voteCounts?.upvotes ?? 0}
         gradientFrom="green-50"
         gradientVia="green-25"
@@ -75,7 +75,7 @@ export function DashboardMetrics({
 
       <DashboardCard
         icon={ThumbsDown}
-        title="Negative sentiments"
+        title="Downvotes"
         value={voteCounts?.downvotes ?? 0}
         gradientFrom="red-50"
         gradientVia="red-25"

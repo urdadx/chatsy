@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chatbot, websiteSource } from "@/db/schema";
+import { chatbot, knowledge, websiteSource } from "@/db/schema";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { deleteCachedData, withCache } from "@/lib/redis/cache";
 import FirecrawlApp from "@mendable/firecrawl-js";
@@ -201,6 +201,13 @@ export const ServerRoute = createServerFileRoute("/api/scrape").methods({
           { status: 404 },
         );
       }
+
+      // Delete associated knowledge entries (embeddings)
+      await db
+        .delete(knowledge)
+        .where(
+          and(eq(knowledge.source, "website"), eq(knowledge.sourceId, id)),
+        );
 
       await db.delete(websiteSource).where(eq(websiteSource.id, id));
 

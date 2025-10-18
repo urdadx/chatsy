@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { chatbot, documentSource } from "@/db/schema";
+import { chatbot, documentSource, knowledge } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { deleteFileFromStorage } from "@/lib/hooks/delete-from-storage";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
@@ -181,6 +181,16 @@ export const ServerRoute = createServerFileRoute(
     }
 
     if (deleted) {
+      // Delete associated knowledge entries (embeddings)
+      await db
+        .delete(knowledge)
+        .where(
+          and(
+            eq(knowledge.source, "document"),
+            eq(knowledge.sourceId, deleted.id),
+          ),
+        );
+
       await db
         .update(chatbot)
         .set({

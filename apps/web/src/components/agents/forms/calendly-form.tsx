@@ -120,7 +120,6 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
       if (isEditing) {
         queryClient.invalidateQueries({ queryKey: ["action", actionId] })
       }
-      router.history.back()
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to save Calendly action")

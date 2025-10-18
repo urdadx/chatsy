@@ -93,7 +93,7 @@ export const CreateActionDialog = () => {
       description: "Add a custom button action to open links or trigger events"
     },
     {
-      href: "/admin/actions/new-action?actionType=caldotcom",
+      href: "/admin/actions/new-action?actionType=cal_booking",
       iconSrc: CalDotComIcon,
       title: "Get Cal.com booking slots",
       description: "Allow customers to book meetings via Cal.com"

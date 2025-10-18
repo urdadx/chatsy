@@ -65,7 +65,6 @@ export function LeadsForm({ actionId }: LeadsFormProps) {
       if (isEditing) {
         queryClient.invalidateQueries({ queryKey: ["action", actionId] })
       }
-      router.history.back()
     },
     onError: () => {
       toast.error(

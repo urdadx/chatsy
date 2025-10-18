@@ -159,6 +159,7 @@ export function CalAppointmentPicker({
                 <Label htmlFor="notes">Additional Notes (Optional)</Label>
                 <Textarea
                   id="notes"
+                  className="w-full"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Any special requirements or notes..."

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { textSource } from "@/db/schema";
+import { knowledge, textSource } from "@/db/schema";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -171,6 +171,16 @@ export const ServerRoute = createServerFileRoute("/api/text-sources").methods({
         { status: 404 },
       );
     }
+
+    // Delete associated knowledge entries (embeddings)
+    await db
+      .delete(knowledge)
+      .where(
+        and(
+          eq(knowledge.source, "text"),
+          eq(knowledge.sourceId, parsed.data.id),
+        ),
+      );
 
     return json({ message: "Text source deleted", deleted });
   },

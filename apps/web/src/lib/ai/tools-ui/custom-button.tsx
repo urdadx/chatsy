@@ -21,7 +21,7 @@ export function CustomButton({
   return (
     <div className="flex flex-col gap-3 p-2 rounded-lg max-w-md">
 
-      <p className="text-sm ">Please click the button below to continue</p>
+      {/* <p className="text-sm ">Please click the button below to continue</p> */}
 
       <Button
         onClick={handleClick}

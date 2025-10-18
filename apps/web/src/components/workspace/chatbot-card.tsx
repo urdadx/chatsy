@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSetActiveChatbot } from "@/hooks/use-chatbot-management";
+import { useSetActiveChatbot } from "@/hooks/use-chatbot";
 import { timeAgo } from "@/lib/utils";
 import { ArrowRightLeft, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";

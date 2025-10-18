@@ -108,7 +108,6 @@ export const calBookingTool = (chatbotId: string) =>
           actionId: bestMatch.id,
           name: bestMatch.name,
           description: bestMatch.description,
-          eventTypeUrl: properties.eventTypeUrl,
           username,
           eventSlug,
           eventTypeName: properties.eventTypeName,

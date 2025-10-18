@@ -1,6 +1,8 @@
+import { ActionsEmptyState } from "@/components/agents/action-empty-state";
 import { ActionCard } from "@/components/agents/actions-card";
 import { CreateActionDialog } from "@/components/agents/create-action-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import Spinner from "@/components/ui/spinner";
 import type { ActionType } from "@/db/schema";
 import { api } from "@/lib/api";
@@ -14,7 +16,7 @@ export const Route = createFileRoute("/admin/actions/")({
 });
 
 function RouteComponent() {
-  const [_searchTerm, _setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
 
   const {
@@ -132,7 +134,10 @@ function RouteComponent() {
   const filteredActions = actions.filter(
     (action) =>
       action.toolName !== "knowledge_base" &&
-      action.toolName !== "escalate_to_human"
+      action.toolName !== "escalate_to_human" &&
+      (searchTerm === "" ||
+        action.toolName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        action.description?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   if (isLoading) {
@@ -167,21 +172,32 @@ function RouteComponent() {
             {/* biome-ignore lint/a11y/useHeadingContent: <explanation> */}
             <h2 className="text-xl font-semibold flex sm:hidden"></h2>
             <h2 className="text-xl font-semibold hidden sm:flex">Agent Actions</h2>
-            <CreateActionDialog />
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Search actions..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <CreateActionDialog />
+            </div>
           </div>
           {!isLoading && !isError && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {filteredActions.map((action) => (
-                <ActionCard
-                  key={action.id}
-                  action={action}
-                  onToggle={handleToggleAction}
-                  onDescriptionChange={handleDescriptionChange}
-                  onDelete={handleDeleteAction}
-                  isLoading={toggleMutation.isPending || descriptionMutation.isPending || deleteMutation.isPending}
-                />
-              ))}
-            </div>
+            filteredActions.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {filteredActions.map((action) => (
+                  <ActionCard
+                    key={action.id}
+                    action={action}
+                    onToggle={handleToggleAction}
+                    onDescriptionChange={handleDescriptionChange}
+                    onDelete={handleDeleteAction}
+                    isLoading={toggleMutation.isPending || descriptionMutation.isPending || deleteMutation.isPending}
+                  />
+                ))}
+              </div>
+            ) : (
+              <ActionsEmptyState />
+            )
           )}
         </div>
       </div>

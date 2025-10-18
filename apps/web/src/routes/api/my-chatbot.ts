@@ -7,14 +7,14 @@ import {
 } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
-import { deleteCachedData, withCache } from "@/lib/redis/cache";
 import { checkSubscriptionLimits } from "@/lib/subscription/subscription-utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { count, eq, sql } from "drizzle-orm";
+import { nanoid } from "nanoid";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import { auth, createDefaultActions } from "../../../auth";
+import { auth } from "../../../auth";
 
 const createChatbotSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -50,34 +50,22 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       return new Response("No active chatbot found", { status: 404 });
     }
 
-    const chatbotData = await withCache(
-      `chatbot:${activeChatbotId}:full`,
-      async () => {
-        const [userChatbot] = await db.query.chatbot.findMany({
-          where: (fields, { eq }) => eq(fields.id, activeChatbotId),
-        });
+    const [userChatbot] = await db.query.chatbot.findMany({
+      where: (fields, { eq }) => eq(fields.id, activeChatbotId),
+    });
 
-        if (!userChatbot) {
-          return null;
-        }
-
-        const actions = await db
-          .select()
-          .from(Action)
-          .where(eq(Action.chatbotId, activeChatbotId));
-
-        return { ...userChatbot, actions };
-      },
-      { ttl: 60 },
-    );
-
-    if (!chatbotData) {
+    if (!userChatbot) {
       return new Response("Could not retrieve active chatbot data", {
         status: 404,
       });
     }
 
-    return json(chatbotData);
+    const actions = await db
+      .select()
+      .from(Action)
+      .where(eq(Action.chatbotId, activeChatbotId));
+
+    return json({ ...userChatbot, actions });
   },
   PATCH: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
@@ -132,9 +120,6 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         if (!updated) {
           return new Response("Chatbot not found", { status: 404 });
         }
-
-        // Invalidate the cache after updating
-        await deleteCachedData(`chatbot:${activeChatbotId}:full`);
 
         const actions = await db
           .select()
@@ -205,11 +190,11 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       const parsed = createChatbotSchema.safeParse(body);
 
       if (!parsed.success) {
-        return json({ error: parsed.error.format() }, { status: 400 });
+        return json({ error: z.treeifyError(parsed.error) }, { status: 400 });
       }
 
       // Generate a unique embed token
-      const embedToken = `embed_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+      const embedToken = `embed_${nanoid(4)}`;
 
       const [newChatbot] = await db
         .insert(chatbot)
@@ -253,8 +238,6 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         );
       }
 
-      await createDefaultActions(newChatbot.id);
-
       const actions = await db
         .select()
         .from(Action)
@@ -290,7 +273,6 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
 
       const { chatbotId } = parsed.data;
 
-      // Verify the chatbot exists and belongs to the user's organization
       const [existingChatbot] = await db
         .select()
         .from(chatbot)
@@ -336,7 +318,6 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       // If this was the active chatbot, update sessions to use another chatbot
       const isActiveChatbot = session?.session?.activeChatbotId === chatbotId;
       if (isActiveChatbot) {
-        // Find another chatbot in the organization to set as active
         const [newActiveChatbot] = await db
           .select({ id: chatbot.id })
           .from(chatbot)
@@ -344,7 +325,6 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
           .limit(1);
 
         if (newActiveChatbot) {
-          // Update all sessions for this user to use the new active chatbot
           await db
             .update(sessionTable)
             .set({

@@ -125,6 +125,7 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
     onSuccess: () => {
       toast.success("Action deleted")
       queryClient.invalidateQueries({ queryKey: ["actions"] })
+      router.history.back()
     },
     onError: () => {
       toast.error(

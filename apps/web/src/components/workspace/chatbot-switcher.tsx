@@ -22,7 +22,7 @@ import {
 import {
   useChatbots,
   useSetActiveChatbot,
-} from "@/hooks/use-chatbot-management";
+} from "@/hooks/use-chatbot";
 import { authClient } from "@/lib/auth-client";
 import { RiCheckboxCircleFill } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";

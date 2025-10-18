@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { Action, chatbot, session, user } from "@/db/schema";
+import { chatbot, session, user } from "@/db/schema";
 import {
   sendOrganizationInvitation,
   sendResetPasswordEmail,
@@ -29,41 +29,6 @@ export const polarClient = new Polar({
   accessToken: POLAR_ACCESS_TOKEN!,
   server: isDevelopment ? "sandbox" : "production",
 });
-
-export const createDefaultActions = async (chatbotId: string) => {
-  const defaultActions = [
-    {
-      chatbotId,
-      name: "Give us feedback",
-      toolName: "collect_feedback",
-      description:
-        "Collects feedback, reviews, complaints, or suggestions from users.",
-      isActive: true,
-      showInQuickMenu: true,
-    },
-    {
-      chatbotId,
-      name: "Report an issue",
-      toolName: "report_issue",
-      description:
-        "Allow users to report bugs, problems, or issues they encounter.",
-      isActive: true,
-      showInQuickMenu: true,
-    },
-  ];
-
-  try {
-    await db.insert(Action).values(defaultActions);
-    console.log(
-      `Created ${defaultActions.length} default actions for chatbot: ${chatbotId}`,
-    );
-  } catch (error) {
-    console.error(
-      `Failed to create default actions for chatbot ${chatbotId}:`,
-      error,
-    );
-  }
-};
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -225,11 +190,6 @@ export const auth = betterAuth({
             console.log(
               `Created default chatbot for organization: ${organization.id}`,
             );
-
-            // Create default actions for the chatbot
-            if (createdChatbot?.id) {
-              await createDefaultActions(createdChatbot.id);
-            }
           } catch (error) {
             console.error(
               `Failed to create default chatbot for organization ${organization.id}:`,

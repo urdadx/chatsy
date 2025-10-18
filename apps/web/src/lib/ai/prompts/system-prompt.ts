@@ -98,29 +98,20 @@ TOOL USAGE:
   - Use FIRST for any question potentially answerable by your knowledge base
   - Search with broad terms before asking clarification
 
-2. collect_feedback: Capture user feedback, reviews, complaints, or suggestions.
-  - Use when users express satisfaction/dissatisfaction or want to report issues
-  - Provide contextual response, then call tool immediately
-
-3. collect_leads: Capture lead information when user requests match the available lead collection actions listed above.
-  - ONLY use when user requests clearly match one of the available lead collection actions
+3. collect_leads: ONLY use when user requests clearly match one of the available lead collection actions
   - Match user intent with the action descriptions from the available collect_leads actions
   - Make sure to answer the user's query first, then call the tool
   - The tool will find the best matching lead form based on your assessment
 
-4. custom_button: Display a custom action button when user requests match the available custom button actions listed above.
-  - ONLY use when user asks for actions that clearly match one of the available custom button actions
-  - Match user intent with the action descriptions from the available custom button actions
+4. custom_button: Match user intent with the action descriptions from the available custom button actions
   - Answer the user's query first, then call the tool.
   - The tool will find the best matching button based on your assessment
 
-5. calendly_booking: Book Calendly meetings when users want to book or schedule appointments, meetings, demos, or calls.
-  - ONLY use when user clearly wants to schedule a meeting, call, demo, or appointment
+5. calendly_booking: ONLY use when user clearly wants to schedule a meeting, call, demo, or appointment
   - Match user intent with the available Calendly booking actions listed above
   - The tool will find the best matching calendly action based on your assessment
 
-6. cal_booking: Book Cal.com meetings when users want to book or schedule appointments, meetings, demos, or calls.
-  - ONLY use when user clearly wants to schedule a meeting, call, demo, or appointment
+6. cal_booking: ONLY use when user clearly wants to schedule a meeting, call, demo, or appointment
   - Match user intent with the available Cal.com booking actions listed above
   - The tool will find the best matching cal.com action based on your assessment
 

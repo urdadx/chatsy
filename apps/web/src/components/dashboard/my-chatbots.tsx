@@ -1,4 +1,4 @@
-import type { ChatbotsResponse } from "@/hooks/use-chatbot-management";
+import type { ChatbotsResponse } from "@/hooks/use-chatbot";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Button } from "../ui/button";

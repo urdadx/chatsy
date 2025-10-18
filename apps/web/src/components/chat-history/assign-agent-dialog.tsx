@@ -62,7 +62,7 @@ export const AssignAgentDialog = ({ chatId }: AssignAgentDialogProps) => {
           <DialogHeader>
             <DialogTitle className="text-xl">Assign to team member</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
-              Select an member from your organization to assign
+              Select a member from your organization to assign
             </DialogDescription>
           </DialogHeader>
 

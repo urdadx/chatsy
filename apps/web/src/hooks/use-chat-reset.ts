@@ -1,6 +1,6 @@
 import { generateUUID } from "@/lib/utils";
 import { useCallback, useEffect, useState } from "react";
-import { useChatbots } from "./use-chatbot-management";
+import { useChatbots } from "./use-chatbot";
 
 export const useChatWithReset = () => {
   const [chatId, setChatId] = useState<string>("");

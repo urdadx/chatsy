@@ -42,6 +42,7 @@ interface ChatBodyProps {
   children?: ReactNode;
   chatStatus?: "unresolved" | "resolved" | "escalated";
   wsIsTyping?: boolean;
+  showActions?: boolean;
 }
 
 const ChatBodyComponent = ({
@@ -59,6 +60,7 @@ const ChatBodyComponent = ({
   children,
   chatStatus,
   wsIsTyping,
+  showActions = true,
 }: ChatBodyProps) => {
   const greetingMessage = chatbot?.initialMessage || "";
   const queryClient = useQueryClient();
@@ -148,7 +150,7 @@ const ChatBodyComponent = ({
                   }
                   setMessages={setMessages}
                   chatbot={chatbot}
-                  showActions={false}
+                  showActions={showActions}
                 />
               ))}
 
@@ -193,7 +195,8 @@ function areEqual(prev: ChatBodyProps, next: ChatBodyProps) {
     prev.chatbot?.initialMessage === next.chatbot?.initialMessage &&
     prev.className === next.className &&
     prev.chatStatus === next.chatStatus &&
-    prev.wsIsTyping === next.wsIsTyping
+    prev.wsIsTyping === next.wsIsTyping &&
+    prev.showActions === next.showActions
   );
 }
 

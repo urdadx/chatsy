@@ -12,7 +12,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import Spinner from "@/components/ui/spinner";
 import { useChatHistory } from "@/hooks/use-chat-history";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -23,8 +22,7 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { RotateCcw } from "lucide-react";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import z from "zod";
 
 export const chatHistorySearchSchema = z.object({
@@ -60,19 +58,19 @@ function RouteComponent() {
   const chats = data?.pages.flatMap((page) => page.chats) ?? [];
   const queryClient = useQueryClient();
 
+  // Prevent body scroll on this page
+  useEffect(() => {
+    document.body.classList.add("overflow-hidden");
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, []);
+
   const handleRefresh = () => {
     refetch();
     queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
     queryClient.invalidateQueries({ queryKey: ["chat-logs"], exact: false });
   }
-
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
 
   const handleChatIdChange = (value: string) => {
     if (isMobile) {
@@ -144,7 +142,7 @@ function RouteComponent() {
 
   return (
     <>
-      <div className=" w-full h-[90vh] mx-auto ">
+      <div className="w-full h-[90vh] mx-auto">
 
         <div className="bg-white h-full flex flex-col overflow-hidden">
 
@@ -171,8 +169,8 @@ function RouteComponent() {
                 </div>
               </div>
               <div className={`${isMobile ? "w-[96vw]" : "w-96"} bg-white flex-1 min-h-0`}>
-                <ScrollArea
-                  className="h-full"
+                <div
+                  className="h-full smooth-div"
                   onScroll={(e) => {
                     const el = e.currentTarget;
                     const nearBottom =
@@ -218,7 +216,7 @@ function RouteComponent() {
                       <Spinner className="text-primary" />
                     </div>
                   )}
-                </ScrollArea>
+                </div>
               </div>
             </div>
 

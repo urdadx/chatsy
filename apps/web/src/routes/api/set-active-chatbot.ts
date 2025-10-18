@@ -3,9 +3,9 @@ import { chatbot, session as sessionTable } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
+import { auth } from "auth";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { auth } from "../../../auth";
 
 const setActiveChatbotSchema = z.object({
   chatbotId: z.string().uuid("Invalid chatbot ID format"),
