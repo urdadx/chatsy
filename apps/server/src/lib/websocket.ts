@@ -112,7 +112,7 @@ export function createWebSocketServer(server: http.Server) {
           }
           case "message": {
             await ensureEscalated(currentChatId);
-            const role = data.role === "agent" ? "human" : "user";
+            const role: "human" | "user" = data.role === "agent" ? "human" : "user";
             const msg = {
               id: crypto.randomUUID(),
               chatId: currentChatId,

@@ -13,9 +13,11 @@ COPY package.json pnpm-lock.yaml* ./
 
 # Copy all package.json files
 COPY apps/web/package.json ./apps/web/
+COPY apps/server/package.json ./apps/server/
+COPY packages/store/package.json ./packages/store/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install all dependencies (including dev for build tools)
+RUN pnpm install
 
 # Copy source code
 COPY . .
@@ -47,6 +49,9 @@ ENV VITE_REMOVE_BRANDING_ADDON=$VITE_REMOVE_BRANDING_ADDON
 # Build the TanStack Start application
 RUN pnpm build
 
+# Build the websocket server
+RUN pnpm --filter server build
+
 # Production stage
 FROM node:21-alpine AS production
 
@@ -64,12 +69,26 @@ COPY --from=base /app/apps/web/drizzle ./apps/web/drizzle
 COPY --from=base /app/apps/web/drizzle.config.ts ./apps/web/
 COPY --from=base /app/apps/web/src ./apps/web/src
 COPY --from=base /app/apps/web/.env* ./apps/web/
+
+# Copy built websocket server
+COPY --from=base /app/apps/server/dist ./apps/server/dist
+COPY --from=base /app/apps/server/package.json ./apps/server/
+COPY --from=base /app/apps/server/src ./apps/server/src
+
+# Copy built packages
+COPY --from=base /app/packages/store/dist ./packages/store/dist
+COPY --from=base /app/packages/store/package.json ./packages/store/
+
 COPY --from=base /app/package.json ./
 COPY --from=base /app/pnpm-lock.yaml* ./
 COPY --from=base /app/pnpm-workspace.yaml ./
 
-# Install all dependencies (including dev) for drizzle-kit
-RUN pnpm install --frozen-lockfile
+# Copy startup script
+COPY start.sh ./
+RUN chmod +x start.sh
+
+# Install production dependencies only
+RUN pnpm install --prod --no-frozen-lockfile
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
@@ -81,17 +100,17 @@ RUN chown -R tanstack:nodejs /app
 # Switch to non-root user
 USER tanstack
 
-# Expose port (TanStack Start default is 3000)
-EXPOSE 3000
+# Expose ports (TanStack Start on 3000, WebSocket server on 3001)
+EXPOSE 3000 
 
 # Set environment to production
 ENV NODE_ENV=production
 
 # Set working directory to the web app for relative paths to work
-WORKDIR /app/apps/web
+# WORKDIR /app/apps/web
 
 # Run database migrations/push before starting the app
 # RUN npx drizzle-kit push
 
-# Start the TanStack Start application
-CMD ["node", ".output/server/index.mjs"]
+# Start both web and websocket services
+CMD ["./start.sh"]
