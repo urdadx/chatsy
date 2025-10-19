@@ -88,7 +88,7 @@ COPY start.sh ./
 RUN chmod +x start.sh
 
 # Install production dependencies only
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --no-frozen-lockfile
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
