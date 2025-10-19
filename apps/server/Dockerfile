@@ -53,5 +53,4 @@ EXPOSE 3001
 ENV NODE_ENV=production
 ENV PORT=3001
 
-# Start the WebSocket server using startup script
 CMD ["./start.sh"]
