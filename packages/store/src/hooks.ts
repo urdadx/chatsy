@@ -450,7 +450,6 @@ export function createChatStoreCreator<TMessage extends UIMessage>(
               _memoizedSelectors: new Map(), // Clear memoized selectors on sync
             },
             false,
-            "syncFromUseChat",
           );
           if (newState.messages) {
             throttledMessagesUpdater?.();
