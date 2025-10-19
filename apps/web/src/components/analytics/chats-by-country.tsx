@@ -62,7 +62,7 @@ export function ChatsByCountry({
 
   const mapCountries = countryStats.map((country) => {
     const countryCode = getCountryCode(country.country) || "unknown";
-    const iconSrc = `https://flag.vercel.app/m/${countryCode}.svg`;
+    const iconSrc = `https://flag.vercel.app/m/${country.country}.svg`;
     return {
       icon: (
         <img

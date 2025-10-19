@@ -9,6 +9,13 @@ export function getLocationFromCloudflare(headers: Headers) {
   const country = headers.get("cf-ipcountry") || "Ghana";
   const continent = headers.get("cf-ipcontinent") || "AF";
 
+  console.log("Cloudflare Headers:", {
+    city,
+    region,
+    country,
+    continent,
+  });
+
   const ip =
     headers.get("cf-connecting-ip") ||
     headers.get("x-forwarded-for")?.split(",")[0].trim() ||
