@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import type { Vote } from "@/db/schema";
 import type { ChatMessage } from "@/lib/types";
+import { useChatMessages, useChatStatus } from "@padyna/store";
 import { RiBardFill } from "@remixicon/react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ChatRequestOptions, ChatStatus } from "ai";
@@ -48,9 +49,9 @@ const ChatBodyComponent = ({
   isLoading,
   error,
   isDeactivated,
-  messages,
+  messages: propMessages,
   setMessages,
-  status,
+  status: propStatus,
   chatError,
   chatId,
   votes,
@@ -63,6 +64,19 @@ const ChatBodyComponent = ({
 }: ChatBodyProps) => {
   const greetingMessage = chatbot?.initialMessage || "";
   const queryClient = useQueryClient();
+
+  // Try to use store hooks, fallback to props if not in Provider context
+  let messages = propMessages;
+  let status = propStatus;
+
+  try {
+    const storeMessages = useChatMessages<ChatMessage>();
+    const storeStatus = useChatStatus();
+    if (storeMessages) messages = storeMessages;
+    if (storeStatus) status = storeStatus;
+  } catch {
+    // Not in Provider context, use props
+  }
 
   if (isDeactivated) {
     return (
@@ -103,17 +117,15 @@ const ChatBodyComponent = ({
         <div className="flex items-center justify-center h-full text-red-500">
           <div className="text-center">
             <p className="text-sm">Error loading messages</p>
-            {queryClient && (
-              <Button
-                variant="outline"
-                onClick={() =>
-                  queryClient.invalidateQueries({ queryKey: ["messages"] })
-                }
-                className="mt-2"
-              >
-                Try Again
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              onClick={() =>
+                queryClient.invalidateQueries({ queryKey: ["messages"] })
+              }
+              className="mt-2"
+            >
+              Try Again
+            </Button>
           </div>
         </div>
       </div>
@@ -132,7 +144,7 @@ const ChatBodyComponent = ({
               chatbot={chatbot}
             />
           ) : (
-            // Replace nested Conversation with a simple container to keep a single StickToBottom context
+
             <div className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 md:gap-6 px-2 py-4">
               {messages.map((message, index) => (
                 <PreviewMessage
@@ -163,7 +175,7 @@ const ChatBodyComponent = ({
                 <TypingIndicator
                   label="Agent is typing..."
                   name={chatbot?.name || "Agent"}
-                  avatarSrc={chatbot?.image || "/placeholder-avatar.png"}
+                  avatarSrc={chatbot?.image || ""}
                 />
               )}
             </div>

@@ -150,7 +150,7 @@ export const message = pgTable("Message", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   chatId: uuid("chatId")
     .notNull()
-    .references(() => chat.id),
+    .references(() => chat.id, { onDelete: "cascade" }),
   role: varchar("role", {
     enum: ["system", "assistant", "user", "human"],
   }).notNull(),
@@ -165,10 +165,10 @@ export const vote = pgTable(
   {
     chatId: uuid("chatId")
       .notNull()
-      .references(() => chat.id),
+      .references(() => chat.id, { onDelete: "cascade" }),
     messageId: uuid("messageId")
       .notNull()
-      .references(() => message.id),
+      .references(() => message.id, { onDelete: "cascade" }),
     isUpvoted: boolean("isUpvoted").notNull(),
   },
   (table) => [primaryKey({ columns: [table.chatId, table.messageId] })],

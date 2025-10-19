@@ -227,10 +227,7 @@ export const PreviewMessage = ({
                 if (state === "output-available") {
                   return (
                     <div className="space-y-2 px-2" key={toolCallId}>
-                      <p>
-                        I have escalated your issue to a human agent. They will be
-                        with you shortly to assist with your request.
-                      </p>
+
                       <EscalateToHumanNotification
                         reason={(output as any)?.reason || "complex-issue"}
                         message={(output as any)?.message || undefined}
@@ -358,7 +355,7 @@ export const PreviewMessage = ({
                   ) {
                     return (
                       <div className="px-2 space-y-2" key={toolCallId}>
-                        <p>If you're interested in talking with us, kindly schedule a call using the form below🙂</p>
+
                         <CalendlyBooking
                           eventTypeUri={(output as any).eventTypeUri}
                           eventTypeName={(output as any).eventTypeName}
@@ -433,7 +430,7 @@ export const PreviewMessage = ({
                   ) {
                     return (
                       <div className="px-2 space-y-2" key={toolCallId}>
-                        <p>If you're interested in talking with us, kindly schedule a call using the form below🙂</p>
+
                         <CalBooking
                           username={(output as any).username}
                           eventSlug={(output as any).eventSlug}

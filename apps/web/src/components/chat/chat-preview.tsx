@@ -2,32 +2,27 @@ import type { Vote } from "@/db/schema";
 import { useChat as useChatData } from "@/hooks/use-chat";
 import { useChatWithReset } from "@/hooks/use-chat-reset";
 import { useChatbot } from "@/hooks/use-chatbot";
-import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
 import type { ChatMessage } from "@/lib/types";
 import { fetchWithErrorHandlers } from "@/lib/utils";
-import { useChat } from "@ai-sdk/react";
+import { Provider, useChat } from "@padyna/store";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DefaultChatTransport } from "ai";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { ChatBody } from "./chat-body";
 import { ChatFooter } from "./chat-footer";
 import { ChatHeader } from "./chat-header";
 import { ChatLanding } from "./chat-landing";
-import { convertToUIMessages } from "./convert-to-ui-message";
 
-export function ChatPreview() {
+function ChatPreviewContent() {
   const { chatId, resetChat } = useChatWithReset();
-  // Removed database message persistence - messages will be ephemeral
-  // const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
   const { data: chatData } = useChatData(chatId);
   const [input, setInput] = useState("");
   const [showLanding, setShowLanding] = useState(() => {
     return localStorage.getItem("chat-preview-interface") === "landing";
   });
 
-  // Always start with empty messages - no persistence
   const initialMessages: ChatMessage[] = [];
 
   const queryClient = useQueryClient();
@@ -65,8 +60,6 @@ export function ChatPreview() {
       });
     },
   });
-
-  // Removed useEffect that synced messages from DB - keeping chat ephemeral
 
   const handleSubmit = (event?: React.FormEvent) => {
     event?.preventDefault();
@@ -169,5 +162,13 @@ export function ChatPreview() {
         className="bg-gray-50/40 space-y-2"
       />
     </div>
+  );
+}
+
+export function ChatPreview() {
+  return (
+    <Provider<ChatMessage> initialMessages={[]}>
+      <ChatPreviewContent />
+    </Provider>
   );
 }

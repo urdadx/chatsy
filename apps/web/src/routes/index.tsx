@@ -11,7 +11,6 @@ import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
-  ssr: false,
 });
 
 function HomeComponent() {

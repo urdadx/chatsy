@@ -11,12 +11,13 @@ import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
 import { ChatSDKError } from "@/lib/errors";
+import type { ChatMessage } from "@/lib/types";
 import { fetchWithErrorHandlers } from "@/lib/utils";
-import { useChat } from "@ai-sdk/react";
+import { Provider, useChat } from "@padyna/store";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { useWidgetAnalytics } from "@/hooks/use-widget-analytics";
@@ -57,7 +58,6 @@ const uiStateReducer = (state: any, action: any) => {
   }
 };
 
-// Custom hook for logging analytics
 const useAnalytics = (widgetId: string, chatbotId: string) => {
   return useWidgetAnalytics({
     widgetId,
@@ -147,7 +147,7 @@ const ErrorState = ({ error, onRetry }: any) => (
   </div>
 );
 
-function RouteComponent() {
+function BubbleWidgetContent() {
   const { widgetId } = Route.useParams();
   const { chatId, resetChat } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
@@ -204,7 +204,6 @@ function RouteComponent() {
     onMessage: (message) => {
       console.log("Received WebSocket message:", message);
 
-      // Convert WebSocket message to UI message format
       const uiMessage = {
         id: message.id,
         role: (message.role === "human" ? "assistant" : message.role) as "user" | "assistant" | "system",
@@ -244,7 +243,7 @@ function RouteComponent() {
     sendMessage,
     regenerate,
     error: chatError,
-  } = useChat({
+  } = useChat<ChatMessage>({
     id: chatId,
     transport: new DefaultChatTransport({
       fetch: async (url, options) => {
@@ -257,7 +256,6 @@ function RouteComponent() {
               dispatchUiState({ type: "SET_DEACTIVATED", payload: true });
             }
           } catch (e) {
-            // Ignore parsing errors
           }
         }
 
@@ -287,14 +285,20 @@ function RouteComponent() {
     },
   });
 
-  // Sync initial messages with chat messages
+
+  // Track the current chatId to prevent restoring messages after reset
+  const chatIdRef = useRef(chatId);
+
   useEffect(() => {
-    if (initialMessages.length > 0 && messages.length === 0) {
+    // Only sync messages if we're on the same chat session
+    // This prevents restoring old messages after a chat reset
+    if (chatIdRef.current === chatId && initialMessages.length > 0 && messages.length === 0) {
       setMessages(initialMessages);
     }
-  }, [initialMessages, messages.length, setMessages]);
+    // Update the ref when chatId changes
+    chatIdRef.current = chatId;
+  }, [chatId, initialMessages, messages.length, setMessages]);
 
-  // Memoized handlers
   const handleSubmit = useCallback(
     (event: any) => {
       event?.preventDefault();
@@ -340,8 +344,6 @@ function RouteComponent() {
 
   const handleInputChange = useCallback((event: any) => {
     dispatchUiState({ type: "SET_INPUT", payload: event.target.value });
-
-    // Send typing indicator when escalated and connected
     if (isEscalated && wsIsConnected && wsSendTyping) {
       if (event.target.value.trim()) {
         wsSendTyping(true);
@@ -461,5 +463,13 @@ function RouteComponent() {
         </>
       )}
     </div>
+  );
+}
+
+function RouteComponent() {
+  return (
+    <Provider<ChatMessage> initialMessages={[]}>
+      <BubbleWidgetContent />
+    </Provider>
   );
 }

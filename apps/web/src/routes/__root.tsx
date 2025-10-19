@@ -12,6 +12,7 @@ import {
 } from "@tanstack/react-router";
 import appCss from "../index.css?url";
 
+
 export type RouterAppContext = {
   queryClient: QueryClient;
 };
@@ -74,11 +75,10 @@ function RootDocument() {
       </head>
       <body suppressHydrationWarning>
         <RetrainingBannerProvider>
-          <div className="">
-            <TooltipProvider>
-              <Outlet />
-            </TooltipProvider>
-          </div>
+          <TooltipProvider>
+
+            <Outlet />
+          </TooltipProvider>
           <Toaster richColors theme="light" />
         </RetrainingBannerProvider>
         <Scripts />

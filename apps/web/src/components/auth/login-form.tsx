@@ -92,17 +92,7 @@ export function LoginForm({
           <CardTitle className="text-3xl instrument-serif-regular">
             Welcome back
           </CardTitle>
-          {lastLogin && (
-            <div className="text-sm text-muted-foreground mt-2">
-              You last signed in with{" "}
-              <span className="font-medium text-primary">
-                {lastLogin.method === 'google' ? 'Google' : 'email'}
-                {lastLogin.email && lastLogin.method === 'email' && (
-                  <span className="text-muted-foreground"> ({lastLogin.email})</span>
-                )}
-              </span>
-            </div>
-          )}
+
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(handleEmailSignIn)}>
@@ -195,7 +185,7 @@ export function LoginForm({
                   <Button
                     type="submit"
                     className={cn(
-                      "w-full",
+                      "w-full relative",
                       lastLogin?.method === 'email' && "ring-2 ring-primary/20"
                     )}
                     disabled={isSubmitting}
@@ -207,6 +197,11 @@ export function LoginForm({
                         <Mail className="h-4 w-4" />
                         Continue with email
                       </>
+                    )}
+                    {lastLogin?.method === 'email' && (
+                      <div className="absolute shadow-sm -top-1 -right-1 flex items-center gap-1 bg-white text-primary text-xs px-2 py-0.5 rounded-full">
+                        Last used
+                      </div>
                     )}
                   </Button>
 

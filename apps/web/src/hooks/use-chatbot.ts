@@ -74,17 +74,18 @@ export function useDeleteChatbot() {
       });
       return response.data;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["chatbot"] });
-      queryClient.invalidateQueries({ queryKey: ["chatbots"] });
+    onSuccess: async (data) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["chatbot"] }),
+        queryClient.invalidateQueries({ queryKey: ["chatbots"] }),
+      ]);
 
       toast.success("Chatbot deleted successfully!");
 
-      // If the deleted chatbot was active, refresh the page to update the UI
       if (data.wasActive) {
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 500);
       }
     },
     onError: (error: any) => {
@@ -110,7 +111,6 @@ export function useChatbots() {
   });
 }
 
-// Hook to create a new chatbot
 export function useCreateChatbot() {
   const queryClient = useQueryClient();
 
@@ -139,7 +139,6 @@ export function useCreateChatbot() {
   });
 }
 
-// Hook to switch active chatbot
 export function useSetActiveChatbot() {
   const queryClient = useQueryClient();
 

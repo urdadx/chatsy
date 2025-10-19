@@ -26,7 +26,9 @@ export function DeleteWorkspace({
   const handleDeleteChatbot = async () => {
     try {
       await deleteChatbotMutation.mutateAsync(workspaceId);
+      onClose(); // Close the dialog after successful deletion
     } catch (error) {
+      // Error is already handled by the mutation's onError
     }
   };
 

@@ -13,8 +13,9 @@ import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
 import { useWidgetAnalytics } from "@/hooks/use-widget-analytics";
 import { ChatSDKError } from "@/lib/errors";
+import type { ChatMessage } from "@/lib/types";
 import { fetchWithErrorHandlers } from "@/lib/utils";
-import { useChat } from "@ai-sdk/react";
+import { Provider, useChat } from "@padyna/store";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
@@ -24,6 +25,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
 } from "react";
 import { toast } from "sonner";
@@ -228,7 +230,7 @@ const useChatHandlers = (
   };
 };
 
-function RouteComponent(): JSX.Element {
+function TalkPageContent(): JSX.Element {
   const { pageId } = Route.useParams();
   const { chatId, resetChat } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
@@ -310,7 +312,7 @@ function RouteComponent(): JSX.Element {
     sendMessage,
     regenerate,
     error: chatError,
-  } = useChat({
+  } = useChat<ChatMessage>({
     id: chatId,
     transport: new DefaultChatTransport({
       fetch: async (input: RequestInfo | URL, options?: RequestInit) => {
@@ -348,11 +350,19 @@ function RouteComponent(): JSX.Element {
     },
   });
 
+
+  // Track the current chatId to prevent restoring messages after reset
+  const chatIdRef = useRef(chatId);
+
   useEffect(() => {
-    if (initialMessages.length > 0 && messages.length === 0) {
+    // Only sync messages if we're on the same chat session
+    // This prevents restoring old messages after a chat reset
+    if (chatIdRef.current === chatId && initialMessages.length > 0 && messages.length === 0) {
       setMessages(initialMessages);
     }
-  }, [initialMessages, messages.length, setMessages]);
+    // Update the ref when chatId changes
+    chatIdRef.current = chatId;
+  }, [chatId, initialMessages, messages.length, setMessages]);
 
   const {
     handleSubmit,
@@ -472,5 +482,13 @@ function RouteComponent(): JSX.Element {
         )}
       </div>
     </div>
+  );
+}
+
+function RouteComponent(): JSX.Element {
+  return (
+    <Provider<ChatMessage> initialMessages={[]}>
+      <TalkPageContent />
+    </Provider>
   );
 }

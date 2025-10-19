@@ -11,7 +11,7 @@ function RouteComponent() {
       <div className="max-w-5xl w-full max-h-screen mx-auto px-4 sm:px-0 py-4">
         <h1 className="text-xl font-semibold my-2 hidden sm:flex">Leads</h1>
         <p className="text-muted-foreground">
-          Monitor leads and feedback from customers
+          Monitor leads, issue reports and feedback from customers
         </p>
         <div className="py-4">
           <ActivityTable />

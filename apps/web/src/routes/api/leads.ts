@@ -16,8 +16,8 @@ const leadSchema = z.object({
 export const ServerRoute = createServerFileRoute("/api/leads").methods({
   POST: async ({ request }) => {
     try {
-      const cfCountry = request.headers.get("CF-IPCountry");
-      const cfCity = request.headers.get("CF-IPCity");
+      const cfCountry = request.headers.get("CF-IPCountry") || "GH";
+      const cfCity = request.headers.get("CF-IPCity") || "Accra";
 
       let detectedLocation: string | undefined;
       if (cfCity && cfCountry) {

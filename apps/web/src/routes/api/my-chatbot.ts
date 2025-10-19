@@ -7,6 +7,7 @@ import {
 } from "@/db/schema";
 import { isUserMemberOfOrganization } from "@/lib/ai/chat-functions";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
+import { deleteCachedData } from "@/lib/redis/cache";
 import { checkSubscriptionLimits } from "@/lib/subscription/subscription-utils";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
@@ -306,6 +307,16 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
 
       // Delete the chatbot (cascade deletes will handle related records)
       await db.delete(chatbot).where(eq(chatbot.id, chatbotId));
+
+      // Invalidate all related cache entries
+      await deleteCachedData([
+        `chatbots:org:${organizationId}`, // Organization's chatbots list
+        `chatbot:${chatbotId}`, // Individual chatbot cache (if exists)
+        `questions:${chatbotId}`, // Chatbot's Q&A cache
+        `analytics:${chatbotId}`, // Chatbot's analytics cache
+        `scraped-data:${chatbotId}`, // Chatbot's scraped data cache
+        `document-sources:${chatbotId}`, // Chatbot's document sources cache
+      ]);
 
       // Decrement the organization's chatbot count
       await db
