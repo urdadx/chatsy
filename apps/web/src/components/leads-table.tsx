@@ -28,7 +28,7 @@ import {
   PlusIcon,
   TrashIcon,
 } from "lucide-react";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { AddLeadForm } from "./add-lead-form";
 
 import {
