@@ -101,7 +101,7 @@ RUN chown -R tanstack:nodejs /app
 USER tanstack
 
 # Expose ports (TanStack Start on 3000, WebSocket server on 3001)
-EXPOSE 3000 3001
+EXPOSE 3000 
 
 # Set environment to production
 ENV NODE_ENV=production
