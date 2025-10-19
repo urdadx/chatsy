@@ -1,8 +1,8 @@
 # Use Node.js 21+ as the base image
 FROM node:21-alpine AS base
 
-# Install pnpm globally
-RUN npm install -g pnpm@10.10.0
+# Install pnpm and drizzle-kit globally
+RUN npm install -g pnpm@10.10.0 drizzle-kit
 
 # Set working directory
 WORKDIR /app
@@ -55,8 +55,8 @@ RUN pnpm --filter server build
 # Production stage
 FROM node:21-alpine AS production
 
-# Install pnpm globally
-RUN npm install -g pnpm@10.10.0
+# Install pnpm and drizzle-kit globally
+RUN npm install -g pnpm@10.10.0 drizzle-kit
 
 # Set working directory
 WORKDIR /app
