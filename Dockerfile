@@ -14,9 +14,10 @@ COPY package.json pnpm-lock.yaml* ./
 # Copy all package.json files
 COPY apps/web/package.json ./apps/web/
 COPY apps/server/package.json ./apps/server/
+COPY packages/store/package.json ./packages/store/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install all dependencies (including dev for build tools)
+RUN pnpm install
 
 # Copy source code
 COPY . .
@@ -74,6 +75,10 @@ COPY --from=base /app/apps/server/dist ./apps/server/dist
 COPY --from=base /app/apps/server/package.json ./apps/server/
 COPY --from=base /app/apps/server/src ./apps/server/src
 
+# Copy built packages
+COPY --from=base /app/packages/store/dist ./packages/store/dist
+COPY --from=base /app/packages/store/package.json ./packages/store/
+
 COPY --from=base /app/package.json ./
 COPY --from=base /app/pnpm-lock.yaml* ./
 COPY --from=base /app/pnpm-workspace.yaml ./
@@ -82,8 +87,8 @@ COPY --from=base /app/pnpm-workspace.yaml ./
 COPY start.sh ./
 RUN chmod +x start.sh
 
-# Install all dependencies (including dev) for drizzle-kit
-RUN pnpm install --frozen-lockfile
+# Install production dependencies only
+RUN pnpm install --prod --frozen-lockfile
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
