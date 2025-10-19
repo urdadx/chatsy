@@ -1,5 +1,8 @@
-# Use Node.js 21+ as the base image
-FROM node:21-alpine AS base
+# Use Node.js 22+ as the base image (better compatibility)
+FROM node:22-alpine AS base
+
+# Install build dependencies for native modules
+RUN apk add --no-cache python3 make g++
 
 # Install pnpm globally
 RUN npm install -g pnpm@10.10.0
@@ -10,8 +13,8 @@ WORKDIR /app/apps/server
 # Copy server package.json and install dependencies
 COPY package.json ./
 
-# Install dependencies directly for the server
-RUN npm install --production=false
+# Install dependencies with proper flags
+RUN npm install --omit=dev=false
 
 # Copy source code
 COPY . ./
@@ -20,7 +23,7 @@ COPY . ./
 RUN npm run build
 
 # Production stage
-FROM node:21-alpine AS production
+FROM node:22-alpine AS production
 
 # Set working directory
 WORKDIR /app/apps/server
@@ -30,7 +33,7 @@ COPY --from=base /app/apps/server/dist ./dist
 COPY --from=base /app/apps/server/package.json ./
 
 # Install production dependencies only
-RUN npm install --production
+RUN npm install --omit=dev
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
