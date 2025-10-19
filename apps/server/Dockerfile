@@ -52,4 +52,4 @@ ENV NODE_ENV=production
 ENV PORT=3001
 
 # Start the WebSocket server
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/src/index.js"]
