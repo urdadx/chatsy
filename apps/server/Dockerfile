@@ -45,7 +45,6 @@ RUN chown -R wsserver:nodejs /app
 # Switch to non-root user
 USER wsserver
 
-# Expose WebSocket server port
 EXPOSE 3001
 
 # Set environment to production
