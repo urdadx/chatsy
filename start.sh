@@ -2,11 +2,7 @@
 
 # Start both the web app and websocket server
 
-echo "Starting services..."
-
-# Start websocket server in background
-echo "Starting websocket server on port 3001..."
-cd /app/apps/server && PORT=3001 node dist/index.js &
+echo "Starting client..."
 
 # Start web app in foreground  
 echo "Starting web app on port 3000..."
