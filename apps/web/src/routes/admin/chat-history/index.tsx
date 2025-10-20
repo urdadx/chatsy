@@ -216,6 +216,12 @@ function RouteComponent() {
                       <Spinner className="text-primary" />
                     </div>
                   )}
+
+                  {!hasNextPage && !isLoading && chats.length > 0 && (
+                    <div className="flex justify-center py-4">
+                      <p className="text-sm text-gray-500">No more data</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

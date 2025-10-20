@@ -25,7 +25,6 @@ import { WidgetSettings } from "./widget-settings";
 
 interface ChatbotSettingsProps {
   chatbot: any;
-
 }
 
 export function ChatbotSettings(

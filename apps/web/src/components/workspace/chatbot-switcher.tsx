@@ -27,7 +27,7 @@ import { authClient } from "@/lib/auth-client";
 import { RiCheckboxCircleFill } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronsUpDown, PlusIcon, User, UserRoundPlus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { InviteMembers } from "./invite-members";
@@ -46,10 +46,15 @@ export function ChatbotSwitcher() {
     );
   }, [chatbotsData]);
 
-  const currentLogo = useMemo(
-    () => activeChatbot?.image,
-    [activeChatbot?.image],
-  );
+  // Add a timestamp to force image cache invalidation when data changes
+  const [imageTimestamp, setImageTimestamp] = useState(Date.now());
+
+  useEffect(() => {
+    // Update timestamp when activeChatbot changes to force image reload
+    setImageTimestamp(Date.now());
+  }, [activeChatbot?.image]);
+
+  const currentLogo = activeChatbot?.image;
 
   const { data: member } = useQuery({
     queryKey: ["activeMember"],
@@ -90,9 +95,14 @@ export function ChatbotSwitcher() {
     >
       {currentLogo ? (
         <div className="rounded-full w-8 h-8">
-          <Avatar className="h-8 w-8 rounded-full object-cover "
+          <Avatar
+            key={`${currentLogo}-${imageTimestamp}`}
+            className="h-8 w-8 rounded-full object-cover "
           >
-            <AvatarImage src={currentLogo} alt={activeChatbot?.name} />
+            <AvatarImage
+              src={`${currentLogo}?t=${imageTimestamp}`}
+              alt={activeChatbot?.name}
+            />
             <AvatarFallback>
               <User className="h-5 w-5 text-gray-600" />
             </AvatarFallback>
@@ -146,8 +156,14 @@ export function ChatbotSwitcher() {
                   }`}
               >
                 {chatbot.image ? (
-                  <Avatar className="h-10 w-10 rounded-full border-2 border-primary">
-                    <AvatarImage src={chatbot?.image} alt={chatbot?.name} />
+                  <Avatar
+                    key={`${chatbot.image}-${imageTimestamp}`}
+                    className="h-10 w-10 rounded-full border-2 border-primary"
+                  >
+                    <AvatarImage
+                      src={`${chatbot.image}?t=${imageTimestamp}`}
+                      alt={chatbot?.name}
+                    />
                     <AvatarFallback>
                       <User className="h-5 w-5 text-gray-600" />
                     </AvatarFallback>
@@ -251,8 +267,14 @@ export function ChatbotSwitcher() {
                           }
                         >
                           {chatbot.image ? (
-                            <Avatar className="h-8 w-8 rounded-full border-2 border-primary">
-                              <AvatarImage src={chatbot?.image} alt={chatbot?.name} />
+                            <Avatar
+                              key={`${chatbot.image}-${imageTimestamp}`}
+                              className="h-8 w-8 rounded-full border-2 border-primary"
+                            >
+                              <AvatarImage
+                                src={`${chatbot.image}?t=${imageTimestamp}`}
+                                alt={chatbot?.name}
+                              />
                               <AvatarFallback>
                                 <User className="h-5 w-5 text-gray-600" />
                               </AvatarFallback>

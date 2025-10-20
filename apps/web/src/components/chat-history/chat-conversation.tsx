@@ -14,6 +14,7 @@ import {
   ChatContainerScrollAnchor,
 } from "../ui/chat-container";
 import { Input } from "../ui/input";
+import { InputEmojiPicker } from "../ui/input-emoji-picker";
 import { SafeBoringAvatar } from "../ui/safe-boring-avatar";
 import { ScrollButton } from "../ui/scroll-button";
 import Spinner from "../ui/spinner";
@@ -198,14 +199,22 @@ export const ChatConversation = () => {
           </>
         ) : isEscalated ? (
           <>
-            <div className="flex-1 flex items-center gap-2">
-
+            <div className="flex-1 flex items-center gap-1 bg-white rounded-md border border-input pr-1">
               <Input
                 placeholder={hasJoined ? (isConnected ? "Type a message..." : "Connecting...") : "Click Join to start"}
                 value={draft}
                 onChange={handleInputChange}
                 disabled={!isConnected || !hasJoined}
-                className="flex-1"
+                className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+              <InputEmojiPicker
+                onEmojiSelect={(emoji) => {
+                  setDraft((prev) => prev + emoji);
+                  if (hasJoined) {
+                    sendTyping(true);
+                  }
+                }}
+                disabled={!isConnected || !hasJoined}
               />
             </div>
             <Button type="submit" disabled={!hasJoined || !draft.trim() || !isConnected}>

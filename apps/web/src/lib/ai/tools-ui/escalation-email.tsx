@@ -15,6 +15,7 @@ interface EscalationEmailProps {
   reason: string;
   chatbotName: string;
   createdAt?: string;
+  summary?: string;
 }
 
 const reasonLabels = {
@@ -30,6 +31,7 @@ export const EscalationEmail = ({
   createdAt,
   reason,
   chatbotName,
+  summary,
 }: EscalationEmailProps) => {
   const appUrl =
     import.meta.env.VITE_NODE_ENV === "development"
@@ -44,13 +46,22 @@ export const EscalationEmail = ({
       </Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>Your attention is Required </Heading>
+          <Heading style={h1}>Your Attention Is Required </Heading>
 
           <Text style={bodyText}>
             A customer's conversation with {chatbotName} has been escalated and
             requires human attention. Please review and respond to the customer
             as soon as possible.
           </Text>
+
+          {summary && (
+            <Section style={summarySection}>
+              <Text style={summaryTitle}>
+                <strong>Conversation Summary:</strong>
+              </Text>
+              <Text style={summaryText}>{summary}</Text>
+            </Section>
+          )}
 
           <Section style={infoSection}>
             <Text style={infoText}>
@@ -112,6 +123,29 @@ const infoSection = {
   borderRadius: "4px",
   padding: "15px",
   margin: "20px 0",
+};
+
+const summarySection = {
+  backgroundColor: "#eff6ff",
+  borderLeft: "4px solid #3b82f6",
+  borderRadius: "4px",
+  padding: "15px",
+  margin: "20px 0",
+};
+
+const summaryTitle = {
+  color: "#1e40af",
+  fontSize: "14px",
+  margin: "0 0 8px 0",
+  lineHeight: "20px",
+};
+
+const summaryText = {
+  color: "#374151",
+  fontSize: "14px",
+  margin: "0",
+  lineHeight: "22px",
+  fontStyle: "italic" as const,
 };
 
 const infoText = {

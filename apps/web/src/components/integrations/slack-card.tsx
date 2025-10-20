@@ -21,6 +21,12 @@ export const SlackCard = () => {
                 Not connected
               </Badge>
             </div> */}
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="gap-1">
+
+                Coming soon
+              </Badge>
+            </div>
 
           </div>
           <h3 className="font-medium text-sm sm:text-base">Slack</h3>

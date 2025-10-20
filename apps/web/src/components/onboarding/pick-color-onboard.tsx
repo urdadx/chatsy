@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { ArrowRight, Palette } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { Button } from "../ui/button";
@@ -71,8 +71,7 @@ export const ColorPickerDialog = ({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex text-md items-center gap-2">
-            <Palette className="w-5 h-5 text-purple-600" />
+          <DialogTitle className="flex text-xl items-center gap-2">
             Pick a color
           </DialogTitle>
         </DialogHeader>

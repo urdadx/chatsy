@@ -11,24 +11,23 @@ import {
 import { useDeleteChatbot } from "@/hooks/use-chatbot";
 
 
-interface DeleteWorkspaceProps {
-  workspaceId: string;
+interface DeleteChatbotProps {
+  chatbotId: string;
   onClose: () => void;
 }
 
-export function DeleteWorkspace({
-  workspaceId,
+export function DeleteChatbot({
+  chatbotId,
   onClose,
-}: DeleteWorkspaceProps) {
+}: DeleteChatbotProps) {
 
   const deleteChatbotMutation = useDeleteChatbot();
 
   const handleDeleteChatbot = async () => {
     try {
-      await deleteChatbotMutation.mutateAsync(workspaceId);
-      onClose(); // Close the dialog after successful deletion
+      await deleteChatbotMutation.mutateAsync(chatbotId);
+      onClose();
     } catch (error) {
-      // Error is already handled by the mutation's onError
     }
   };
 
@@ -45,7 +44,7 @@ export function DeleteWorkspace({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-red-500 text-white"
+            className="bg-red-500 hover:bg-red-300 text-white"
             onClick={handleDeleteChatbot}
           >
             Continue

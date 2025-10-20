@@ -9,9 +9,9 @@ import {
 } from "@remixicon/react";
 import { Check, Copy } from "lucide-react";
 import { useRef, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { SafeBoringAvatar } from "../ui/safe-boring-avatar";
 import {
   Tooltip,
   TooltipContent,
@@ -113,23 +113,11 @@ export const LinkInBio = ({ embedToken }: LinkInBioProps) => {
     <>
       <div className="flex justify-center items-center py-2 sm:py-3">
         <div className="relative rounded-full border-2 border-primary">
-          <Avatar
-            className="inline-flex border-2 
-           items-center justify-center overflow-hidden rounded-full align-middle w-[90px] h-[90px] sm:w-[96px] sm:h-[96px]"
-          >
-            <AvatarImage
-              className="h-full w-full rounded-[inherit] object-cover"
-              src={chatbot?.image || ""}
-              referrerPolicy="no-referrer"
-              alt="avatar"
-            />
-            <AvatarFallback
-              className="leading-1 flex h-full w-full items-center justify-center bg-white text-[15px] font-medium"
-              delayMs={100}
-            >
-              {chatbot?.name?.charAt(0).toUpperCase() || "C"}
-            </AvatarFallback>
-          </Avatar>
+          <SafeBoringAvatar
+            name={chatbot?.name || "Chatbot"}
+            size={96}
+            className="border-2"
+          />
         </div>
       </div>
       <div className="flex flex-wrap justify-center gap-2 sm:gap-4">

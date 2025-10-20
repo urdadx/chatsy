@@ -1,7 +1,8 @@
 import { db } from "@/db";
-import { chat, chatbot, member, user } from "@/db/schema";
+import { chat, chatbot, member, message, user } from "@/db/schema";
+import { google } from "@/lib/ai/providers";
 import { resendClient } from "@/lib/emails/email";
-import { tool } from "ai";
+import { generateText, tool } from "ai";
 import { eq } from "drizzle-orm";
 import z from "zod";
 import EscalationEmail from "../tools-ui/escalation-email";
@@ -33,6 +34,60 @@ export const escalateToHumanTool = (context: EscalateToHumanContext) =>
       try {
         const organizationId = context.organizationId;
 
+        // Fetch all messages from the chat to generate summary
+        const chatMessages = await db
+          .select({
+            role: message.role,
+            parts: message.parts,
+            createdAt: message.createdAt,
+          })
+          .from(message)
+          .where(eq(message.chatId, context.chatId))
+          .orderBy(message.createdAt);
+
+        let conversationSummary = "Customer conversation requires attention.";
+
+        if (chatMessages.length > 0) {
+          try {
+            const conversationText = chatMessages
+              .map((msg) => {
+                const parts = msg.parts as Array<{
+                  type: string;
+                  text?: string;
+                }>;
+                const text = parts
+                  .filter((part) => part.type === "text")
+                  .map((part) => part.text)
+                  .join(" ");
+                return `${msg.role}: ${text}`;
+              })
+              .join("\n");
+
+            const { text: summary } = await generateText({
+              model: google("gemini-2.0-flash"),
+              prompt: `Summarize this customer support conversation in exactly 50 words or less. Focus on the main issue and key points:\n\n${conversationText}`,
+            });
+
+            conversationSummary = summary.trim();
+          } catch (summaryError) {
+            console.error("Failed to generate summary:", summaryError);
+            // Fallback: Use first user message
+            const firstUserMsg = chatMessages.find((m) => m.role === "user");
+            if (firstUserMsg) {
+              const parts = firstUserMsg.parts as Array<{
+                type: string;
+                text?: string;
+              }>;
+              const text = parts
+                .filter((part) => part.type === "text")
+                .map((part) => part.text)
+                .join(" ");
+              conversationSummary =
+                text.slice(0, 200) + (text.length > 200 ? "..." : "");
+            }
+          }
+        }
+
         // Fetch all members of organization from the db
         const membersWithEmails = await db
           .select({ email: user.email })
@@ -63,6 +118,7 @@ export const escalateToHumanTool = (context: EscalateToHumanContext) =>
           createdAt: new Date().toLocaleString(),
           reason: reason || "complex-issue",
           chatbotName: chatbotName?.name || "Chatbot",
+          summary: conversationSummary,
         });
 
         const { error } = await resendClient.emails.send({

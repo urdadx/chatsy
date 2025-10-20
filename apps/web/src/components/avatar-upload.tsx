@@ -160,23 +160,29 @@ export function AvatarUpload() {
 
       const { url: uploadedImageUrl } = await uploadResponse.json();
 
-      const updatedChatbot = {
-        ...chatbot,
-        image: uploadedImageUrl,
-      };
+      // Add cache busting parameter
+      const imageUrlWithCacheBust = `${uploadedImageUrl}?t=${Date.now()}`;
 
-      await updateChatbotMutation.mutateAsync(updatedChatbot);
-
+      // Immediately update local state for instant UI feedback
       if (finalImageUrl?.startsWith("blob:")) {
         URL.revokeObjectURL(finalImageUrl);
       }
-      setFinalImageUrl(uploadedImageUrl as string);
+      setFinalImageUrl(imageUrlWithCacheBust);
+
+      const updatedChatbot = {
+        ...chatbot,
+        image: uploadedImageUrl, // Save original URL without cache bust
+      };
+
+      await updateChatbotMutation.mutateAsync(updatedChatbot);
 
       removeFile(fileId);
       setIsDialogOpen(false);
       setCroppedAreaPixels(null);
     } catch (error) {
       console.error("Error during apply:", error);
+      // Revert local state on error
+      setFinalImageUrl(chatbot?.image || null);
     } finally {
       setIsUploading(false);
     }
@@ -186,6 +192,10 @@ export function AvatarUpload() {
     if (!chatbot) return;
 
     try {
+      // Immediately update local state for instant UI feedback
+      const previousImageUrl = finalImageUrl;
+      setFinalImageUrl(null);
+
       // Update chatbot to remove image
       const updatedChatbot = {
         ...chatbot,
@@ -195,12 +205,13 @@ export function AvatarUpload() {
       await updateChatbotMutation.mutateAsync(updatedChatbot);
 
       // Clean up local state
-      if (finalImageUrl?.startsWith("blob:")) {
-        URL.revokeObjectURL(finalImageUrl);
+      if (previousImageUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(previousImageUrl);
       }
-      setFinalImageUrl(null);
     } catch (error) {
       console.error("Error removing image:", error);
+      // Revert local state on error
+      setFinalImageUrl(chatbot?.image || null);
     }
   };
 

@@ -271,6 +271,72 @@ export default function Component() {
       ?.setFilterValue(newFilterValue.length ? newFilterValue : undefined);
   };
 
+  const exportToCSV = () => {
+    // Get filtered rows from the table
+    const rows = table.getFilteredRowModel().rows;
+
+    if (rows.length === 0) {
+      return;
+    }
+
+    // Helper function to escape CSV values
+    const escapeCSV = (value: string | undefined | null): string => {
+      if (!value) return '';
+      const stringValue = String(value);
+      // If the value contains comma, quote, or newline, wrap it in quotes and escape internal quotes
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return stringValue;
+    };
+
+    // Format date helper
+    const formatDate = (dateStr: string): string => {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    };
+
+    // CSV Headers
+    const headers = ['Date', 'Name', 'Contact', 'Location', 'Type'];
+
+    // CSV Rows
+    const csvRows = rows.map(row => {
+      const data = row.original;
+      return [
+        escapeCSV(formatDate(data.date)),
+        escapeCSV(data.name),
+        escapeCSV(data.email || 'Not available'),
+        escapeCSV(data.location),
+        escapeCSV(data.type)
+      ].join(',');
+    });
+
+    // Combine headers and rows
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    // Generate filename with current date
+    const today = new Date().toISOString().split('T')[0];
+    const filename = `activity-export-${today}.csv`;
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center">
@@ -385,7 +451,7 @@ export default function Component() {
         </div>
         <div className="flex items-center gap-3">
           {/* Add user button */}
-          <Button className="ml-auto" variant="outline">
+          <Button className="ml-auto" variant="outline" onClick={exportToCSV}>
             <FileDown
               className="-ms-1 opacity-60"
               size={16}

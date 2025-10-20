@@ -25,7 +25,7 @@ export const ServerRoute = createServerFileRoute(
       const body = await request.json();
       const parsed = connectSchema.safeParse(body);
       if (!parsed.success) {
-        return json({ error: parsed.error.format() }, { status: 400 });
+        return json({ error: z.treeifyError(parsed.error) }, { status: 400 });
       }
 
       const redirectUri = process.env.CALENDLY_REDIRECT_URI!;

@@ -48,7 +48,7 @@ export async function ensureCalendlyAccessToken(chatbotId: string) {
     const tokenData = await tokenResponse.json();
     if (!tokenResponse.ok || tokenData.error) {
       console.error("Calendly refresh failed", tokenData);
-      return { integration, refreshed: false } as const; // Keep old token (may still have a few seconds)
+      return { integration, refreshed: false } as const;
     }
 
     const updatedExpiry = tokenData.expires_in

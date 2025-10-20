@@ -71,8 +71,9 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
   PATCH: async ({ request }) => {
     const session = await auth.api.getSession({ headers: request.headers });
     const userId = session?.user?.id;
+    const organizationId = session?.session?.activeOrganizationId;
 
-    if (!userId) {
+    if (!userId || !organizationId) {
       return json({ error: "Unauthorized: Please log in" }, { status: 401 });
     }
 
@@ -121,6 +122,12 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
         if (!updated) {
           return new Response("Chatbot not found", { status: 404 });
         }
+
+        // Invalidate relevant cache entries when chatbot is updated
+        await deleteCachedData([
+          `chatbots:org:${organizationId}`, // Organization's chatbots list cache
+          `chatbot:${activeChatbotId}`, // Individual chatbot cache (if exists)
+        ]);
 
         const actions = await db
           .select()

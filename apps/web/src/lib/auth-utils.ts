@@ -67,15 +67,9 @@ export const getActiveSubscription = createServerFn().handler(async () => {
 export const getActiveMeter = createServerFn().handler(async () => {
   const externalCustomerId = (await getCustomerExternalId()) || "";
 
-  return withCache(
-    `meter:customer:${externalCustomerId}`,
-    async () => {
-      const result = await polarClient.customers.getStateExternal({
-        externalId: externalCustomerId,
-      });
+  const result = await polarClient.customers.getStateExternal({
+    externalId: externalCustomerId,
+  });
 
-      return result?.activeMeters[0] || [];
-    },
-    { ttl: 600 },
-  );
+  return result?.activeMeters[0] || [];
 });

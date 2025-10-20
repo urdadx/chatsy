@@ -9,7 +9,7 @@ import { useSetActiveChatbot } from "@/hooks/use-chatbot";
 import { timeAgo } from "@/lib/utils";
 import { ArrowRightLeft, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { DeleteWorkspace } from "./delete-workspace";
+import { DeleteChatbot } from "./delete-chatbot";
 
 interface ChatbotCardProps {
   chatbotId: string;
@@ -92,8 +92,8 @@ export function ChatbotCard({
         </div>
       </div>
       {isDeleting && (
-        <DeleteWorkspace
-          workspaceId={chatbotId}
+        <DeleteChatbot
+          chatbotId={chatbotId}
           onClose={() => setIsDeleting(false)}
         />
       )}

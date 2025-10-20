@@ -1,5 +1,6 @@
 import { AISuggestion, AISuggestions } from "@/components/ui/ai-suggestions";
 import { Input } from "@/components/ui/input";
+import { InputEmojiPicker } from "@/components/ui/input-emoji-picker";
 import type { ChatStatus } from "ai";
 import { ArrowUp } from "lucide-react";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
@@ -82,16 +83,27 @@ function ChatFooterComponent({
       {children}
 
       <form onSubmit={onSubmit} className="flex items-center space-x-2">
-        <Input
-          id="message"
-          className="flex-1 text-sm bg-white sm:text-base"
-          autoComplete="off"
-          value={input}
-          onChange={onInputChange}
-          placeholder={placeholder}
-          aria-label="Message"
-          style={inputStyle as any}
-        />
+        <div className="flex-1 flex items-center gap-1 bg-white rounded-md border border-input pr-1">
+          <Input
+            id="message"
+            className="flex-1 text-sm border-0 focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-base"
+            autoComplete="off"
+            value={input}
+            onChange={onInputChange}
+            placeholder={placeholder}
+            aria-label="Message"
+            style={inputStyle as any}
+          />
+          <InputEmojiPicker
+            onEmojiSelect={(emoji) => {
+              const event = {
+                target: { value: input + emoji },
+              } as ChangeEvent<HTMLInputElement>;
+              onInputChange(event);
+            }}
+            disabled={status === "streaming" || status === "submitted"}
+          />
+        </div>
         <button
           className="rounded-full p-2"
           type="submit"

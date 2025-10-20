@@ -56,10 +56,61 @@ export function useUpdateChatbot() {
       const response = await api.patch("/my-chatbot", payload);
       return response.data;
     },
+    onMutate: async (variables) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ["chatbot"] });
+      await queryClient.cancelQueries({ queryKey: ["chatbots"] });
+
+      // Snapshot the previous values
+      const previousChatbot = queryClient.getQueryData(["chatbot"]);
+      const previousChatbots = queryClient.getQueryData(["chatbots"]);
+
+      // Optimistically update chatbot query
+      if (previousChatbot) {
+        queryClient.setQueryData(["chatbot"], (old: any) => ({
+          ...old,
+          ...variables,
+        }));
+      }
+
+      // Optimistically update chatbots query
+      if (previousChatbots) {
+        queryClient.setQueryData(["chatbots"], (old: any) => {
+          if (!old?.chatbots || !old?.activeChatbotId) return old;
+
+          return {
+            ...old,
+            chatbots: old.chatbots.map((chatbot: any) =>
+              chatbot.id === old.activeChatbotId
+                ? { ...chatbot, ...variables }
+                : chatbot,
+            ),
+          };
+        });
+      }
+
+      // Return a context object with the snapshotted values
+      return { previousChatbot, previousChatbots };
+    },
+    onError: (err, variables, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousChatbot) {
+        queryClient.setQueryData(["chatbot"], context.previousChatbot);
+      }
+      if (context?.previousChatbots) {
+        queryClient.setQueryData(["chatbots"], context.previousChatbots);
+      }
+    },
     onSuccess: () => {
+      // Force immediate refetch to ensure consistency with server and clear any Redis cache
+      queryClient.refetchQueries({ queryKey: ["chatbot"] });
+      queryClient.refetchQueries({ queryKey: ["chatbots"] });
+      toast.success("Saved!");
+    },
+    onSettled: () => {
+      // Always invalidate after error or success to ensure we have the latest data
       queryClient.invalidateQueries({ queryKey: ["chatbot"] });
       queryClient.invalidateQueries({ queryKey: ["chatbots"] });
-      toast.success("Saved!");
     },
   });
 }
