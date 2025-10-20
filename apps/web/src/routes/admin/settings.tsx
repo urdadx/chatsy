@@ -21,7 +21,7 @@ import z from "zod";
 
 const settingsSchema = z.object({
   tab: z
-    .enum(["account", "billing", "members", "invitations"])
+    .enum(["account", "billing", "team"])
     .optional()
     .default("account"),
 });
@@ -39,7 +39,7 @@ function RouteComponent() {
   const handleTabChange = (value: string) => {
     navigate({
       search: {
-        tab: value as "account" | "billing" | "members" | "invitations",
+        tab: value as "account" | "billing" | "team"
       },
     });
   };
@@ -83,19 +83,12 @@ function RouteComponent() {
                 Usage & Billing
               </TabsTrigger>
               <TabsTrigger
-                value="members"
+                value="team"
                 className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
               >
-                Members
+                Team
               </TabsTrigger>
-              {isAdmin && (
-                <TabsTrigger
-                  value="invitations"
-                  className="hover:bg-accent text-sm hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                >
-                  Invitations
-                </TabsTrigger>
-              )}
+
             </TabsList>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
@@ -112,34 +105,30 @@ function RouteComponent() {
           <TabsContent value="billing">
             <Billing />
           </TabsContent>
-          <TabsContent value="members">
-            <div className="flex justify-between items-center py-4">
-              <h1 className="text-md font-semibold ">All Members</h1>
+          <TabsContent className="space-y-8" value="team">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center pt-6">
+                <h1 className="text-md font-semibold"> Members</h1>
 
-              {isAdmin && (
-                <Button onClick={() => setInviteMembersOpen(true)}>
-                  Invite new member
-                </Button>
-              )}
+                {isAdmin && (
+                  <Button onClick={() => setInviteMembersOpen(true)}>
+                    Invite new member
+                  </Button>
+                )}
+              </div>
+              <div className="w-full border rounded-xl p-4">
+                <MembersTable />
+              </div>
             </div>
-            <div className="w-full border rounded-xl p-4">
-              <MembersTable />
+            <div className="space-y-4">
+              <h1 className="text-md font-semibold "> Invitations</h1>
+              <div className="w-full border rounded-xl p-4">
+                <InvitationsTable />
+              </div>
             </div>
+            <div className="h-14" />
           </TabsContent>
-          <TabsContent value="invitations">
-            <div className="flex justify-between items-center py-4">
-              <h1 className="text-md font-semibold ">All Invitations</h1>
 
-              {isAdmin && (
-                <Button onClick={() => setInviteMembersOpen(true)}>
-                  Invite new member
-                </Button>
-              )}
-            </div>
-            <div className="w-full border rounded-xl p-4">
-              <InvitationsTable />
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
     </>

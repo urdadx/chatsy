@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
+import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
@@ -15,10 +15,12 @@ import { CancelInvitationDialog } from "./cancel-invitation-dialog";
 export function InvitationActions({ invitation }: { invitation: any }) {
   const [isCancelling, setIsCancelling] = useState(false);
   const queryClient = useQueryClient();
+  const { email, role } = invitation;
 
   const resendInvitation = useMutation({
-    mutationFn: async (invitationId: string) => {
-      await authClient.organization.resendInvitation({ invitationId });
+    mutationFn: async () => {
+      const response = await api.post("/invite-member", { email, role });
+      return response.data;
     },
     onSuccess: () => {
       toast.success("Invitation resent successfully");
