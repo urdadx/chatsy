@@ -8,15 +8,9 @@ import { getCustomerExternalId } from "./subscription/subscription-functions";
 export const getSession = createServerFn().handler(async () => {
   const headers = getHeaders() as unknown as Headers;
 
-  return withCache(
-    `session:${"authed-user"}`,
-    async () => {
-      return auth.api.getSession({
-        headers: headers,
-      });
-    },
-    { ttl: 300 },
-  );
+  return auth.api.getSession({
+    headers: headers,
+  });
 });
 
 export const getUser = async () => {
