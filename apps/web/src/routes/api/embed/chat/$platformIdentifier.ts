@@ -19,12 +19,13 @@ import {
   JsonToSseTransformStream,
   convertToModelMessages,
   createUIMessageStream,
+  pruneMessages,
   smoothStream,
   stepCountIs,
   streamText,
 } from "ai";
+import { polarClient } from "auth";
 import { and, eq } from "drizzle-orm";
-import { polarClient } from "../../../../../auth";
 
 export const ServerRoute = createServerFileRoute(
   "/api/embed/chat/$platformIdentifier",
@@ -194,12 +195,21 @@ export const ServerRoute = createServerFileRoute(
 
         const stream = createUIMessageStream({
           execute: ({ writer: dataStream }) => {
+            const modelMessages = convertToModelMessages(uiMessages, {
+              ignoreIncompleteToolCalls: true,
+            });
+
+            const prunedMessages = pruneMessages({
+              messages: modelMessages,
+              reasoning: "all",
+              toolCalls: "before-last-message",
+              emptyMessages: "remove",
+            });
+
             const result = streamText({
               model: google("gemini-2.0-flash"),
               system: systemPrompt(chatbotName, chatbotPersonality, toolsMap),
-              messages: convertToModelMessages(uiMessages, {
-                ignoreIncompleteToolCalls: true,
-              }),
+              messages: prunedMessages,
               stopWhen: stepCountIs(5),
               experimental_transform: smoothStream({ chunking: "word" }),
               tools,
@@ -247,7 +257,6 @@ export const ServerRoute = createServerFileRoute(
           stream.pipeThrough(new JsonToSseTransformStream()),
         );
 
-        // Add CORS headers for embedded widgets
         const headers = new Headers(response.headers);
         headers.set("X-Chat-Id", id);
         headers.set("Cache-Control", "no-cache");

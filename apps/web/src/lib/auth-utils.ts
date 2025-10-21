@@ -2,7 +2,6 @@ import type { Subscription } from "@polar-sh/sdk/models/components/subscription.
 import { createServerFn } from "@tanstack/react-start";
 import { getHeaders } from "@tanstack/react-start/server";
 import { auth, polarClient } from "../../auth";
-import { withCache } from "./redis/cache";
 import { getCustomerExternalId } from "./subscription/subscription-functions";
 
 export const getSession = createServerFn().handler(async () => {
@@ -31,29 +30,23 @@ export const getActiveSubscription = createServerFn().handler(async () => {
     return null;
   }
 
-  return withCache(
-    `subscription:org:${activeOrganizationId}`,
-    async () => {
-      const { result } = await auth.api.subscriptions({
-        query: {
-          page: 1,
-          limit: 10,
-          active: true,
-          referenceId: activeOrganizationId,
-        },
-        headers: getHeaders() as unknown as Headers,
-      });
-
-      const subscription = result?.items?.[0] as Subscription;
-      const status = subscription?.status;
-      if (status !== "active") {
-        return null;
-      }
-
-      return subscription;
+  const { result } = await auth.api.subscriptions({
+    query: {
+      page: 1,
+      limit: 10,
+      active: true,
+      referenceId: activeOrganizationId,
     },
-    { ttl: 600 },
-  );
+    headers: getHeaders() as unknown as Headers,
+  });
+
+  const subscription = result?.items?.[0] as Subscription;
+  const status = subscription?.status;
+  if (status !== "active") {
+    return null;
+  }
+
+  return subscription;
 });
 
 // get active meter for everyone in the organization

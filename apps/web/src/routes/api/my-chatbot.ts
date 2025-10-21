@@ -23,9 +23,7 @@ const createChatbotSchema = z.object({
   primaryColor: z.string().default("#9333ea"),
   theme: z.enum(["light", "dark"]).default("light"),
   hidePoweredBy: z.boolean().default(false),
-  initialMessage: z
-    .string()
-    .default("Hello there👋, how can I help you today?"),
+  initialMessage: z.string().default("Hello there, how can I help you today?"),
   suggestedMessages: z.array(z.string()).optional(),
   isEmbeddingEnabled: z.boolean().default(true),
   allowedDomains: z.array(z.string()).optional(),
