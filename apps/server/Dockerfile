@@ -1,32 +1,26 @@
 # Use Node.js 22+ as the base image
 FROM node:22-alpine AS base
 
-# Install pnpm and build dependencies
-RUN npm install -g pnpm
+# Install build dependencies for native modules
 RUN apk add --no-cache python3 make g++
 
-# Set working directory to project root
+# Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/server/package.json ./apps/server/
-COPY packages/*/package.json ./packages/*/
+# Copy package.json and install dependencies
+COPY package.json ./
 
-# Install all dependencies
-RUN pnpm install
+# Install dependencies
+RUN npm install
 
-# Copy all source code
+# Copy source code
 COPY . .
 
-# Build the project
-RUN pnpm build
+# Build the server
+RUN npm run build
 
 # Development stage
 FROM node:22-alpine AS development
-
-# Install pnpm
-RUN npm install -g pnpm
 
 # Set working directory
 WORKDIR /app
@@ -38,4 +32,4 @@ COPY --from=base /app ./
 EXPOSE 3001
 
 # Run development server
-CMD ["pnpm", "dev"]
+CMD ["npm", "run", "dev"]
