@@ -29,7 +29,7 @@ WORKDIR /app
 COPY --from=base /app ./
 
 # Expose development server port
-EXPOSE 3001
+EXPOSE 3000
 
 # Run development server
 CMD ["npm", "run", "dev"]
