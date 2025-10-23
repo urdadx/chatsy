@@ -33,7 +33,7 @@ export const SlackCard = () => {
           <p className="text-gray-600 text-sm sm:text-md flex-grow">
             Send notifications to your Slack channel about important events and updates.
           </p>
-          <Button className="w-fit rounded-sm  h-9" variant="outline">
+          <Button disabled className="w-fit rounded-sm  h-9" variant="outline">
             Connect
           </Button>
 
