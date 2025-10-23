@@ -58,12 +58,12 @@ export function useChatWebSocket({
 
     if (typeof window !== "undefined") {
       const protocol = location.protocol === "https:" ? "wss:" : "ws:";
-      const host = location.hostname;
-      const port =
-        location.port || (location.protocol === "https:" ? "443" : "80");
-      const wsPort = process.env.NODE_ENV === "development" ? "3000" : port;
 
-      return `${protocol}//${host}:${wsPort}/ws`;
+      if (process.env.NODE_ENV === "development") {
+        return "ws://localhost:3000/ws";
+      }
+
+      return "wss://ws.padyna.com/ws";
     }
 
     return null;
@@ -152,12 +152,12 @@ export function useChatWebSocket({
           if (reconnectAttemptsRef.current < maxReconnectAttempts) {
             const delay = Math.min(
               1000 * 2 ** reconnectAttemptsRef.current,
-              30000,
+              30000
             );
             reconnectAttemptsRef.current += 1;
 
             console.log(
-              `Attempting to reconnect (${reconnectAttemptsRef.current}/${maxReconnectAttempts}) in ${delay}ms...`,
+              `Attempting to reconnect (${reconnectAttemptsRef.current}/${maxReconnectAttempts}) in ${delay}ms...`
             );
 
             reconnectTimeoutRef.current = setTimeout(() => {
@@ -166,7 +166,7 @@ export function useChatWebSocket({
           } else {
             setStatus("error");
             onErrorRef.current?.(
-              "Connection lost and max reconnection attempts reached",
+              "Connection lost and max reconnection attempts reached"
             );
           }
         }
@@ -227,7 +227,7 @@ export function useChatWebSocket({
 
       if (!ws || ws.readyState !== WebSocket.OPEN || !currentChatId) {
         console.warn(
-          "Cannot send message: WebSocket not connected or no chat ID",
+          "Cannot send message: WebSocket not connected or no chat ID"
         );
         return false;
       }
@@ -240,7 +240,7 @@ export function useChatWebSocket({
             chatId: currentChatId,
             text,
             role,
-          }),
+          })
         );
         return true;
       } catch (err) {
@@ -249,7 +249,7 @@ export function useChatWebSocket({
         return false;
       }
     },
-    [role, onError],
+    [role, onError]
   );
 
   const sendTyping = useCallback(
@@ -268,13 +268,13 @@ export function useChatWebSocket({
             chatId: currentChatId,
             role,
             isTyping: typing,
-          }),
+          })
         );
       } catch (err) {
         console.error("Failed to send typing indicator:", err);
       }
     },
-    [role],
+    [role]
   );
 
   return {
