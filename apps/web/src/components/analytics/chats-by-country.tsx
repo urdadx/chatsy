@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMemo } from "react";
 import BarList from "./bar-list";
 
-import { getCountryCode, getCountryCodeFromCity } from "@/constants/counties";
+import { getCountryCode, getCountryCodeFromCity, getCountryFromCode } from "@/constants/counties";
 import { Maximize2, MousePointerClick } from "lucide-react";
 import { useState } from "react";
 import Spinner from "../ui/spinner";
@@ -62,6 +62,7 @@ export function ChatsByCountry({
 
   const mapCountries = countryStats.map((country) => {
     const countryCode = getCountryCode(country.country) || "unknown";
+    const countryName = getCountryFromCode(country.country) || "unknown"
     const iconSrc = `https://flag.vercel.app/m/${country.country}.svg`;
     return {
       icon: (
@@ -72,7 +73,7 @@ export function ChatsByCountry({
           key={country.country}
         />
       ),
-      title: country.country,
+      title: countryName,
       href: "",
       value: country.totalCount,
       linkId: "",

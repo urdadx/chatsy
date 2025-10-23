@@ -1,7 +1,6 @@
 // https://developers.cloudflare.com/fundamentals/reference/http-request-headers/
 
 export function getLocationFromCloudflare(headers: Headers) {
-  // Try both lowercase and uppercase header names (Cloudflare uses uppercase)
   const city = headers.get("CF-IPCity") || headers.get("cf-ipcity") || "Accra";
   const region =
     headers.get("CF-Region") ||
@@ -10,7 +9,7 @@ export function getLocationFromCloudflare(headers: Headers) {
     headers.get("cf-region-code") ||
     "Greater Accra";
   const country =
-    headers.get("CF-IPCountry") || headers.get("cf-ipcountry") || "Ghana";
+    headers.get("CF-IPCountry") || headers.get("cf-ipcountry") || "GH";
   const continent =
     headers.get("CF-IPContinent") || headers.get("cf-ipcontinent") || "AF";
 

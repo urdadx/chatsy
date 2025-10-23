@@ -194,8 +194,16 @@ const countryToCodeMap: Record<string, string> = {
   Zimbabwe: "ZW",
 };
 
+const codeToCountryMap: Record<string, string> = Object.fromEntries(
+  Object.entries(countryToCodeMap).map(([country, code]) => [code, country]),
+);
+
 export const getCountryCode = (countryName: string): string | null => {
   return countryToCodeMap[countryName] || null;
+};
+
+export const getCountryFromCode = (countryCode: string): string | null => {
+  return codeToCountryMap[countryCode] || null;
 };
 
 // Create a lookup map for efficient access
