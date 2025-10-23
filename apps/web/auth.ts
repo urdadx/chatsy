@@ -76,6 +76,14 @@ export const auth = betterAuth({
         input: false,
       },
     },
+    deleteUser: {
+      enabled: true,
+      afterDelete: async (user) => {
+        await polarClient.customers.deleteExternal({
+          externalId: user.id,
+        });
+      },
+    },
   },
   session: {
     additionalFields: {

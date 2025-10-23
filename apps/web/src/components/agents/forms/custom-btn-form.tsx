@@ -35,13 +35,13 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
   const [description, setDescription] = useState("")
   const [buttonText, setButtonText] = useState("")
   const [destinationUrl, setDestinationUrl] = useState("")
-  const [showInQuickMenu, setShowInQuickMenu] = useState(false)
+  const [isActive, setIsActive] = useState(true)
 
   useEffect(() => {
     if (existingAction) {
       setName(existingAction.name || "")
       setDescription(existingAction.description || "")
-      setShowInQuickMenu(existingAction.showInQuickMenu || false)
+      setIsActive(existingAction.isActive ?? true)
 
       const props = existingAction.actionProperties
       if (props) {
@@ -56,6 +56,7 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
       name: string
       description: string
       toolName: string
+      isActive: boolean
       showInQuickMenu: boolean
       actionProperties: {
         buttonText: string
@@ -111,7 +112,8 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
       name: name.trim(),
       description: description.trim(),
       toolName: "custom_button",
-      showInQuickMenu,
+      isActive,
+      showInQuickMenu: false,
       actionProperties: {
         buttonText: buttonText.trim(),
         buttonUrl: destinationUrl.trim()
@@ -230,12 +232,12 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
 
         <div className="flex items-center gap-3">
           <Switch
-            id="show-quick-menu"
-            checked={showInQuickMenu}
-            onCheckedChange={setShowInQuickMenu}
+            id="is-active"
+            checked={isActive}
+            onCheckedChange={setIsActive}
           />
-          <Label htmlFor="show-quick-menu" className="text-sm font-medium cursor-pointer">
-            Show in quick menu page on the chat widget
+          <Label htmlFor="is-active" className="text-sm font-medium cursor-pointer">
+            Use action in bot conversations
           </Label>
         </div>
       </div>

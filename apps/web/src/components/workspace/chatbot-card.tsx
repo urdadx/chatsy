@@ -21,7 +21,6 @@ interface ChatbotCardProps {
 export function ChatbotCard({
   chatbotId,
   name,
-  logo,
   createdAt,
 }: ChatbotCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -42,18 +41,13 @@ export function ChatbotCard({
       <div className="w-full max-w-sm ">
         <div className="overflow-hidden border rounded-xl">
           <div className="relative h-24 overflow-hidden">
-            {logo ? (
-              <img
-                src={logo}
-                alt={name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
+            {
               <img
                 src={`https://api.dicebear.com/9.x/glass/svg?seed=${name}`}
                 alt={name}
+                loading="lazy"
                 className="w-full h-full object-cover"
-              />)}
+              />}
           </div>
           <div className="p-4 bg-white">
             <div className="flex items-start justify-between">

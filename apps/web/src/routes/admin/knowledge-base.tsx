@@ -41,7 +41,7 @@ function RouteComponent() {
       {/* Main content scrollable */}
       <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:pr-[360px] bg-white">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-xl font-semibold mb-6 hidden sm:block">
+          <h1 className="text-xl font-semibold mb-6  sm:block">
             Knowledge Base
           </h1>
           <Tabs value={tab} onValueChange={handleTabChange}>

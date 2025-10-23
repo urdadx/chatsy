@@ -35,7 +35,7 @@ export function PersonalitySelector({ personality }: { personality?: string }) {
       <Select onValueChange={handleChange} value={selectedPersonality}>
         <SelectTrigger
           id={id}
-          className="[&>span_svg]:text-muted-foreground/80 [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 w-[250px]"
+          className="[&>span_svg]:text-muted-foreground/80 [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 w-full sm:w-[250px]"
         >
           <SelectValue placeholder="Select personality" />
         </SelectTrigger>

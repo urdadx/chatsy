@@ -21,7 +21,7 @@ import {
 import { useChatbot } from "@/hooks/use-chatbot";
 import { signOut } from "@/lib/auth-client";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { CreditCard, LogOut, User } from "lucide-react";
+import { CreditCard, LogOut } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
@@ -59,8 +59,11 @@ export function UserDropdown({ user }: any) {
       <Avatar className="h-10 w-10 rounded-full border-2 border-primary">
         <AvatarImage src={user?.image} alt={chatbot?.name || user?.username} />
         <AvatarFallback>
-          <User className="h-5 w-5 text-gray-600" />
-        </AvatarFallback>
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold bg-primary"
+          >
+            {user?.name.charAt(0).toUpperCase() || "C"}
+          </div>           </AvatarFallback>
       </Avatar>
       <div className="grid flex-1 text-left text-sm leading-tight">
         <span className="truncate font-medium">{user?.name}</span>
@@ -79,7 +82,11 @@ export function UserDropdown({ user }: any) {
           <Avatar className="h-10 w-10 sm:h-6 sm:w-6 rounded-full border">
             <AvatarImage src={user?.image} alt={user?.username} />
             <AvatarFallback>
-              <User className="h-4 w-4 sm:h-3 sm:w-3 text-gray-600" />
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold bg-primary"
+              >
+                {user?.name.charAt(0).toUpperCase() || "C"}
+              </div>
             </AvatarFallback>
           </Avatar>
           <span className="font-medium">{user?.email}</span>
@@ -134,8 +141,11 @@ export function UserDropdown({ user }: any) {
                       <Avatar className="h-10 w-10 sm:h-6 sm:w-6 rounded-full border">
                         <AvatarImage src={user?.image} alt={user?.username} />
                         <AvatarFallback>
-                          <User className="h-10 w-10 sm:h-3 sm:w-3 text-gray-600" />
-                        </AvatarFallback>
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold bg-primary"
+                          >
+                            {user?.name.charAt(0).toUpperCase() || "C"}
+                          </div>                           </AvatarFallback>
                       </Avatar>
                       <span className="font-medium">{user?.email}</span>
                     </div>

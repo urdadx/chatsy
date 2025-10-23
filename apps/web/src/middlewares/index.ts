@@ -24,7 +24,6 @@ export const subscriptionMiddleware = createMiddleware({
       query: {
         page: 1,
         limit: 1,
-        active: true,
         referenceId: activeOrganizationId,
       },
       headers: request.headers,
@@ -34,7 +33,21 @@ export const subscriptionMiddleware = createMiddleware({
       | CustomerSubscription
       | undefined;
 
-    const hasActiveSubscription = subscription?.status === "active";
+    let hasActiveSubscription = false;
+
+    if (subscription?.status === "active") {
+      // If subscription is active (paid), it's always valid regardless of trial end
+      hasActiveSubscription = true;
+    } else if (subscription?.status === "trialing") {
+      // For trialing subscriptions, check if trial has ended
+      // @ts-ignore - polar needs to update their types to include trialEnd
+      const hasTrialEnded = subscription?.trialEnd
+        ? // @ts-ignore
+          new Date(subscription.trialEnd) < new Date()
+        : false;
+
+      hasActiveSubscription = !hasTrialEnded;
+    }
 
     return await next({
       context: {
@@ -56,6 +69,11 @@ export const subscriptionMiddleware = createMiddleware({
   }
 });
 
+// i am using getCustomerExternalId here to get the external customer ID
+// then using that to get the active meters from polar
+// and then getting the llm_usage meter to find the tokens left
+// because polar does not return meter data in subscription object for invited users
+// in an organization
 export const tokenUsageMiddleware = createMiddleware({
   type: "request",
 }).server(async ({ next }) => {
@@ -71,7 +89,6 @@ export const tokenUsageMiddleware = createMiddleware({
     const tokensLeft = meterItem
       ? meterItem.creditedUnits - meterItem.consumedUnits
       : 0;
-    console.log("Tokens left for llm_usage:", tokensLeft);
 
     return await next({
       context: {

@@ -22,7 +22,7 @@ interface CalendlyFormProps {
 export function CalendlyForm({ actionId }: CalendlyFormProps) {
   const { data: chatbot } = useChatbot()
   const [selectedEventType, setSelectedEventType] = useState<string | undefined>(undefined)
-  const [showInQuickMenu, setShowInQuickMenu] = useState(false)
+  const [isActive, setIsActive] = useState(true)
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const router = useRouter()
@@ -43,7 +43,7 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
     if (existingAction) {
       setName(existingAction.name || "")
       setDescription(existingAction.description || "")
-      setShowInQuickMenu(existingAction.showInQuickMenu || false)
+      setIsActive(existingAction.isActive ?? true)
 
       const props = existingAction.actionProperties
       if (props?.eventTypeUri) {
@@ -92,13 +92,14 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
       eventTypeUri: string
       eventTypeName: string
       userEmail?: string
-      showInQuickMenu: boolean
+      isActive: boolean
     }) => {
       const payload = {
         name: data.name,
         description: data.description,
         toolName: "calendly_booking",
-        showInQuickMenu: data.showInQuickMenu,
+        isActive: data.isActive,
+        showInQuickMenu: false,
         actionProperties: {
           eventTypeUri: data.eventTypeUri,
           eventTypeName: data.eventTypeName,
@@ -155,7 +156,7 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
       eventTypeUri: selectedEventType,
       eventTypeName: getEventTypeSlug(selectedEventTypeData),
       userEmail,
-      showInQuickMenu,
+      isActive,
     })
   }
 
@@ -320,9 +321,9 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <Switch id="show-quick-menu" checked={showInQuickMenu} onCheckedChange={setShowInQuickMenu} />
-          <Label htmlFor="show-quick-menu" className="text-sm font-medium cursor-pointer">
-            Show in quick menu page on the chat widget
+          <Switch id="is-active" checked={isActive} onCheckedChange={setIsActive} />
+          <Label htmlFor="is-active" className="text-sm font-medium cursor-pointer">
+            Use action in bot conversations
           </Label>
         </div>
       </div>

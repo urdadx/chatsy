@@ -201,7 +201,7 @@ export function ChatbotSettings(
           </div>
         </div>
         <Separator className="my-3" />
-        <div className="flex flex-col items-center sm:flex-row gap-3 justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <div className="flex items-center gap-2">
             <Label>Chatbot Personality</Label>
           </div>

@@ -124,7 +124,7 @@ export const CreateActionDialog = () => {
           Create new action
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full max-w-2xl  p-0 gap-0 animate-scale-in">
+      <DialogContent className="w-[95vw] max-w-2xl p-0 gap-0 animate-scale-in">
         <DialogHeader className="px-6 py-4 border-border">
           <DialogTitle className="font-semibold text-xl text-foreground">
             Create a new action

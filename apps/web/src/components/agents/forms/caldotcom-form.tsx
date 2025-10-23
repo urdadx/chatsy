@@ -34,13 +34,13 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [eventTypeUrl, setEventTypeUrl] = useState("")
-  const [showInQuickMenu, setShowInQuickMenu] = useState(false)
+  const [isActive, setIsActive] = useState(true)
 
   useEffect(() => {
     if (existingAction) {
       setName(existingAction.name || "")
       setDescription(existingAction.description || "")
-      setShowInQuickMenu(existingAction.showInQuickMenu || false)
+      setIsActive(existingAction.isActive ?? true)
 
       const props = existingAction.actionProperties
       if (props) {
@@ -54,6 +54,7 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
       name: string
       description: string
       toolName: string
+      isActive: boolean
       showInQuickMenu: boolean
       actionProperties: {
         eventTypeUrl: string
@@ -110,7 +111,8 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
       name: name.trim(),
       description: description.trim(),
       toolName: "cal_booking",
-      showInQuickMenu,
+      isActive,
+      showInQuickMenu: false,
       actionProperties: {
         eventTypeUrl: eventTypeUrl.trim()
       }
@@ -211,12 +213,12 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
 
         <div className="flex items-center gap-3">
           <Switch
-            id="show-quick-menu"
-            checked={showInQuickMenu}
-            onCheckedChange={setShowInQuickMenu}
+            id="is-active"
+            checked={isActive}
+            onCheckedChange={setIsActive}
           />
-          <Label htmlFor="show-quick-menu" className="text-sm font-medium cursor-pointer">
-            Show in quick menu page on the chat widget
+          <Label htmlFor="is-active" className="text-sm font-medium cursor-pointer">
+            Use action in bot conversations
           </Label>
         </div>
       </div>

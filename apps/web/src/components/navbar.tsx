@@ -31,9 +31,9 @@ export const Navbar = () => {
           <div className="flex sm:hidden">
             <SidebarTrigger className=" w-5 h-5 text-muted-foreground mr-2" />
           </div>
-          <h2 className="flex sm:hidden text-md font-semibold capitalize">
+          {/* <h2 className="flex sm:hidden text-md font-semibold capitalize">
             {headerName}
-          </h2>
+          </h2> */}
         </div>
         <div className="flex items-center gap-2">
           <ShareBot />

@@ -99,7 +99,7 @@ export function MemberActions({ member }: { member: any }) {
             Modify role
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
-            Delete
+            Remove
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

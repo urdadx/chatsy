@@ -10,8 +10,8 @@ export const SourcesHeader = ({
   onSearchChange,
 }: SourcesHeaderProps) => {
   return (
-    <div className="flex justify-between items-center mb-4">
-      <h3 className="font-semibold text-lg">Website Sources</h3>
+    <div className="flex justify-between gap-4 items-center mb-4">
+      <h3 className="font-semibold text-lg hidden sm:block ">Website Sources</h3>
       <SearchInput
         placeholder="Search sources..."
         value={searchTerm}

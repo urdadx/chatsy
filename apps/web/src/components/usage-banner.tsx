@@ -9,7 +9,12 @@ import { Dialog, DialogTrigger } from "./ui/dialog";
 import { UpgradeBanner } from "./upgrade-banner";
 
 export function UsageBanner() {
-  const { data: activeMeters, isLoading, isError } = useActiveMeters();
+  const { data, isLoading, isError, refetch } = useActiveMeters();
+  const activeMeters = data?.activeMeters[0] || null
+  const subscription = data?.activeSubscriptions?.[0] || null
+
+  // @ts-ignore - polar needs to update their types for better auth
+  const isTrialing = subscription?.status === "trialing"
 
   const creditedUnits = activeMeters?.creditedUnits ?? 0;
   const balance = activeMeters?.balance ?? 0;
@@ -23,15 +28,32 @@ export function UsageBanner() {
       <Card className="shadow-none h-fit">
         <div className="px-4 grid gap-4">
           <Skeleton className="h-4 w-32 mb-2" />
-          {/* <Skeleton className="h-3 w-full mb-4" /> */}
           <Skeleton className="h-8 w-full" />
         </div>
       </Card>
     );
   }
 
+  if (isTrialing) {
+    return <UpgradeBanner subscription={subscription} />;
+  }
+
+
   if (isError) {
-    return <UpgradeBanner />;
+    return (
+      <Card className="shadow-none h-fit">
+        <div className="px-4 grid gap-4">
+          <h3 className="text-sm font-medium text-red-600">
+            Error loading usage data
+          </h3>
+        </div>
+        <Button variant="outline" className="mt-2" onClick={() => refetch()}>
+          Try Again
+        </Button>
+      </Card>
+    )
+
+
   }
 
   return (

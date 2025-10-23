@@ -235,7 +235,7 @@ export const ChatConversation = () => {
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                You can escalate the chat from the chat settings to join in.
+                You can escalate this chat from the chat settings to join in.
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -245,7 +245,7 @@ export const ChatConversation = () => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                You can escalate the chat from the chat settings to join in.
+                You can escalate this chat from the chat settings to join in.
               </TooltipContent>
             </Tooltip>
           </div>

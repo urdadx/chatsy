@@ -18,6 +18,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { authClient } from "@/lib/auth-client";
+import { useMutation } from "@tanstack/react-query";
 import { CircleAlert } from "lucide-react";
 import { useState } from "react";
 
@@ -25,15 +27,31 @@ export const ProfileDelete = () => {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
 
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await authClient.deleteUser({
+        callbackURL: "/login"
+      });
+    },
+  });
+
+  const handleDelete = () => {
+    deleteMutation.mutate();
+  };
+
   const ConfirmationContent = () => (
     <>
       <div className="space-y-2 sm:space-y-3 mt-4">
-        <div className="text-base sm:text-lg flex items-center gap-1 sm:gap-2">
+        <div className="text-xl flex items-center gap-1 sm:gap-2">
           <div
-            className="flex size-6 sm:size-8 shrink-0 items-center justify-center rounded-full border border-border"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border"
             aria-hidden="true"
           >
-            <CircleAlert className="opacity-80" size={14} strokeWidth={2} />
+            <CircleAlert
+              className="opacity-80"
+              size={20}
+              strokeWidth={2}
+            />
           </div>
           Delete account
         </div>
@@ -63,10 +81,12 @@ export const ProfileDelete = () => {
           </DrawerClose>
         )}
         <Button
+          onClick={handleDelete}
           variant="destructive"
-          className="transition-all text-xs sm:text-sm py-1.5 sm:py-2"
+          disabled={deleteMutation.isPending}
+          className="transition-all text-white text-xs sm:text-sm py-1.5 sm:py-2"
         >
-          Yes, delete
+          {deleteMutation.isPending ? "Deleting..." : "Yes, delete"}
         </Button>
       </div>
     </>
@@ -120,10 +140,12 @@ export const ProfileDelete = () => {
                     </Button>
                   </DialogClose>
                   <Button
+                    onClick={handleDelete}
                     variant="destructive"
+                    disabled={deleteMutation.isPending}
                     className="transition-all text-white text-xs sm:text-sm py-1.5 sm:py-2"
                   >
-                    Yes, delete
+                    {deleteMutation.isPending ? "Deleting..." : "Yes, delete"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -135,7 +157,7 @@ export const ProfileDelete = () => {
                   Delete Account
                 </Button>
               </DrawerTrigger>
-              <DrawerContent className="px-4 py-4">
+              <DrawerContent className="px-4 py-4 h-[40%]">
                 <DrawerHeader className="text-left p-0">
                   <DrawerTitle className="sr-only">Confirm Delete</DrawerTitle>
                 </DrawerHeader>

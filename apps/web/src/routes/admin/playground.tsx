@@ -54,7 +54,7 @@ function RouteComponent() {
       {/* Main content */}
       <div className="md:pr-[420px] ">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
-          <div className="mb-6 flex-col hidden sm:flex">
+          <div className="mb-6 flex-col  sm:flex">
             <h1 className="text-xl font-semibold mb-2">Playground</h1>
             <p className="text-muted-foreground hidden sm:block">
               Preview and configure your chatbot's behavior and styling

@@ -110,7 +110,7 @@ function RouteComponent() {
       <div className=" w-full h-[90vh] mx-auto p-1 sm:p-4">
         <div className="bg-white border rounded-xl py-2 h-full flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-4 pt-1 pb-2 border-b bg-white rounded-t-3xl">
-            <h1 className="text-xl font-semibold hidden sm:flex">Chat Logs</h1>
+            <h1 className="text-xl font-semibold  sm:flex">Chat Logs</h1>
             <div className="flex items-center space-x-3">
               <ChatFilterDialog
                 currentFilter={filter}
@@ -150,7 +150,7 @@ function RouteComponent() {
             {/* Sidebar */}
             <div className="flex flex-col gap-2 p-2 py-4 h-full">
               <div className="flex items-center mb-2 justify-between flex-shrink-0">
-                <h1 className="text-xl font-semibold hidden sm:flex">Chat Logs</h1>
+                <h1 className="text-xl font-semibold px-2 sm:flex">Chat Logs</h1>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"

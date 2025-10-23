@@ -53,7 +53,7 @@ function RouteComponent() {
           sourcesCount={sourcesCount}
           conversationsCount={conversationsCount}
           voteCounts={voteCounts}
-          meter={meter}
+          meter={meter?.activeMeters[0] || undefined}
           visitorData={visitorData}
         />
         {renderStatus()}

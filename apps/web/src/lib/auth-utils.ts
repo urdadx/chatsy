@@ -34,7 +34,6 @@ export const getActiveSubscription = createServerFn().handler(async () => {
     query: {
       page: 1,
       limit: 10,
-      active: true,
       referenceId: activeOrganizationId,
     },
     headers: getHeaders() as unknown as Headers,
@@ -42,7 +41,7 @@ export const getActiveSubscription = createServerFn().handler(async () => {
 
   const subscription = result?.items?.[0] as Subscription;
   const status = subscription?.status;
-  if (status !== "active") {
+  if (status !== "active" && status !== "trialing") {
     return null;
   }
 
@@ -58,5 +57,5 @@ export const getActiveMeter = createServerFn().handler(async () => {
     externalId: externalCustomerId,
   });
 
-  return result?.activeMeters[0] || [];
+  return result;
 });
