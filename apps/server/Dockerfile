@@ -5,52 +5,31 @@ FROM node:22-alpine AS base
 RUN apk add --no-cache python3 make g++
 
 # Set working directory
-WORKDIR /app/apps/server
+WORKDIR /app
 
-# Copy server package.json and install dependencies
+# Copy package.json and install dependencies
 COPY package.json ./
 
-# Install dependencies with proper flags
-RUN npm install --omit=dev=false
+# Install dependencies
+RUN npm install
 
 # Copy source code
-COPY . ./
+COPY . .
 
-# Build the websocket server
+# Build the server
 RUN npm run build
 
-# Production stage
-FROM node:22-alpine AS production
+# Development stage
+FROM node:22-alpine AS development
 
 # Set working directory
-WORKDIR /app/apps/server
+WORKDIR /app
 
-# Copy built websocket server
-COPY --from=base /app/apps/server/dist ./dist
-COPY --from=base /app/apps/server/package.json ./
+# Copy everything from base
+COPY --from=base /app ./
 
-# Copy startup script
-COPY start.sh ./
-RUN chmod +x start.sh
+# Expose development server port
+EXPOSE 3000
 
-# Install production dependencies only
-RUN npm install --omit=dev
-
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S wsserver -u 1001
-
-# Change ownership of the app directory
-RUN chown -R wsserver:nodejs /app
-
-# Switch to non-root user
-USER wsserver
-
-# Expose WebSocket server port
-EXPOSE 3001
-
-# Set environment to production
-ENV NODE_ENV=production
-ENV PORT=3001
-
-CMD ["./start.sh"]
+# Run development server
+CMD ["npm", "run", "dev"]

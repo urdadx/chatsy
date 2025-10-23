@@ -409,11 +409,14 @@ function createChatStoreCreator(initialMessages = []) {
       _syncState: (newState) => {
         markLastAction("chat:_syncState");
         batchUpdates(() => {
-          set({
-            ...newState,
-            _memoizedSelectors: /* @__PURE__ */ new Map()
-            // Clear memoized selectors on sync
-          });
+          set(
+            {
+              ...newState,
+              _memoizedSelectors: /* @__PURE__ */ new Map()
+              // Clear memoized selectors on sync
+            },
+            false
+          );
           if (newState.messages) {
             throttledMessagesUpdater?.();
           }

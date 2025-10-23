@@ -28,7 +28,6 @@ import { Route as BubbleWidgetIdRouteImport } from './routes/bubble/$widgetId'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminPlaygroundRouteImport } from './routes/admin/playground'
 import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
-import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
 import { Route as AdminKnowledgeBaseRouteImport } from './routes/admin/knowledge-base'
 import { Route as AdminIntegrationsRouteImport } from './routes/admin/integrations'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
@@ -178,11 +177,6 @@ const AdminPlaygroundRoute = AdminPlaygroundRouteImport.update({
 const AdminOverviewRoute = AdminOverviewRouteImport.update({
   id: '/overview',
   path: '/overview',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminLeadsRoute = AdminLeadsRouteImport.update({
-  id: '/leads',
-  path: '/leads',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminKnowledgeBaseRoute = AdminKnowledgeBaseRouteImport.update({
@@ -540,7 +534,6 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
-  '/admin/leads': typeof AdminLeadsRoute
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -574,7 +567,6 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
-  '/admin/leads': typeof AdminLeadsRoute
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -609,7 +601,6 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/knowledge-base': typeof AdminKnowledgeBaseRoute
-  '/admin/leads': typeof AdminLeadsRoute
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/playground': typeof AdminPlaygroundRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -645,7 +636,6 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/integrations'
     | '/admin/knowledge-base'
-    | '/admin/leads'
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
@@ -679,7 +669,6 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/integrations'
     | '/admin/knowledge-base'
-    | '/admin/leads'
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
@@ -713,7 +702,6 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/integrations'
     | '/admin/knowledge-base'
-    | '/admin/leads'
     | '/admin/overview'
     | '/admin/playground'
     | '/admin/settings'
@@ -1234,13 +1222,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOverviewRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/leads': {
-      id: '/admin/leads'
-      path: '/leads'
-      fullPath: '/admin/leads'
-      preLoaderRoute: typeof AdminLeadsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/admin/knowledge-base': {
       id: '/admin/knowledge-base'
       path: '/knowledge-base'
@@ -1693,7 +1674,6 @@ interface AdminRouteRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminIntegrationsRoute: typeof AdminIntegrationsRoute
   AdminKnowledgeBaseRoute: typeof AdminKnowledgeBaseRoute
-  AdminLeadsRoute: typeof AdminLeadsRoute
   AdminOverviewRoute: typeof AdminOverviewRoute
   AdminPlaygroundRoute: typeof AdminPlaygroundRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -1708,7 +1688,6 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminIntegrationsRoute: AdminIntegrationsRoute,
   AdminKnowledgeBaseRoute: AdminKnowledgeBaseRoute,
-  AdminLeadsRoute: AdminLeadsRoute,
   AdminOverviewRoute: AdminOverviewRoute,
   AdminPlaygroundRoute: AdminPlaygroundRoute,
   AdminSettingsRoute: AdminSettingsRoute,
