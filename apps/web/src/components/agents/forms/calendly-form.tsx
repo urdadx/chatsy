@@ -115,11 +115,19 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
       const response = await api.post("/agent-actions", payload)
       return response.data
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success(isEditing ? "Calendly action updated" : "Calendly action created")
       queryClient.invalidateQueries({ queryKey: ["actions"] })
       if (isEditing) {
         queryClient.invalidateQueries({ queryKey: ["action", actionId] })
+      } else {
+        const newActionId = data?.action?.id || data?.id
+        if (newActionId) {
+          router.navigate({
+            to: '/admin/actions/edit-action',
+            search: { actionId: newActionId, toolName: 'calendly_booking' }
+          })
+        }
       }
     },
     onError: (error: any) => {
@@ -181,7 +189,9 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
     onSuccess: () => {
       toast.success("Action deleted")
       queryClient.invalidateQueries({ queryKey: ["actions"] })
-      router.history.back()
+      router.navigate({
+        to: '/admin/actions',
+      })
     },
     onError: () => {
       toast.error(
@@ -204,7 +214,11 @@ export function CalendlyForm({ actionId }: CalendlyFormProps) {
             className="text-sm"
             type="button"
             aria-label="Go back"
-            onClick={() => router.history.back()}
+            onClick={() =>
+              router.navigate({
+                to: '/admin/actions',
+              })
+            }
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>

@@ -1,5 +1,4 @@
 import { SolarLetterBoldDuotone } from "@/assets/icons/letter";
-import { useLocation } from "@tanstack/react-router";
 import { useState } from "react";
 import { ShareBot } from "./share-bot/share-bot";
 import { Button } from "./ui/button";
@@ -7,16 +6,8 @@ import { SidebarTrigger } from "./ui/sidebar";
 import { InviteMembers } from "./workspace/invite-members";
 
 export const Navbar = () => {
-  const pathname = useLocation({
-    select: (location) => location.pathname,
-  });
-
-  const headerName = pathname.startsWith("/admin")
-    ? pathname.replace("/admin/", "").split("/")[0].replace(/-/g, " ")
-    : pathname.replace(/-/g, " ");
 
   const [inviteMembersOpen, setInviteMembersOpen] = useState(false);
-
 
   return (
     <>
@@ -31,9 +22,7 @@ export const Navbar = () => {
           <div className="flex sm:hidden">
             <SidebarTrigger className=" w-5 h-5 text-muted-foreground mr-2" />
           </div>
-          {/* <h2 className="flex sm:hidden text-md font-semibold capitalize">
-            {headerName}
-          </h2> */}
+
         </div>
         <div className="flex items-center gap-2">
           <ShareBot />

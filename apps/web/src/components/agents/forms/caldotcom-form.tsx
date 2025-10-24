@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { api } from "@/lib/api"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useRouter } from "@tanstack/react-router"
+import { useNavigate, useRouter } from "@tanstack/react-router"
 import { ArrowLeft } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -68,11 +68,19 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
       const response = await api.post("/agent-actions", actionData)
       return response.data
     },
-    onSuccess: () => {
-      toast.success("successful")
+    onSuccess: (data) => {
+      toast.success(isEditing ? "Action updated" : "Action created")
       queryClient.invalidateQueries({ queryKey: ["actions"] })
       if (isEditing) {
         queryClient.invalidateQueries({ queryKey: ["action", actionId] })
+      } else {
+        const newActionId = data?.action?.id || data?.id
+        if (newActionId) {
+          router.navigate({
+            to: '/admin/actions/edit-action',
+            search: { actionId: newActionId, toolName: 'cal_booking' }
+          })
+        }
       }
     },
     onError: () => {
@@ -81,6 +89,9 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
       )
     }
   })
+
+  const navigate = useNavigate()
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -99,6 +110,7 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
       toast.warning("Please enter an event type URL")
       return
     }
+
 
     // Validate Cal.com URL format
     const urlPattern = /^https:\/\/cal\.com\/([^\/]+)\/([^\/]+)$/
@@ -127,7 +139,9 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
     onSuccess: () => {
       toast.success("Action deleted")
       queryClient.invalidateQueries({ queryKey: ["actions"] })
-      router.history.back()
+      router.navigate({
+        to: "/admin/actions"
+      })
     },
     onError: () => {
       toast.error(
@@ -151,7 +165,13 @@ export function CaldotComForm({ actionId }: CaldotComFormProps) {
             className="text-sm"
             type="button"
             aria-label="Go back"
-            onClick={() => router.history.back()}
+            onClick={() => {
+              navigate(
+                {
+                  to: '/admin/actions',
+                }
+              )
+            }}
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>

@@ -19,9 +19,12 @@ import {
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { authClient } from "@/lib/auth-client";
+import { sleep } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { CircleAlert } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import Spinner from "../ui/spinner";
 
 export const ProfileDelete = () => {
   const isMobile = useIsMobile();
@@ -29,10 +32,13 @@ export const ProfileDelete = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      await authClient.deleteUser({
-        callbackURL: "/login"
-      });
+      await authClient.deleteUser();
     },
+    onSuccess: () => {
+      toast.success("Account deleted successfully.");
+      sleep(500)
+      window.location.href = "/login";
+    }
   });
 
   const handleDelete = () => {
@@ -86,7 +92,11 @@ export const ProfileDelete = () => {
           disabled={deleteMutation.isPending}
           className="transition-all text-white text-xs sm:text-sm py-1.5 sm:py-2"
         >
-          {deleteMutation.isPending ? "Deleting..." : "Yes, delete"}
+          {deleteMutation.isPending ? <>
+            Deleting...
+            <Spinner className="ml-1 text-white" />
+
+          </> : "Yes, delete"}
         </Button>
       </div>
     </>
@@ -145,7 +155,11 @@ export const ProfileDelete = () => {
                     disabled={deleteMutation.isPending}
                     className="transition-all text-white text-xs sm:text-sm py-1.5 sm:py-2"
                   >
-                    {deleteMutation.isPending ? "Deleting..." : "Yes, delete"}
+                    {deleteMutation.isPending ? <>
+                      Deleting...
+                      <Spinner className="ml-1 text-white" />
+
+                    </> : "Yes, delete"}
                   </Button>
                 </DialogFooter>
               </DialogContent>

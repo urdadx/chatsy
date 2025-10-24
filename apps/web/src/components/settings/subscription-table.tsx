@@ -38,9 +38,7 @@ export const SubscriptionTable = () => {
 
   const isAdmin = member?.role === "owner" || member?.role === "admin";
 
-  const handleManageSubscription = async () => {
-    await authClient.customer.portal();
-  }
+
 
   return (
     <div className="mx-auto">
@@ -91,26 +89,6 @@ export const SubscriptionTable = () => {
               </TooltipContent>
             )}
           </Tooltip>
-          {/* <Tooltip>
-            <TooltipTrigger asChild>
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button onClick={handleManageSubscription} variant="outline">
-                  Manage
-                </Button>
-              </motion.div>
-            </TooltipTrigger>
-            {!isAdmin && (
-              <TooltipContent className="bg-white shadow-sm p-3" sideOffset={8}>
-                <p className="text-black text-sm">
-                  Only admins can change workspace logo. Please contact your
-                  admin
-                </p>
-              </TooltipContent>
-            )}
-          </Tooltip> */}
 
         </div>
       </div>

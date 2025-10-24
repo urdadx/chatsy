@@ -71,11 +71,19 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
       const response = await api.post("/agent-actions", actionData)
       return response.data
     },
-    onSuccess: () => {
-      toast.success("successful")
+    onSuccess: (data) => {
+      toast.success(isEditing ? "Action updated" : "Action created")
       queryClient.invalidateQueries({ queryKey: ["actions"] })
       if (isEditing) {
         queryClient.invalidateQueries({ queryKey: ["action", actionId] })
+      } else {
+        const newActionId = data?.action?.id || data?.id
+        if (newActionId) {
+          router.navigate({
+            to: '/admin/actions/edit-action',
+            search: { actionId: newActionId, toolName: 'custom_button' }
+          })
+        }
       }
     },
     onError: () => {
@@ -129,7 +137,9 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
     onSuccess: () => {
       toast.success("Action deleted")
       queryClient.invalidateQueries({ queryKey: ["actions"] })
-      router.history.back()
+      router.navigate({
+        to: '/admin/actions',
+      })
     },
     onError: () => {
       toast.error(
@@ -153,7 +163,11 @@ export function CustomButtonForm({ actionId }: CustomButtonFormProps) {
             className="text-sm"
             type="button"
             aria-label="Go back"
-            onClick={() => router.history.back()}
+            onClick={() => {
+              router.navigate({
+                to: '/admin/actions',
+              })
+            }}
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
