@@ -51,6 +51,7 @@ ENV VITE_EXTRA_MESSAGE_CREDITS_ADDON=$VITE_EXTRA_MESSAGE_CREDITS_ADDON
 ENV VITE_REMOVE_BRANDING_ADDON=$VITE_REMOVE_BRANDING_ADDON
 
 # Build the TanStack Start application
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN pnpm build
 
 # Build the websocket server
