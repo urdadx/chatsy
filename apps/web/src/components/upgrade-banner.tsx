@@ -37,7 +37,6 @@ export function UpgradeBanner({ subscription }: { subscription?: any }) {
 
 
 
-
   return (
     <Card className="shadow-none h-fit gap-2">
       <CardHeader className="">
