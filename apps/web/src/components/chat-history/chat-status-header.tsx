@@ -73,7 +73,7 @@ export const ChatStatusHeader = ({
           <>
             <div className="size-2 rounded-full bg-yellow-500" />
             <span className="font-medium text-yellow-700 dark:text-yellow-300">
-              Couldn't connect. The user likely left the chat.
+              Couldn't connect. Please try again.
             </span>
           </>
         ) : (

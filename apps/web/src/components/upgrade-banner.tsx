@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TextShimmer } from "@/components/ui/text-shimmer";
-import { authClient } from "@/lib/auth-client";
+
 
 export function UpgradeBanner({ subscription }: { subscription?: any }) {
 
@@ -35,9 +35,6 @@ export function UpgradeBanner({ subscription }: { subscription?: any }) {
     return "Upgrade Available";
   };
 
-  const handleCustomerPortal = async () => {
-    await authClient.customer.portal();
-  }
 
 
 
@@ -52,15 +49,16 @@ export function UpgradeBanner({ subscription }: { subscription?: any }) {
         </CardDescription>
       </CardHeader>
       <div className="grid px-3">
-        <Button
-          onClick={handleCustomerPortal}
-          className="w-full text-sidebar-primary-foreground shadow-none"
-          size="sm"
-        >
-          <TextShimmer duration={1.5} className="text-white">
-            Upgrade your plan
-          </TextShimmer>
-        </Button>
+        <a target="_blank" href="/choose-plan" rel="noreferrer">
+          <Button
+            className="w-full text-sidebar-primary-foreground shadow-none"
+            size="sm"
+          >
+            <TextShimmer duration={1.5} className="text-white">
+              Upgrade your plan
+            </TextShimmer>
+          </Button>
+        </a>
       </div>
     </Card>
   );

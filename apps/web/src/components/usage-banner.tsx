@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActiveMeters } from "@/hooks/use-usage-meters";
+import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { AddOnsDialog } from "./add-ons-dialog";
 import { Button } from "./ui/button";
@@ -86,6 +87,7 @@ export function UsageBanner() {
               >
                 <p className="text-white">Buy more credits</p>
               </Button>
+
             </motion.div>
           </DialogTrigger>
           <AddOnsDialog defaultValue="messages" />

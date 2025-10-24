@@ -246,7 +246,7 @@ export function Pricing() {
                             ) : plan.name === "Enterprise" ? (
                               "Contact Sales"
                             ) : (
-                              "Get Started for free"
+                              "Start free trial"
                             )}
                           </Button>
                         </motion.div>
@@ -334,7 +334,7 @@ export function Pricing() {
                           ) : plan.name === "Enterprise" ? (
                             "Contact Sales"
                           ) : (
-                            "Get Started for free"
+                            "Start free trial"
                           )}
                         </Button>
                       </CardFooter>
