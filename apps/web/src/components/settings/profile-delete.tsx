@@ -48,7 +48,7 @@ export const ProfileDelete = () => {
   const ConfirmationContent = () => (
     <>
       <div className="space-y-2 sm:space-y-3 mt-4">
-        <div className="text-xl flex items-center gap-1 sm:gap-2">
+        <div className="text-lg flex items-center gap-2">
           <div
             className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border"
             aria-hidden="true"
@@ -80,7 +80,7 @@ export const ProfileDelete = () => {
           <DrawerClose asChild>
             <Button
               variant="outline"
-              className="text-xs sm:text-sm py-1.5 sm:py-2"
+              className=" py-1.5 sm:py-2"
             >
               Cancel
             </Button>
@@ -90,7 +90,7 @@ export const ProfileDelete = () => {
           onClick={handleDelete}
           variant="destructive"
           disabled={deleteMutation.isPending}
-          className="transition-all text-white text-xs sm:text-sm py-1.5 sm:py-2"
+          className="transition-all text-white  py-1.5 sm:py-2"
         >
           {deleteMutation.isPending ? <>
             Deleting...
@@ -171,7 +171,7 @@ export const ProfileDelete = () => {
                   Delete Account
                 </Button>
               </DrawerTrigger>
-              <DrawerContent className="px-4 py-4 h-[40%]">
+              <DrawerContent className="px-4 py-4 h-[25%]">
                 <DrawerHeader className="text-left p-0">
                   <DrawerTitle className="sr-only">Confirm Delete</DrawerTitle>
                 </DrawerHeader>

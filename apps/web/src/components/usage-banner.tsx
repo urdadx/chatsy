@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActiveMeters } from "@/hooks/use-usage-meters";
-import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { AddOnsDialog } from "./add-ons-dialog";
 import { Button } from "./ui/button";
@@ -42,13 +41,13 @@ export function UsageBanner() {
 
   if (isError) {
     return (
-      <Card className="shadow-none h-fit">
+      <Card className="shadow-none h-fit px-2">
         <div className="px-4 grid gap-4">
           <h3 className="text-sm font-medium text-red-600">
             Error loading usage data
           </h3>
         </div>
-        <Button variant="outline" className="mt-2" onClick={() => refetch()}>
+        <Button variant="outline" className="mt-2 h-9" onClick={() => refetch()}>
           Try Again
         </Button>
       </Card>
