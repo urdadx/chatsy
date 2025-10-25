@@ -4,7 +4,11 @@ import { CustomButtonForm } from '@/components/agents/forms/custom-btn-form'
 import { FeedbackForm } from '@/components/agents/forms/feedback-form'
 import { LeadsForm } from '@/components/agents/forms/leads-form'
 import { ChatPreview } from '@/components/chat/chat-preview'
+import { Button } from '@/components/ui/button'
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { Eye } from 'lucide-react'
+import { useState } from 'react'
 import z from 'zod'
 
 const editActionSchema = z.object({
@@ -19,6 +23,7 @@ export const Route = createFileRoute('/admin/actions/edit-action')({
 
 function RouteComponent() {
   const { actionId, toolName } = useSearch({ from: '/admin/actions/edit-action' })
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const getFormComponent = () => {
     switch (toolName) {
@@ -61,6 +66,20 @@ function RouteComponent() {
           <ChatPreview />
         </div>
       </div>
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <DrawerTrigger asChild>
+          <Button className="flex sm:hidden rounded-full shadow-lg fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+            <Eye className="w-5 h-5" />
+            Preview
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent className="h-[95%] px-2">
+          <DrawerHeader>
+            <DrawerTitle className="sr-only">Chat Preview</DrawerTitle>
+          </DrawerHeader>
+          <ChatPreview />
+        </DrawerContent>
+      </Drawer>
     </div>
   )
 }

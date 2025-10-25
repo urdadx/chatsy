@@ -274,7 +274,7 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       const parsed = deleteChatbotSchema.safeParse(body);
 
       if (!parsed.success) {
-        return json({ error: parsed.error.format() }, { status: 400 });
+        return json({ error: z.treeifyError(parsed.error) }, { status: 400 });
       }
 
       const { chatbotId } = parsed.data;
@@ -304,24 +304,13 @@ export const ServerRoute = createServerFileRoute("/api/my-chatbot").methods({
       if (chatbotCount?.count <= 1) {
         return json(
           {
-            error: "Cannot delete the last chatbot in an organization",
+            error: "Cannot delete the only chatbot in the organization",
           },
           { status: 400 },
         );
       }
 
-      // Delete the chatbot (cascade deletes will handle related records)
       await db.delete(chatbot).where(eq(chatbot.id, chatbotId));
-
-      // Invalidate all related cache entries
-      await deleteCachedData([
-        `chatbots:org:${organizationId}`, // Organization's chatbots list
-        `chatbot:${chatbotId}`, // Individual chatbot cache (if exists)
-        `questions:${chatbotId}`, // Chatbot's Q&A cache
-        `analytics:${chatbotId}`, // Chatbot's analytics cache
-        `scraped-data:${chatbotId}`, // Chatbot's scraped data cache
-        `document-sources:${chatbotId}`, // Chatbot's document sources cache
-      ]);
 
       // Decrement the organization's chatbot count
       await db

@@ -279,18 +279,15 @@ export default function Component() {
       return;
     }
 
-    // Helper function to escape CSV values
     const escapeCSV = (value: string | undefined | null): string => {
       if (!value) return '';
       const stringValue = String(value);
-      // If the value contains comma, quote, or newline, wrap it in quotes and escape internal quotes
       if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
         return `"${stringValue.replace(/"/g, '""')}"`;
       }
       return stringValue;
     };
 
-    // Format date helper
     const formatDate = (dateStr: string): string => {
       if (!dateStr) return '';
       const date = new Date(dateStr);
@@ -301,10 +298,8 @@ export default function Component() {
       });
     };
 
-    // CSV Headers
     const headers = ['Date', 'Name', 'Contact', 'Location', 'Type'];
 
-    // CSV Rows
     const csvRows = rows.map(row => {
       const data = row.original;
       return [
@@ -316,15 +311,12 @@ export default function Component() {
       ].join(',');
     });
 
-    // Combine headers and rows
     const csvContent = [headers.join(','), ...csvRows].join('\n');
 
-    // Create blob and download
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
 
-    // Generate filename with current date
     const today = new Date().toISOString().split('T')[0];
     const filename = `activity-export-${today}.csv`;
 

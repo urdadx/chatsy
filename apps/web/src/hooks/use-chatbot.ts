@@ -140,9 +140,11 @@ export function useDeleteChatbot() {
       }
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.error || "Failed to delete chatbot";
-      toast.error(errorMessage);
+      if (error.status === 400) {
+        toast.warning(
+          "This is the only chatbot in your organization so it can't be deleted.",
+        );
+      }
     },
   });
 }
@@ -185,7 +187,7 @@ export function useCreateChatbot() {
         throw error;
       }
 
-      toast.error(errorData?.error || "Failed to create chatbot");
+      toast.warning(errorData?.error || "Failed to create chatbot");
     },
   });
 }
@@ -207,7 +209,7 @@ export function useSetActiveChatbot() {
       window.location.reload();
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.error || "Failed to switch chatbot");
+      toast.warning(error.response?.data?.error || "Failed to switch chatbot");
     },
   });
 }

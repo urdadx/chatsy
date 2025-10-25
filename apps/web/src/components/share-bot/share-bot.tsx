@@ -113,7 +113,7 @@ export const ShareBot = () => {
             <LinkInBio chatbotName={chatbotName} embedToken={embedToken} />
           </TabsContent>
           <TabsContent value="qr" className="space-y-6">
-            <QRCodeExport chatbotName={chatbotName} />
+            <QRCodeExport chatbotName={chatbotName} embedToken={embedToken} />
           </TabsContent>
         </Tabs>
       ) : (

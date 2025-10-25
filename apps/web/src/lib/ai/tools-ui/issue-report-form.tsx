@@ -131,6 +131,7 @@ export function IssueReportForm({ color }: { color?: string }) {
         </Label>
         <Input
           id="email"
+          type="email"
           name="email"
           placeholder="e.g. jane@gmail.com"
           value={formData.email}

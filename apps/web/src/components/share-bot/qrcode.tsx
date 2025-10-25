@@ -3,8 +3,14 @@ import { motion } from "motion/react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Button } from "../ui/button";
 
-export const QRCodeExport = ({ chatbotName }: { chatbotName: string }) => {
-  const baseUrl = `${window.location.origin}/bio-page/${chatbotName}`;
+interface QRCodeExportProps {
+  chatbotName: string;
+  embedToken: string;
+}
+
+
+export const QRCodeExport = ({ embedToken }: QRCodeExportProps) => {
+  const baseUrl = `${window.location.origin}/talk/${embedToken}`;
   const downloadQRCode = () => {
     const canvas = document.getElementById("qr-code") as HTMLCanvasElement;
     if (!canvas) return;

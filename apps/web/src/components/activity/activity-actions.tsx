@@ -1,3 +1,4 @@
+import { useIsMobile } from "@/hooks/use-mobile";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +12,8 @@ import Spinner from "../ui/spinner";
 export function RowActions({ row }: any) {
   const id = row.original.id;
   const type = row.original.type;
+
+  const isMobile = useIsMobile();
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["activity-details", id, type],
@@ -42,8 +45,9 @@ export function RowActions({ row }: any) {
     );
   }
 
+
   return (
-    <Drawer.Root direction="right" open={open} onOpenChange={setOpen}>
+    <Drawer.Root direction={isMobile ? "bottom" : "right"} open={open} onOpenChange={setOpen}>
       <Drawer.Trigger asChild>
         <div className="flex justify-center">
           <Button
@@ -58,10 +62,15 @@ export function RowActions({ row }: any) {
       </Drawer.Trigger>
       <Drawer.Overlay className="fixed backdrop-blur-xs inset-0 bg-black/10" />
       <Drawer.Content
-        className="right-2 bg-background z-10 top-2 bottom-2 fixed outline-none w-[400px] flex"
-        style={{ ["--initial-transform" as any]: "calc(100% + 16px)" }}
+        className={cn(
+          "bg-background z-10 fixed outline-none w-[400px] flex",
+          isMobile
+            ? "right-0 justify-center top-0 bottom-0"
+            : "right-2 top-2 bottom-2"
+        )}
+        style={{ '--initial-transform': 'calc(100% + 16px)' } as React.CSSProperties}
       >
-        <div className="bg-white smooth-div h-full w-full grow p-6 flex flex-col rounded-[16px]">
+        <div className="bg-white smooth-div h-full w-full grow p-6 flex flex-col sm:rounded-none rounded-[16px]">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center justify-between w-full">
