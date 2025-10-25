@@ -171,7 +171,7 @@ export const ProfileDelete = () => {
                   Delete Account
                 </Button>
               </DrawerTrigger>
-              <DrawerContent className="px-4 py-4 h-[25%]">
+              <DrawerContent className="px-4 py-4 h-[35%]">
                 <DrawerHeader className="text-left p-0">
                   <DrawerTitle className="sr-only">Confirm Delete</DrawerTitle>
                 </DrawerHeader>

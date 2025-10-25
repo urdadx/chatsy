@@ -8,7 +8,6 @@ import { Logo } from "../logo-image";
 const menuItems = [
   { name: "Features", href: "#features" },
   { name: "Integrations", href: "#integrations" },
-  // { name: "How to Use", href: "#howtouse" },
   { name: "Pricing", href: "#pricing" },
   { name: "FAQs", href: "#faqs" },
 ];
@@ -37,7 +36,7 @@ export const HeroHeader = () => {
           className={cn(
             "mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 lg:px-12",
             isScrolled &&
-              "bg-background/50 max-w-4xl h-fit rounded-full border backdrop-blur-lg lg:px-5",
+            "bg-background/50 max-w-4xl h-fit rounded-full border backdrop-blur-lg lg:px-5",
           )}
         >
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
@@ -51,7 +50,7 @@ export const HeroHeader = () => {
               </Link>
 
               <Button className={cn(isScrolled && "block", "block lg:hidden")}>
-                <Link to="/register">
+                <Link to="/login">
                   <span>Get started</span>
                 </Link>
               </Button>

@@ -179,7 +179,7 @@ export function ChatAnalytics({
 
         <Select value={selectedTimeRange} onValueChange={handleTimeRangeChange}>
           <SelectTrigger
-            className=" w-[250px] rounded-lg sm:ml-auto sm:flex"
+            className="w-fit sm:w-[250px] rounded-lg sm:ml-auto sm:flex"
             aria-label="Select a value"
           >
             <SelectValue placeholder="Last 3 months" />
