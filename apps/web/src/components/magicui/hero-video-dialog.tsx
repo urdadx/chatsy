@@ -1,4 +1,4 @@
-import LandingImage from "@/assets/landing-image.png";
+import LandingImage from "@/assets/landing-showcase.png";
 import { Play, XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
