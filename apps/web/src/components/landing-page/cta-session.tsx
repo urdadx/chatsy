@@ -28,7 +28,7 @@ export const CTASession = () => {
                 className="mx-auto mt-8 hidden max-w-xl text-wrap text-lg sm:block"
               >
                 Instantly answer customer queries with an AI support agent
-                trained on your website, docs, faqs and more
+                trained on your own business data - website, docs, faqs and more.
               </motion.p>
               <motion.p
                 initial={{ y: 50, opacity: 0 }}

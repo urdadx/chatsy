@@ -11,19 +11,19 @@ export default function FAQs() {
       id: "item-1",
       question: "How does the AI customer support bot work?",
       answer:
-        "Our bot is trained on your knowledge base and support documentation, allowing it to instantly answer customer questions 24/7 across all supported channels.",
+        "The bot is trained on your knowledge base (files, youtube videos etc) and support documentation, allowing it to instantly answer customer questions 24/7 across all supported channels.",
     },
     {
       id: "item-2",
       question: "What integrations does the platform support?",
       answer:
-        "We integrate with major communication channels including WhatsApp, Facebook Messenger, Telegram, and live chat widgets. More integrations coming soon.",
+        "We integrate with major communication channels including WhatsApp, Calendly, Cal.com and Slack. More integrations coming soon.",
     },
     {
       id: "item-3",
       question: "Can I customize the responses of the AI?",
       answer:
-        "Yes. You can customize tone, language and messaging in the dashboard, and also provide custom rules and example answers for specific use cases.",
+        "Yes. You can customize your bot's personality, language and tone in the dashboard's playground.",
     },
     {
       id: "item-4",
@@ -35,7 +35,7 @@ export default function FAQs() {
       id: "item-5",
       question: "Is there a free trial or demo available?",
       answer:
-        "We offer a 3-day free trial with full access to all features. You can also request a live demo with our team (support@padyna.com) if you’d like to see it in action first.",
+        "We offer a 7-day free trial with full access to all features. You can also request a live demo with our team (support@padyna.com) if you’d like to see it in action first.",
     },
   ];
 

@@ -15,8 +15,8 @@ export default function IntegrationsSection() {
                 </span>{" "}
               </h2>
               <p className="text-muted-foreground text-lg">
-                Connect seamlessly with popular platforms and services to
-                enhance your workflow.
+                Connect seamlessly with popular platforms and services  to
+                enhance your customer support experience.
               </p>
             </div>
           </div>

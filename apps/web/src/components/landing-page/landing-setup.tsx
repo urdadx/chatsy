@@ -21,8 +21,8 @@ export function Setup() {
             </span>{" "}
           </h2>
           <p className="text-pretty text-lg text-neutral-500">
-            Follow these simple steps to set up your AI-powered customer support
-            system and start handling queries efficiently.
+            Setting up your AI-powered customer support is quick and easy. Just
+            follow these simple steps to get started.
           </p>
         </motion.div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 sm:mt-14">

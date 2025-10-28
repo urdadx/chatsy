@@ -24,14 +24,14 @@ export default function Features() {
           </h2>
           <p className="text-pretty text-lg text-neutral-500">
             Enhance your customer support with our comprehensive features,
-            designed to streamline interactions and boost productivity.
+            designed to streamline interactions and boost customer success rates.
           </p>
         </motion.div>
         <div className="mx-auto mt-14 grid w-full max-w-screen-lg grid-cols-1 px-4 sm:grid-cols-2">
           <div className="contents divide-neutral-200 max-sm:divide-y sm:divide-x">
             <FeatureCard
               title="AI powered customer support"
-              description="Answer customer queries with an AI support agent trained on your website, docs, and more."
+              description="Instantly answer customer queries with an AI agent trained on your own business."
             >
               <SampleChat />
             </FeatureCard>
@@ -53,7 +53,7 @@ export default function Features() {
             </FeatureCard>
             <FeatureCard
               title="Share everywhere"
-              description="Embed, share, or use QR codes for instant connections."
+              description="Share your bot with customers via an embed widget, custom link or QR code."
             >
               <LandingShare />
             </FeatureCard>

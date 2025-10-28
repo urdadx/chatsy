@@ -23,13 +23,13 @@ function HomeComponent() {
           <HeroVideoDialog
             className="block dark:hidden"
             animationStyle="top-in-bottom-out"
-            videoSrc="https://www.youtube.com/embed/xP-7DPrct7I?si=qbAARKAjkXh017A6"
+            videoSrc="https://www.youtube.com/embed/WZ7hLRLdTIw?si=q7T9MsErVoRWKTgj"
             thumbnailAlt="Hero Video"
           />
           <HeroVideoDialog
             className="hidden dark:block"
             animationStyle="top-in-bottom-out"
-            videoSrc="https://www.youtube.com/embed/xP-7DPrct7I?si=qbAARKAjkXh017A6"
+            videoSrc="https://www.youtube.com/embed/WZ7hLRLdTIw?si=q7T9MsErVoRWKTgj"
             thumbnailAlt="Hero Video"
           />
         </div>
