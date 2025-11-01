@@ -499,15 +499,38 @@
       this.isOpen = true;
       this.iframe.style.display = "block";
 
+      if (window.innerWidth <= 768) {
+        // On mobile: make iframe fullscreen and hide bubble
+        Object.assign(this.iframe.style, {
+          position: "fixed",
+          top: "0",
+          left: "0",
+          width: "100vw",
+          height: "100vh",
+          maxWidth: "100vw",
+          maxHeight: "100vh",
+          borderRadius: "0",
+          zIndex: this.config.zIndex + 2,
+          transform: "none",
+          opacity: "1",
+        });
+        if (this.bubble) this.bubble.style.display = "none";
+      } else {
+        this.iframe.style.opacity = "1";
+        this.iframe.style.transform = "scale(1) translateY(0)";
+      }
+
       this.iframe.contentWindow?.postMessage(
         { type: "padyna-widget-user-opened" },
         this.config.baseUrl,
       );
 
-      requestAnimationFrame(() => {
-        this.iframe.style.opacity = "1";
-        this.iframe.style.transform = "scale(1) translateY(0)";
-      });
+      if (window.innerWidth > 768) {
+        requestAnimationFrame(() => {
+          this.iframe.style.opacity = "1";
+          this.iframe.style.transform = "scale(1) translateY(0)";
+        });
+      }
 
       this.updateBubbleIcon();
       this.clearUnreadCount();
@@ -519,18 +542,22 @@
 
       this.isOpen = false;
 
-      this.iframe.style.opacity = "0";
-      this.iframe.style.transform =
-        window.innerWidth <= 768
-          ? "translateY(100%)"
-          : "scale(0.8) translateY(20px)";
+      if (window.innerWidth <= 768) {
+        // On mobile: hide iframe and show bubble
+        this.iframe.style.display = "none";
+        if (this.bubble) this.bubble.style.display = "flex";
+      } else {
+        this.iframe.style.opacity = "0";
+        this.iframe.style.transform =
+          window.innerWidth <= 768
+            ? "translateY(100%)"
+            : "scale(0.8) translateY(20px)";
+        setTimeout(() => {
+          this.iframe.style.display = "none";
+        }, 300);
+      }
 
       this.updateBubbleIcon();
-
-      setTimeout(() => {
-        this.iframe.style.display = "none";
-      }, 300);
-
       this.dispatchEvent("padyna-bubble-closed", { isOpen: false });
     }
 
