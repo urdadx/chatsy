@@ -407,6 +407,7 @@ function BubbleWidgetContent() {
       {uiState.showLanding ? (
         <ChatLanding
           onGoToMain={handleGoToMain}
+          onCloseWidget={handleCloseWidget}
           chatbot={chatbot}
           className="h-full rounded-2xl"
         />

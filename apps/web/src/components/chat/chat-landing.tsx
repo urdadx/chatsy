@@ -10,6 +10,7 @@ import { ScrollArea } from "../ui/scroll-area";
 
 interface ChatLandingProps {
   onGoToMain: () => void;
+  onCloseWidget?: () => void;
   chatbot?: {
     image?: string | null;
     name?: string | null;
@@ -19,12 +20,10 @@ interface ChatLandingProps {
   children?: ReactNode;
 }
 
-export function ChatLanding({ onGoToMain, chatbot, className }: ChatLandingProps) {
+export function ChatLanding({ onGoToMain, onCloseWidget, chatbot, className }: ChatLandingProps) {
   const { primaryColor, image } = chatbot || {};
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [showIssueReportForm, setShowIssueReportForm] = useState(false);
-
-
 
   if (showFeedbackForm) {
     return (
@@ -91,13 +90,28 @@ export function ChatLanding({ onGoToMain, chatbot, className }: ChatLandingProps
               : undefined,
           }}
         >
-          <div className="flex gap-2 w-full ">
+          <div className="flex gap-2 w-full items-center">
             <Avatar className="w-12 h-12 shadow-sm border-2 border-white">
               <AvatarImage src={image || undefined} alt="Assistant" />
               <AvatarFallback>
                 <RiBardFill className="w-5 h-5 text-muted-foreground" />
               </AvatarFallback>
             </Avatar>
+            <div className="flex-1" />
+            {/* Close widget button */}
+            {onCloseWidget && (
+              <Button
+                size="icon"
+                variant="ghost"
+                className="ml-auto p-2 rounded-full hover:bg-white/20 transition-colors"
+                aria-label="Close widget"
+                onClick={onCloseWidget}
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13.5 4.5L4.5 13.5M4.5 4.5L13.5 13.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </Button>
+            )}
           </div>
           <div className="text-2xl leading-normal block text-white">
             <p className="wrap-break-word font-semibold">Hey there 👋</p>
