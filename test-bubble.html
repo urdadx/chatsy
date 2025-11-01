@@ -52,25 +52,8 @@
             <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
         </div>
     </div>
-<!-- Padyna Chat Bubble Widget -->
 <script>
-  (function() {
-    const script = document.createElement('script');
-    script.src = 'http://localhost:3001/embed.js';
-    script.async = true;
-    script.onload = function() {
-      PadynaWidget.init({
-        embedToken: 'embed_VXOj',
-        mode: 'bubble',
-        position: 'bottom-right',
-        baseUrl: 'http://localhost:3001',
-        bubbleSize: 'medium',
-        showBadge: true,
-        autoOpen: false
-      });
-    };
-    document.head.appendChild(script);
-  })();
+(function(){if(!window.PadynaWidget||!window.PadynaWidget._initialized){window.PadynaWidget=window.PadynaWidget||{};window.PadynaWidget.config={embedToken:"embed_zXxw",mode:"bubble",position:"bottom-right",baseUrl:"http://localhost:3001",bubbleSize:"medium",showWelcomePopup:true,showBadge:true,autoOpen:false};const onLoad=function(){const script=document.createElement("script");script.src="http://localhost:3001/embed.js";script.id="padyna-embed-script";script.async=true;document.body.appendChild(script)};if(document.readyState==="complete"||document.readyState==="interactive"){onLoad()}else{window.addEventListener("DOMContentLoaded",onLoad)}}})();
 </script>
 </body>
 </html>

@@ -8,13 +8,18 @@
         embedToken: config.embedToken,
         baseUrl: config.baseUrl || "https://padyna.com",
         containerId: config.containerId || "padyna-widget",
-        mode: config.mode || "bubble", // 'bubble' or 'iframe'
+        mode: config.mode || "bubble",
         theme: config.theme || "light",
         position: config.position || "bottom-right",
-        bubbleSize: config.bubbleSize || "medium", // 'small', 'medium', 'large'
-        showBadge: config.showBadge !== false, // Default true
+        bubbleSize: config.bubbleSize || "medium",
+        showBadge: config.showBadge !== false,
         autoOpen: config.autoOpen || false,
         openDelay: config.openDelay || 0,
+        showWelcomePopup: config.showWelcomePopup || false,
+        welcomeMessage:
+          config.welcomeMessage || "Hi👋, I am Padyna AI, ask me anything!",
+        welcomePopupDelay: config.welcomePopupDelay || 2000,
+        welcomePopupDuration: config.welcomePopupDuration || 0,
         zIndex: config.zIndex || 9999,
         ...config,
       };
@@ -24,8 +29,10 @@
       this.iframe = null;
       this.container = null;
       this.bubble = null;
+      this.welcomePopup = null;
       this.unreadCount = 0;
       this.chatData = null;
+      this.welcomePopupShown = false;
     }
 
     init() {
@@ -39,6 +46,9 @@
           this.createContainer();
           if (this.config.mode === "bubble") {
             this.createBubble();
+            if (this.config.showWelcomePopup) {
+              this.createWelcomePopup();
+            }
           } else {
             this.createIframe();
           }
@@ -83,28 +93,180 @@
         document.body.appendChild(this.container);
       }
 
-      // Apply base container styles
-      this.container.style.position = "fixed";
-      this.container.style.zIndex = this.config.zIndex.toString();
-      this.container.style.fontFamily =
-        'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      Object.assign(this.container.style, {
+        position: "fixed",
+        zIndex: this.config.zIndex.toString(),
+        fontFamily:
+          'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      });
     }
+
+    createWelcomePopup() {
+      const popupShownKey = `padyna-welcome-shown-${this.config.embedToken}`;
+      if (sessionStorage.getItem(popupShownKey)) {
+        return;
+      }
+
+      this.welcomePopup = document.createElement("div");
+      this.welcomePopup.className = "padyna-welcome-popup";
+
+      Object.assign(this.welcomePopup.style, {
+        position: "absolute",
+        backgroundColor: "white",
+        borderRadius: "12px",
+        padding: "16px 20px",
+        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+        width: "300px",
+        opacity: "0",
+        transform: "translateY(10px) scale(0.95)",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        pointerEvents: "none",
+        zIndex: (this.config.zIndex - 1).toString(),
+      });
+
+      this.positionWelcomePopup();
+
+      const content = document.createElement("div");
+      content.style.display = "flex";
+      content.style.alignItems = "flex-start";
+      content.style.gap = "8px";
+
+      const message = document.createElement("div");
+      message.textContent = this.config.welcomeMessage;
+      Object.assign(message.style, {
+        flex: "1",
+        fontSize: "14px",
+        lineHeight: "1.5",
+        color: "#1f2937",
+      });
+
+      const closeButton = document.createElement("button");
+      closeButton.innerHTML = "×";
+      Object.assign(closeButton.style, {
+        background: "none",
+        border: "none",
+        fontSize: "20px",
+        lineHeight: "1",
+        color: "#9ca3af",
+        cursor: "pointer",
+        padding: "0",
+        width: "20px",
+        height: "20px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: "0",
+        transition: "color 0.2s",
+      });
+
+      closeButton.addEventListener("mouseenter", () => {
+        closeButton.style.color = "#6b7280";
+      });
+
+      closeButton.addEventListener("mouseleave", () => {
+        closeButton.style.color = "#9ca3af";
+      });
+
+      closeButton.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.hideWelcomePopup();
+      });
+
+      content.appendChild(message);
+      content.appendChild(closeButton);
+      this.welcomePopup.appendChild(content);
+
+      this.welcomePopup.addEventListener("click", () => {
+        this.hideWelcomePopup();
+        this.openChat();
+      });
+
+      this.container.appendChild(this.welcomePopup);
+
+      setTimeout(() => {
+        this.showWelcomePopup();
+      }, this.config.welcomePopupDelay);
+    }
+
+    positionWelcomePopup() {
+      if (!this.welcomePopup) return;
+
+      const bubbleSize = this.getBubbleSize();
+      const gap = 12;
+
+      this.welcomePopup.style.top = "auto";
+      this.welcomePopup.style.bottom = "auto";
+      this.welcomePopup.style.left = "auto";
+      this.welcomePopup.style.right = "auto";
+
+      switch (this.config.position) {
+        case "bottom-right":
+          this.welcomePopup.style.bottom = `${bubbleSize + gap}px`;
+          this.welcomePopup.style.right = "0";
+          break;
+        case "bottom-left":
+          this.welcomePopup.style.bottom = `${bubbleSize + gap}px`;
+          this.welcomePopup.style.left = "0";
+          break;
+        case "top-right":
+          this.welcomePopup.style.top = `${bubbleSize + gap}px`;
+          this.welcomePopup.style.right = "0";
+          break;
+        case "top-left":
+          this.welcomePopup.style.top = `${bubbleSize + gap}px`;
+          this.welcomePopup.style.left = "0";
+          break;
+        default:
+          this.welcomePopup.style.bottom = `${bubbleSize + gap}px`;
+          this.welcomePopup.style.right = "0";
+      }
+    }
+
+    showWelcomePopup() {
+      if (!this.welcomePopup || this.welcomePopupShown || this.isOpen) return;
+
+      this.welcomePopup.style.opacity = "1";
+      this.welcomePopup.style.transform = "translateY(0) scale(1)";
+      this.welcomePopup.style.pointerEvents = "auto";
+      this.welcomePopupShown = true;
+
+      const popupShownKey = `padyna-welcome-shown-${this.config.embedToken}`;
+      sessionStorage.setItem(popupShownKey, "true");
+
+      this.dispatchEvent("padyna-welcome-popup-shown", {});
+
+      if (this.config.welcomePopupDuration > 0) {
+        setTimeout(() => {
+          this.hideWelcomePopup();
+        }, this.config.welcomePopupDuration);
+      }
+    }
+
+    hideWelcomePopup() {
+      if (!this.welcomePopup) return;
+
+      this.welcomePopup.style.opacity = "0";
+      this.welcomePopup.style.transform = "translateY(10px) scale(0.95)";
+      this.welcomePopup.style.pointerEvents = "none";
+
+      this.dispatchEvent("padyna-welcome-popup-hidden", {});
+
+      setTimeout(() => {
+        if (this.welcomePopup?.parentNode) {
+          this.welcomePopup.parentNode.removeChild(this.welcomePopup);
+          this.welcomePopup = null;
+        }
+      }, 300);
+    }
+
     createBubble() {
-      // Create bubble trigger
       this.bubble = document.createElement("div");
       this.bubble.className = "padyna-bubble";
       this.setupBubbleStyles();
       this.setupBubbleContent();
-
-      // Position the bubble
       this.positionBubble();
-
-      // Add click handler
       this.bubble.addEventListener("click", () => this.toggleChat());
-
       this.container.appendChild(this.bubble);
-
-      // Initially hidden iframe for chat
       this.createIframe();
       this.iframe.style.display = "none";
     }
@@ -129,7 +291,6 @@
         userSelect: "none",
       });
 
-      // Hover effects
       this.bubble.addEventListener("mouseenter", () => {
         this.bubble.style.transform = "scale(1.05)";
         this.bubble.style.boxShadow = "0 6px 20px rgba(0, 0, 0, 0.2)";
@@ -140,35 +301,32 @@
         this.bubble.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
       });
     }
+
     setupBubbleContent() {
-      // Create bubble content wrapper
       const content = document.createElement("div");
       content.style.position = "relative";
       content.style.display = "flex";
       content.style.alignItems = "center";
       content.style.justifyContent = "center";
 
-      // Chat icon (default state)
       const chatIcon = document.createElement("div");
       chatIcon.className = "padyna-chat-icon";
       chatIcon.style.transition = "opacity 0.2s ease-in-out";
       chatIcon.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="#FFFFFF" fill-rule="evenodd" d="M22 12c0 5.523-4.477 10-10 10c-1.6 0-3.112-.376-4.452-1.044a1.63 1.63 0 0 0-1.149-.133l-2.226.596a1.3 1.3 0 0 1-1.591-1.592l.595-2.226a1.63 1.63 0 0 0-.134-1.148A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10M12 7.25a.75.75 0 0 1 .75.75v8a.75.75 0 0 1-1.5 0V8a.75.75 0 0 1 .75-.75M8.75 10a.75.75 0 0 0-1.5 0v4a.75.75 0 0 0 1.5 0zM16 9.25a.75.75 0 0 1 .75.75v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#FFFFFF" fill-rule="evenodd" d="M22 12c0 5.523-4.477 10-10 10c-1.6 0-3.112-.376-4.452-1.044a1.63 1.63 0 0 0-1.149-.133l-2.226.596a1.3 1.3 0 0 1-1.591-1.592l.595-2.226a1.63 1.63 0 0 0-.134-1.148A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10M12 7.25a.75.75 0 0 1 .75.75v8a.75.75 0 0 1-1.5 0V8a.75.75 0 0 1 .75-.75M8.75 10a.75.75 0 0 0-1.5 0v4a.75.75 0 0 0 1.5 0zM16 9.25a.75.75 0 0 1 .75.75v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/></svg>
       `;
 
-      // Chevron down icon (opened state)
       const chevronIcon = document.createElement("div");
       chevronIcon.className = "padyna-chevron-icon";
       chevronIcon.style.display = "none";
       chevronIcon.style.transition = "opacity 0.2s ease-in-out";
       chevronIcon.innerHTML = `
-       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE --><path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg>
+       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg>
       `;
 
       content.appendChild(chatIcon);
       content.appendChild(chevronIcon);
 
-      // Add notification badge if needed
       if (this.config.showBadge && this.unreadCount > 0) {
         this.createNotificationBadge(content);
       }
@@ -258,7 +416,6 @@
       });
 
       if (window.innerWidth <= 768) {
-        // Mobile responsive
         Object.assign(this.iframe.style, {
           width: "100vw",
           height: "calc(100vh - 80px)",
@@ -310,7 +467,6 @@
           this.container.style.right = `${margin}px`;
       }
 
-      // Ensure container dimensions don't interfere with positioning
       this.container.style.width = "auto";
       this.container.style.height = "auto";
     }
@@ -335,27 +491,25 @@
     openChat() {
       if (this.config.mode !== "bubble" || this.isOpen) return;
 
+      if (this.welcomePopup) {
+        this.hideWelcomePopup();
+      }
+
       this.isOpen = true;
       this.iframe.style.display = "block";
 
-      // Notify the iframe that user actually opened the widget
       this.iframe.contentWindow?.postMessage(
         { type: "padyna-widget-user-opened" },
         this.config.baseUrl,
       );
 
-      // Animate iframe in
       requestAnimationFrame(() => {
         this.iframe.style.opacity = "1";
         this.iframe.style.transform = "scale(1) translateY(0)";
       });
 
-      // Update bubble icon to chevron
       this.updateBubbleIcon();
-
-      // Clear unread count when opened
       this.clearUnreadCount();
-
       this.dispatchEvent("padyna-bubble-opened", { isOpen: true });
     }
 
@@ -364,23 +518,21 @@
 
       this.isOpen = false;
 
-      // Animate iframe out
       this.iframe.style.opacity = "0";
       this.iframe.style.transform =
         window.innerWidth <= 768
           ? "translateY(100%)"
           : "scale(0.8) translateY(20px)";
 
-      // Update bubble icon back to chat
       this.updateBubbleIcon();
 
-      // Hide iframe after animation
       setTimeout(() => {
         this.iframe.style.display = "none";
       }, 300);
 
       this.dispatchEvent("padyna-bubble-closed", { isOpen: false });
     }
+
     handleAutoOpen() {
       if (this.config.autoOpen && this.config.openDelay > 0) {
         setTimeout(() => {
@@ -390,7 +542,6 @@
     }
 
     setupEventListeners() {
-      // Listen for messages from the iframe
       window.addEventListener("message", (event) => {
         if (event.origin !== this.config.baseUrl) {
           return;
@@ -417,24 +568,20 @@
         }
       });
 
-      // Handle window resize for responsive behavior
       window.addEventListener("resize", () => {
         if (this.config.mode === "bubble") {
           this.handleWindowResize();
         }
       });
 
-      // Handle escape key to close chat
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && this.isOpen) {
           this.closeChat();
         }
       });
 
-      // Handle page unload to notify widget for analytics
       window.addEventListener("beforeunload", () => {
         if (this.iframe && this.isOpen) {
-          // Notify the widget that the parent page is being unloaded
           this.iframe.contentWindow.postMessage(
             { type: "parent-page-unload" },
             this.config.baseUrl,
@@ -447,7 +594,6 @@
       if (!this.iframe) return;
 
       if (window.innerWidth <= 768) {
-        // Mobile styles
         Object.assign(this.iframe.style, {
           width: "100vw",
           height: "calc(100vh - 80px)",
@@ -461,7 +607,6 @@
           zIndex: this.config.zIndex + 1,
         });
       } else {
-        // Desktop styles
         Object.assign(this.iframe.style, {
           width: "450px",
           height: "550px",
@@ -476,6 +621,7 @@
         });
       }
     }
+
     handleResize(data) {
       if (this.iframe && this.config.mode !== "bubble") {
         this.iframe.style.width = `${data.width}px`;
@@ -507,7 +653,6 @@
           this.unreadCount > 99 ? "99+" : this.unreadCount.toString();
         badge.style.display = this.unreadCount > 0 ? "flex" : "none";
       } else if (this.unreadCount > 0 && this.bubble) {
-        // Create badge if it doesn't exist
         const content = this.bubble.querySelector("div");
         if (content) {
           this.createNotificationBadge(content);
@@ -525,7 +670,6 @@
       document.dispatchEvent(event);
     }
 
-    // Public API methods
     destroy() {
       if (this.container?.parentNode) {
         this.container.parentNode.removeChild(this.container);
@@ -563,10 +707,22 @@
       this.unreadCount = 0;
       this.updateNotificationBadge();
     }
+
+    showWelcome() {
+      if (this.welcomePopup && !this.isOpen) {
+        this.showWelcomePopup();
+      }
+    }
+
+    hideWelcome() {
+      if (this.welcomePopup) {
+        this.hideWelcomePopup();
+      }
+    }
   }
 
   // Global API
-  window.PadynaWidget = {
+  const PadynaAPI = {
     instances: new Map(),
 
     init: function (config) {
@@ -606,26 +762,78 @@
     },
   };
 
-  // Auto-initialize if config is provided via data attributes
-  document.addEventListener("DOMContentLoaded", function () {
+  // Initialize from global config or data attributes
+  function initializeWidget() {
+    // Check if there's a global config set before the script loaded
+    if (window.PadynaWidget?.config && !window.PadynaWidget._initialized) {
+      console.log("Initializing Padyna Widget from global config");
+      const config = window.PadynaWidget.config;
+      const widget = new PadynaWidget(config);
+      widget.init();
+
+      // Replace with API and store the instance
+      const tempConfig = window.PadynaWidget.config;
+      window.PadynaWidget = PadynaAPI;
+      window.PadynaWidget.instances.set(
+        config.containerId || "default",
+        widget,
+      );
+      window.PadynaWidget._initialized = true;
+      return;
+    }
+
+    // Check for data attributes
     const autoInitElements = document.querySelectorAll(
       "[data-padyna-embed-token]",
     );
 
-    autoInitElements.forEach(function (element) {
-      const config = {
-        embedToken: element.getAttribute("data-padyna-embed-token"),
-        containerId: element.id || undefined,
-        baseUrl: element.getAttribute("data-padyna-base-url") || undefined,
-        position: element.getAttribute("data-padyna-position") || undefined,
-        mode: element.getAttribute("data-padyna-mode") || "bubble",
-        bubbleSize: element.getAttribute("data-padyna-bubble-size") || "medium",
-        autoOpen: element.getAttribute("data-padyna-auto-open") === "true",
-        openDelay:
-          Number.parseInt(element.getAttribute("data-padyna-open-delay")) || 0,
-      };
+    if (autoInitElements.length > 0) {
+      console.log("Initializing Padyna Widget from data attributes");
+      // Set up the API if not already done
+      if (!window.PadynaWidget || !window.PadynaWidget.init) {
+        window.PadynaWidget = PadynaAPI;
+      }
 
-      window.PadynaWidget.init(config);
-    });
-  });
+      autoInitElements.forEach(function (element) {
+        const config = {
+          embedToken: element.getAttribute("data-padyna-embed-token"),
+          containerId: element.id || undefined,
+          baseUrl: element.getAttribute("data-padyna-base-url") || undefined,
+          position: element.getAttribute("data-padyna-position") || undefined,
+          mode: element.getAttribute("data-padyna-mode") || "bubble",
+          bubbleSize:
+            element.getAttribute("data-padyna-bubble-size") || "medium",
+          autoOpen: element.getAttribute("data-padyna-auto-open") === "true",
+          openDelay:
+            Number.parseInt(element.getAttribute("data-padyna-open-delay")) ||
+            0,
+          showWelcomePopup:
+            element.getAttribute("data-padyna-show-welcome") === "true",
+          welcomeMessage:
+            element.getAttribute("data-padyna-welcome-message") || undefined,
+          welcomePopupDelay:
+            Number.parseInt(
+              element.getAttribute("data-padyna-welcome-delay"),
+            ) || 500,
+          welcomePopupDuration:
+            Number.parseInt(
+              element.getAttribute("data-padyna-welcome-duration"),
+            ) || 0,
+        };
+
+        window.PadynaWidget.init(config);
+      });
+    } else if (!window.PadynaWidget || !window.PadynaWidget._initialized) {
+      // No config found, just set up the API
+      window.PadynaWidget = PadynaAPI;
+    }
+  }
+
+  // Run initialization
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeWidget);
+  } else {
+    // DOM is already loaded
+    initializeWidget();
+  }
 })();

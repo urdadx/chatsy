@@ -8,12 +8,67 @@ import { Setup } from "@/components/landing-page/landing-setup";
 import { Pricing } from "@/components/landing-page/pricing";
 import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+
+declare global {
+  interface Window {
+    PadynaWidget?: any;
+  }
+}
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
+  head: () => ({
+    title: "Padyna - AI agents for your business",
+    meta: [
+      {
+        name: "description",
+        content:
+          "Magical customer experiences for your business. Create a custom AI agent for your business in minutes.",
+      },
+      {
+        name: "keywords",
+        content:
+          "AI, bot, link in bio, custom bot, padyna, customer support, chatbot",
+      },
+    ],
+    scripts: [
+      {
+        src: ""
+      }
+    ],
+  }),
+
 });
 
 function HomeComponent() {
+  useEffect(() => {
+    if (!window.PadynaWidget || !window.PadynaWidget._initialized) {
+      window.PadynaWidget = window.PadynaWidget || {};
+      window.PadynaWidget.config = {
+        embedToken: 'embed_8vzy',
+        mode: "bubble",
+        position: "bottom-right",
+        bubbleSize: "medium",
+        showWelcomePopup: true,
+        showBadge: true,
+        autoOpen: false,
+      };
+      const onLoad = function () {
+        const script = document.createElement("script");
+        script.src = 'https://padyna.com/embed.js';
+        script.id = "padyna-embed-script";
+        script.async = true;
+        document.body.appendChild(script);
+      };
+      if (document.readyState === "complete" || document.readyState === "interactive") {
+        onLoad();
+      } else {
+        window.addEventListener("DOMContentLoaded", onLoad);
+      }
+    }
+  }, []);
+
   return (
     <main className="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:4rem_4rem] ">
       <HeroHeader />
@@ -43,6 +98,7 @@ function HomeComponent() {
         <FAQs />
         <FooterSection />
       </div>
+
     </main>
   );
 }

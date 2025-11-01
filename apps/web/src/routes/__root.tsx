@@ -12,7 +12,6 @@ import {
 } from "@tanstack/react-router";
 import appCss from "../index.css?url";
 
-
 export type RouterAppContext = {
   queryClient: QueryClient;
 };
@@ -67,23 +66,22 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 function RootDocument() {
+
+
   return (
     <html lang="en">
       <head>
-
         <HeadContent />
       </head>
       <body suppressHydrationWarning>
         <RetrainingBannerProvider>
           <TooltipProvider>
-
             <Outlet />
           </TooltipProvider>
           <Toaster richColors theme="light" />
         </RetrainingBannerProvider>
         <Scripts />
-
-        {isDevelopment && <ReactQueryDevtools position="left" initialIsOpen={false} />}
+        {isDevelopment && <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />}
       </body>
     </html>
   );
