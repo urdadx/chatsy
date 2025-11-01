@@ -18,26 +18,7 @@ declare global {
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
-  head: () => ({
-    title: "Padyna - AI agents for your business",
-    meta: [
-      {
-        name: "description",
-        content:
-          "Magical customer experiences for your business. Create a custom AI agent for your business in minutes.",
-      },
-      {
-        name: "keywords",
-        content:
-          "AI, bot, link in bio, custom bot, padyna, customer support, chatbot",
-      },
-    ],
-    scripts: [
-      {
-        src: ""
-      }
-    ],
-  }),
+
 
 });
 
@@ -51,6 +32,7 @@ function HomeComponent() {
         position: "bottom-right",
         bubbleSize: "medium",
         showWelcomePopup: true,
+        welcomeMessage: "Hey there👋, ask me anything!",
         showBadge: true,
         autoOpen: false,
       };
