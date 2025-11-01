@@ -491,16 +491,12 @@
 
     openChat() {
       if (this.config.mode !== "bubble" || this.isOpen) return;
-
       if (this.welcomePopup) {
         this.hideWelcomePopup();
       }
-
       this.isOpen = true;
       this.iframe.style.display = "block";
-
       if (window.innerWidth <= 768) {
-        // On mobile: make iframe fullscreen and hide bubble
         Object.assign(this.iframe.style, {
           position: "fixed",
           top: "0",
@@ -513,25 +509,24 @@
           zIndex: this.config.zIndex + 2,
           transform: "none",
           opacity: "1",
+          display: "block",
         });
         if (this.bubble) this.bubble.style.display = "none";
+        document.body.style.overflow = "hidden";
       } else {
         this.iframe.style.opacity = "1";
         this.iframe.style.transform = "scale(1) translateY(0)";
       }
-
       this.iframe.contentWindow?.postMessage(
         { type: "padyna-widget-user-opened" },
         this.config.baseUrl,
       );
-
       if (window.innerWidth > 768) {
         requestAnimationFrame(() => {
           this.iframe.style.opacity = "1";
           this.iframe.style.transform = "scale(1) translateY(0)";
         });
       }
-
       this.updateBubbleIcon();
       this.clearUnreadCount();
       this.dispatchEvent("padyna-bubble-opened", { isOpen: true });
@@ -539,13 +534,11 @@
 
     closeChat() {
       if (this.config.mode !== "bubble" || !this.isOpen) return;
-
       this.isOpen = false;
-
       if (window.innerWidth <= 768) {
-        // On mobile: hide iframe and show bubble
         this.iframe.style.display = "none";
         if (this.bubble) this.bubble.style.display = "flex";
+        document.body.style.overflow = "";
       } else {
         this.iframe.style.opacity = "0";
         this.iframe.style.transform =
@@ -556,7 +549,6 @@
           this.iframe.style.display = "none";
         }, 300);
       }
-
       this.updateBubbleIcon();
       this.dispatchEvent("padyna-bubble-closed", { isOpen: false });
     }
