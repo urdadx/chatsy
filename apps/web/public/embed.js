@@ -17,7 +17,7 @@
         openDelay: config.openDelay || 0,
         showWelcomePopup: config.showWelcomePopup || false,
         welcomeMessage:
-          config.welcomeMessage || "Hi👋, I am Padyna AI, ask me anything!",
+          config.welcomeMessage || "Hey there👋, ask me anything!",
         welcomePopupDelay: config.welcomePopupDelay || 2000,
         welcomePopupDuration: config.welcomePopupDuration || 0,
         zIndex: config.zIndex || 9999,
@@ -117,6 +117,7 @@
         padding: "16px 20px",
         boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
         width: "300px",
+        maxWidth: "280px",
         opacity: "0",
         transform: "translateY(10px) scale(0.95)",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
