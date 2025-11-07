@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth-client";
 import { getLastLoginMethod, setLastLoginMethod } from "@/lib/last-login";
 import { cn } from "@/lib/utils";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Mail } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -30,7 +30,6 @@ export function LoginForm({
     setValue,
   } = useForm<LoginFormData>();
 
-  const navigate = useNavigate();
   const [lastLogin, setLastLogin] = useState<ReturnType<typeof getLastLoginMethod>>(null);
 
   useEffect(() => {
@@ -53,9 +52,7 @@ export function LoginForm({
         onSuccess: () => {
           setLastLoginMethod('email', data.email);
           toast.success("Signed in successfully");
-          navigate({
-            to: "/admin/overview",
-          });
+          window.location.href = "/admin/overview";
         },
         onError: (ctx: any) => {
           toast.error(ctx.error.message);
@@ -74,9 +71,7 @@ export function LoginForm({
       {
         onSuccess: () => {
           setLastLoginMethod('google');
-          navigate({
-            to: "/admin/overview",
-          });
+          window.location.href = "/admin/overview";
         },
         onError: (ctx: any) => {
           toast.error(ctx.error.message);

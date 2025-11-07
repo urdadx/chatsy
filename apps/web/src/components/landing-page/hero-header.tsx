@@ -92,11 +92,12 @@ export const HeroHeader = () => {
                     <Button
                       asChild
                       variant="outline"
+                      onClick={() => {
+                        window.location.href = "/login";
+                      }}
                       className={cn(isScrolled && "lg:hidden")}
                     >
-                      <Link to="/login">
-                        <span>Login</span>
-                      </Link>
+                      <span>Login</span>
                     </Button>
                     <Button asChild className={cn(isScrolled && "lg:hidden")}>
                       <Link to="/register">

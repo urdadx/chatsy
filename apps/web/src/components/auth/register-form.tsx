@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { signIn, signUp } from "@/lib/auth-client";
 import { setLastLoginMethod } from "@/lib/last-login";
 import { cn } from "@/lib/utils";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -29,7 +29,6 @@ export function RegisterForm({
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>();
 
-  const navigate = useNavigate();
 
   const handleRegister = async (data: RegisterFormData) => {
     await signUp.email(
@@ -44,9 +43,7 @@ export function RegisterForm({
           console.log("Registration successful", ctx);
           setLastLoginMethod('email', data.email);
           toast.success("Account created successfully");
-          navigate({
-            to: "/verify-email",
-          });
+          window.location.href = "/onboarding";
         },
         onError: (ctx: any) => {
           toast.error(
@@ -66,9 +63,7 @@ export function RegisterForm({
       {
         onSuccess: () => {
           setLastLoginMethod('google');
-          navigate({
-            to: "/onboarding",
-          });
+          window.location.href = "/onboarding";
         },
         onError: (ctx: any) => {
           toast.error(ctx.error.message);
