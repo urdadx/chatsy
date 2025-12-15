@@ -10,6 +10,7 @@ import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
 import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
+import { useNotificationSounds } from "@/hooks/use-notification-sounds";
 import { ChatSDKError } from "@/lib/errors";
 import type { ChatMessage } from "@/lib/types";
 import { fetchWithErrorHandlers } from "@/lib/utils";
@@ -189,6 +190,8 @@ function BubbleWidgetContent({ chatId, resetChat }: BubbleWidgetContentProps) {
 
   const isEscalated = chatData?.status === "escalated";
 
+  const { playConnectedSound, playDisconnectedSound, playMessageSound } = useNotificationSounds();
+
   const {
     status: wsStatus,
     isTyping: wsIsTyping,
@@ -204,6 +207,14 @@ function BubbleWidgetContent({ chatId, resetChat }: BubbleWidgetContentProps) {
       console.error("WebSocket error:", err);
       toast.error(`Connection error: ${err}`);
     },
+    onAgentJoined: () => {
+      // Play connected sound when an agent joins the chat
+      playConnectedSound();
+    },
+    onAgentLeft: () => {
+      // Play disconnected sound when an agent leaves the chat
+      playDisconnectedSound();
+    },
     onMessage: (message) => {
       console.log("Received WebSocket message:", message);
 
@@ -216,6 +227,11 @@ function BubbleWidgetContent({ chatId, resetChat }: BubbleWidgetContentProps) {
           originalRole: message.role,
         },
       };
+
+      // Play message sound for incoming messages from agent (human role)
+      if (message.role === "human") {
+        playMessageSound();
+      }
 
       setMessages((prevMessages) => {
         const messageExists = prevMessages.some(msg => msg.id === uiMessage.id);

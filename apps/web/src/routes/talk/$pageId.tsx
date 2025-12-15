@@ -11,6 +11,7 @@ import { useChatWithResetEmbed } from "@/hooks/use-chat-reset-embed";
 import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useChatWidget } from "@/hooks/use-chat-widget";
 import { useMessages } from "@/hooks/use-db-messages";
+import { useNotificationSounds } from "@/hooks/use-notification-sounds";
 import { useWidgetAnalytics } from "@/hooks/use-widget-analytics";
 import { ChatSDKError } from "@/lib/errors";
 import type { ChatMessage } from "@/lib/types";
@@ -266,6 +267,8 @@ function TalkPageContent({ chatId, resetChat }: TalkPageContentProps): JSX.Eleme
 
   const isEscalated = chatData?.status === "escalated";
 
+  const { playConnectedSound, playDisconnectedSound, playMessageSound } = useNotificationSounds();
+
   const {
     status: wsStatus,
     isTyping: wsIsTyping,
@@ -280,6 +283,14 @@ function TalkPageContent({ chatId, resetChat }: TalkPageContentProps): JSX.Eleme
     onError: () => {
       toast.error("Connection error");
     },
+    onAgentJoined: () => {
+      // Play connected sound when an agent joins the chat
+      playConnectedSound();
+    },
+    onAgentLeft: () => {
+      // Play disconnected sound when an agent leaves the chat
+      playDisconnectedSound();
+    },
     onMessage: (message) => {
       const uiMessage = {
         id: message.id,
@@ -290,6 +301,11 @@ function TalkPageContent({ chatId, resetChat }: TalkPageContentProps): JSX.Eleme
           originalRole: message.role,
         },
       };
+
+      // Play message sound for incoming messages from agent (human role)
+      if (message.role === "human") {
+        playMessageSound();
+      }
 
       setMessages((prevMessages) => {
         const messageExists = prevMessages.some(msg => msg.id === uiMessage.id);

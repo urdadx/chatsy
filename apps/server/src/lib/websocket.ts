@@ -19,8 +19,10 @@ export type WSInbound =
   | { type: "message"; chatId: string; text: string; role?: "user" | "agent" };
 
 export type WSOutbound =
-  | { type: "joined"; chatId: string }
+  | { type: "joined"; chatId: string; role: "user" | "agent" }
   | { type: "left"; chatId: string }
+  | { type: "agent_joined"; chatId: string }
+  | { type: "agent_left"; chatId: string }
   | {
       type: "typing";
       chatId: string;
@@ -61,6 +63,7 @@ export function createWebSocketServer(server: http.Server) {
 
   wss.on("connection", (ws) => {
     let currentChatId: string | null = null;
+    let currentRole: "user" | "agent" | null = null;
 
     ws.on("message", async (raw) => {
       try {
@@ -68,14 +71,30 @@ export function createWebSocketServer(server: http.Server) {
         if (data.type === "join") {
           await ensureEscalated(data.chatId);
           currentChatId = data.chatId;
+          currentRole = data.role;
           if (!rooms.has(data.chatId)) rooms.set(data.chatId, new Set());
           rooms.get(data.chatId)!.add(ws);
+
+          // Notify the joining client
           ws.send(
             JSON.stringify({
               type: "joined",
               chatId: data.chatId,
+              role: data.role,
             } satisfies WSOutbound),
           );
+
+          // If an agent joins, notify other clients (users) in the room
+          if (data.role === "agent") {
+            broadcast(
+              data.chatId,
+              {
+                type: "agent_joined",
+                chatId: data.chatId,
+              },
+              ws,
+            );
+          }
           return;
         }
 
@@ -91,6 +110,8 @@ export function createWebSocketServer(server: http.Server) {
 
         switch (data.type) {
           case "leave": {
+            const leavingChatId = currentChatId;
+            const leavingRole = currentRole;
             rooms.get(currentChatId)?.delete(ws);
             ws.send(
               JSON.stringify({
@@ -98,7 +119,21 @@ export function createWebSocketServer(server: http.Server) {
                 chatId: currentChatId,
               } satisfies WSOutbound),
             );
+
+            // If an agent leaves, notify other clients (users) in the room
+            if (leavingRole === "agent" && leavingChatId) {
+              broadcast(
+                leavingChatId,
+                {
+                  type: "agent_left",
+                  chatId: leavingChatId,
+                },
+                ws,
+              );
+            }
+
             currentChatId = null;
+            currentRole = null;
             break;
           }
           case "typing": {
@@ -112,7 +147,8 @@ export function createWebSocketServer(server: http.Server) {
           }
           case "message": {
             await ensureEscalated(currentChatId);
-            const role: "human" | "user" = data.role === "agent" ? "human" : "user";
+            const role: "human" | "user" =
+              data.role === "agent" ? "human" : "user";
             const msg = {
               id: crypto.randomUUID(),
               chatId: currentChatId,
@@ -145,6 +181,14 @@ export function createWebSocketServer(server: http.Server) {
     ws.on("close", () => {
       if (currentChatId) {
         rooms.get(currentChatId)?.delete(ws);
+
+        // If an agent disconnects, notify other clients (users) in the room
+        if (currentRole === "agent") {
+          broadcast(currentChatId, {
+            type: "agent_left",
+            chatId: currentChatId,
+          });
+        }
       }
     });
   });

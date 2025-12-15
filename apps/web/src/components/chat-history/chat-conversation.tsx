@@ -1,6 +1,7 @@
 import { useChat } from "@/hooks/use-chat";
 import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useMessages } from "@/hooks/use-db-messages";
+import { useNotificationSounds } from "@/hooks/use-notification-sounds";
 import { useSession } from "@/lib/auth-client";
 import { useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
@@ -46,6 +47,8 @@ export const ChatConversation = () => {
   const [draft, setDraft] = useState("");
   const [hasJoined, setHasJoined] = useState(false);
 
+  const { playMessageSound } = useNotificationSounds();
+
   // Reset hasJoined when chatId changes
   useEffect(() => {
     setHasJoined(false);
@@ -56,6 +59,12 @@ export const ChatConversation = () => {
     chatId: chatId || "",
     role: "agent",
     onError: (err) => console.error("WebSocket error:", err),
+    onMessage: (message) => {
+      // Play message sound for incoming messages from user
+      if (message.role === "user") {
+        playMessageSound();
+      }
+    },
   });
 
 

@@ -13,6 +13,8 @@ export interface UseChatWebSocketOptions {
   onMessage?: (message: any) => void;
   onTyping?: (data: { role: "user" | "agent"; isTyping: boolean }) => void;
   onError?: (error: string) => void;
+  onAgentJoined?: () => void;
+  onAgentLeft?: () => void;
 }
 
 export function useChatWebSocket({
@@ -21,6 +23,8 @@ export function useChatWebSocket({
   onMessage,
   onTyping,
   onError,
+  onAgentJoined,
+  onAgentLeft,
 }: UseChatWebSocketOptions) {
   const wsRef = useRef<WebSocket | null>(null);
   const activeChatIdRef = useRef<string>(chatId);
@@ -30,6 +34,8 @@ export function useChatWebSocket({
   const onMessageRef = useRef(onMessage);
   const onTypingRef = useRef(onTyping);
   const onErrorRef = useRef(onError);
+  const onAgentJoinedRef = useRef(onAgentJoined);
+  const onAgentLeftRef = useRef(onAgentLeft);
   const [status, setStatus] = useState<WebSocketStatus>("disconnected");
   const [isTyping, setIsTyping] = useState(false);
   const queryClient = useQueryClient();
@@ -38,7 +44,9 @@ export function useChatWebSocket({
     onMessageRef.current = onMessage;
     onTypingRef.current = onTyping;
     onErrorRef.current = onError;
-  }, [onMessage, onTyping, onError]);
+    onAgentJoinedRef.current = onAgentJoined;
+    onAgentLeftRef.current = onAgentLeft;
+  }, [onMessage, onTyping, onError, onAgentJoined, onAgentLeft]);
 
   useEffect(() => {
     const previousChatId = activeChatIdRef.current;
@@ -149,6 +157,18 @@ export function useChatWebSocket({
               queryClient.invalidateQueries({
                 queryKey: ["messages", payload.chatId],
               });
+              break;
+            case "agent_joined":
+              // An agent has joined the chat - notify the user
+              if (payload.chatId === activeChatIdRef.current) {
+                onAgentJoinedRef.current?.();
+              }
+              break;
+            case "agent_left":
+              // An agent has left the chat - notify the user
+              if (payload.chatId === activeChatIdRef.current) {
+                onAgentLeftRef.current?.();
+              }
               break;
             case "message":
               if (payload.chatId === activeChatIdRef.current) {
