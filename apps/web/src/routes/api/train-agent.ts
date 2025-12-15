@@ -20,7 +20,8 @@ import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { subscriptionMiddleware } from "@/middlewares";
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { and, eq, gt, or } from "drizzle-orm";
+import { sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { auth } from "../../../auth";
 
 export const ServerRoute = createServerFileRoute("/api/train-agent").methods(
@@ -57,7 +58,6 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods(
           );
         }
 
-        // Get chatbot details
         const [chatbotData] = await db
           .select({
             id: chatbot.id,
@@ -70,180 +70,184 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods(
         if (!chatbotData) {
           return json({ error: "Chatbot not found." }, { status: 404 });
         }
+
         try {
-          const lastTrainedAt = chatbotData.lastTrainedAt;
+          console.log(`\n🚀 Starting training for chatbot: ${chatbotId}`);
 
           await db
             .update(chatbot)
             .set({ trainingStatus: "in-progress" })
             .where(eq(chatbot.id, chatbotData.id));
 
-          // Only retrain documents that are new or updated since last training
-          const documentFilter = lastTrainedAt
-            ? and(
-                eq(documentSource.chatbotId, chatbotId),
-                or(
-                  gt(documentSource.createdAt, lastTrainedAt),
-                  gt(documentSource.updatedAt, lastTrainedAt),
-                ),
-              )
-            : eq(documentSource.chatbotId, chatbotId);
+          // ALWAYS delete all existing knowledge and retrain everything
+          // This ensures consistency and avoids orphaned embeddings
+          console.log("🗑️ Clearing existing knowledge base...");
+          await db.delete(knowledge).where(eq(knowledge.chatbotId, chatbotId));
 
+          let totalChunksCreated = 0;
+
+          // ============ PROCESS DOCUMENTS ============
           const documents = await db
             .select()
             .from(documentSource)
-            .where(documentFilter);
+            .where(eq(documentSource.chatbotId, chatbotId));
+
+          console.log(`\n📄 Processing ${documents.length} documents`);
+
           for (const doc of documents) {
-            await db
-              .delete(knowledge)
-              .where(
-                and(
-                  eq(knowledge.source, "document"),
-                  eq(knowledge.sourceId, doc.id),
-                ),
-              );
-            const text = await extractTextFromDocument(doc.url, doc.type);
-            const chunks = await chunkDocument(text);
-            for (let i = 0; i < chunks.length; i++) {
-              const embedding = await generateAnswerEmbedding(chunks[i]);
-              try {
+            console.log(`  📁 Document: ${doc.name} (${doc.type})`);
+
+            try {
+              const text = await extractTextFromDocument(doc.url, doc.type);
+
+              if (!text || text.trim().length === 0) {
+                console.error("  ⚠️ No text extracted from document");
+                continue;
+              }
+
+              console.log(`  📝 Extracted ${text.length} characters`);
+
+              const chunks = chunkDocument(text);
+              console.log(`  ✂️ Created ${chunks.length} chunks`);
+
+              for (let i = 0; i < chunks.length; i++) {
+                const embedding = await generateAnswerEmbedding(chunks[i]);
+                const cleanContent = chunks[i].replace(/\0/g, "");
+                const embeddingString = `[${embedding.join(",")}]`;
+
                 await db.insert(knowledge).values({
                   userId,
                   chatbotId,
                   source: "document",
                   sourceId: doc.id,
-                  content: chunks[i],
-                  embedding,
-                  metadata: { chunkIndex: i },
+                  content: cleanContent,
+                  embedding: sql`${embeddingString}::vector`,
+                  metadata: { chunkIndex: i, documentName: doc.name },
                 });
-              } catch (insertError) {
-                console.error(
-                  `Failed to insert knowledge for document ${doc.id}, chunk ${i}:`,
-                  insertError,
-                );
-                console.error("Data being inserted:", {
-                  source: "document",
-                  sourceId: doc.id,
-                  chatbotId,
-                  userId,
-                  content: `${chunks[i].substring(0, 100)}...`,
-                  embedding: embedding
-                    ? `[${embedding.length} dimensions]`
-                    : null,
-                  metadata: { chunkIndex: i },
-                });
-                throw insertError;
+                totalChunksCreated++;
               }
+              console.log("  ✅ Trained successfully");
+            } catch (docError) {
+              console.error("  ❌ Error:", docError);
             }
           }
 
-          // Only retrain questions that are new or updated since last training
-          const questionFilter = lastTrainedAt
-            ? and(
-                eq(question.chatbotId, chatbotId),
-                or(
-                  gt(question.createdAt, lastTrainedAt),
-                  gt(question.updatedAt, lastTrainedAt),
-                ),
-              )
-            : eq(question.chatbotId, chatbotId);
-
+          // ============ PROCESS Q&A PAIRS ============
           const questions = await db
             .select()
             .from(question)
-            .where(questionFilter);
+            .where(eq(question.chatbotId, chatbotId));
+
+          console.log(`\n❓ Processing ${questions.length} Q&A pairs`);
+
           for (const q of questions) {
-            await db
-              .delete(knowledge)
-              .where(
-                and(eq(knowledge.source, "qna"), eq(knowledge.sourceId, q.id)),
-              );
-            const questionEmbedding = await generateQuestionEmbedding(
-              q.question,
-            );
-            await db.insert(knowledge).values({
-              userId,
-              chatbotId,
-              source: "qna",
-              sourceId: q.id,
-              content: q.question,
-              embedding: questionEmbedding,
-              metadata: { answer: q.answer },
-            });
-          }
+            console.log(`  💬 Q: "${q.question.substring(0, 40)}..."`);
 
-          // Only retrain text sources that are new or updated since last training
-          const textFilter = lastTrainedAt
-            ? and(
-                eq(textSource.chatbotId, chatbotId),
-                or(
-                  gt(textSource.createdAt, lastTrainedAt),
-                  gt(textSource.updatedAt, lastTrainedAt),
-                ),
-              )
-            : eq(textSource.chatbotId, chatbotId);
-
-          const texts = await db.select().from(textSource).where(textFilter);
-          for (const t of texts) {
-            await db
-              .delete(knowledge)
-              .where(
-                and(eq(knowledge.source, "text"), eq(knowledge.sourceId, t.id)),
+            try {
+              const questionEmbedding = await generateQuestionEmbedding(
+                q.question,
               );
-            const chunks = await chunkDocument(t.content);
-            for (let i = 0; i < chunks.length; i++) {
-              const embedding = await generateAnswerEmbedding(chunks[i]);
+              const cleanQuestion = q.question.replace(/\0/g, "");
+              const embeddingString = `[${questionEmbedding.join(",")}]`;
+
               await db.insert(knowledge).values({
                 userId,
                 chatbotId,
-                source: "text",
-                sourceId: t.id,
-                content: chunks[i],
-                embedding,
-                metadata: { chunkIndex: i },
+                source: "qna",
+                sourceId: q.id,
+                content: cleanQuestion,
+                embedding: sql`${embeddingString}::vector`,
+                metadata: { answer: q.answer },
               });
+              totalChunksCreated++;
+              console.log("  ✅ Trained successfully");
+            } catch (qError) {
+              console.error("  ❌ Error:", qError);
             }
           }
 
-          // Only retrain website sources that are new or updated since last training
-          const websiteFilter = lastTrainedAt
-            ? and(
-                eq(websiteSource.chatbotId, chatbotId),
-                or(
-                  gt(websiteSource.createdAt, lastTrainedAt),
-                  gt(websiteSource.updatedAt, lastTrainedAt),
-                ),
-              )
-            : eq(websiteSource.chatbotId, chatbotId);
+          // ============ PROCESS TEXT SOURCES ============
+          const texts = await db
+            .select()
+            .from(textSource)
+            .where(eq(textSource.chatbotId, chatbotId));
 
+          console.log(`\n📝 Processing ${texts.length} text sources`);
+
+          for (const t of texts) {
+            console.log(`  📄 Text: "${t.title}"`);
+
+            try {
+              const chunks = chunkDocument(t.content);
+              console.log(`  ✂️ Created ${chunks.length} chunks`);
+
+              for (let i = 0; i < chunks.length; i++) {
+                const embedding = await generateAnswerEmbedding(chunks[i]);
+                const cleanContent = chunks[i].replace(/\0/g, "");
+                const embeddingString = `[${embedding.join(",")}]`;
+
+                await db.insert(knowledge).values({
+                  userId,
+                  chatbotId,
+                  source: "text",
+                  sourceId: t.id,
+                  content: cleanContent,
+                  embedding: sql`${embeddingString}::vector`,
+                  metadata: { chunkIndex: i, title: t.title },
+                });
+                totalChunksCreated++;
+              }
+              console.log("  ✅ Trained successfully");
+            } catch (tError) {
+              console.error("  ❌ Error:", tError);
+            }
+          }
+
+          // ============ PROCESS WEBSITE SOURCES ============
           const websites = await db
             .select()
             .from(websiteSource)
-            .where(websiteFilter);
+            .where(eq(websiteSource.chatbotId, chatbotId));
+
+          console.log(`\n🌐 Processing ${websites.length} website sources`);
+
           for (const w of websites) {
-            await db
-              .delete(knowledge)
-              .where(
-                and(
-                  eq(knowledge.source, "website"),
-                  eq(knowledge.sourceId, w.id),
-                ),
+            console.log(`  🔗 Website: ${w.url}`);
+
+            try {
+              if (!w.markdown || w.markdown.trim().length === 0) {
+                console.log("  ⚠️ No markdown content for website");
+                continue;
+              }
+
+              const chunks = chunkDocument(w.markdown);
+              console.log(
+                `  ✂️ Created ${chunks.length} chunks from ${w.markdown.length} chars`,
               );
-            const chunks = await chunkDocument(w.markdown);
-            for (let i = 0; i < chunks.length; i++) {
-              const embedding = await generateAnswerEmbedding(chunks[i]);
-              await db.insert(knowledge).values({
-                userId,
-                chatbotId,
-                source: "website",
-                sourceId: w.id,
-                content: chunks[i],
-                embedding,
-                metadata: { chunkIndex: i, url: w.url },
-              });
+
+              for (let i = 0; i < chunks.length; i++) {
+                const embedding = await generateAnswerEmbedding(chunks[i]);
+                const cleanContent = chunks[i].replace(/\0/g, "");
+                const embeddingString = `[${embedding.join(",")}]`;
+
+                await db.insert(knowledge).values({
+                  userId,
+                  chatbotId,
+                  source: "website",
+                  sourceId: w.id,
+                  content: cleanContent,
+                  embedding: sql`${embeddingString}::vector`,
+                  metadata: { chunkIndex: i, url: w.url },
+                });
+                totalChunksCreated++;
+              }
+              console.log("  ✅ Trained successfully");
+            } catch (wError) {
+              console.error("  ❌ Error:", wError);
             }
           }
 
+          // Update chatbot status
           await db
             .update(chatbot)
             .set({
@@ -252,7 +256,31 @@ export const ServerRoute = createServerFileRoute("/api/train-agent").methods(
             })
             .where(eq(chatbot.id, chatbotData.id));
 
-          return json({ message: "Agent training initiated successfully." });
+          // Verify knowledge was stored
+          const [verifyCount] = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(knowledge)
+            .where(eq(knowledge.chatbotId, chatbotId));
+
+          console.log("\n🎉 Training complete!");
+          console.log(
+            `📊 Total knowledge chunks created: ${totalChunksCreated}`,
+          );
+          console.log(
+            `✅ Verified ${verifyCount?.count || 0} entries in knowledge base`,
+          );
+
+          return json({
+            message: "Agent training completed successfully.",
+            stats: {
+              documents: documents.length,
+              questions: questions.length,
+              texts: texts.length,
+              websites: websites.length,
+              totalChunks: totalChunksCreated,
+              verifiedEntries: Number(verifyCount?.count || 0),
+            },
+          });
         } catch (error) {
           await db
             .update(chatbot)

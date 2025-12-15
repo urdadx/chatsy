@@ -1,16 +1,16 @@
 import { embed } from "ai";
-import { google } from "./providers";
+import { openai } from "./providers";
 
-const model = google.textEmbedding("gemini-embedding-001");
+// Use OpenAI embeddings (kept at 768 dims to match existing vectors)
+const model = openai.textEmbedding("text-embedding-3-small");
 
 export async function generateQuestionEmbedding(text: string) {
   const { embedding } = await embed({
     model,
     value: text,
     providerOptions: {
-      google: {
-        outputDimensionality: 768,
-        taskType: "RETRIEVAL_QUERY",
+      openai: {
+        dimensions: 768,
       },
     },
   });
@@ -22,9 +22,8 @@ export async function generateAnswerEmbedding(text: string) {
     model,
     value: text,
     providerOptions: {
-      google: {
-        outputDimensionality: 768,
-        taskType: "RETRIEVAL_DOCUMENT",
+      openai: {
+        dimensions: 768,
       },
     },
   });

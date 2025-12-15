@@ -77,6 +77,7 @@ import { ServerRoute as IntegrationsCalendlyCallbackServerRouteImport } from './
 import { ServerRoute as ApiWebhookPolarServerRouteImport } from './routes/api/webhook/polar'
 import { ServerRoute as ApiSourcesCountServerRouteImport } from './routes/api/sources/count'
 import { ServerRoute as ApiEmbedGenerateTokenServerRouteImport } from './routes/api/embed/generate-token'
+import { ServerRoute as ApiDebugKnowledgeStatusServerRouteImport } from './routes/api/debug/knowledge-status'
 import { ServerRoute as ApiChatHistoryServerRouteImport } from './routes/api/chat/history'
 import { ServerRoute as ApiChatAssignAgentServerRouteImport } from './routes/api/chat/assign-agent'
 import { ServerRoute as ApiCalSlotsServerRouteImport } from './routes/api/cal/slots'
@@ -434,6 +435,12 @@ const ApiEmbedGenerateTokenServerRoute =
     path: '/api/embed/generate-token',
     getParentRoute: () => rootServerRouteImport,
   } as any)
+const ApiDebugKnowledgeStatusServerRoute =
+  ApiDebugKnowledgeStatusServerRouteImport.update({
+    id: '/api/debug/knowledge-status',
+    path: '/api/debug/knowledge-status',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiChatHistoryServerRoute = ApiChatHistoryServerRouteImport.update({
   id: '/api/chat/history',
   path: '/api/chat/history',
@@ -776,6 +783,7 @@ export interface FileServerRoutesByFullPath {
   '/api/cal/slots': typeof ApiCalSlotsServerRoute
   '/api/chat/assign-agent': typeof ApiChatAssignAgentServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
+  '/api/debug/knowledge-status': typeof ApiDebugKnowledgeStatusServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/webhook/polar': typeof ApiWebhookPolarServerRoute
@@ -827,6 +835,7 @@ export interface FileServerRoutesByTo {
   '/api/cal/slots': typeof ApiCalSlotsServerRoute
   '/api/chat/assign-agent': typeof ApiChatAssignAgentServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
+  '/api/debug/knowledge-status': typeof ApiDebugKnowledgeStatusServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/webhook/polar': typeof ApiWebhookPolarServerRoute
@@ -879,6 +888,7 @@ export interface FileServerRoutesById {
   '/api/cal/slots': typeof ApiCalSlotsServerRoute
   '/api/chat/assign-agent': typeof ApiChatAssignAgentServerRoute
   '/api/chat/history': typeof ApiChatHistoryServerRoute
+  '/api/debug/knowledge-status': typeof ApiDebugKnowledgeStatusServerRoute
   '/api/embed/generate-token': typeof ApiEmbedGenerateTokenServerRoute
   '/api/sources/count': typeof ApiSourcesCountServerRoute
   '/api/webhook/polar': typeof ApiWebhookPolarServerRoute
@@ -932,6 +942,7 @@ export interface FileServerRouteTypes {
     | '/api/cal/slots'
     | '/api/chat/assign-agent'
     | '/api/chat/history'
+    | '/api/debug/knowledge-status'
     | '/api/embed/generate-token'
     | '/api/sources/count'
     | '/api/webhook/polar'
@@ -983,6 +994,7 @@ export interface FileServerRouteTypes {
     | '/api/cal/slots'
     | '/api/chat/assign-agent'
     | '/api/chat/history'
+    | '/api/debug/knowledge-status'
     | '/api/embed/generate-token'
     | '/api/sources/count'
     | '/api/webhook/polar'
@@ -1034,6 +1046,7 @@ export interface FileServerRouteTypes {
     | '/api/cal/slots'
     | '/api/chat/assign-agent'
     | '/api/chat/history'
+    | '/api/debug/knowledge-status'
     | '/api/embed/generate-token'
     | '/api/sources/count'
     | '/api/webhook/polar'
@@ -1086,6 +1099,7 @@ export interface RootServerRouteChildren {
   ApiCalSlotsServerRoute: typeof ApiCalSlotsServerRoute
   ApiChatAssignAgentServerRoute: typeof ApiChatAssignAgentServerRoute
   ApiChatHistoryServerRoute: typeof ApiChatHistoryServerRoute
+  ApiDebugKnowledgeStatusServerRoute: typeof ApiDebugKnowledgeStatusServerRoute
   ApiEmbedGenerateTokenServerRoute: typeof ApiEmbedGenerateTokenServerRoute
   ApiSourcesCountServerRoute: typeof ApiSourcesCountServerRoute
   ApiWebhookPolarServerRoute: typeof ApiWebhookPolarServerRoute
@@ -1569,6 +1583,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiEmbedGenerateTokenServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/debug/knowledge-status': {
+      id: '/api/debug/knowledge-status'
+      path: '/api/debug/knowledge-status'
+      fullPath: '/api/debug/knowledge-status'
+      preLoaderRoute: typeof ApiDebugKnowledgeStatusServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/chat/history': {
       id: '/api/chat/history'
       path: '/api/chat/history'
@@ -1765,6 +1786,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiCalSlotsServerRoute: ApiCalSlotsServerRoute,
   ApiChatAssignAgentServerRoute: ApiChatAssignAgentServerRoute,
   ApiChatHistoryServerRoute: ApiChatHistoryServerRoute,
+  ApiDebugKnowledgeStatusServerRoute: ApiDebugKnowledgeStatusServerRoute,
   ApiEmbedGenerateTokenServerRoute: ApiEmbedGenerateTokenServerRoute,
   ApiSourcesCountServerRoute: ApiSourcesCountServerRoute,
   ApiWebhookPolarServerRoute: ApiWebhookPolarServerRoute,

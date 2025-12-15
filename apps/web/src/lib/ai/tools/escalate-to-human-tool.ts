@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { chat, chatbot, member, message, user } from "@/db/schema";
-import { google } from "@/lib/ai/providers";
+import { openai } from "@/lib/ai/providers";
 import { resendClient } from "@/lib/emails/email";
 import { generateText, tool } from "ai";
 import { eq } from "drizzle-orm";
@@ -64,7 +64,7 @@ export const escalateToHumanTool = (context: EscalateToHumanContext) =>
               .join("\n");
 
             const { text: summary } = await generateText({
-              model: google("gemini-2.0-flash"),
+              model: openai("gpt-4o-mini"),
               prompt: `Summarize this customer support conversation in exactly 50 words or less. Focus on the main issue and key points:\n\n${conversationText}`,
             });
 

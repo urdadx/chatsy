@@ -35,7 +35,7 @@ function HomeComponent() {
         welcomeMessage: "Hey there👋, ask me anything!",
         showBadge: true,
         autoOpen: false,
-      };
+      };  
       const onLoad = function () {
         const script = document.createElement("script");
         script.src = 'https://padyna.com/embed.js';

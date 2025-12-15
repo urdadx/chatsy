@@ -9,7 +9,7 @@ import {
 } from "@/lib/ai/chat-functions";
 import { getActiveToolsWithActions } from "@/lib/ai/get-active-tools";
 import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
-import { google } from "@/lib/ai/providers";
+import { openai } from "@/lib/ai/providers";
 import { ChatSDKError } from "@/lib/errors";
 import { detectDeviceFromUserAgent, generateUUID } from "@/lib/utils";
 import { embedChatRateLimitMiddleware } from "@/middlewares";
@@ -207,7 +207,7 @@ export const ServerRoute = createServerFileRoute(
             });
 
             const result = streamText({
-              model: google("gemini-2.0-flash"),
+              model: openai("gpt-4o-mini"),
               system: systemPrompt(chatbotName, chatbotPersonality, toolsMap),
               messages: prunedMessages,
               stopWhen: stepCountIs(5),
@@ -284,7 +284,6 @@ export const ServerRoute = createServerFileRoute(
     }),
 
   OPTIONS: api.handler(async ({ request }) => {
-    // Handle CORS preflight requests
     const referer = request.headers.get("referer");
     const headers = new Headers({
       "Access-Control-Allow-Origin": referer ? new URL(referer).origin : "*",

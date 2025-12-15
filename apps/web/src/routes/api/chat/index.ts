@@ -11,7 +11,7 @@ import {
 } from "@/lib/ai/chat-functions";
 import { getActiveToolsWithActions } from "@/lib/ai/get-active-tools";
 import { systemPrompt } from "@/lib/ai/prompts/system-prompt";
-import { google } from "@/lib/ai/providers";
+import { openai } from "@/lib/ai/providers";
 import { ChatSDKError } from "@/lib/errors";
 import { getActiveChatbotId } from "@/lib/hooks/get-active-chatbot";
 import { getCustomerExternalId } from "@/lib/subscription/subscription-functions";
@@ -207,7 +207,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/").methods(
               });
 
               const result = streamText({
-                model: google("gemini-2.0-flash"),
+                model: openai("gpt-4o-mini"),
                 system: systemPrompt(chatbotName, chatbotPersonality, toolsMap),
                 messages: prunedMessages,
                 stopWhen: stepCountIs(5),

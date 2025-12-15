@@ -32,39 +32,41 @@ export async function extractTextFromDocument(
   }
 }
 
-// Enhanced chunking with overlap
-export function chunkDocument(
-  text: string,
-  chunkSize = 1000,
-  overlapSize = 200,
-): string[] {
+export function chunkDocument(text: string, chunkSize = 500): string[] {
   const chunks: string[] = [];
-  const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 0);
+
+  const sentences = text
+    .replace(/([.!?])\s+/g, "$1|")
+    .split("|")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 10);
 
   let currentChunk = "";
-  let previousChunk = "";
+  let lastChunkEnd = "";
 
-  for (const sentence of sentences) {
-    const trimmedSentence = sentence.trim();
+  for (let i = 0; i < sentences.length; i++) {
+    const sentence = sentences[i];
+    const potentialChunk = currentChunk
+      ? `${currentChunk} ${sentence}`
+      : sentence;
 
-    if (
-      (currentChunk + trimmedSentence).length > chunkSize &&
-      currentChunk.length > 0
-    ) {
+    if (potentialChunk.length > chunkSize && currentChunk.length > 0) {
       chunks.push(currentChunk.trim());
 
-      // Add overlap from previous chunk
-      const overlapWords = previousChunk.split(" ").slice(-overlapSize / 10);
-      currentChunk = `${overlapWords.join(" ")} ${trimmedSentence}`;
-      previousChunk = currentChunk;
+      const words = currentChunk.split(" ");
+      const overlapWords = Math.min(20, Math.floor(words.length / 3));
+      lastChunkEnd = words.slice(-overlapWords).join(" ");
+
+      currentChunk = `${lastChunkEnd} ${sentence}`;
     } else {
-      currentChunk += `${trimmedSentence}. `;
+      currentChunk = potentialChunk;
     }
   }
 
-  if (currentChunk.trim().length > 0) {
+  if (currentChunk.trim().length > 10) {
     chunks.push(currentChunk.trim());
   }
 
-  return chunks;
+  console.log(`📚 Chunked document into ${chunks.length} chunks`);
+  return chunks.length > 0 ? chunks : [text];
 }

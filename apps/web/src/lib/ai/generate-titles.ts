@@ -1,4 +1,4 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { openai } from "@/lib/ai/providers";
 import { type UIMessage, generateText } from "ai";
 
 export async function generateTitleFromUserMessage({
@@ -6,11 +6,8 @@ export async function generateTitleFromUserMessage({
 }: {
   message: UIMessage;
 }) {
-  const google = createGoogleGenerativeAI({
-    apiKey: process.env.GEMINI_API_KEY!,
-  });
   const { text: title } = await generateText({
-    model: google("gemini-2.5-flash"),
+    model: openai("gpt-4o-mini"),
     system: `\n
     - you will generate a short title based on the first message a user begins a conversation with
     - ensure it is not more than 80 characters long
