@@ -147,9 +147,13 @@ const ErrorState = ({ error, onRetry }: any) => (
   </div>
 );
 
-function BubbleWidgetContent() {
+interface BubbleWidgetContentProps {
+  chatId: string;
+  resetChat: () => void;
+}
+
+function BubbleWidgetContent({ chatId, resetChat }: BubbleWidgetContentProps) {
   const { widgetId } = Route.useParams();
-  const { chatId, resetChat } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
   const { data: chatData } = useChatData(chatId);
   const { retry } = useRetry();
@@ -185,7 +189,6 @@ function BubbleWidgetContent() {
 
   const isEscalated = chatData?.status === "escalated";
 
-  // Initialize WebSocket for escalated chats
   const {
     status: wsStatus,
     isTyping: wsIsTyping,
@@ -214,9 +217,7 @@ function BubbleWidgetContent() {
         },
       };
 
-      // Add message to the UI immediately for real-time experience
       setMessages((prevMessages) => {
-        // Check if message already exists to avoid duplicates
         const messageExists = prevMessages.some(msg => msg.id === uiMessage.id);
         if (messageExists) return prevMessages;
 
@@ -225,7 +226,6 @@ function BubbleWidgetContent() {
     },
   });
 
-  // Auto-connect WebSocket when chat becomes escalated
   useEffect(() => {
     if (isEscalated && !wsIsConnected && wsStatus === "disconnected") {
       console.log("Chat escalated, connecting to WebSocket...");
@@ -286,17 +286,17 @@ function BubbleWidgetContent() {
   });
 
 
-  // Track the current chatId to prevent restoring messages after reset
   const chatIdRef = useRef(chatId);
 
   useEffect(() => {
-    // Only sync messages if we're on the same chat session
-    // This prevents restoring old messages after a chat reset
-    if (chatIdRef.current === chatId && initialMessages.length > 0 && messages.length === 0) {
+    if (chatIdRef.current !== chatId) {
+      chatIdRef.current = chatId;
+      return;
+    }
+
+    if (initialMessages.length > 0 && messages.length === 0) {
       setMessages(initialMessages);
     }
-    // Update the ref when chatId changes
-    chatIdRef.current = chatId;
   }, [chatId, initialMessages, messages.length, setMessages]);
 
   const handleSubmit = useCallback(
@@ -354,11 +354,15 @@ function BubbleWidgetContent() {
   }, [isEscalated, wsIsConnected, wsSendTyping]);
 
   const handleResetChat = useCallback(() => {
-    resetChat();
     setMessages([]);
     dispatchUiState({ type: "RESET" });
+
+    resetChat();
+
     queryClient.invalidateQueries({ queryKey: ["messages"] });
     queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
+    queryClient.invalidateQueries({ queryKey: ["votes"] });
+    queryClient.invalidateQueries({ queryKey: ["chat"] });
   }, [resetChat, setMessages, queryClient]);
 
   const handleGoToMain = useCallback(() => {
@@ -389,7 +393,6 @@ function BubbleWidgetContent() {
     enabled: messages.length >= 2,
   });
 
-  // Notify parent that widget is ready
   useEffect(() => {
     notifyParent(MESSAGE_TYPES.WIDGET_READY);
   }, [notifyParent]);
@@ -468,9 +471,11 @@ function BubbleWidgetContent() {
 }
 
 function RouteComponent() {
+  const { chatId, resetChat } = useChatWithResetEmbed();
+
   return (
-    <Provider<ChatMessage> initialMessages={[]}>
-      <BubbleWidgetContent />
+    <Provider<ChatMessage> key={chatId} initialMessages={[]}>
+      <BubbleWidgetContent chatId={chatId} resetChat={resetChat} />
     </Provider>
   );
 }

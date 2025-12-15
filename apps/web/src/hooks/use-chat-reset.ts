@@ -1,57 +1,44 @@
 import { generateUUID } from "@/lib/utils";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useChatbots } from "./use-chatbot";
 
 export const useChatWithReset = () => {
-  const [chatId, setChatId] = useState<string>("");
+  // Generate a new chat ID on each mount to avoid reusing the same chat
+  const [chatId, setChatId] = useState<string>(() => generateUUID());
   const [previousChatbotId, setPreviousChatbotId] = useState<string>("");
+  const initializedRef = useRef(false);
 
   const { data: chatbotsData, isLoading } = useChatbots();
   const activeChatbot = chatbotsData?.activeChatbotId;
-
-  const getChatStorageKey = useCallback((chatbotId: string) => {
-    return `chatId_${chatbotId}`;
-  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined" && activeChatbot) {
       const currentChatbotId = activeChatbot;
 
-      // If chatbot changed, clear any temporary chat state
+      // If chatbot changed, generate a new chat ID
       if (previousChatbotId && previousChatbotId !== currentChatbotId) {
-        setChatId("");
+        setChatId(generateUUID());
       }
 
-      const storageKey = getChatStorageKey(currentChatbotId);
-      const existingId = localStorage.getItem(storageKey);
-
-      if (existingId) {
-        setChatId(existingId);
-      } else {
-        const newId = generateUUID();
-        localStorage.setItem(storageKey, newId);
-        setChatId(newId);
+      // Only set initial chat ID once per mount if not already set
+      if (!initializedRef.current) {
+        initializedRef.current = true;
       }
 
       setPreviousChatbotId(currentChatbotId);
     }
-  }, [activeChatbot, getChatStorageKey, previousChatbotId]);
+  }, [activeChatbot, previousChatbotId]);
 
   const resetChat = useCallback(() => {
-    if (typeof window !== "undefined" && activeChatbot) {
-      const storageKey = getChatStorageKey(activeChatbot);
+    if (typeof window !== "undefined") {
       const newId = generateUUID();
-      localStorage.setItem(storageKey, newId);
       setChatId(newId);
     }
-  }, [activeChatbot, getChatStorageKey]);
+  }, []);
 
   const clearChatbotChats = useCallback(() => {
-    if (typeof window !== "undefined" && activeChatbot) {
-      const storageKey = getChatStorageKey(activeChatbot);
-      localStorage.removeItem(storageKey);
-    }
-  }, [activeChatbot, getChatStorageKey]);
+    // No-op since we no longer store chat IDs in localStorage
+  }, []);
 
   return {
     chatId,

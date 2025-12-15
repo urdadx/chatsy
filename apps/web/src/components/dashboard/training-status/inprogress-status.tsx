@@ -1,8 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { RiCheckboxCircleFill } from "@remixicon/react";
+import { useNavigate } from "@tanstack/react-router";
 import { Eye } from "lucide-react";
 
 export const InProgressStatus = () => {
+
+  const navigate = useNavigate()
+
+  const handleSeeProgress = () => {
+    navigate({
+      to: "/admin/knowledge-base",
+    });
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <p className="text-lg font-semibold text-gray-800">Training status</p>
@@ -21,6 +31,7 @@ export const InProgressStatus = () => {
             </p>
             <Button
               variant="outline"
+              onClick={handleSeeProgress}
               className="mt-2 border-yellow-500 text-yellow-700 hover:text-yellow-800 hover:border-yellow-600"
             >
               <Eye className="w-4 h-4" />

@@ -29,6 +29,7 @@ export const chatHistorySearchSchema = z.object({
   chatId: z.string().optional(),
   filter: z.enum(["24h", "7d", "30d", "90d", "all"]).default("24h"),
   status: z.enum(["all", "unresolved", "resolved", "escalated"]).default("all"),
+  privacy: z.enum(["all", "private", "public"]).default("all"),
 });
 
 export const Route = createFileRoute("/admin/chat-history/")({
@@ -38,7 +39,7 @@ export const Route = createFileRoute("/admin/chat-history/")({
 
 function RouteComponent() {
   const navigate = useNavigate({ from: "/admin/chat-history" });
-  const { chatId, filter, status } = useSearch({
+  const { chatId, filter, status, privacy } = useSearch({
     from: "/admin/chat-history/",
   });
   const isMobile = useIsMobile();
@@ -53,7 +54,7 @@ function RouteComponent() {
     refetch,
     isLoading,
     isError,
-  } = useChatHistory(filter, status);
+  } = useChatHistory(filter, status, privacy);
 
   const chats = data?.pages.flatMap((page) => page.chats) ?? [];
   const queryClient = useQueryClient();
@@ -80,18 +81,20 @@ function RouteComponent() {
     }
 
     navigate({
-      search: { chatId: value, filter, status },
+      search: { chatId: value, filter, status, privacy },
     });
   };
 
   const handleApplyFilters = (
     newFilter: "24h" | "7d" | "30d" | "90d" | "all",
-    newStatus: "all" | "unresolved" | "resolved" | "escalated"
+    newStatus: "all" | "unresolved" | "resolved" | "escalated",
+    newPrivacy: "all" | "private" | "public"
   ) => {
     navigate({
       search: {
         filter: newFilter,
         status: newStatus,
+        privacy: newPrivacy,
         chatId: undefined,
       },
     });
@@ -115,6 +118,7 @@ function RouteComponent() {
               <ChatFilterDialog
                 currentFilter={filter}
                 currentStatus={status}
+                currentPrivacy={privacy}
                 onApplyFilters={handleApplyFilters}
               />
               <Button
@@ -164,6 +168,7 @@ function RouteComponent() {
                   <ChatFilterDialog
                     currentFilter={filter}
                     currentStatus={status}
+                    currentPrivacy={privacy}
                     onApplyFilters={handleApplyFilters}
                   />
                 </div>

@@ -154,8 +154,6 @@ const useChatHandlers = (
           dispatchUiState({ type: "SET_INPUT", payload: "" });
           wsSendTyping?.(false);
 
-          // For now, let database sync handle the user message display
-          // The WebSocket will handle the agent's response in real-time
           queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
         } else {
           toast.error("Failed to send message. Please try again.");
@@ -171,12 +169,16 @@ const useChatHandlers = (
   );
 
   const handleResetChat = useCallback(() => {
-    resetChat?.();
     setMessages([]);
     dispatchUiState({ type: "RESET" });
     logEvent(ANALYTICS_EVENTS.BIO_PAGE_CHAT_RESET);
+
+    resetChat?.();
+
     queryClient?.invalidateQueries({ queryKey: ["messages"] });
     queryClient?.invalidateQueries({ queryKey: ["chat-logs"] });
+    queryClient?.invalidateQueries({ queryKey: ["votes"] });
+    queryClient?.invalidateQueries({ queryKey: ["chat"] });
   }, [resetChat, setMessages, dispatchUiState, logEvent, queryClient]);
 
   const handleGoToMain = useCallback(() => {
@@ -230,9 +232,13 @@ const useChatHandlers = (
   };
 };
 
-function TalkPageContent(): JSX.Element {
+interface TalkPageContentProps {
+  chatId: string;
+  resetChat: () => void;
+}
+
+function TalkPageContent({ chatId, resetChat }: TalkPageContentProps): JSX.Element {
   const { pageId } = Route.useParams();
-  const { chatId, resetChat } = useChatWithResetEmbed();
   const { data: messagesFromDb, isLoading, error } = useMessages(chatId);
   const { data: chatData } = useChatData(chatId);
   const { retry } = useRetry();
@@ -355,13 +361,18 @@ function TalkPageContent(): JSX.Element {
   const chatIdRef = useRef(chatId);
 
   useEffect(() => {
-    // Only sync messages if we're on the same chat session
-    // This prevents restoring old messages after a chat reset
-    if (chatIdRef.current === chatId && initialMessages.length > 0 && messages.length === 0) {
+    // When chatId changes (e.g., after reset), update ref and clear messages if it's a new chat
+    if (chatIdRef.current !== chatId) {
+      // ChatId changed - this is a new/reset chat
+      chatIdRef.current = chatId;
+      // Don't restore old messages for a new chat
+      return;
+    }
+
+    // Only sync messages if we're on the same chat session and have messages to restore
+    if (initialMessages.length > 0 && messages.length === 0) {
       setMessages(initialMessages);
     }
-    // Update the ref when chatId changes
-    chatIdRef.current = chatId;
   }, [chatId, initialMessages, messages.length, setMessages]);
 
   const {
@@ -486,9 +497,11 @@ function TalkPageContent(): JSX.Element {
 }
 
 function RouteComponent(): JSX.Element {
+  const { chatId, resetChat } = useChatWithResetEmbed();
+
   return (
-    <Provider<ChatMessage> initialMessages={[]}>
-      <TalkPageContent />
+    <Provider<ChatMessage> key={chatId} initialMessages={[]}>
+      <TalkPageContent chatId={chatId} resetChat={resetChat} />
     </Provider>
   );
 }

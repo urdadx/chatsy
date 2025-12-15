@@ -3,7 +3,7 @@ import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useMessages } from "@/hooks/use-db-messages";
 import { useSession } from "@/lib/auth-client";
 import { useSearch } from "@tanstack/react-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { convertToUIMessages } from "../chat/convert-to-ui-message";
 import { PreviewMessage } from "../chat/preview-message";
 import { TypingIndicator } from "../chat/typing-indicator";
@@ -45,6 +45,12 @@ export const ChatConversation = () => {
 
   const [draft, setDraft] = useState("");
   const [hasJoined, setHasJoined] = useState(false);
+
+  // Reset hasJoined when chatId changes
+  useEffect(() => {
+    setHasJoined(false);
+    setDraft("");
+  }, [chatId]);
 
   const { status, isTyping, sendMessage, sendTyping, isConnected, connect, disconnect } = useChatWebSocket({
     chatId: chatId || "",

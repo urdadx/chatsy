@@ -14,6 +14,7 @@ const querySchema = z.object({
   direction: z.enum(["next", "prev"]).default("next"),
   filter: z.enum(["24h", "7d", "30d", "90d", "all"]).default("24h"),
   status: z.enum(["all", "unresolved", "resolved", "escalated"]).default("all"),
+  privacy: z.enum(["all", "private", "public"]).default("all"),
 });
 
 export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
@@ -62,7 +63,7 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
       return new Response("Invalid query params", { status: 400 });
     }
 
-    const { limit, cursor, filter, status } = result.data;
+    const { limit, cursor, filter, status, privacy } = result.data;
 
     // Time filtering
     let timeFilter: SQL<any> | undefined;
@@ -83,11 +84,18 @@ export const ServerRoute = createServerFileRoute("/api/chat/history").methods({
       statusFilter = eq(chat.status, status);
     }
 
+    // Privacy/Visibility filtering
+    let privacyFilter: SQL<any> | undefined;
+    if (privacy !== "all") {
+      privacyFilter = eq(chat.visibility, privacy);
+    }
+
     try {
       const whereConditions = [eq(chat.chatbotId, chatbotId)];
 
       if (timeFilter) whereConditions.push(timeFilter);
       if (statusFilter) whereConditions.push(statusFilter);
+      if (privacyFilter) whereConditions.push(privacyFilter);
 
       if (cursor) {
         const [refChat] = await db

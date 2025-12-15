@@ -20,22 +20,30 @@ import { useEffect, useState } from "react";
 interface ChatFilterDialogProps {
   currentFilter: "24h" | "7d" | "30d" | "90d" | "all";
   currentStatus: "all" | "unresolved" | "resolved" | "escalated";
-  onApplyFilters: (filter: "24h" | "7d" | "30d" | "90d" | "all", status: "all" | "unresolved" | "resolved" | "escalated") => void;
+  currentPrivacy: "all" | "private" | "public";
+  onApplyFilters: (
+    filter: "24h" | "7d" | "30d" | "90d" | "all",
+    status: "all" | "unresolved" | "resolved" | "escalated",
+    privacy: "all" | "private" | "public"
+  ) => void;
 }
 
 export function ChatFilterDialog({
   currentFilter,
   currentStatus,
+  currentPrivacy,
   onApplyFilters,
 }: ChatFilterDialogProps) {
   const [open, setOpen] = useState(false);
   const [tempFilter, setTempFilter] = useState(currentFilter);
   const [tempStatus, setTempStatus] = useState(currentStatus);
+  const [tempPrivacy, setTempPrivacy] = useState(currentPrivacy);
 
   useEffect(() => {
     setTempFilter(currentFilter);
     setTempStatus(currentStatus);
-  }, [currentFilter, currentStatus]);
+    setTempPrivacy(currentPrivacy);
+  }, [currentFilter, currentStatus, currentPrivacy]);
 
   const handleTempFilterChange = (value: string) => {
     setTempFilter(value as "24h" | "7d" | "30d" | "90d" | "all");
@@ -45,8 +53,12 @@ export function ChatFilterDialog({
     setTempStatus(value as "all" | "unresolved" | "resolved" | "escalated");
   };
 
+  const handleTempPrivacyChange = (value: string) => {
+    setTempPrivacy(value as "all" | "private" | "public");
+  };
+
   const handleApply = () => {
-    onApplyFilters(tempFilter, tempStatus);
+    onApplyFilters(tempFilter, tempStatus, tempPrivacy);
     setOpen(false);
   };
 
@@ -92,6 +104,21 @@ export function ChatFilterDialog({
                 <SelectItem value="unresolved">Unresolved</SelectItem>
                 <SelectItem value="resolved">Resolved</SelectItem>
                 <SelectItem value="escalated">Escalated</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid gap-2">
+            <label htmlFor="privacy-filter" className="text-sm font-medium">
+              Type
+            </label>
+            <Select value={tempPrivacy} onValueChange={handleTempPrivacyChange}>
+              <SelectTrigger className="w-full" id="privacy-filter">
+                <SelectValue placeholder="Privacy" />
+              </SelectTrigger>
+              <SelectContent className="w-full">
+                <SelectItem value="all">All Chats</SelectItem>
+                <SelectItem value="private">Private</SelectItem>
+                <SelectItem value="public">Public</SelectItem>
               </SelectContent>
             </Select>
           </div>

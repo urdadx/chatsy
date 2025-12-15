@@ -5,6 +5,7 @@ import type { ComponentType, SVGProps } from "react";
 export { default as Photo } from "./photo";
 export { default as Success } from "./success";
 export { default as Tick } from "./tick";
+export { default as Globe } from "./globe";
 
 // loaders
 export * from "./loading-circle";

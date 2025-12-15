@@ -1,3 +1,4 @@
+import { Globe } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { } from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -87,9 +88,10 @@ export function ChatsByDeviceSources({
         Desktop: <Monitor className="w-4" />,
         Tablet: <TabletSmartphone className="w-4" />,
         Bot: <Bot className="w-4" />,
-        other: <TabletSmartphone className="w-4" />,
+        other: <Globe className="w-4" />,
+        Unknown: <Globe className="w-4" />,
       };
-      const icon = deviceIcon[device.deviceType as keyof typeof deviceIcon];
+      const icon = deviceIcon[device.deviceType as keyof typeof deviceIcon] || <Globe className="w-4" />;
 
       return {
         icon,
@@ -107,15 +109,18 @@ export function ChatsByDeviceSources({
   const allOperatingSystems = metrics
     ? metrics.operatingsystems.map((os: any) => {
       const osCode =
-        osCodes[os.osName as keyof typeof osCodes] ?? osCodes["GNU/Linux"];
+        osCodes[os.osName as keyof typeof osCodes];
+      const isUnknown = !osCode || os.osName === "Unknown" || !os.osName;
       const iconSrc = `../../../public/os/${osCode}.png`;
-      const icon = (
+      const icon = isUnknown ? (
+        <Globe className="w-4" key={os.osName} />
+      ) : (
         <img key={os.osName} alt="staticon" src={iconSrc} className="w-5" />
       );
 
       return {
         icon,
-        title: os.osName,
+        title: os.osName || "Unknown",
         href: "",
         value: os.totalCount,
         linkId: "",
@@ -125,19 +130,28 @@ export function ChatsByDeviceSources({
 
   const allBrowsers = metrics
     ? metrics.browsers.map((browser: any) => {
-      const iconSrc = `../../../public/browser/${browser.browserName.toLowerCase()}.png`;
-      const icon = (
+      const browserName = browser.browserName?.toLowerCase();
+      const isUnknown = !browserName || browserName === "unknown";
+      const iconSrc = `../../../public/browser/${browserName}.png`;
+      const icon = isUnknown ? (
+        <Globe className="w-4" key={browser.browserName} />
+      ) : (
         <img
           key={browser.browserName}
           alt={browser.browserName}
           src={iconSrc}
           className="w-4"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            target.parentElement?.insertAdjacentHTML('afterbegin', '<span class="w-4 inline-block"></span>');
+          }}
         />
       );
 
       return {
         icon,
-        title: browser.browserName,
+        title: browser.browserName || "Unknown",
         href: "",
         value: browser.totalCount,
         linkId: "",

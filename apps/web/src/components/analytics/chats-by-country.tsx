@@ -2,6 +2,7 @@ import {
   Africa,
   Asia,
   Europe,
+  Globe,
   NorthAmerica,
   Oceania,
   SouthAmerica,
@@ -60,10 +61,13 @@ export function ChatsByCountry({
   }, [analytics]);
 
   const mapCountries = countryStats.map((country) => {
-    const countryName = getCountryFromCode(country.country) || "unknown"
+    const countryName = getCountryFromCode(country.country) || "Unknown";
+    const isUnknown = !countryName || countryName === "Unknown" || country.country === "unknown";
     const iconSrc = `https://flag.vercel.app/m/${country.country}.svg`;
     return {
-      icon: (
+      icon: isUnknown ? (
+        <Globe className="w-4" key={country.country} />
+      ) : (
         <img
           src={iconSrc}
           className="w-4"
@@ -79,10 +83,13 @@ export function ChatsByCountry({
   });
 
   const mapCities = cityStats.map((city) => {
-    const countryCode = getCountryCodeFromCity(city.city) || "unknown";
+    const countryCode = getCountryCodeFromCity(city.city);
+    const isUnknown = !countryCode || countryCode === "unknown" || !city.city;
     const iconSrc = `https://flag.vercel.app/m/${countryCode}.svg`;
     return {
-      icon: (
+      icon: isUnknown ? (
+        <Globe className="w-4" key={city.city} />
+      ) : (
         <img
           src={iconSrc}
           className="w-4"
@@ -90,14 +97,14 @@ export function ChatsByCountry({
           key={city.city}
         />
       ),
-      title: city.city,
+      title: city.city || "Unknown",
       href: "",
       value: city.totalCount,
     };
   });
 
   const mapContinents = continentStats.map((continent) => {
-    let icon = null;
+    let icon: React.ReactNode = <Globe className="w-4" key={continent.continent} />;
     const name = continent.continent;
     const actualName =
       continent.continent === "AF"
@@ -112,29 +119,29 @@ export function ChatsByCountry({
                 ? "Oceania"
                 : continent.continent === "SA"
                   ? "South America"
-                  : continent.continent;
+                  : "Unknown";
 
     // Use initials for continent icon mapping
     if (name === "AF" || name === "Africa") {
-      icon = <Africa className="w-4" />;
+      icon = <Africa className="w-4" key={continent.continent} />;
     } else if (name === "AS" || name === "Asia") {
-      icon = <Asia className="w-4" />;
+      icon = <Asia className="w-4" key={continent.continent} />;
     } else if (name === "EU" || name === "Europe") {
-      icon = <Europe className="w-4" />;
+      icon = <Europe className="w-4" key={continent.continent} />;
     } else if (
       name === "NA" ||
       name === "North America" ||
       name === "NorthAmerica"
     ) {
-      icon = <NorthAmerica className="w-4" />;
+      icon = <NorthAmerica className="w-4" key={continent.continent} />;
     } else if (name === "OC" || name === "Oceania") {
-      icon = <Oceania className="w-4" />;
+      icon = <Oceania className="w-4" key={continent.continent} />;
     } else if (
       name === "SA" ||
       name === "South America" ||
       name === "SouthAmerica"
     ) {
-      icon = <SouthAmerica className="w-4" />;
+      icon = <SouthAmerica className="w-4" key={continent.continent} />;
     }
 
     return {

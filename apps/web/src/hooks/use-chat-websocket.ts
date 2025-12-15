@@ -41,7 +41,35 @@ export function useChatWebSocket({
   }, [onMessage, onTyping, onError]);
 
   useEffect(() => {
+    const previousChatId = activeChatIdRef.current;
     activeChatIdRef.current = chatId;
+
+    // If chatId changed and we were connected, disconnect from old chat
+    if (previousChatId && previousChatId !== chatId && wsRef.current) {
+      const ws = wsRef.current;
+
+      // Leave the old chat room
+      if (ws.readyState === WebSocket.OPEN) {
+        try {
+          ws.send(JSON.stringify({ type: "leave", chatId: previousChatId }));
+        } catch (err) {
+          console.error("Failed to send leave message:", err);
+        }
+      }
+
+      // Close the connection
+      ws.close();
+      wsRef.current = null;
+      setStatus("disconnected");
+      setIsTyping(false);
+      reconnectAttemptsRef.current = 0;
+
+      // Clear any pending reconnect
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+    }
   }, [chatId]);
 
   useEffect(() => {
@@ -97,7 +125,7 @@ export function useChatWebSocket({
       wsRef.current = ws;
 
       ws.onopen = () => {
-        setStatus("connected");
+        // Don't set connected yet - wait for "joined" confirmation from server
         reconnectAttemptsRef.current = 0;
         try {
           ws.send(JSON.stringify({ type: "join", chatId, role }));
@@ -114,6 +142,13 @@ export function useChatWebSocket({
 
           switch (payload.type) {
             case "joined":
+              // Now we're truly connected and in the chat room
+              setStatus("connected");
+              // Fetch any messages that might have been sent before we connected
+              // This ensures we don't miss messages sent during the connection gap
+              queryClient.invalidateQueries({
+                queryKey: ["messages", payload.chatId],
+              });
               break;
             case "message":
               if (payload.chatId === activeChatIdRef.current) {
@@ -152,12 +187,12 @@ export function useChatWebSocket({
           if (reconnectAttemptsRef.current < maxReconnectAttempts) {
             const delay = Math.min(
               1000 * 2 ** reconnectAttemptsRef.current,
-              30000
+              30000,
             );
             reconnectAttemptsRef.current += 1;
 
             console.log(
-              `Attempting to reconnect (${reconnectAttemptsRef.current}/${maxReconnectAttempts}) in ${delay}ms...`
+              `Attempting to reconnect (${reconnectAttemptsRef.current}/${maxReconnectAttempts}) in ${delay}ms...`,
             );
 
             reconnectTimeoutRef.current = setTimeout(() => {
@@ -166,7 +201,7 @@ export function useChatWebSocket({
           } else {
             setStatus("error");
             onErrorRef.current?.(
-              "Connection lost and max reconnection attempts reached"
+              "Connection lost and max reconnection attempts reached",
             );
           }
         }
@@ -227,7 +262,7 @@ export function useChatWebSocket({
 
       if (!ws || ws.readyState !== WebSocket.OPEN || !currentChatId) {
         console.warn(
-          "Cannot send message: WebSocket not connected or no chat ID"
+          "Cannot send message: WebSocket not connected or no chat ID",
         );
         return false;
       }
@@ -240,7 +275,7 @@ export function useChatWebSocket({
             chatId: currentChatId,
             text,
             role,
-          })
+          }),
         );
         return true;
       } catch (err) {
@@ -249,7 +284,7 @@ export function useChatWebSocket({
         return false;
       }
     },
-    [role, onError]
+    [role, onError],
   );
 
   const sendTyping = useCallback(
@@ -268,13 +303,13 @@ export function useChatWebSocket({
             chatId: currentChatId,
             role,
             isTyping: typing,
-          })
+          }),
         );
       } catch (err) {
         console.error("Failed to send typing indicator:", err);
       }
     },
-    [role]
+    [role],
   );
 
   return {
