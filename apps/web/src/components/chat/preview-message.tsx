@@ -13,6 +13,13 @@ import { CollectFeedbackForm } from "@/lib/ai/tools-ui/collect-feedback-form";
 import { CollectLeadsForm } from "@/lib/ai/tools-ui/collect-leads-form";
 import { CustomButton } from "@/lib/ai/tools-ui/custom-button";
 import { EscalateToHumanNotification } from "@/lib/ai/tools-ui/escalate-to-human-notification";
+import {
+  BookingToolSkeleton,
+  CollectFeedbackFormSkeleton,
+  CollectLeadsFormSkeleton,
+  CustomButtonSkeleton,
+  EscalateToHumanSkeleton,
+} from "@/lib/ai/tools-ui/tool-skeletons";
 import type { ChatMessage } from "@/lib/types";
 import { sanitizeText } from "@/lib/utils";
 import type { UseChatHelpers } from "@ai-sdk/react";
@@ -127,7 +134,15 @@ export const PreviewMessage = ({
                   );
                 }
 
-                if (state === "input-available" || state === "output-available") {
+                if (state === "input-streaming" || state === "input-available") {
+                  return (
+                    <div className="px-2" key={toolCallId}>
+                      <CollectFeedbackFormSkeleton />
+                    </div>
+                  );
+                }
+
+                if (state === "output-available") {
                   return (
                     <div className="px-2" key={toolCallId}>
                       <CollectFeedbackForm
@@ -158,7 +173,15 @@ export const PreviewMessage = ({
                   );
                 }
 
-                if (state === "input-available" || state === "output-available") {
+                if (state === "input-streaming" || state === "input-available") {
+                  return (
+                    <div className="px-2" key={toolCallId}>
+                      <CollectLeadsFormSkeleton />
+                    </div>
+                  );
+                }
+
+                if (state === "output-available") {
                   return (
                     <div className="px-2" key={toolCallId}>
                       <CollectLeadsForm color={activeChatbot?.primaryColor} />
@@ -238,17 +261,10 @@ export const PreviewMessage = ({
                   );
                 }
 
-                if (state === "input-streaming") {
+                if (state === "input-streaming" || state === "input-available") {
                   return (
-                    <div
-                      key={toolCallId}
-                      className="flex items-center gap-2 text-muted-foreground text-sm"
-                    >
-                      <Loader
-                        variant="dots"
-                        className="text-muted-foreground"
-                      />
-                      <span>Escalating to human agent...</span>
+                    <div key={toolCallId} className="px-2">
+                      <EscalateToHumanSkeleton />
                     </div>
                   );
                 }
@@ -273,17 +289,10 @@ export const PreviewMessage = ({
                   );
                 }
 
-                if (state === "input-available") {
+                if (state === "input-streaming" || state === "input-available") {
                   return (
-                    <div
-                      key={toolCallId}
-                      className="flex items-center gap-2 text-muted-foreground text-sm"
-                    >
-                      <Loader
-                        variant="dots"
-                        className="text-muted-foreground"
-                      />
-                      <span>Loading button...</span>
+                    <div key={toolCallId} className="px-2">
+                      <CustomButtonSkeleton />
                     </div>
                   );
                 }
@@ -331,17 +340,10 @@ export const PreviewMessage = ({
                   );
                 }
 
-                if (state === "input-available") {
+                if (state === "input-streaming" || state === "input-available") {
                   return (
-                    <div
-                      key={toolCallId}
-                      className="flex items-center gap-2 text-muted-foreground text-sm"
-                    >
-                      <Loader
-                        variant="dots"
-                        className="text-muted-foreground"
-                      />
-                      <span>Setting up meeting...</span>
+                    <div key={toolCallId} className="px-2">
+                      <BookingToolSkeleton />
                     </div>
                   );
                 }
@@ -355,7 +357,6 @@ export const PreviewMessage = ({
                   ) {
                     return (
                       <div className="px-2 space-y-2" key={toolCallId}>
-
                         <CalendlyBooking
                           eventTypeUri={(output as any).eventTypeUri}
                           eventTypeName={(output as any).eventTypeName}
@@ -389,17 +390,10 @@ export const PreviewMessage = ({
                   );
                 }
 
-                if (state === "input-available") {
+                if (state === "input-streaming" || state === "input-available") {
                   return (
-                    <div
-                      key={toolCallId}
-                      className="flex items-center gap-2 text-muted-foreground text-sm"
-                    >
-                      <Loader
-                        variant="dots"
-                        className="text-muted-foreground"
-                      />
-                      <span>Setting up meeting...</span>
+                    <div key={toolCallId} className="px-2">
+                      <BookingToolSkeleton />
                     </div>
                   );
                 }

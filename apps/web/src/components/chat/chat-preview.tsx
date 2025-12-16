@@ -15,8 +15,12 @@ import { ChatFooter } from "./chat-footer";
 import { ChatHeader } from "./chat-header";
 import { ChatLanding } from "./chat-landing";
 
-function ChatPreviewContent() {
-  const { chatId, resetChat } = useChatWithReset();
+interface ChatPreviewContentProps {
+  chatId: string;
+  resetChat: () => void;
+}
+
+function ChatPreviewContent({ chatId, resetChat }: ChatPreviewContentProps) {
   const { data: chatData } = useChatData(chatId);
   const [input, setInput] = useState("");
   const [showLanding, setShowLanding] = useState(() => {
@@ -72,12 +76,11 @@ function ChatPreviewContent() {
 
   const handleResetChat = useCallback(() => {
     resetChat();
-    setMessages([]);
     setInput("");
     toast.success("Chat reset successfully");
     queryClient.invalidateQueries({ queryKey: ["chat-logs"] });
     queryClient.invalidateQueries({ queryKey: ["messages"] });
-  }, [resetChat, setMessages, setInput, queryClient]);
+  }, [resetChat, setInput, queryClient]);
 
   const handleGoToMain = useCallback(() => {
     localStorage.setItem("chat-preview-interface", "chat");
@@ -166,9 +169,11 @@ function ChatPreviewContent() {
 }
 
 export function ChatPreview() {
+  const { chatId, resetChat } = useChatWithReset();
+
   return (
-    <Provider<ChatMessage> initialMessages={[]}>
-      <ChatPreviewContent />
+    <Provider<ChatMessage> key={chatId} initialMessages={[]}>
+      <ChatPreviewContent chatId={chatId} resetChat={resetChat} />
     </Provider>
   );
 }

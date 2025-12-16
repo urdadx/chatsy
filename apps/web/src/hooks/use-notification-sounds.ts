@@ -17,7 +17,6 @@ export function useNotificationSounds() {
       }
       connectedAudioRef.current.currentTime = 0;
       connectedAudioRef.current.play().catch((err) => {
-        // Silently fail if autoplay is blocked
         console.warn("Could not play connected sound:", err);
       });
     } catch (err) {
@@ -33,7 +32,6 @@ export function useNotificationSounds() {
       }
       disconnectedAudioRef.current.currentTime = 0;
       disconnectedAudioRef.current.play().catch((err) => {
-        // Silently fail if autoplay is blocked
         console.warn("Could not play disconnected sound:", err);
       });
     } catch (err) {
@@ -49,7 +47,6 @@ export function useNotificationSounds() {
       }
       messageAudioRef.current.currentTime = 0;
       messageAudioRef.current.play().catch((err) => {
-        // Silently fail if autoplay is blocked
         console.warn("Could not play message sound:", err);
       });
     } catch (err) {

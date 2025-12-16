@@ -29,10 +29,9 @@ export const getChatById = createServerFn({ method: "GET" })
         .leftJoin(member, eq(chat.agentAssigned, member.id))
         .leftJoin(user, eq(member.userId, user.id))
         .where(eq(chat.id, ctx.data));
-      if (!selectedChat) {
-        throw new Error(`Chat with id "${ctx.data}" not found`);
-      }
-      return selectedChat;
+
+      // Return null if chat not found - this is valid for new chats
+      return selectedChat ?? null;
     } catch (error) {
       console.error("Error getting chat by ID:", error);
       throw new Error("Failed to get chat by ID");
