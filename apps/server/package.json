@@ -18,7 +18,6 @@
     "db:down": "docker compose down"
   },
   "dependencies": {
-    "better-auth": "^1.3.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.2",
