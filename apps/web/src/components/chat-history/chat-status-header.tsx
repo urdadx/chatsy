@@ -2,7 +2,7 @@ import { Button } from "../ui/button";
 import Spinner from "../ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
-type ConnectionStatus = "connected" | "connecting" | "disconnected" | "error" | "idle";
+type ConnectionStatus = "connected" | "connecting" | "disconnected" | "error" | "idle" | "waiting";
 
 interface ChatStatusHeaderProps {
   status: ConnectionStatus;

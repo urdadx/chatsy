@@ -94,8 +94,6 @@ export function useChatWebSocket({
     if (wsUrl) return wsUrl;
 
     if (typeof window !== "undefined") {
-      const protocol = location.protocol === "https:" ? "wss:" : "ws:";
-
       if (process.env.NODE_ENV === "development") {
         return "ws://localhost:3000/ws";
       }
