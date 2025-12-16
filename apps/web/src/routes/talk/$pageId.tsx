@@ -1,3 +1,4 @@
+import { AgentStatusBanner } from "@/components/chat/agent-status-banner";
 import { ChatBody } from "@/components/chat/chat-body";
 import { ChatFooter } from "@/components/chat/chat-footer";
 import { ChatHeader } from "@/components/chat/chat-header";
@@ -267,6 +268,8 @@ function TalkPageContent({ chatId, resetChat }: TalkPageContentProps): JSX.Eleme
 
   const isEscalated = chatData?.status === "escalated";
 
+  const [agentStatus, setAgentStatus] = useState<"connected" | "disconnected" | "idle">("idle");
+
   const { playConnectedSound, playDisconnectedSound, playMessageSound } = useNotificationSounds();
 
   const {
@@ -281,14 +284,14 @@ function TalkPageContent({ chatId, resetChat }: TalkPageContentProps): JSX.Eleme
     chatId: chatId,
     role: "user",
     onError: () => {
-      toast.error("Connection error");
+      console.log("WebSocket connection error");
     },
     onAgentJoined: () => {
-      // Play connected sound when an agent joins the chat
+      setAgentStatus("connected");
       playConnectedSound();
     },
     onAgentLeft: () => {
-      // Play disconnected sound when an agent leaves the chat
+      setAgentStatus("disconnected");
       playDisconnectedSound();
     },
     onMessage: (message) => {
@@ -302,7 +305,6 @@ function TalkPageContent({ chatId, resetChat }: TalkPageContentProps): JSX.Eleme
         },
       };
 
-      // Play message sound for incoming messages from agent (human role)
       if (message.role === "human") {
         playMessageSound();
       }
@@ -346,7 +348,9 @@ function TalkPageContent({ chatId, resetChat }: TalkPageContentProps): JSX.Eleme
             if (errorData.error?.includes("offline")) {
               dispatchUiState({ type: "SET_DEACTIVATED", payload: true });
             }
-          } catch (e) { }
+          } catch (e) {
+            console.log("Failed to parse error response:", e);
+          }
         }
 
         return response;
@@ -373,19 +377,13 @@ function TalkPageContent({ chatId, resetChat }: TalkPageContentProps): JSX.Eleme
   });
 
 
-  // Track the current chatId to prevent restoring messages after reset
   const chatIdRef = useRef(chatId);
 
   useEffect(() => {
-    // When chatId changes (e.g., after reset), update ref and clear messages if it's a new chat
     if (chatIdRef.current !== chatId) {
-      // ChatId changed - this is a new/reset chat
       chatIdRef.current = chatId;
-      // Don't restore old messages for a new chat
       return;
     }
-
-    // Only sync messages if we're on the same chat session and have messages to restore
     if (initialMessages.length > 0 && messages.length === 0) {
       setMessages(initialMessages);
     }
@@ -466,6 +464,13 @@ function TalkPageContent({ chatId, resetChat }: TalkPageContentProps): JSX.Eleme
               resetIcon="refresh"
               className="flex-shrink-0"
             />
+
+            {isEscalated && agentStatus !== "idle" && (
+              <AgentStatusBanner
+                status={agentStatus}
+                onDismiss={() => setAgentStatus("idle")}
+              />
+            )}
 
             <ChatBody
               isLoading={isLoading}

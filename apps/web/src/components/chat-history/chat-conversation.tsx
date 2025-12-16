@@ -3,6 +3,7 @@ import { useChatWebSocket } from "@/hooks/use-chat-websocket";
 import { useMessages } from "@/hooks/use-db-messages";
 import { useNotificationSounds } from "@/hooks/use-notification-sounds";
 import { useSession } from "@/lib/auth-client";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { convertToUIMessages } from "../chat/convert-to-ui-message";
@@ -16,7 +17,6 @@ import {
 } from "../ui/chat-container";
 import { Input } from "../ui/input";
 import { InputEmojiPicker } from "../ui/input-emoji-picker";
-import { SafeBoringAvatar } from "../ui/safe-boring-avatar";
 import { ScrollButton } from "../ui/scroll-button";
 import Spinner from "../ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
@@ -48,6 +48,7 @@ export const ChatConversation = () => {
   const [hasJoined, setHasJoined] = useState(false);
 
   const { playMessageSound } = useNotificationSounds();
+  const queryClient = useQueryClient();
 
   // Reset hasJoined when chatId changes
   useEffect(() => {
@@ -74,6 +75,11 @@ export const ChatConversation = () => {
     if (!hasJoined) {
       connect();
       setHasJoined(true);
+      queryClient.invalidateQueries({
+        queryKey: ["chat-logs"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
       return;
     }
 
@@ -97,7 +103,12 @@ export const ChatConversation = () => {
     disconnect();
     setHasJoined(false);
     setDraft("");
-  }, [disconnect]);
+    queryClient.invalidateQueries({
+      queryKey: ["chat-logs"],
+      exact: false,
+    });
+    queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
+  }, [disconnect, queryClient, chatId]);
 
   return (
     <div className="relative flex-1 h-full flex flex-col min-h-0">
@@ -148,7 +159,6 @@ export const ChatConversation = () => {
                 ))}
                 {isTyping && (
                   <div className="flex items-center gap-2">
-                    <SafeBoringAvatar name="user" size={32} className="mb-2" />
                     <TypingIndicator
                       label="User is typing..."
                       className="px-1"

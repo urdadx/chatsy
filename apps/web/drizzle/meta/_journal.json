@@ -78,6 +78,13 @@
       "when": 1756936670680,
       "tag": "0010_clean_nighthawk",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1765894548470,
+      "tag": "0011_sticky_the_watchers",
+      "breakpoints": true
     }
   ]
 }

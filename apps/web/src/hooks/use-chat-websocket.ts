@@ -5,7 +5,8 @@ export type WebSocketStatus =
   | "connecting"
   | "connected"
   | "disconnected"
-  | "error";
+  | "error"
+  | "waiting";
 
 export interface UseChatWebSocketOptions {
   chatId: string;

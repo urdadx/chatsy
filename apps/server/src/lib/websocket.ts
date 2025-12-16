@@ -120,8 +120,14 @@ export function createWebSocketServer(server: http.Server) {
               } satisfies WSOutbound),
             );
 
-            // If an agent leaves, notify other clients (users) in the room
+            // If an agent leaves, update chat status and notify other clients
             if (leavingRole === "agent" && leavingChatId) {
+              // Set chat status to unresolved so user can talk with AI bot
+              await db
+                .update(schema.chat)
+                .set({ status: "unresolved" })
+                .where(eq(schema.chat.id, leavingChatId));
+
               broadcast(
                 leavingChatId,
                 {
@@ -178,12 +184,18 @@ export function createWebSocketServer(server: http.Server) {
       }
     });
 
-    ws.on("close", () => {
+    ws.on("close", async () => {
       if (currentChatId) {
         rooms.get(currentChatId)?.delete(ws);
 
-        // If an agent disconnects, notify other clients (users) in the room
+        // If an agent disconnects, update chat status and notify other clients
         if (currentRole === "agent") {
+          // Set chat status to unresolved so user can talk with AI bot
+          await db
+            .update(schema.chat)
+            .set({ status: "unresolved" })
+            .where(eq(schema.chat.id, currentChatId));
+
           broadcast(currentChatId, {
             type: "agent_left",
             chatId: currentChatId,

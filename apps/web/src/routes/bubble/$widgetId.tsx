@@ -1,3 +1,4 @@
+import { AgentStatusBanner } from "@/components/chat/agent-status-banner";
 import { ChatBody } from "@/components/chat/chat-body";
 import { ChatFooter } from "@/components/chat/chat-footer";
 import { ChatHeader } from "@/components/chat/chat-header";
@@ -190,6 +191,8 @@ function BubbleWidgetContent({ chatId, resetChat }: BubbleWidgetContentProps) {
 
   const isEscalated = chatData?.status === "escalated";
 
+  const [agentStatus, setAgentStatus] = useState<"connected" | "disconnected" | "idle">("idle");
+
   const { playConnectedSound, playDisconnectedSound, playMessageSound } = useNotificationSounds();
 
   const {
@@ -205,14 +208,13 @@ function BubbleWidgetContent({ chatId, resetChat }: BubbleWidgetContentProps) {
     role: "user",
     onError: (err) => {
       console.error("WebSocket error:", err);
-      toast.error(`Connection error: ${err}`);
     },
     onAgentJoined: () => {
-      // Play connected sound when an agent joins the chat
+      setAgentStatus("connected");
       playConnectedSound();
     },
     onAgentLeft: () => {
-      // Play disconnected sound when an agent leaves the chat
+      setAgentStatus("disconnected");
       playDisconnectedSound();
     },
     onMessage: (message) => {
@@ -442,6 +444,13 @@ function BubbleWidgetContent({ chatId, resetChat }: BubbleWidgetContentProps) {
             showBackButton={true}
             resetIcon="rotate"
           />
+
+          {isEscalated && agentStatus !== "idle" && (
+            <AgentStatusBanner
+              status={agentStatus}
+              onDismiss={() => setAgentStatus("idle")}
+            />
+          )}
 
           <ChatBody
             isLoading={isLoading}

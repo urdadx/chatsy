@@ -14,7 +14,7 @@ export const TypingIndicator = ({
 }: TypingIndicatorProps) => {
   return (
     <Message from="assistant" className={className}>
-      <MessageAvatar src={avatarSrc || "/placeholder-avatar.png"} name={name} />
+      <MessageAvatar src={avatarSrc} name={name} />
       <MessageContent variant="flat">
         <div className="flex items-center gap-2 text-muted-foreground text-sm py-1">
           <div className="flex gap-1">
