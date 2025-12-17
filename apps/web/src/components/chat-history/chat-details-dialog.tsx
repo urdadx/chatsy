@@ -1,10 +1,10 @@
+import { osCodes } from "@/constants/os"
 import { getChatById } from "@/lib/server-functions/chat-queries"
 import type { ChatData, ChatMetaData } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { useQuery } from "@tanstack/react-query"
 import { format } from "date-fns"
-import { Info } from "lucide-react"
-import { Badge } from "../ui/badge"
+import { HelpCircle, Info, Monitor, Smartphone, Tablet } from "lucide-react"
 import { Button } from "../ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
 
@@ -97,12 +97,36 @@ export const ChatDetailsDialog = ({ chatId }: { chatId?: string }) => {
                     <div className="flex items-center justify-between">
                       <span className="text-base font-medium text-muted-foreground">Device information</span>
                       <div className="flex gap-2">
-                        <Badge variant="outline">{metadata.device.type}</Badge>
+                        {metadata.device.type === "mobile" ? (
+                          <Smartphone className="w-4 h-4" />
+                        ) : metadata.device.type === "tablet" ? (
+                          <Tablet className="w-4 h-4" />
+                        ) : metadata.device.type === "desktop" ? (
+                          <Monitor className="w-4 h-4" />
+                        ) : (
+                          <HelpCircle className="w-4 h-4" />
+                        )}
                         {metadata.device.os !== "unknown" && (
-                          <Badge variant="outline">{metadata.device.os}</Badge>
+                          <img
+                            src={`/public/os/${osCodes[metadata.device.os as keyof typeof osCodes] || metadata.device.os.toUpperCase()}.png`}
+                            alt={metadata.device.os}
+                            className="w-4 h-4"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
                         )}
                         {metadata.device.browser !== "unknown" && (
-                          <Badge variant="outline">{metadata.device.browser}</Badge>
+                          <img
+                            src={`/public/browser/${metadata.device.browser.toLowerCase()}.png`}
+                            alt={metadata.device.browser}
+                            className="w-4 h-4"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
                         )}
                       </div>
                     </div>

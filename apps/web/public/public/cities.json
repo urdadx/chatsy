@@ -4804,6 +4804,7 @@
   {"name":"Caceres","lat":"-16.05","lng":"-57.51","country":"Brazil","countryCode":"BR"},
   {"name":"Bento Goncalves","lat":"-29.1695","lng":"-51.52","country":"Brazil","countryCode":"BR"},
   {"name":"Santo Andre","lat":"-23.6528","lng":"-46.5278","country":"Brazil","countryCode":"BR"},
+  {"name":"Diadema","lat":"-23.6528","lng":"-46.5278","country":"Brazil","countryCode":"BR"},
   {"name":"Bage","lat":"-31.32","lng":"-54.1","country":"Brazil","countryCode":"BR"},
   {"name":"Caracarai","lat":"1.8162","lng":"-61.1277","country":"Brazil","countryCode":"BR"},
   {"name":"Concordia","lat":"-27.23","lng":"-52.03","country":"Brazil","countryCode":"BR"},
@@ -6302,6 +6303,7 @@
   {"name":"Hradec Kralove","lat":"50.206","lng":"15.812","country":"Czechia","countryCode":"CZ"},
   {"name":"Zlin","lat":"49.2304","lng":"17.65","country":"Czechia","countryCode":"CZ"},
   {"name":"Berlin","lat":"52.5218","lng":"13.4015","country":"Germany","countryCode":"DE"},
+  {"name":"Sörup","lat":"52.5218","lng":"13.4015","country":"Germany","countryCode":"DE"},
   {"name":"Cologne","lat":"50.93","lng":"6.95","country":"Germany","countryCode":"DE"},
   {"name":"Munich","lat":"48.1299","lng":"11.575","country":"Germany","countryCode":"DE"},
   {"name":"Potsdam","lat":"52.4004","lng":"13.07","country":"Germany","countryCode":"DE"},
@@ -7057,6 +7059,7 @@
   {"name":"Saint Peter Port","lat":"49.4561","lng":"-2.5408","country":"Guernsey","countryCode":"GG"},
   {"name":"Ho","lat":"6.6004","lng":"0.47","country":"Ghana","countryCode":"GH"},
   {"name":"Bolgatanga","lat":"10.7904","lng":"-0.85","country":"Ghana","countryCode":"GH"},
+  {"name":"Medina Estates","lat":"10.7904","lng":"-0.85","country":"Ghana","countryCode":"GH"},
   {"name":"Yendi","lat":"9.4337","lng":"-0.0167","country":"Ghana","countryCode":"GH"},
   {"name":"Tamale","lat":"9.4004","lng":"-0.84","country":"Ghana","countryCode":"GH"},
   {"name":"Sunyani","lat":"7.336","lng":"-2.336","country":"Ghana","countryCode":"GH"},
@@ -8089,6 +8092,7 @@
   {"name":"Al Ahmadi","lat":"29.0769","lng":"48.0838","country":"Kuwait","countryCode":"KW"},
   {"name":"Al Jahra","lat":"29.3375","lng":"47.6581","country":"Kuwait","countryCode":"KW"},
   {"name":"Kuwait","lat":"29.3697","lng":"47.9783","country":"Kuwait","countryCode":"KW"},
+  {"name":"Al Farwānīyah","lat":"29.3697","lng":"47.9783","country":"Kuwait","countryCode":"KW"},
   {"name":"George Town","lat":"19.2804","lng":"-81.33","country":"Cayman Islands","countryCode":"KY"},
   {"name":"Pago Pago","lat":"-14.274","lng":"-170.7046","country":"American Samoa","countryCode":"AS"},
   {"name":"Hagta","lat":"13.4745","lng":"144.7504","country":"Guam","countryCode":"GU"},
@@ -12958,4 +12962,6 @@
   {"name":"Brandon","lat":"43.5928","lng":"-96.5799","country":"United States","countryCode":"US"},
   {"name":"Madison","lat":"44.0062","lng":"-97.1084","country":"United States","countryCode":"US"},
   {"name":"Belle Fourche","lat":"44.664","lng":"-103.8564","country":"United States","countryCode":"US"}
+  {"name":"Ashburn","lat":"44.664","lng":"-103.8564","country":"United States","countryCode":"US"}
+  {"name":"Osage Beach","lat":"44.664","lng":"-103.8564","country":"United States","countryCode":"US"}
   ]

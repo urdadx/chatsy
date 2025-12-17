@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCountryCodeFromCity, getCountryFromCode } from "@/constants/counties";
+import { decodeLatin1ToUtf8 } from "@/lib/utils";
 import { Maximize2, MousePointerClick } from "lucide-react";
 import { useMemo } from "react";
 import { useState } from "react";
@@ -30,6 +31,8 @@ export function ChatsByCountry({
 
   const analytics = propVisitorData;
 
+  console.log(decodeLatin1ToUtf8('Al FarwÄnÄ«yah'))
+
   const { countryStats, cityStats, continentStats } = useMemo(() => {
     const countryMap: Record<string, number> = {};
     const cityMap: Record<string, number> = {};
@@ -39,7 +42,8 @@ export function ChatsByCountry({
         countryMap[row.country] = (countryMap[row.country] || 0) + 1;
       }
       if (row.city) {
-        cityMap[row.city] = (cityMap[row.city] || 0) + 1;
+        const decodedCity = decodeLatin1ToUtf8(row.city);
+        cityMap[decodedCity] = (cityMap[decodedCity] || 0) + 1;
       }
       if (row.continent) {
         continentMap[row.continent] = (continentMap[row.continent] || 0) + 1;

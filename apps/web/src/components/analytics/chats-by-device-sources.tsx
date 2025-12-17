@@ -108,8 +108,12 @@ export function ChatsByDeviceSources({
 
   const allOperatingSystems = metrics
     ? metrics.operatingsystems.map((os: any) => {
-      const osCode =
-        osCodes[os.osName as keyof typeof osCodes];
+      let osName = os.osName;
+      // Handle macOS exception
+      if (osName === "macOS") {
+        osName = "MAC";
+      }
+      const osCode = osCodes[osName as keyof typeof osCodes];
       const isUnknown = !osCode || os.osName === "Unknown" || !os.osName;
       const iconSrc = `../../../public/os/${osCode}.png`;
       const icon = isUnknown ? (

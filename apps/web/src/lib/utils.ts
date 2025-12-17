@@ -555,3 +555,7 @@ export async function extractOpenGraphInfo(link: string): Promise<{
     };
   }
 }
+
+export function decodeLatin1ToUtf8(str: string): string {
+  return decodeURIComponent(escape(str));
+}

@@ -1,3 +1,4 @@
+import { decodeLatin1ToUtf8 } from "../lib/utils";
 import citiesData from "./cities.json";
 
 interface CityData {
@@ -210,7 +211,8 @@ export const getCountryFromCode = (countryCode: string): string | null => {
 const cityToCountryCodeMap = new Map<string, string>();
 
 citiesData.forEach((city: CityData) => {
-  cityToCountryCodeMap.set(city.name.toLowerCase(), city.countryCode);
+  const decodedName = decodeLatin1ToUtf8(city.name);
+  cityToCountryCodeMap.set(decodedName.toLowerCase(), city.countryCode);
 });
 
 export const getCountryCodeFromCity = (cityName: string): string | null => {
