@@ -46,7 +46,7 @@ export function ViewAllStats({
     <Dialog open={dialogOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="w-[500px] max-h-[80vh] ">
         <DialogHeader className="pb-2">
-          <DialogTitle className="text-2xl font-semibold capitalize">
+          <DialogTitle className="text-xl font-semibold capitalize">
             All {name}
           </DialogTitle>
           <DialogDescription className="mb-2">
