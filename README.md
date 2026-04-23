@@ -1,6 +1,7 @@
 # Padyna: AI customer support bot for everyone
 
-This is an AI-powered customer support application with a web interface and server backend.
+Padyna is an AI-powered customer support for businesses. Train your AI agent using your own business data (files, document, FAQs, Youtube etc) and let the AI agent handle support for you.
+Escalate to human when agent cant respond to questions by customers.
 
 ## Prerequisites
 
@@ -50,13 +51,6 @@ cp apps/web/.env.example apps/web/.env
 **apps/web/.env:**
 - `VITE_SERVER_URL` — Server API URL (e.g., http://localhost:3000)
 - `DATABASE_URL` — Same as server DATABASE_URL
-
-### Optional: WhatsApp Integration
-
-To enable WhatsApp support, add to `.env.whatsapp`:
-- `WHATSAPP_APP_ID` — From Meta Developer Portal
-- `WHATSAPP_APP_SECRET` — From Meta Developer Portal
-- `WHATSAPP_WEBHOOK_VERIFY_TOKEN` — Your chosen verify token
 
 ## Tech Stack
 
